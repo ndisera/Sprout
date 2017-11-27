@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="well login-box">
-                    <form action="" ng-submit="attemptLogin($event)">
+                    <form action="" ng-submit="attemptLogin()">
                         <h1>Login</h1>
                         <hr />
                         <div class="form-group">
@@ -91,7 +91,7 @@
             </div>
         </div>
     </nav>
-    <div id="main">
+    <div id="main" ng-show="loggedIn" ng-cloak>
         <div ng-view></div>
     </div>
 

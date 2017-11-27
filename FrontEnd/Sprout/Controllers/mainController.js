@@ -1,18 +1,22 @@
 ﻿app.controller('mainController', function ($scope, $location) {
 
-    $scope.loggedIn = false;
+    $scope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"))
+    if ($scope.loggedIn === null)
+        $scope.loggedIn = false;
 
-    $scope.attemptLogin = function (event) {
+    $scope.attemptLogin = function () {
         if (($scope.username === "ndisera" || $scope.username === "sredman" || $scope.username === "gwatson" || $scope.username === "gzuber") && $scope.password === "password") {
             $scope.loggedIn = true;
+            localStorage.setItem("loggedIn", true);
         }
         $scope.username = "";
         $scope.password = "";
-        event.preventDefault();
     };
 
     $scope.logout = function () {
         $scope.loggedIn = false;
+        localStorage.setItem("loggedIn", false);
+        $location.path('')
     }
 
     $(document).ready(function () {
