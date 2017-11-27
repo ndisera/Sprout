@@ -94,10 +94,12 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\login.css" />
     <Content Include="Content\student.css" />
-    <Content Include="Controllers\fsController.js" />
+    <Content Include="Controllers\focusStudentsController.js" />
     <Content Include="Controllers\homeController.js" />
     <Content Include="Controllers\mainController.js" />
+    <Content Include="Controllers\scoresInputController.js" />
     <Content Include="Controllers\settingsController.js" />
     <Content Include="Controllers\studentController.js" />
     <Content Include="packages.config" />
@@ -121,7 +123,6 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\navbar.css" />
-    <Content Include="Controllers\loginController.js" />
     <Content Include="Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Images\seeds-clipart-tree-sprout-6.png" />
     <Content Include="Images\Twenty_One_Pilots_album_cover.jpg" />
@@ -135,7 +136,7 @@
     <Content Include="index.html" />
     <Content Include="Views\focusStudents.html" />
     <Content Include="Views\home.html" />
-    <Content Include="Views\login.html" />
+    <Content Include="Views\scoresInput.html" />
     <Content Include="Views\settings.html" />
     <Content Include="Views\student.html" />
     <Content Include="Web.config" />

@@ -9,13 +9,25 @@ app.config(function ($routeProvider) {
             controller: 'homeController'
         })
 
-        // route for the login page
-        .when('/login', {
-            templateUrl: 'Views/login.html',
-            controller: 'loginController'
+        // route for the settings page
+        .when('/settings', {
+            templateUrl: 'Views/settings.html',
+            controller: 'settingsController'
         })
 
-        // route for the contact page
+        // route for the focus students page
+        .when('/focus', {
+            templateUrl: 'Views/focusStudents.html',
+            controller: 'focusStudentsController'
+        })
+
+        // route for the input scores page
+        .when('/scores', {
+            templateUrl: 'Views/scoresInput.html',
+            controller: 'scoresInputController'
+        })
+
+        // route for the student profile page
         .when('/student', {
             templateUrl: 'Views/student.html',
             controller: 'studentController'
