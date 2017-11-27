@@ -5,11 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="Content/bootstrap.min.css">
+    <link rel="stylesheet" href="Content/datepicker.css" />
     <link rel="stylesheet" href="Content/navbar.css" />
     <link rel="stylesheet" href="Content/student.css" />
     <link rel="stylesheet" href="Content/login.css" />
+    <link rel="stylesheet" href="Content/app.css" />
     <script src="Scripts/jquery-3.2.1.min.js"></script>
     <script src="Scripts/bootstrap.min.js"></script>
+    <script src="Scripts/bootstrap-datepicker.js"></script>
     <script src="Scripts/angular.min.js"></script>
     <script src="Scripts/angular-route.min.js"></script>
 </head>
@@ -24,7 +27,7 @@
                         <hr />
                         <div class="form-group">
                             <label for="username">Username</label>
-                            <input ng-model="username" placeholder="Username" type="text" class="form-control" />
+                            <input autofocus ng-model="username" placeholder="Username" type="text" class="form-control" />
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>

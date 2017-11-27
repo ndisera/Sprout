@@ -44,13 +44,22 @@
                 <p>
                     This should let the coordinator select a date and enter behavior/effort scores for each of that student's classes
                 </p>
-                <form>
+                <form class="form-inline" action="" ng-submit="attemptLogin()">
+                    <form-group>
+                        <label for="date">For date: </label>
+                        <div class="input-group date" data-provide="datepicker">
+                            <input ng-model="behaviorDate" type="text" class="form-control" id="datepicker">
+                        </div>
+                        <input type="submit" class="btn btn-success" value="Submit" />
+                    </form-group>
+                </form>
+                <!--<form>
                     Birthday:
                     <input type="date" name="bday">
                     <input type="submit">
-                </form>
+                </form>-->
             </div>
-            <div id="behavior_view" class="student_behavior">
+            <!--<div id="behaviorView" class="studentBehavior">
                 <ul class="nav nav-tabs">
                     <li class="active">
                         <a data-toggle="tab" data-target="#behaviorViewAvg">Average</a>
@@ -72,7 +81,7 @@
                 <p>
                     This should let the coordinator see the student's average/high/low scores for the past week
                 </p>
-            </div>
+            </div>-->
         </div>
         <div id="goals" class="tab-pane fade">
             <h3>IEP Goals</h3>

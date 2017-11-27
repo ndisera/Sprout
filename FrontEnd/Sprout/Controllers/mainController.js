@@ -17,7 +17,12 @@
         $scope.loggedIn = false;
         localStorage.setItem("loggedIn", false);
         $location.path('')
-    }
+    };
+
+    // for autofocus in ie
+    $(function () {
+        $('[autofocus]:not(:focus)').eq(0).focus();
+    });
 
     $(document).ready(function () {
         $(".navbar-toggle").on("click", function () {
