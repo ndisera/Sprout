@@ -1,1 +1,8 @@
+# virtualenv stuff
 env/
+
+# database stuff
+*.sqlite3
+
+# compiled stuffs
+*.pyc
