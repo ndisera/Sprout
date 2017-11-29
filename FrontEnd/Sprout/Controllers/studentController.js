@@ -7,6 +7,13 @@
         format: "mm/dd/yyyy"
     });
 
+    function defaultDate() {
+        date = new Date();
+        $scope.behaviorDate = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
+    }
+
+    defaultDate();
+
     $scope.records = [
     {
         "Name": "Math",
