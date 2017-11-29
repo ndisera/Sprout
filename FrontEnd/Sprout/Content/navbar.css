@@ -9,6 +9,10 @@
     height: 50px;
 }
 
+#profileDropdown {
+    cursor: pointer;
+}
+
 @media (min-width: 0px) {
     #sproutLogo {
         margin-left: 15px;

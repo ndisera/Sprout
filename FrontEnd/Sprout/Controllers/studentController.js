@@ -47,11 +47,14 @@
     }
     ];
 
-    $scope.changeDate = function (event) {
-        event.preventDefault();
+    $scope.changeDate = function () {
         // set select boxes back to one
         var temp = "";
         $(".effortScore").val("");
         $(".behaviorScore").val("");
     }
+
+    $('#datepicker').datepicker().on('changeDate', function (ev) {
+        $scope.changeDate();
+    });
 });
