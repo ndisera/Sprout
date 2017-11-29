@@ -76,11 +76,11 @@
                             <img id="userPic" src="Images/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
-                            <li ng-click="logout()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                            <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
+                            <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
+                            <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
+                            <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                            <li ng-click="logout(); clearSearch()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                         </ul>
                     </li>
                 </ul>
