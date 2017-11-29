@@ -1,8 +1,17 @@
-# virtualenv stuff
+# virtualenv stuffs
 env/
 
-# database stuff
+# database stuffs
 *.sqlite3
 
 # compiled stuffs
 *.pyc
+
+# pycharm stuffs
+.idea/
+
+# vim stuffs
+*.swp
+
+# mac stuffs
+.DS_Store
