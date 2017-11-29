@@ -6,11 +6,11 @@ cd to <Repo>/BackEnd
 
 Run command `virtualenv env`
 
-We are going to activate the virtual environment. This needs to happen every time before working on the BackEnd
+> We are going to activate the virtual environment. This needs to happen every time before working on the BackEnd
 
-Run: `source env/bin/activate`
+> Run: `source env/bin/activate`
 
-(In order to deactivate, run `deactivate`)
+> (In order to deactivate, run `deactivate`)
 
 Run `pip install django djangorestframework`
 
