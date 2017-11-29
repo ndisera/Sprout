@@ -15,3 +15,7 @@
 .nav-tabs, .nav-pills {
     text-align:center;
 }
+
+.nav-tabs li, .nav-pills li {
+    cursor: pointer;
+}
