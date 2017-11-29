@@ -1,19 +1,49 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Bootstrap Example</title>
+    <title>Sprout</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="Content/bootstrap.min.css">
+    <link rel="stylesheet" href="Content/datepicker.css" />
     <link rel="stylesheet" href="Content/navbar.css" />
     <link rel="stylesheet" href="Content/student.css" />
+    <link rel="stylesheet" href="Content/login.css" />
+    <link rel="stylesheet" href="Content/app.css" />
     <script src="Scripts/jquery-3.2.1.min.js"></script>
     <script src="Scripts/bootstrap.min.js"></script>
+    <script src="Scripts/bootstrap-datepicker.js"></script>
     <script src="Scripts/angular.min.js"></script>
     <script src="Scripts/angular-route.min.js"></script>
 </head>
 <body ng-app="app" ng-controller="mainController">
-    <nav class="navbar navbar-inverse navbar-fixed-top">
+
+    <div class="container" ng-hide="loggedIn" ng-cloak>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="well login-box">
+                    <form action="" ng-submit="attemptLogin()">
+                        <h1>Login</h1>
+                        <hr />
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input autofocus ng-model="username" placeholder="Username" type="text" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input ng-model="password" placeholder="Password" type="password" class="form-control" />
+                        </div>
+                        <div class="form-group text-center">
+                            <button class="btn btn-danger btn-cancel-action">Cancel</button>
+                            <input type="submit" class="btn btn-success btn-login-submit" value="Login" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" ng-show="loggedIn" ng-cloak>
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -21,7 +51,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="#" class="navbar-left"><img id="sproutLogo" src="Images/seeds-clipart-tree-sprout-6.png"></a>
+                <a href="#" class="navbar-left" ng-click="clearSearch()"><img id="sproutLogo" src="Images/seeds-clipart-tree-sprout-6.png"></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <form class="navbar-form navbar-left" ng-submit="getProfile()">
@@ -46,25 +76,25 @@
                             <img id="userPic" src="Images/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                            <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
+                            <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
+                            <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
+                            <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                            <li ng-click="logout(); clearSearch()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                         </ul>
                     </li>
                 </ul>
                 <ul class="nav navbar-nav hidden-sm hidden-md hidden-lg hidden-xl">
-                    <li><a href="#"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
-                    <li><a href="#"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
+                    <li><a href="#focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
+                    <li><a href="#scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
                     <li><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
-                    <li><a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                    <li><a href="#settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
                     <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                 </ul>
             </div>
         </div>
     </nav>
-    <div id="main">
+    <div id="main" ng-show="loggedIn" ng-cloak>
         <div ng-view></div>
     </div>
 
@@ -72,5 +102,8 @@
     <script src="Controllers/mainController.js"></script>
     <script src="Controllers/loginController.js"></script>
     <script src="Controllers/studentController.js"></script>
+    <script src="Controllers/focusStudentsController.js"></script>
+    <script src="Controllers/settingsController.js"></script>
+    <script src="Controllers/scoresInputController.js"></script>
 </body>
 </html>
