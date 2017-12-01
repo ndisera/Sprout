@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sprout", "Sprout\Sprout.csproj", "{FE1ADCB2-D10C-4D89-B2C5-8C38C2616496}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sprout", "public\Sprout.csproj", "{FE1ADCB2-D10C-4D89-B2C5-8C38C2616496}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
