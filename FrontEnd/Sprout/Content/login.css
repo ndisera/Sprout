@@ -1,13 +1,15 @@
 ﻿.well.login-box {
-    margin:0 auto;
+    margin: 0 auto;
     max-width: 500px;
 }
-.well.login-box h1 {
-  font-size:26px;
-  text-align:center;
-  font-weight:300;
-}
-.well.login-box label {
-  font-weight:300;
-  font-size:16px;
-}
+
+    .well.login-box h1 {
+        font-size: 26px;
+        text-align: center;
+        font-weight: 300;
+    }
+
+    .well.login-box label {
+        font-weight: 300;
+        font-size: 16px;
+    }
