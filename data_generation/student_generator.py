@@ -15,6 +15,35 @@ class StudentGenerator(object):
         self.port_num = port_num
         self.url_port = str(self.url) + ":" + str(self.port_num) + "/student/"
 
+    def upload_random_student(self,
+                              first_names,
+                              last_names,
+                              birthdate_range_start=datetime.date(2006, 9, 1),
+                              birthdate_range_end=datetime.date(2008, 9, 1)):
+        """Generate and upload a random student based on the passed parameters
+
+        :param first_names:
+        :type first_names: list of strings
+        :param last_names:
+        :type last_names: list of strings
+        :param birthdate_range_start:
+        :type birthdate_range_start: datetime.date
+        :param birthdate_range_end:
+        :type birthdate_range_end: datetime.date
+        :return:
+        """
+        first_name = random.choice(first_names)
+        last_name = random.choice(last_names)
+
+        date_range_size = birthdate_range_end - birthdate_range_start
+
+        random_date_delta = random.randint(0, date_range_size.days)
+
+        birthdate = birthdate_range_start + datetime.timedelta(random_date_delta)
+
+        self.upload_student(first_name, last_name, birthdate)
+
+
     def upload_developer_information(self):
         self.upload_student(first_name="Nico",
                             last_name="DiSera",
@@ -55,3 +84,4 @@ class StudentGenerator(object):
 if __name__ == "__main__":
     generator = StudentGenerator()
     generator.upload_developer_information()
+    generator.upload_random_student(["simon", "guy"], ["watson", "redman"])
