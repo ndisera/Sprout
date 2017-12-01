@@ -135,6 +135,7 @@
     <Content Include="Scripts\bootstrap-datepicker.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\Chart.bundle.min.js" />
     <Content Include="Scripts\jquery-3.2.1.min.js" />
     <Content Include="index.html" />
     <Content Include="Views\focusStudents.html" />
