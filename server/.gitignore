@@ -1,4 +1,5 @@
 # virtualenv stuffs
+../env/
 env/
 
 # database stuffs
@@ -9,6 +10,7 @@ env/
 
 # pycharm stuffs
 .idea/
+../.idea/
 
 # vim stuffs
 *.swp

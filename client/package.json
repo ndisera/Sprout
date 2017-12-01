@@ -1,0 +1,7 @@
+{
+  "name": "sprout-client",
+  "description": "Sprout",
+  "dependencies": {
+    "express": "4"
+  }
+}
