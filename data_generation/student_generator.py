@@ -15,6 +15,37 @@ class StudentGenerator(object):
         self.port_num = port_num
         self.url_port = str(self.url) + ":" + str(self.port_num) + "/student/"
 
+    def upload_many_random_students(self,
+                                    num_students,
+                                    first_names_file="./first_names.txt",
+                                    last_names_file="./last_names.txt",
+                                    birthdate_range_start=datetime.date(2006, 9, 1),
+                                    birthdate_range_end=datetime.date(2008, 9, 1)):
+        """Upload a specified number of students by reading first and last names from text files
+
+        :param num_students: Number of students to upload
+        :type num_students: int
+        :param first_names_file:
+        :param last_names_file:
+        :param birthdate_range_start:
+        :type birthdate_range_start: datetime.date
+        :param birthdate_range_end:
+        :type birthdate_range_end: datetime.date
+        :return: void
+        """
+        with open(first_names_file, 'r') as first_names_file:
+            with open(last_names_file, 'r') as last_names_file:
+                first_names = first_names_file.read()
+                first_names = first_names.split()
+                last_names = last_names_file.read()
+                last_names = last_names.split()
+
+                for i in range(0, num_students):
+                    self.upload_random_student(first_names,
+                                               last_names,
+                                               birthdate_range_start,
+                                               birthdate_range_end)
+
     def upload_random_student(self,
                               first_names,
                               last_names,
@@ -30,7 +61,7 @@ class StudentGenerator(object):
         :type birthdate_range_start: datetime.date
         :param birthdate_range_end:
         :type birthdate_range_end: datetime.date
-        :return:
+        :return: void
         """
         first_name = random.choice(first_names)
         last_name = random.choice(last_names)
@@ -83,5 +114,4 @@ class StudentGenerator(object):
 
 if __name__ == "__main__":
     generator = StudentGenerator()
-    generator.upload_developer_information()
-    generator.upload_random_student(["simon", "guy"], ["watson", "redman"])
+    generator.upload_many_random_students(5)
