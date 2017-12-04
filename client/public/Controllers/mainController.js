@@ -3,6 +3,8 @@
     $scope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"))
     if ($scope.loggedIn === null)
         $scope.loggedIn = false;
+    else if ($scope.loggedIn)
+        $location.path('/focus');
 
     $scope.attemptLogin = function () {
         if (($scope.username === "ndisera" || $scope.username === "sredman" || $scope.username === "gwatson" || $scope.username === "gzuber") && $scope.password === "password") {
