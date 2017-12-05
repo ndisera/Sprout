@@ -160,14 +160,110 @@ class SectionViewSet(viewsets.ModelViewSet):
             schema=coreschema.Integer(title="Teacher")),
         ]
 
+
+class EnrollmentViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    SectionViewSet class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(EnrollmentViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(EnrollmentViewSet, path, method, link)
+
 class EnrollmentViewSet(viewsets.ModelViewSet):
     """
     """
-    queryset = Enrollment.objects.all()
     serializer_class = EnrollmentSerializer
 
+    query_student = 'student'
+    query_section = 'section'
+    def get_queryset(self):
+        queryset = Enrollment.objects.all()
+        student = self.request.query_params.get(self.query_student, None)
+        section = self.request.query_params.get(self.query_section, None)
+        if student is not None and section is not None:
+            queryset = queryset.filter(student=student, section=section)
+        elif student is not None:
+            queryset = queryset.filter(student=student)
+        elif section is not None:
+            queryset = queryset.filter(section=section)
+        return queryset
 
+    """ schema related class variables """
+    name_student = 'student'
+    name_section = 'section'
+    desc_student_id = 'ID of the student'
+    desc_section_id = 'ID of the section'
+    desc_enrollment_id = 'ID of the enrollment'
+    path_id = 'id'
+    schema = EnrollmentViewSetSchema()
+    list_fields = [
+        coreapi.Field(
+            name=query_student, 
+            location="query", 
+            description="ID of student, used to filter enrollments by student",
+            schema=coreschema.String(title=query_student)),
+        coreapi.Field(
+            name=query_section, 
+            location="query", 
+            description="ID of section, used to filter enrollments by section",
+            schema=coreschema.String(title=query_section)),
+        ]
 
+    create_fields = [
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form", 
+            description=desc_student_id,
+            schema=coreschema.Integer(title=name_student)),
+        coreapi.Field(
+            name=name_section,
+            required=True,
+            location="form", 
+            description=desc_section_id,
+            schema=coreschema.Integer(title=name_section)),
+        ]
+
+    update_fields = [
+        coreapi.Field(
+            name=path_id,
+            required=True,
+            location="path", 
+            description=desc_enrollment_id,
+            schema=coreschema.String()),
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form", 
+            description=desc_student_id,
+            schema=coreschema.Integer(title=name_student)),
+        coreapi.Field(
+            name=name_section, 
+            required=True,
+            location="form", 
+            description=desc_section_id,
+            schema=coreschema.Integer(title=name_section)),
+        ]
+
+    partial_update_fields = [
+        coreapi.Field(
+            name=path_id, 
+            required=True,
+            location="path", 
+            description=desc_enrollment_id,
+            schema=coreschema.String()),
+        coreapi.Field(
+            name=name_student,
+            location="form", 
+            description=desc_student_id,
+            schema=coreschema.Integer(title=name_student)),
+        coreapi.Field(
+            name=name_section, 
+            location="form", 
+            description=desc_section_id,
+            schema=coreschema.Integer(title=name_section)),
+        ]
 
 
 
