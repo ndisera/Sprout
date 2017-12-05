@@ -13,37 +13,20 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-"""
-from django.conf.urls import url
-
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-]
-
-
-
-from django.conf.urls import url
-from django.contrib import admin
-from rest_framework.urlpatterns import format_suffix_patterns
-from api import views
-
-urlpatterns = [
-        url(r'^students/$', views.student_list),
-        url(r'^students/(?P<pk>[0-9]+)/$', views.student_detail),
-]
-
-urlpatterns = format_suffix_patterns(urlpatterns)
-"""
 
 from django.conf.urls import url
 from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
+from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.views import get_swagger_view
-from api.views import StudentViewSet
+from api.views import TeacherViewSet, StudentViewSet, ClassViewSet
 
 router = DefaultRouter()
-router.register(prefix='student', viewset=StudentViewSet)
+router.register(prefix='teachers', viewset=TeacherViewSet, base_name='Teachers')
+router.register(prefix='students', viewset=StudentViewSet, base_name='Students')
+router.register(prefix='classes', viewset=ClassViewSet, base_name='Classes')
 
 urlpatterns = router.urls
 urlpatterns.append(url(r'^docs/', include_docs_urls(title='Sprout API', public=False)))
 urlpatterns.append(url(r'^swagger/', get_swagger_view(title='Sprout API')))
+urlpatterns.append(url(r'^schema/', get_schema_view(title='Sprout Schema')))
