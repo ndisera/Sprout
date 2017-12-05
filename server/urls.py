@@ -19,12 +19,13 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.views import get_swagger_view
-from api.views import TeacherViewSet, StudentViewSet, ClassViewSet
+from api.views import *
 
 router = DefaultRouter()
 router.register(prefix='teachers', viewset=TeacherViewSet, base_name='Teachers')
 router.register(prefix='students', viewset=StudentViewSet, base_name='Students')
-router.register(prefix='classes', viewset=ClassViewSet, base_name='Classes')
+router.register(prefix='sections', viewset=SectionViewSet, base_name='Sections')
+router.register(prefix='enrollments', viewset=EnrollmentViewSet, base_name='Enrollments')
 
 urlpatterns = router.urls
 urlpatterns.append(url(r'^docs/', include_docs_urls(title='Sprout API', public=False)))

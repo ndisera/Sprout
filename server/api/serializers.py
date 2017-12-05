@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.db import models
-from api.models import Teacher, Student, Class
+from api.models import Teacher, Student, Section, Enrollment
 
 class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,7 +12,12 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate')
 
-class ClassSerializer(serializers.ModelSerializer):
+class SectionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Class
+        model = Section
         fields = ('id', 'title', 'teacher')
+
+class EnrollmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Enrollment
+        fields = ('id', 'section', 'student')
