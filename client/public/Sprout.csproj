@@ -109,9 +109,9 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="Fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -126,7 +126,7 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\navbar.css" />
-    <Content Include="Fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Images\seeds-clipart-tree-sprout-6.png" />
     <Content Include="Images\Twenty_One_Pilots_album_cover.jpg" />
     <Content Include="Scripts\ai.0.15.0-build58334.js" />
