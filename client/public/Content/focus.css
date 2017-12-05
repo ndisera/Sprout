@@ -1,0 +1,25 @@
+﻿.panel-placeholder {
+    border: 1px dotted black;
+    border-radius: 4px;
+    margin: 0 15px 20px 15px;
+    padding: 0;
+    height: 50px;
+}
+
+.glyphicon.glyphicon-fire, .glyphicon.glyphicon-alert {
+    font-size:25px;
+    float:right;
+}
+
+.glyphicon.glyphicon-chevron-up, .glyphicon.glyphicon-chevron-down {
+    float:right;
+    cursor:pointer
+}
+
+div .focusProgress, div .focusCaution {
+    min-height:30px;
+}
+
+.focusGraph {
+    min-height:200px;
+}
