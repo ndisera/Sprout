@@ -32,12 +32,21 @@
         <div id="behavior" class="tab-pane fade">
             <h3>Behavior</h3>
             <hr />
-            <div id="behaviorMonthlyGraphic" class="studentBehavior">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-12 focusGraph">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!--<div id="behaviorMonthlyGraphic" class="studentBehavior">
                 <p>
                     This should be a graphic showing the student's behavior and effort over the last month
                 </p>
-                <canvas id="myChart" width="400" height="400"></canvas>
-            </div>
+                <div class="chart-container" style="position: relative; height:40vh; width:80vw;">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>-->
             <div id="behaviorClassGraphic" class="studentBehavior">
                 <p>
                     This should be a graphic showing the student's recent behavior in various classes

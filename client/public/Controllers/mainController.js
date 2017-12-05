@@ -3,7 +3,7 @@
     $scope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"))
     if ($scope.loggedIn === null)
         $scope.loggedIn = false;
-    else if ($scope.loggedIn)
+    else if ($scope.loggedIn && $location.path() == "")
         $location.path('/focus');
 
     $scope.attemptLogin = function () {
