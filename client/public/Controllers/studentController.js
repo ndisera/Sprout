@@ -1,4 +1,14 @@
-﻿app.controller("studentController", function ($scope, $location) {
+﻿app.controller("studentController", function ($scope, $location, $http) {
+
+    $http({
+        method: 'GET',
+        url: 'http://localhost:8000/behaviors/'
+    }).then(function successCallback(response) {
+        $scope.behaviors = response.data;
+    }, function errorCallback(response) {
+        $scope.status = response.status;
+    });
+
     if (!JSON.parse(localStorage.getItem("loggedIn"))) {
         location.path('');
     }
@@ -8,7 +18,7 @@
     });
 
     function defaultDate() {
-        date = new Date();
+        var date = new Date();
         $scope.behaviorDate = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
     }
 

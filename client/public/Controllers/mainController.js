@@ -1,4 +1,17 @@
-﻿app.controller('mainController', function ($scope, $location) {
+﻿app.controller('mainController', function ($scope, $location, $http) {
+
+    $http({
+        method: 'GET',
+        url: 'http://localhost:8000/students/'
+    }).then(function successCallback(response) {
+        $scope.students = response.data;
+        $scope.studentNames = []
+        for (var i = 0; i < $scope.students.length; i++) {
+            $scope.studentNames.push($scope.students[i].first_name + " " + $scope.students[i].last_name);
+        }
+    }, function errorCallback(response) {
+        $scope.status = response.status;
+    });
 
     $scope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"))
     if ($scope.loggedIn === null)
@@ -33,8 +46,12 @@
     });
 
     $scope.getProfile = function () {
-        if ($scope.studentName === "Nico DiSera" || $scope.studentName === "Simon Redman" || $scope.studentName === "Guy Watson" || $scope.studentName === "Graham Zuber")
-            $location.path('/student')
+        for (var i = 0; i < $scope.studentNames.length; i++) {
+            if ($scope.studentNames[i] === $scope.studentName) {
+                $location.path('/student');
+                return;
+            }
+        }
     };
 
     $scope.clearSearch = function () {

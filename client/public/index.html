@@ -62,10 +62,7 @@
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search Students" list="student" name="student" ng-model="studentName">
                         <datalist id="student">
-                            <option value="Nico DiSera">
-                            <option value="Graham Zuber">
-                            <option value="Guy Watson">
-                            <option value="Simon Redman">
+                            <option ng-repeat="s in students" value="{{s.first_name}} {{s.last_name}}">
                         </datalist>
                         <div class="input-group-btn">
                             <button class="btn btn-default" type="submit">
