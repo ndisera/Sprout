@@ -1,2 +1,4 @@
 # pycharm stuffs
 .idea/
+*.pyc
+
