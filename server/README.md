@@ -62,7 +62,7 @@ Accessing the documentation for the api is very simple -- the server hosts its o
 
 You can navigate to [localhost:8000/docs/](http://localhost:8000/docs/)
 
-Or, if you like swagger, go to [localhost:8000/swagger/](http://localhost:8000/docs/)
+Or, if you like swagger, go to [localhost:8000/swagger/](http://localhost:8000/swagger/)
 
 These both have the added benefit of allowing you to test the api right there on the webpage.
 
