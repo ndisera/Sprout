@@ -60,3 +60,16 @@ class Enrollment(models.Model):
         unique_together = (('section', 'student'),)
         ordering = ('section',)
 
+class Behavior(models.Model):
+    """
+    Behavior
+    Represents a student's behavior score in a class on a
+    given day.
+    """
+    enrollment = models.ForeignKey(Enrollment, related_name='enrollment', unique_for_date='date')
+    date = models.DateField()
+    behavior = models.IntegerField()
+    effort = models.IntegerField()
+
+    class Meta:
+        ordering = ('enrollment', 'date',)

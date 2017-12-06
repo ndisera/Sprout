@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import coreapi
 import coreschema
 from rest_framework import status, viewsets
+from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from api.models import *
 from api.serializers import *
@@ -181,11 +182,11 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
         queryset = Enrollment.objects.all()
         student = self.request.query_params.get(self.query_student, None)
         section = self.request.query_params.get(self.query_section, None)
-        if student is not None and section is not None:
-            queryset = queryset.filter(student=student, section=section)
-        elif student is not None:
+        # if student is not None and section is not None:
+            # queryset = queryset.filter(student=student, section=section)
+        if student is not None:
             queryset = queryset.filter(student=student)
-        elif section is not None:
+        if section is not None:
             queryset = queryset.filter(section=section)
         return queryset
 
@@ -264,6 +265,76 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
             description=desc_section_id,
             schema=coreschema.Integer(title=name_section)),
         ]
+
+class BehaviorViewSet(viewsets.ModelViewSet):
+    """
+    allows interaction with the set of "Behavior" instances
+
+    list:
+    gets all the sections registered in Sprout.
+
+    create:
+    creates a new section. requires a title and teacher id. teacher id 
+    represents the teacher of the class
+
+    read:
+    gets the section specified by the id path param.
+
+    update:
+    updates an existing section. requires a section id, title, and teacher id.
+
+    partial_update:
+    updates parts of an existing section. does not require all values.
+
+    """
+    serializer_class = BehaviorSerializer
+
+    query_student = 'student'
+    query_section = 'section'
+    query_start_date = 'startdate'
+    query_end_date = 'enddate'
+    def get_queryset(self):
+        queryset = Behavior.objects.all()
+        student = self.request.query_params.get(self.query_student, None)
+        section = self.request.query_params.get(self.query_section, None)
+        start_date = self.request.query_params.get(self.query_start_date, None)
+        end_date = self.request.query_params.get(self.query_end_date, None)
+
+        if student is not None:
+            enrolls = Enrollment.objects.filter(student=student)
+            queryset = queryset.filter(enrollment_id__in=enrolls)
+
+        if section is not None:
+            enrolls = Enrollment.objects.filter(section=section)
+            queryset = queryset.filter(enrollment_id__in=enrolls)
+
+        if start_date is not None:
+            queryset = queryset.filter(date__gte=start_date)
+
+        if end_date is not None:
+            queryset = queryset.filter(date__lte=end_date)
+
+        return queryset
+
+    # def list(self, request):
+        # queryset = Behavior.objects.all().filter(id='2')
+        # serializer = BehaviorSerializer(queryset, many=True)
+        # return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
