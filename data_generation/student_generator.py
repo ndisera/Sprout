@@ -74,7 +74,7 @@ class StudentGenerator(object):
         birthdate = birthdate_range_start + datetime.timedelta(random_date_delta)
 
         # Generate a random student id
-        random_id_number = random.randrange(0, 999999)
+        random_id_number = random.randrange(100000, 999999)
         # If that number turns out to be non-unique, we will be in trouble. Cross your fingers!
         student_id = str(StudentGenerator.RANDOM_STUDENT_ID_PREFIX + str(random_id_number))
 
