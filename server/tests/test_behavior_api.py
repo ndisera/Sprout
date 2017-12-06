@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.db import IntegrityError
 from api.models import Behavior
 from api.models import Enrollment
 from api.models import Section
@@ -66,3 +67,15 @@ class BehaviorTestCase(TestCase):
         self.assertEqual(behavior.effort,
                          5,
                          "Incorrect effort score returned")
+
+    def test_behavior_date_enrollment_uniqueness(self):
+        """
+        Test that the database blocks putting a behavior score with the same date and enrollment
+
+        This test is expected to raise an error because the enrollment and date are not unique
+        """
+        with self.assertRaises(IntegrityError):
+            Behavior.objects.create(enrollment=self.enrollment,
+                                    date=self.behavior_date,
+                                    behavior=1,
+                                    effort=1)
