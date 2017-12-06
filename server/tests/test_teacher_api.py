@@ -1,5 +1,6 @@
 from django.test import TestCase
 from api.models import Teacher
+from django.db import IntegrityError
 
 import datetime
 
@@ -53,3 +54,27 @@ class SectionTestCase(TestCase):
         self.assertEqual(simon.last_name,
                          "Redman",
                          "Incorrect first_name returned")
+
+    def test_email_uniqueness(self):
+        """
+        Test that the database blocks putting the same email twice
+
+        This test is expected to raise an error because email is not unique
+        """
+        with self.assertRaises(IntegrityError):
+            Teacher.objects.create(username="eviltwin",
+                                   email="sredman@example.com",
+                                   first_name="Evil",
+                                   last_name="Twin")
+
+    def test_username_uniqueness(self):
+        """
+        Test that the database blocks putting the same username twice
+
+        This test is expected to raise an error because username is not unique
+        """
+        with self.assertRaises(IntegrityError):
+            Teacher.objects.create(username="sredman",
+                                   email="eviltwin@example.com",
+                                   first_name="Evil",
+                                   last_name="Twin")
