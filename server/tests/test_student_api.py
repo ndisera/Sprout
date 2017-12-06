@@ -18,8 +18,8 @@ class StudentTestCase(TestCase):
 
     def test_student_firstname(self):
         simon = Student.objects.get(first_name="Simon")
-        self.assertEqual(simon.last_name,
-                         "Redman",
+        self.assertEqual(simon.first_name,
+                         "Simon",
                          "Incorrect first_name returned")
 
     def test_student_lastname(self):
