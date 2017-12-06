@@ -1,3 +1,6 @@
+# migrations stuffs
+api/migrations/
+
 # virtualenv stuffs
 ../env/
 env/
