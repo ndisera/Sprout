@@ -66,10 +66,18 @@ class Behavior(models.Model):
     Represents a student's behavior score in a class on a
     given day.
     """
-    enrollment = models.ForeignKey(Enrollment, related_name='enrollment', unique_for_date='date')
+    enrollment = models.ForeignKey(Enrollment, related_name='enrollment')
     date = models.DateField()
     behavior = models.IntegerField()
     effort = models.IntegerField()
 
     class Meta:
-        ordering = ('enrollment', 'date',)
+        unique_together = (('enrollment', 'date'),)
+        ordering = ('date',)
+
+
+
+
+
+
+
