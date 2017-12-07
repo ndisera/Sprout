@@ -6,7 +6,7 @@
     height: 50px;
 }
 
-.glyphicon.glyphicon-fire, .glyphicon.glyphicon-alert {
+.glyphicon.glyphicon-fire, .glyphicon.glyphicon-alert, .glyphicon.glyphicon-heart-empty {
     font-size:25px;
     float:right;
 }
@@ -16,10 +16,6 @@
     cursor:pointer
 }
 
-div .focusProgress, div .focusCaution {
-    min-height:30px;
-}
-
-.focusGraph {
-    height:200px;
+.focusProgress, .focusCaution, .focusGraph {
+    height: 200px;
 }

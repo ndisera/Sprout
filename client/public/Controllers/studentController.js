@@ -1,13 +1,57 @@
 ﻿app.controller("studentController", function ($scope, $location, $http, $rootScope) {
 
+    $scope.classes = [];
+    $scope.behaviors = [];
+
+    // get student's classes
     $http({
         method: 'GET',
-        url: 'http://localhost:8000/behaviors/'
+        url: 'http://localhost:8000/enrollments/?' + $rootScope.student.id
     }).then(function successCallback(response) {
-        $scope.behaviors = response.data;
+        // enrollments will contain section id (for mapping to enrollments) and student id
+        $scope.enrollments = response.data;
+        for (var i = 0; i < $scope.enrollments.length; i++) {
+            $http({
+                method: 'GET',
+                url: 'http://localhost:8000/sections/?' + $scope.enrollments[i].section
+            }).then(function successCallback(response) {
+                $scope.classes.push(response.data);
+            }, function errorCallback(response) {
+                $scope.status = response.status;
+            });
+        }
     }, function errorCallback(response) {
         $scope.status = response.status;
     });
+
+    //// the classes array should now contain objects with teacher and title
+
+
+    //// get behavior scores, is this where I filter by start date, end date, student id?
+    //$scope.getBehaviors = function () {
+    //    $http({
+    //        method: 'GET',
+    //        url: 'http://localhost:8000/behaviors/?' + $scope.enrollments[i].section
+    //    }).then(function successCallback(response) {
+    //        $scope.behaviors.push(response.data);
+    //    }, function errorCallback(response) {
+    //        $scope.status = response.status;
+    //    });
+    //}
+
+    //// used to put or push behavior and effort scores
+    //$scope.updateScores = function () {
+    //    // believe I have to check if a score already exists
+    //    // put is so, push otherwise
+    //    $http({
+    //        method: 'GET',
+    //        url: 'http://localhost:8000/behaviors/?' + $scope.enrollments[i].section
+    //    }).then(function successCallback(response) {
+    //        $scope.behaviors.push(response.data);
+    //    }, function errorCallback(response) {
+    //        $scope.status = response.status;
+    //    });
+    //}
 
     if (!JSON.parse(localStorage.getItem("loggedIn"))) {
         location.path('');

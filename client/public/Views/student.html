@@ -39,28 +39,17 @@
                     </div>
                 </div>
             </div>
-            <!--<div id="behaviorMonthlyGraphic" class="studentBehavior">
-                <p>
-                    This should be a graphic showing the student's behavior and effort over the last month
-                </p>
-                <div class="chart-container" style="position: relative; height:40vh; width:80vw;">
-                    <canvas id="myChart"></canvas>
+            <hr />
+
+            <div class="container">
+                <div class="row">
+                    <label>Student Classes Test</label>
+                    <p ng-repeat="class in classes">{{class.title}}</p>
                 </div>
-            </div>-->
-            <div id="behaviorClassGraphic" class="studentBehavior">
-                <p>
-                    This should be a graphic showing the student's recent behavior in various classes
-                </p>
             </div>
-            <div id="behaviorAlert" class="studentBehavior">
-                <p>
-                    This should alert the coordinator that something unusual is happening
-                </p>
-            </div>
+
+
             <div id="behaviorEntry" class="studentBehavior">
-                <p>
-                    This should let the coordinator select a date and enter behavior/effort scores for each of that student's classes
-                </p>
                 <form class="form-inline" action="">
                     <form-group>
                         <label for="date">For date: </label>
@@ -69,12 +58,8 @@
                         </div>
                     </form-group>
                 </form>
-                <!--<form>
-                    Birthday:
-                    <input type="date" name="bday">
-                    <input type="submit">
-                </form>-->
             </div>
+            <br />
             <table class="table table-striped table-responsive">
                 <thead>
                     <tr>
@@ -109,29 +94,6 @@
                     </tr>
                 </tbody>
             </table>
-            <!--<div id="behaviorView" class="studentBehavior">
-                <ul class="nav nav-tabs">
-                    <li class="active">
-                        <a data-toggle="tab" data-target="#behaviorViewAvg">Average</a>
-                    </li>
-                    <li><a data-toggle="tab" data-target="#behaviorViewMax">Max</a></li>
-                    <li><a data-toggle="tab" data-target="#behaviorViewMin">Min</a></li>
-                </ul>
-                <div class="tab-content">
-                    <div id="behaviorViewAvg" class="tab-pane in active">
-                        Show the student's average behavior and effort over the past week
-                    </div>
-                    <div id="behaviorViewMax" class="tab-pane">
-                        Show the student's best behavior and effort over the past week
-                    </div>
-                    <div id="behaviorViewMin" class="tab-pane">
-                        Show the student's worst behavior and effort over the past week
-                    </div>
-                </div>
-                <p>
-                    This should let the coordinator see the student's average/high/low scores for the past week
-                </p>
-            </div>-->
         </div>
         <div id="goals" class="tab-pane fade">
             <h3>IEP Goals</h3>
