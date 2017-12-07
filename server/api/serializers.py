@@ -26,3 +26,9 @@ class BehaviorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Behavior
         fields = ('id', 'enrollment', 'date', 'behavior', 'effort')
+
+class BehaviorRetrieveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Behavior
+        fields = ('id', 'enrollment', 'date', 'behavior', 'effort')
+        depth = 1
