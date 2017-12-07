@@ -10,19 +10,19 @@
         <hr />
         <div class="container-fluid">
             <div class="row">
-                <div class="panel panel-primary">
+                <div class="panel panel-primary" ng-repeat="s in students">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a href="index.html#!/student">Graham Zuber</a>
-                            <span id="chevDown4" class="glyphicon glyphicon-chevron-down"
-                                  data-toggle="collapse" data-target="#collapse1" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
+                            <a href="" ng-click="goToStudent($event)">{{s.first_name}} {{s.last_name}}</a>
+                            <span class="glyphicon glyphicon-chevron-down"
+                                  data-toggle="collapse" data-target="#collapse-{{$index}}" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
                         </h4>
                     </div>
-                    <div id="collapse1" class="panel-collapse collapse">
+                    <div id="collapse-{{$index}}" class="panel-collapse collapse">
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-sm-4 focusGraph">
-                                    <canvas id="oneChart"></canvas>
+                                    <canvas class="line"></canvas>
                                 </div>
                                 <div class="col-sm-4 focusProgress">
                                     Progress Category...
@@ -39,16 +39,16 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a href="index.html#!/student">Simon Redman</a>
-                            <span id="chevDown4" class="glyphicon glyphicon-chevron-down" style="float:right;cursor:pointer"
-                                  data-toggle="collapse" data-target="#collapse2" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
+                            <a href="">Graham Zuber</a>
+                            <span class="glyphicon glyphicon-chevron-down"
+                                  data-toggle="collapse" data-target="#collapse8" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
                         </h4>
                     </div>
-                    <div id="collapse2" class="panel-collapse collapse">
+                    <div id="collapse8" class="panel-collapse collapse">
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-sm-4 focusGraph">
-                                    <canvas id="twoChart"></canvas>
+                                    <canvas class="line"></canvas>
                                 </div>
                                 <div class="col-sm-4 focusProgress">
                                     Progress Category...
@@ -65,44 +65,18 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a href="index.html#!/student">Guy Watson</a>
-                            <span id="chevDown4" class="glyphicon glyphicon-chevron-down" style="float:right;cursor:pointer"
-                                  data-toggle="collapse" data-target="#collapse3" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
+                            <a href="">Simon Redman</a>
+                            <span class="glyphicon glyphicon-chevron-down"
+                                  data-toggle="collapse" data-target="#collapse9" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
                         </h4>
                     </div>
-                    <div id="collapse3" class="panel-collapse collapse">
+                    <div id="collapse9" class="panel-collapse collapse">
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-sm-4 focusGraph">
-                                    <canvas id="threeChart"></canvas>
+                                    <canvas class="line"></canvas>
                                 </div>
                                 <div class="col-sm-4 focusProgress">
-                                    Progress Category...
-                                    <span class="glyphicon glyphicon-fire"></span>
-                                </div>
-                                <div class="col-sm-4 focusCaution">
-                                    Caution Category...
-                                    <span class="glyphicon glyphicon-alert"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a href="index.html#!/student">Nico DiSera</a>
-                            <span id="chevDown4" class="glyphicon glyphicon-chevron-down"
-                                  data-toggle="collapse" data-target="#collapse4" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
-                        </h4>
-                    </div>
-                    <div id="collapse4" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-sm-4 focusGraph">
-                                    <canvas id="fourChart"></canvas>
-                                </div>
-                                <div class="col-sm-4 focusProgressBox">
                                     Progress Category...
                                     <span class="glyphicon glyphicon-fire"></span>
                                 </div>

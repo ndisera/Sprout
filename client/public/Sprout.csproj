@@ -100,7 +100,6 @@
     <Content Include="Content\login.css" />
     <Content Include="Content\student.css" />
     <Content Include="Controllers\focusStudentsController.js" />
-    <Content Include="Controllers\homeController.js" />
     <Content Include="Controllers\mainController.js" />
     <Content Include="Controllers\scoresInputController.js" />
     <Content Include="Controllers\settingsController.js" />

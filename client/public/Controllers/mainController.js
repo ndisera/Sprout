@@ -1,19 +1,21 @@
-﻿app.controller('mainController', function ($scope, $location, $http) {
+﻿app.controller('mainController', function ($scope, $location, $http, $rootScope) {
 
     $http({
         method: 'GET',
         url: 'http://localhost:8000/students/'
     }).then(function successCallback(response) {
+        // our collection of students
         $scope.students = response.data;
-        $scope.studentNames = []
-        for (var i = 0; i < $scope.students.length; i++) {
-            $scope.studentNames.push($scope.students[i].first_name + " " + $scope.students[i].last_name);
-        }
     }, function errorCallback(response) {
         $scope.status = response.status;
     });
 
-    $scope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"))
+    // this is for refresh
+    if ($rootScope.student === undefined)
+        $rootScope.student = JSON.parse(localStorage.getItem("lastStudent"));
+    // if it's still null that's fine
+
+    $scope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"));
     if ($scope.loggedIn === null)
         $scope.loggedIn = false;
     else if ($scope.loggedIn && $location.path() == "")
@@ -46,8 +48,11 @@
     });
 
     $scope.getProfile = function () {
-        for (var i = 0; i < $scope.studentNames.length; i++) {
-            if ($scope.studentNames[i] === $scope.studentName) {
+        for (var i = 0; i < $scope.students.length; i++) {
+            if ($scope.students[i].first_name + " " + $scope.students[i].last_name === $scope.studentName) {
+                // the currently chosen student object
+                $rootScope.student = $scope.students[i];
+                localStorage.setItem("lastStudent", JSON.stringify($rootScope.student));
                 $location.path('/student');
                 return;
             }

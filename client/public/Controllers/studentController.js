@@ -1,4 +1,4 @@
-﻿app.controller("studentController", function ($scope, $location, $http) {
+﻿app.controller("studentController", function ($scope, $location, $http, $rootScope) {
 
     $http({
         method: 'GET',

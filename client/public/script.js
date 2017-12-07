@@ -4,11 +4,6 @@
 app.config(function ($routeProvider) {
     $routeProvider
 
-        .when('/', {
-            templateUrl: 'Views/home.html',
-            controller: 'homeController'
-        })
-
         // route for the settings page
         .when('/settings', {
             templateUrl: 'Views/settings.html',
