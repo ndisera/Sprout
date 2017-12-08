@@ -203,7 +203,7 @@ def upload_basic_bitches():
     # behaviors
     behaviors_url = base_url + 'behaviors/'
 
-    for day in range(1, 8):
+    for day in range(1, 9):
         for enrollment in enrollments_posted:
             to_post = {
                 'date': '2017-12-' + str(day),
