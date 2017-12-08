@@ -34,12 +34,26 @@
             <hr />
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-12 focusGraph">
+                    <div class="col-sm-6 centerText">
+                        <label>Behavior</label>
                         <canvas
                                 id="student_behavior"
-                                class="chart chart-bar"
-                                chart-data="data"
-                                chart-labels="class_titles"
+                                class="chart chart-line"
+                                chart-data="hardcodedBehaviorForThePrototype"
+                                chart-labels="graph_labels"
+                                chart-series="series"
+                                chart-options="options"
+                                chart-dataset-override="datasetOverride"
+                                chart-click="onClick"
+                        ></canvas>
+                    </div>
+                    <div class="col-sm-6 centerText">
+                        <label>Effort</label>
+                        <canvas
+                                id="student_effort"
+                                class="chart chart-line"
+                                chart-data="hardcodedEffortForThePrototype"
+                                chart-labels="graph_labels"
                                 chart-series="series"
                                 chart-options="options"
                                 chart-dataset-override="datasetOverride"

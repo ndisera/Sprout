@@ -3,6 +3,12 @@
     $scope.class_titles = [];
     $scope.classes = [];
     $scope.behaviors = [];
+    // Both behavior and effort are arrays of lists of scores,
+    // where each top-level array corresponds to a section
+    $scope.hardcodedBehaviorForThePrototype = [];
+    $scope.hardcodedEffortForThePrototype = [];
+    // Section IDs are stored as a list of integers
+    $scope.hardcodedSectionIDsForThePrototype = [];
 
     var x = $rootScope.student.id;
 
@@ -103,26 +109,72 @@
     $('#datepicker').datepicker().on('changeDate', function (ev) {
         $scope.changeDate();
     });
+    
+    function getHardcodedPrototypeBehaviorAndEffort()
+    {
+      // Use this skeleton as the body of the get
+      var get_data = {
+        "student": $rootScope.student.id,
+        "start_date": "2017-12-04",
+        "end_date": "2017-12-08"
+      }
+
+      $http({
+        method: 'GET',
+        url: "http://localhost:8000/behaviors/?student=" + get_data["student"] + "&start_date=" + get_data["start_date"] + "&end_date=" + get_data["end_date"]
+      }).then(function successCallback(response)
+      {
+        var behaviors = {};
+        var efforts = {};
+        var sections = [];
+        for (var index = 0; index < response.data.length; index++)
+        {
+          var section_id = response.data[index]["enrollment"]["section"];
+          if (behaviors[section_id] == undefined)
+          {
+            // If we have not started a behavior list for this class, start one now
+            behaviors[section_id] = [];
+            efforts[section_id] = [];
+            sections.push(section_id)
+          }
+          behaviors[section_id].push(response.data[index].behavior);
+          efforts[section_id].push(response.data[index].effort);
+        }
+        
+        // Convert to global arrays
+        for (var index = 0; index < sections.length; index++)
+        {
+          $scope.hardcodedBehaviorForThePrototype.push(behaviors[sections[index]]);
+          $scope.hardcodedEffortForThePrototype.push(efforts[sections[index]]);
+        }
+
+        $scope.hardcodedSectionIDsForThePrototype = sections;
+      }, function errorCallback(response)
+      {
+        $scope.status = response.status;
+      });
+    }
+    
+    getHardcodedPrototypeBehaviorAndEffort();
 
     $scope.data = [
     [65, 59, 80, 81, 56, 55, 40]
     ];
+    $scope.graph_labels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
     $scope.onClick = function (points, evt) {
       console.log(points, evt);
     };
-    $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
     $scope.options = {
       responsive: true,
       maintainAspectRatio: false,
-      scales: {
-        yAxes: [
-        {
-          id: 'y-axis-1',
-          type: 'linear',
+      scales:{
+        yAxes: [{
           display: true,
-          position: 'left'
-        }
-        ]
+          ticks: {
+            min: 1,
+            max: 5
+          }
+        }]
       }
     };
 });
