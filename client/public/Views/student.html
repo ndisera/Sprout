@@ -35,7 +35,16 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-12 focusGraph">
-                        <canvas id="myChart"></canvas>
+                        <canvas
+                                id="student_behavior"
+                                class="chart chart-bar"
+                                chart-data="data"
+                                chart-labels="class_titles"
+                                chart-series="series"
+                                chart-options="options"
+                                chart-dataset-override="datasetOverride"
+                                chart-click="onClick"
+                        ></canvas>
                     </div>
                 </div>
             </div>
