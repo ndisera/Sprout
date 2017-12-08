@@ -1,4 +1,4 @@
-app.controller("studentController", function ($scope, $location, $http, $rootScope, $routeParams) {
+﻿app.controller("studentController", function ($scope, $location, $http, $rootScope, $routeParams) {
 
     $scope.classes = [];
     $scope.behaviors = [];
@@ -6,20 +6,20 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     // get student's classes
     $http({
         method: 'GET',
-        url: 'http://localhost:8000/enrollments/?' + $rootScope.student.id
+        url: 'http://localhost:8000/enrollments/?student=' + $rootScope.student.id
     }).then(function successCallback(response) {
         // enrollments will contain section id (for mapping to enrollments) and student id
         $scope.enrollments = response.data;
+        $scope.classes = [];
+        var index = 0;
         for (var i = 0; i < $scope.enrollments.length; i++) {
-            var id = $scope.enrollments[i].id;
             $http({
                 method: 'GET',
-                url: 'http://localhost:8000/sections/?' + $scope.enrollments[i].section
+                url: 'http://localhost:8000/sections/?section=' + $scope.enrollments[i].section
             }).then(function successCallback(response) {
-                $scope.classes = [];
                 $scope.classes.push({
-                    id: id,
-                    title: response.data[0].title
+                    id: response.data[index].id,
+                    title: response.data[index++].title
                 });
                 var x = $scope.classes;
             }, function errorCallback(response) {
@@ -40,20 +40,14 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
             method: 'GET',
             url: "http://localhost:8000/behaviors/?student=" + $scope.student.id + "&start_date=" + $scope.behaviorDate + "&end_date=" + $scope.behaviorDate
         }).then(function successCallback(response) {
-            var x = $scope.classes;
             $scope.behaviors = response.data;
             $scope.classBehaviorScores = {};
+            var index = 0;
             for (var i = 0; i < $scope.behaviors.length; i++) {
                 $scope.classBehaviorScores[response.data[i].enrollment.id] = {
                     behavior: response.data[i].behavior,
                     effort: response.data[i].effort
                 }
-                //$scope.classBehaviorScores.push({
-                //    id: response.data[i].enrollment.id,
-                //    behaviorValue: response.data[i].behavior,
-                //    effortValue: response.data[i].effort
-                //});
-                var x = $scope.classBehaviorScores;
             }
             
 
@@ -62,20 +56,6 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
             $scope.status = response.status;
         });
     }
-
-    //// used to put or push behavior and effort scores
-    //$scope.updateScores = function () {
-    //    // believe I have to check if a score already exists
-    //    // put is so, push otherwise
-    //    $http({
-    //        method: 'GET',
-    //        url: 'http://localhost:8000/behaviors/?' + $scope.enrollments[i].section
-    //    }).then(function successCallback(response) {
-    //        $scope.behaviors.push(response.data);
-    //    }, function errorCallback(response) {
-    //        $scope.status = response.status;
-    //    });
-    //}
 
     if (!JSON.parse(localStorage.getItem("loggedIn"))) {
         location.path('');
@@ -96,39 +76,6 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     }
 
     defaultDate();
-
-    $scope.records = [
-    {
-        "Name": "Math",
-        "Behavior": "",
-        "Effort": ""
-    },
-    {
-        "Name": "Reading",
-        "Behavior": "",
-        "Effort": ""
-    },
-    {
-        "Name": "Art",
-        "Behavior": "",
-        "Effort": ""
-    },
-    {
-        "Name": "Science",
-        "Behavior": "",
-        "Effort": ""
-    },
-    {
-        "Name": "History",
-        "Behavior": "",
-        "Effort": ""
-    },
-    {
-        "Name": "English",
-        "Behavior": "",
-        "Effort": ""
-    }
-    ];
 
     $scope.changeDate = function () {
         // set select boxes back to one
