@@ -1,4 +1,4 @@
-﻿var app = angular.module("app", ["ngRoute"]);
+﻿var app = angular.module("app", ["ngRoute", "chart.js"]);
 
 // configure our routes
 app.config(function ($routeProvider) {
