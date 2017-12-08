@@ -87,7 +87,10 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
                   var enrollment_obj = $scope.classBehaviorScores[classId].enrollment;
                   $scope.classBehaviorScores[classId] = response.data;
                   $scope.classBehaviorScores[classId].enrollment = enrollment_obj;
-                  getHardcodedPrototypeBehaviorAndEffort();
+
+                  var date = new Date($scope.behaviorDate);
+                  $scope.hardcodedEffortForThePrototype[classId-1][date.getDay()] = $scope.classBehaviorScores[classId].effort;
+                  $scope.hardcodedBehaviorForThePrototype[classId-1][date.getDay()] = $scope.classBehaviorScores[classId].behavior;
                 }, function errorCallback(response) {
                     $scope.status = response.status;
                 });
@@ -189,6 +192,9 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
           $scope.hardcodedBehaviorForThePrototype.push(behaviors[sections[index]]);
           $scope.hardcodedEffortForThePrototype.push(efforts[sections[index]]);
         }
+
+        console.log($scope.hardcodedEffortForThePrototype);
+        console.log($scope.hardcodedBehaviorForThePrototype);
 
         $scope.hardcodedSectionIDsForThePrototype = sections;
       }, function errorCallback(response)
