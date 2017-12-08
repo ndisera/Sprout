@@ -115,7 +115,7 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
         }).then(function successCallback(response) {
           $scope.classBehaviorScores[classId] = response.data;
           $scope.classBehaviorScores[classId].enrollment = enrollment_obj;
-          getHardcodedPrototypeBehaviorAndEffort();
+          //getHardcodedPrototypeBehaviorAndEffort();
         }, function errorCallback(response) {
             $scope.status = response.status;
         });
