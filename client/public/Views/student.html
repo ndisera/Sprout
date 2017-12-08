@@ -2,7 +2,7 @@
     <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
         <li class="active"><a data-toggle="tab" data-target="#overview">Overview</a></li>
         <li><a data-toggle="tab" data-target="#tests">Test Scores</a></li>
-        <li><a data-toggle="tab" data-target="#behavior">Behavior</a></li>
+        <li><a data-toggle="tab" data-target="#behavior" ng-click="getBehaviors()">Behavior</a></li>
         <li><a data-toggle="tab" data-target="#goals">IEP Goals</a></li>
         <li><a data-toggle="tab" data-target="#services">Services</a></li>
         <li><a data-toggle="tab" data-target="#grades">Grades</a></li>
@@ -10,7 +10,7 @@
     <ul class="nav nav-tabs hidden-xs">
         <li class="active"><a data-toggle="tab" data-target="#overview">Overview</a></li>
         <li><a data-toggle="tab" data-target="#tests">Test Scores</a></li>
-        <li><a data-toggle="tab" data-target="#behavior">Behavior</a></li>
+        <li><a data-toggle="tab" data-target="#behavior" ng-click="getBehaviors()">Behavior</a></li>
         <li><a data-toggle="tab" data-target="#goals">IEP Goals</a></li>
         <li><a data-toggle="tab" data-target="#services">Services</a></li>
         <li><a data-toggle="tab" data-target="#grades">Grades</a></li>
@@ -42,6 +42,40 @@
             <hr />
 
             <div class="container">
+                <table class="table table-striped table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Classes</th>
+                            <th>Behavior</th>
+                            <th>Effort</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="class in classes">
+                            <td>{{class.title}}</td>
+                            <td>
+                                <select class="behaviorScore">
+                                    <option disabled ng-selected="classBehaviorScores[class.id].behavior === undefined"></option>
+                                    <option value="1" ng-selected="classBehaviorScores[class.id].behavior === '1'">1</option>
+                                    <option value="2" ng-selected="classBehaviorScores[class.id].behavior === '2'">2</option>
+                                    <option value="3" ng-selected="classBehaviorScores[class.id].behavior === '3'">3</option>
+                                    <option value="4" ng-selected="classBehaviorScores[class.id].behavior === '4'">4</option>
+                                    <option value="5" ng-selected="classBehaviorScores[class.id].behavior === '5'">5</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="effortScore">
+                                    <option disabled ng-selected="classBehaviorScores[class.id].effort === undefined"></option>
+                                    <option value="1" ng-selected="classBehaviorScores[class.id].effort === '1'">1</option>
+                                    <option value="2" ng-selected="classBehaviorScores[class.id].effort === '2'">2</option>
+                                    <option value="3" ng-selected="classBehaviorScores[class.id].effort === '3'">3</option>
+                                    <option value="4" ng-selected="classBehaviorScores[class.id].effort === '4'">4</option>
+                                    <option value="5" ng-selected="classBehaviorScores[class.id].effort === '5'">5</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div class="row">
                     <label>Student Classes Test</label>
                     <p ng-repeat="class in classes">{{class.title}}</p>

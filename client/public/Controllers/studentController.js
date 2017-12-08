@@ -1,8 +1,4 @@
 ﻿app.controller("studentController", function ($scope, $location, $http, $rootScope) {
-
-    $scope.classes = [];
-    $scope.behaviors = [];
-
     // get student's classes
     $http({
         method: 'GET',
@@ -11,11 +7,17 @@
         // enrollments will contain section id (for mapping to enrollments) and student id
         $scope.enrollments = response.data;
         for (var i = 0; i < $scope.enrollments.length; i++) {
+            var id = $scope.enrollments[i].id;
             $http({
                 method: 'GET',
                 url: 'http://localhost:8000/sections/?' + $scope.enrollments[i].section
             }).then(function successCallback(response) {
-                $scope.classes.push(response.data);
+                $scope.classes = [];
+                $scope.classes.push({
+                    id: id,
+                    title: response.data[0].title
+                });
+                var x = $scope.classes;
             }, function errorCallback(response) {
                 $scope.status = response.status;
             });
@@ -27,17 +29,37 @@
     //// the classes array should now contain objects with teacher and title
 
 
-    //// get behavior scores, is this where I filter by start date, end date, student id?
-    //$scope.getBehaviors = function () {
-    //    $http({
-    //        method: 'GET',
-    //        url: 'http://localhost:8000/behaviors/?' + $scope.enrollments[i].section
-    //    }).then(function successCallback(response) {
-    //        $scope.behaviors.push(response.data);
-    //    }, function errorCallback(response) {
-    //        $scope.status = response.status;
-    //    });
-    //}
+    // get behavior scores
+    // pass in student, start date, and end date
+    $scope.getBehaviors = function () {
+        $http({
+            method: 'GET',
+            url: "http://localhost:8000/behaviors/?student=" + $scope.student.id + "&start_date=" + $scope.behaviorDate + "&end_date=" + $scope.behaviorDate
+        }).then(function successCallback(response) {
+            var x = $scope.classes;
+            $scope.behaviors = response.data;
+            $scope.classBehaviorScores = [];
+            for (var i = 0; i < $scope.behaviors.length; i++) {
+                //$scope.classBehaviorScores.push({
+                //    // this id is also used to map to title in $scope.classes
+                //    [response.data[i].enrollment.id]: {
+                //        behavior: response.data[i].behavior,
+                //        effort: response.data[i].effort
+                //    }
+                //})
+                $scope.classBehaviorScores.push({
+                    id: response.data[i].enrollment.id,
+                    behaviorValue: response.data[i].behavior,
+                    effortValue: response.data[i].effort
+                });
+            }
+            
+
+            // now I should be able to match each behavior and effort score to each class
+        }, function errorCallback(response) {
+            $scope.status = response.status;
+        });
+    }
 
     //// used to put or push behavior and effort scores
     //$scope.updateScores = function () {
@@ -58,12 +80,17 @@
     }
 
     $('#datepicker').datepicker({
-        format: "mm/dd/yyyy"
+        format: "yyyy-mm-dd"
     });
 
     function defaultDate() {
         var date = new Date();
-        $scope.behaviorDate = date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
+        // prepend 0 to single digit day
+        var day = "";
+        if (date.getDate() < 10) {
+            day = "0" + date.getDate();
+        }
+        $scope.behaviorDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + day;
     }
 
     defaultDate();
