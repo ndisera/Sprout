@@ -33,202 +33,37 @@
         }
     }
 
-    $('.line').each(function (index, element) {
-        var ctx = element.getContext("2d");
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                datasets: [{
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
+    // All of the following belongs to the hard-coded angular-charts on the Focus Students page
+    $scope.focus_labels = ["January", "February", "March", "April", "May", "June", "July"];
+    $scope.focus_data = [
+    [28, 48, 40, 19, 86, 27, 90]
+    ];
+    $scope.progress_labels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    $scope.progress_data = [
+    [2, 3, 3, 4, 5]
+    ];
+    $scope.progress_colours = ["rgba(80,255,80,1)"]
+    $scope.caution_labels = ["Math", "Reading", "Music", "History", "Spanish"];
+    $scope.caution_data = [
+    [77, 81, 66, 50, 35]
+    ];
+    $scope.caution_colours = [
+      "rgba(255,99,132,1)"
+    ]
+    $scope.onClick = function (points, evt) {
+      console.log(points, evt);
+    };
+    $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
+    $scope.options = {
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
+        yAxes: [
+          {
+            id: 'y-axis-1',
+            type: 'linear',
+            display: true,
+            position: 'left'
                         }
-                    }]
+        ]
                 }
-            }
-        });
-    });
-
-    //var ctx = document.getElementById("oneChart").getContext('2d');
-    //var myChart = new Chart(ctx, {
-    //    type: 'bar',
-    //    data: {
-    //        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-    //        datasets: [{
-    //            label: '# of Votes',
-    //            data: [12, 19, 3, 5, 2, 3],
-    //            backgroundColor: [
-    //                'rgba(255, 99, 132, 0.2)',
-    //                'rgba(54, 162, 235, 0.2)',
-    //                'rgba(255, 206, 86, 0.2)',
-    //                'rgba(75, 192, 192, 0.2)',
-    //                'rgba(153, 102, 255, 0.2)',
-    //                'rgba(255, 159, 64, 0.2)'
-    //            ],
-    //            borderColor: [
-    //                'rgba(255,99,132,1)',
-    //                'rgba(54, 162, 235, 1)',
-    //                'rgba(255, 206, 86, 1)',
-    //                'rgba(75, 192, 192, 1)',
-    //                'rgba(153, 102, 255, 1)',
-    //                'rgba(255, 159, 64, 1)'
-    //            ],
-    //            borderWidth: 1
-    //        }]
-    //    },
-    //    options: {
-    //        responsive: true,
-    //        maintainAspectRatio: false,
-    //        scales: {
-    //            yAxes: [{
-    //                ticks: {
-    //                    beginAtZero: true
-    //                }
-    //            }]
-    //        }
-    //    }
-    //});
-    //var ctx = document.getElementById("twoChart").getContext('2d');
-    //var myChart = new Chart(ctx, {
-    //    type: 'bar',
-    //    data: {
-    //        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-    //        datasets: [{
-    //            label: '# of Votes',
-    //            data: [12, 19, 3, 5, 2, 3],
-    //            backgroundColor: [
-    //                'rgba(255, 99, 132, 0.2)',
-    //                'rgba(54, 162, 235, 0.2)',
-    //                'rgba(255, 206, 86, 0.2)',
-    //                'rgba(75, 192, 192, 0.2)',
-    //                'rgba(153, 102, 255, 0.2)',
-    //                'rgba(255, 159, 64, 0.2)'
-    //            ],
-    //            borderColor: [
-    //                'rgba(255,99,132,1)',
-    //                'rgba(54, 162, 235, 1)',
-    //                'rgba(255, 206, 86, 1)',
-    //                'rgba(75, 192, 192, 1)',
-    //                'rgba(153, 102, 255, 1)',
-    //                'rgba(255, 159, 64, 1)'
-    //            ],
-    //            borderWidth: 1
-    //        }]
-    //    },
-    //    options: {
-    //        responsive: true,
-    //        maintainAspectRatio: false,
-    //        scales: {
-    //            yAxes: [{
-    //                ticks: {
-    //                    beginAtZero: true
-    //                }
-    //            }]
-    //        }
-    //    }
-    //});
-    //var ctx = document.getElementById("threeChart").getContext('2d');
-    //var myChart = new Chart(ctx, {
-    //    type: 'bar',
-    //    data: {
-    //        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-    //        datasets: [{
-    //            label: '# of Votes',
-    //            data: [12, 19, 3, 5, 2, 3],
-    //            backgroundColor: [
-    //                'rgba(255, 99, 132, 0.2)',
-    //                'rgba(54, 162, 235, 0.2)',
-    //                'rgba(255, 206, 86, 0.2)',
-    //                'rgba(75, 192, 192, 0.2)',
-    //                'rgba(153, 102, 255, 0.2)',
-    //                'rgba(255, 159, 64, 0.2)'
-    //            ],
-    //            borderColor: [
-    //                'rgba(255,99,132,1)',
-    //                'rgba(54, 162, 235, 1)',
-    //                'rgba(255, 206, 86, 1)',
-    //                'rgba(75, 192, 192, 1)',
-    //                'rgba(153, 102, 255, 1)',
-    //                'rgba(255, 159, 64, 1)'
-    //            ],
-    //            borderWidth: 1
-    //        }]
-    //    },
-    //    options: {
-    //        responsive: true,
-    //        maintainAspectRatio: false,
-    //        scales: {
-    //            yAxes: [{
-    //                ticks: {
-    //                    beginAtZero: true
-    //                }
-    //            }]
-    //        }
-    //    }
-    //});
-    //var ctx = document.getElementById("fourChart").getContext('2d');
-    //var myChart = new Chart(ctx, {
-    //    type: 'bar',
-    //    data: {
-    //        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-    //        datasets: [{
-    //            label: '# of Votes',
-    //            data: [12, 19, 3, 5, 2, 3],
-    //            backgroundColor: [
-    //                'rgba(255, 99, 132, 0.2)',
-    //                'rgba(54, 162, 235, 0.2)',
-    //                'rgba(255, 206, 86, 0.2)',
-    //                'rgba(75, 192, 192, 0.2)',
-    //                'rgba(153, 102, 255, 0.2)',
-    //                'rgba(255, 159, 64, 0.2)'
-    //            ],
-    //            borderColor: [
-    //                'rgba(255,99,132,1)',
-    //                'rgba(54, 162, 235, 1)',
-    //                'rgba(255, 206, 86, 1)',
-    //                'rgba(75, 192, 192, 1)',
-    //                'rgba(153, 102, 255, 1)',
-    //                'rgba(255, 159, 64, 1)'
-    //            ],
-    //            borderWidth: 1
-    //        }]
-    //    },
-    //    options: {
-    //        responsive: true,
-    //        maintainAspectRatio: false,
-    //        scales: {
-    //            yAxes: [{
-    //                ticks: {
-    //                    beginAtZero: true
-    //                }
-    //            }]
-    //        }
-    //    }
-    //});
+    };
 });
