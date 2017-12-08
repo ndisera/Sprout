@@ -23,7 +23,7 @@ app.config(function ($routeProvider) {
         })
 
         // route for the student profile page
-        .when('/student', {
+        .when('/student/:id', {
             templateUrl: 'Views/student.html',
             controller: 'studentController'
         });
