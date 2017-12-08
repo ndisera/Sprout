@@ -199,7 +199,15 @@
     },
     {
       label: "CS4400",
-      fill: false
+      fill: false,
+      // Set the colour of the line
+      borderColor: [
+      'rgba(255,99,132,1)'
+      ],
+      // Even though the line has no underfill, need a background for the legend box
+      backgroundColor: [
+      'rgba(255, 99, 132, 0.2)'
+      ]
     }
     ];
     $scope.options = {
