@@ -64,7 +64,7 @@
         yAxes: [{
           display: true,
           ticks: {
-            beginAtZero: true,
+            min: 1,
             max: 5
           }
         }]
