@@ -68,8 +68,8 @@ class Behavior(models.Model):
     """
     enrollment = models.ForeignKey(Enrollment, related_name='enrollment')
     date = models.DateField()
-    behavior = models.IntegerField()
-    effort = models.IntegerField()
+    behavior = models.IntegerField(blank=True, null=True)
+    effort = models.IntegerField(blank=True, null=True)
 
     class Meta:
         unique_together = (('enrollment', 'date'),)
