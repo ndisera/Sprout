@@ -223,6 +223,7 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
           display: true,
           ticks: {
             min: 1,
+            stepSize: 1,
             max: 5
           }
         }]
