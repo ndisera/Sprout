@@ -39,7 +39,7 @@
     $scope.getBehaviors = function () {
         $http({
             method: 'GET',
-            url: "http://localhost:8000/behaviors/?student=" + $scope.student.id + "&start_date=" + $scope.behaviorDate + "&end_date=" + $scope.behaviorDate
+            url: "http://localhost:8000/behaviors/?student=" + $rootScope.student.id + "&start_date=" + $scope.behaviorDate + "&end_date=" + $scope.behaviorDate
         }).then(function successCallback(response) {
             $scope.behaviors = response.data;
             $scope.classBehaviorScores = {};
@@ -100,7 +100,7 @@
         $scope.changeDate();
     });
 
-    var ctx = document.getElementById("myChart").getContext('2d');
+    var ctx = document.getElementById("student_behavior").getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
