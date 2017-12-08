@@ -2,6 +2,7 @@
   "name": "sprout-client",
   "description": "Sprout",
   "dependencies": {
+    "angular-chart.js": "^1.1.1",
     "express": "4"
   }
 }
