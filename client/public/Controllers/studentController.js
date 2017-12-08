@@ -205,8 +205,11 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     };
     $scope.datasetOverride = [
     {
+      lineTension: 0.2,
+
       label: "CS5510",
       fill: false,
+
       backgroundColor: 'rgba(255,99,132,0.4)',
       pointBackgroundColor: 'rgba(255,99,132,0.4)',
       pointHoverBackgroundColor: 'rgba(255,99,132,0.4)',
@@ -215,6 +218,8 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
       pointHoverBorderColor: 'rgba(255,99,132,1)'
     },
     {
+      lineTension: 0.2,
+
       label: "CS4400",
       fill: false,
 
