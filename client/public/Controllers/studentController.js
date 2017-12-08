@@ -1,5 +1,5 @@
 ﻿app.controller("studentController", function ($scope, $location, $http, $rootScope, $routeParams) {
-  
+
     $scope.class_titles = [];
     $scope.classes = [];
     $scope.behaviors = [];
@@ -66,15 +66,43 @@
     }
 
     // called when user inputs a new behavior/effort score
-    $scope.changeBehaviors = function () {
-        // do a check to see if I post or put
+    $scope.changeBehaviors = function (classId) {
+        if ($scope.classBehaviorScores === undefined)
+            return;
+        // change my class in scope.classes locally
+        var newBehavior = {
+            "date": $scope.behaviorDate,
+            "enrollment": classId,
+            "effort": document.getElementById("effort-" + classId).value,
+            "behavior": document.getElementById("behavior-" + classId).value
+        };
+        for (var i = 0; i < $scope.classes.length; i++) {
+            if ($scope.classes[i].id === classId) {
+                var x = $scope.classBehaviorScores[classId].id;
+                // put if classBehaviorScores does contain id
+                $http({
+                    method: 'PUT',
+                    url: "http://localhost:8000/behaviors/" + $scope.classBehaviorScores[classId].id + "/",
+                    // going to post behavior object, grab from 
+                    data: newBehavior
+                }).then(function successCallback(response) {
+                    $scope.classBehaviorScores[classId] = response.data;
+                    var x = "got here";
+                }, function errorCallback(response) {
+                    $scope.status = response.status;
+                    console.log(response);
+                });
+                return;
+            }
+        }
+        // not contained, make a post, append to list first
         $http({
             method: 'POST',
             url: "http://localhost:8000/behaviors/",
             // going to post behavior object, grab from 
-            data: "blah"
+            data: newBehavior
         }).then(function successCallback(response) {
-
+            $scope.classBehaviorScores[classId] = response.data;
         }, function errorCallback(response) {
             $scope.status = response.status;
         });

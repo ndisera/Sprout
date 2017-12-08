@@ -86,7 +86,7 @@
                     <tr ng-repeat="class in classes">
                         <td>{{class.title}}</td>
                         <td>
-                            <select class="behaviorScore">
+                            <select class="behaviorScore" id="behavior-{{class.id}}" ng-model="behaviorScore" ng-change="changeBehaviors(class.id)">
                                 <option disabled ng-selected="classBehaviorScores[class.id] === undefined || classBehaviorScores[class.id].behavior === undefined || classBehaviorScores[class.id].behavior === null"></option>
                                 <option value="1" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 1">1</option>
                                 <option value="2" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 2">2</option>
@@ -96,7 +96,7 @@
                             </select>
                         </td>
                         <td>
-                            <select class="effortScore">
+                            <select class="effortScore" id="effort-{{class.id}}" ng-model="effortScore" ng-change="changeBehaviors(class.id)">
                                 <option disabled ng-selected="classBehaviorScores[class.id] === undefined || classBehaviorScores[class.id].effort === undefined || classBehaviorScores[class.id].effort === null"></option>
                                 <option value="1" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 1">1</option>
                                 <option value="2" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 2">2</option>
