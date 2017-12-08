@@ -192,6 +192,16 @@
     $scope.onClick = function (points, evt) {
       console.log(points, evt);
     };
+    $scope.datasetOverride = [
+    {
+      label: "CS5510",
+      fill: false
+    },
+    {
+      label: "CS4400",
+      fill: false
+    }
+    ];
     $scope.options = {
       responsive: true,
       maintainAspectRatio: false,
@@ -203,6 +213,10 @@
             max: 5
           }
         }]
+      },
+      legend:
+      {
+        display: true
       }
     };
 });
