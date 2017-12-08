@@ -1,3 +1,4 @@
+import sys
 import datetime
 import json
 import random
@@ -123,8 +124,110 @@ class StudentGenerator(object):
         if response.status_code >= 400 and response.status_code < 500:
             raise "Unable to POST student: " + str(json)
 
+def post_request(url, data):
+    response = requests.post(url=url, json=data)
+    if response.status_code > 299:
+        print 'oh, crap... something went wrong. error code ' + str(response.status_code) + ' when I posted ' + url + ' with payload: ' + str(data)
+        print 'response data: ' + str(response.json())
+        sys.exit()
+    return response
+    
+
+def upload_basic_bitches():
+    print "it worked!"
+    # teachers
+    host = 'localhost'
+    port = 8000
+    base_url = 'http://' + host + ':' + str(port) + '/'
+    teacher_url = base_url + 'teachers/'
+
+    teacher_matt = {
+        'username': 'mflatt',
+        'first_name': 'Matthew',
+        'last_name': 'Flatt',
+        'email': 'mflatt@cs.utah.edu',
+    }
+
+    teacher_danny = {
+        'username': 'dkopta',
+        'first_name': 'Daniel',
+        'last_name': 'Kopta',
+        'email': 'dkopta@cs.utah.edu',
+    }
+
+    response = post_request(url=teacher_url, data=teacher_matt)
+    teacher_matt_id = response.json()['id']
+
+    response = post_request(url=teacher_url, data=teacher_danny)
+    teacher_danny_id = response.json()['id']
+
+    # students
+    student_url = base_url + 'students/'
+
+    generator = StudentGenerator()
+    generator.upload_developer_information()
+
+    students = requests.get(url=student_url).json()
+
+    # sections
+    section_url = base_url + 'sections/'
+
+    section_matt = {
+        'teacher': teacher_matt_id,
+        'title': 'CS 5510',
+    }
+
+    section_danny = {
+        'teacher': teacher_danny_id,
+        'title': 'CS 4400',
+    }
+
+    response = post_request(url=section_url, data=section_matt)
+    section_matt_id = response.json()['id']
+    response = post_request(url=section_url, data=section_danny)
+    section_danny_id = response.json()['id']
+
+    # enrollments
+    enrollment_url = base_url + 'enrollments/'
+
+    enrollments = []
+    for student in students:
+        enrollments.append({'section': section_matt_id, 'student': student['id']})
+        enrollments.append({'section': section_danny_id, 'student': student['id']})
+
+    enrollments_posted = []
+    for enrollment in enrollments:
+        response = post_request(url=enrollment_url, data=enrollment)
+        enrollments_posted.append(response.json())
+
+    # behaviors
+    behaviors_url = base_url + 'behaviors/'
+
+    for day in range(1, 8):
+        for enrollment in enrollments_posted:
+            to_post = {
+                'date': '2017-12-' + str(day),
+                'enrollment': enrollment['id'],
+                'effort': random.randint(1, 5),
+                'behavior': random.randint(1, 5),
+            }
+            response = post_request(url=behaviors_url, data=to_post)
+
 
 if __name__ == "__main__":
-    generator = StudentGenerator()
-    #generator.upload_developer_information();
-    generator.upload_many_random_students(5)
+    options = {
+        '--setup': upload_basic_bitches,
+    }
+
+    if len(sys.argv) > 1:
+        for x in range(1, len(sys.argv)):
+            if callable(options[sys.argv[x]]):
+                options[sys.argv[x]]()
+    else:
+        generator = StudentGenerator()
+        # generator.upload_developer_information();
+        generator.upload_many_random_students(5)
+
+
+
+

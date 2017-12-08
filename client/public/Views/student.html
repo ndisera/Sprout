@@ -73,7 +73,7 @@
                         <td>{{class.title}}</td>
                         <td>
                             <select class="behaviorScore">
-                                <option disabled ng-selected="classBehaviorScores[class.id] === undefined || classBehaviorScores[class.id].behavior === undefined"></option>
+                                <option disabled ng-selected="classBehaviorScores[class.id] === undefined || classBehaviorScores[class.id].behavior === undefined || classBehaviorScores[class.id].behavior === null"></option>
                                 <option value="1" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 1">1</option>
                                 <option value="2" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 2">2</option>
                                 <option value="3" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 3">3</option>
@@ -83,7 +83,7 @@
                         </td>
                         <td>
                             <select class="effortScore">
-                                <option disabled ng-selected="classBehaviorScores[class.id] === undefined || classBehaviorScores[class.id].effort === undefined"></option>
+                                <option disabled ng-selected="classBehaviorScores[class.id] === undefined || classBehaviorScores[class.id].effort === undefined || classBehaviorScores[class.id].effort === null"></option>
                                 <option value="1" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 1">1</option>
                                 <option value="2" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 2">2</option>
                                 <option value="3" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 3">3</option>

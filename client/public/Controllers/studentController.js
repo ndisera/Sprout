@@ -35,7 +35,7 @@
         $scope.status = response.status;
     });
 
-    //// the classes array should now contain objects with teacher and title
+    // the classes array should now contain objects with teacher and title
 
 
     // get behavior scores
@@ -62,6 +62,21 @@
         });
     }
 
+    // called when user inputs a new behavior/effort score
+    $scope.changeBehaviors = function () {
+        // do a check to see if I post or put
+        $http({
+            method: 'POST',
+            url: "http://localhost:8000/behaviors/",
+            // going to post behavior object, grab from 
+            data: "blah"
+        }).then(function successCallback(response) {
+
+        }, function errorCallback(response) {
+            $scope.status = response.status;
+        });
+    }
+
     if (!JSON.parse(localStorage.getItem("loggedIn"))) {
         location.path('');
     }
@@ -82,11 +97,10 @@
 
     defaultDate();
 
+    // called when date in datepicker is changed
     $scope.changeDate = function () {
-        // set select boxes back to one
-        var temp = "";
-        $(".effortScore").val("");
-        $(".behaviorScore").val("");
+        $scope.behaviorDate = document.getElementById('datepicker').value;
+        $scope.getBehaviors();
     }
 
     $('#datepicker').datepicker().on('changeDate', function (ev) {
