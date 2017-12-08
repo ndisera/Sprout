@@ -1,4 +1,8 @@
-﻿app.controller("studentController", function ($scope, $location, $http, $rootScope) {
+app.controller("studentController", function ($scope, $location, $http, $rootScope, $routeParams) {
+
+    $scope.classes = [];
+    $scope.behaviors = [];
+
     // get student's classes
     $http({
         method: 'GET',

@@ -1,4 +1,4 @@
-﻿var app = angular.module("app", ["ngRoute"]);
+﻿var app = angular.module("app", ["ngRoute", "chart.js"]);
 
 // configure our routes
 app.config(function ($routeProvider) {
@@ -23,7 +23,7 @@ app.config(function ($routeProvider) {
         })
 
         // route for the student profile page
-        .when('/student', {
+        .when('/student/:id', {
             templateUrl: 'Views/student.html',
             controller: 'studentController'
         });

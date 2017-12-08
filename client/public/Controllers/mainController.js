@@ -53,7 +53,7 @@
                 // the currently chosen student object
                 $rootScope.student = $scope.students[i];
                 localStorage.setItem("lastStudent", JSON.stringify($rootScope.student));
-                $location.path('/student');
+                $location.path('/student/' + $scope.students[i].id);
                 return;
             }
         }
