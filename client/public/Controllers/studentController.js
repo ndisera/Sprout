@@ -84,7 +84,8 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
                     // going to post behavior object, grab from 
                     data: newBehavior
                 }).then(function successCallback(response) {
-                    $scope.classBehaviorScores[classId] = response.data;
+                  $scope.classBehaviorScores[classId] = response.data;
+                  getHardcodedPrototypeBehaviorAndEffort();
                 }, function errorCallback(response) {
                     $scope.status = response.status;
                 });
@@ -104,7 +105,8 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
             // going to post behavior object, grab from 
             data: newBehavior
         }).then(function successCallback(response) {
-            $scope.classBehaviorScores[classId] = response.data;
+          $scope.classBehaviorScores[classId] = response.data;
+          getHardcodedPrototypeBehaviorAndEffort();
         }, function errorCallback(response) {
             $scope.status = response.status;
         });
@@ -142,6 +144,10 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     
     function getHardcodedPrototypeBehaviorAndEffort()
     {
+      $scope.hardcodedBehaviorForThePrototype = [];
+      $scope.hardcodedEffortForThePrototype = [];
+      $scope.hardcodedSectionIDsForThePrototype = [];
+      
       // Use this skeleton as the body of the get
       var get_data = {
         "student": $rootScope.student.id,
@@ -187,9 +193,6 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     
     getHardcodedPrototypeBehaviorAndEffort();
 
-    $scope.data = [
-    [65, 59, 80, 81, 56, 55, 40]
-    ];
     $scope.graph_labels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
     $scope.onClick = function (points, evt) {
       console.log(points, evt);
