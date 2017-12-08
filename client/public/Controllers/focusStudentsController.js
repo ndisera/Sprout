@@ -57,4 +57,17 @@
       responsive: true,
       maintainAspectRatio: false
     };
+    $scope.options_behavior = {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales:{
+        yAxes: [{
+          display: true,
+          ticks: {
+            beginAtZero: true,
+            max: 5
+          }
+        }]
+      }
+    };
 });
