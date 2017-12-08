@@ -10,8 +10,6 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     // Section IDs are stored as a list of integers
     $scope.hardcodedSectionIDsForThePrototype = [];
 
-    var x = $rootScope.student.id;
-
     // get student's classes
     $http({
         method: 'GET',
@@ -54,10 +52,7 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
             $scope.behaviors = response.data;
             $scope.classBehaviorScores = {};
             for (var i = 0; i < $scope.behaviors.length; i++) {
-                $scope.classBehaviorScores[response.data[i].enrollment.section] = {
-                    behavior: response.data[i].behavior,
-                    effort: response.data[i].effort
-                }
+                $scope.classBehaviorScores[response.data[i].enrollment.section] = response.data[i];
             }
             // now I should be able to match each behavior and effort score to each class
         }, function errorCallback(response) {
@@ -70,15 +65,18 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
         if ($scope.classBehaviorScores === undefined)
             return;
         // change my class in scope.classes locally
-        var newBehavior = {
-            "date": $scope.behaviorDate,
-            "enrollment": classId,
-            "effort": document.getElementById("effort-" + classId).value,
-            "behavior": document.getElementById("behavior-" + classId).value
-        };
-        for (var i = 0; i < $scope.classes.length; i++) {
-            if ($scope.classes[i].id === classId) {
-                var x = $scope.classBehaviorScores[classId].id;
+        //console.log(newBehavior);
+              var newBehavior = {
+                  "date": $scope.behaviorDate,
+                  "enrollment": null,
+                  "effort": document.getElementById("effort-" + classId).value === "" ? null : document.getElementById("effort-" + classId).value,
+                  "behavior": document.getElementById("behavior-" + classId).value === "" ? null : document.getElementById("behavior-" + classId).value
+              };
+
+        if($scope.classBehaviorScores[classId] !== undefined && $scope.classBehaviorScores[classId] !== null) {
+
+              newBehavior.enrollment = $scope.classBehaviorScores[classId].enrollment.id;
+              
                 // put if classBehaviorScores does contain id
                 $http({
                     method: 'PUT',
@@ -87,14 +85,18 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
                     data: newBehavior
                 }).then(function successCallback(response) {
                     $scope.classBehaviorScores[classId] = response.data;
-                    var x = "got here";
                 }, function errorCallback(response) {
                     $scope.status = response.status;
-                    console.log(response);
                 });
                 return;
+        }
+
+        for(var j = 0; j < $scope.enrollments.length; ++j) {
+            if($scope.enrollments[j].section === classId) {
+              newBehavior.enrollment = $scope.enrollments[j].id;
             }
         }
+
         // not contained, make a post, append to list first
         $http({
             method: 'POST',
