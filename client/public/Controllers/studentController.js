@@ -200,19 +200,24 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     $scope.datasetOverride = [
     {
       label: "CS5510",
-      fill: false
+      fill: false,
+      backgroundColor: 'rgba(255,99,132,0.4)',
+      pointBackgroundColor: 'rgba(255,99,132,0.4)',
+      pointHoverBackgroundColor: 'rgba(255,99,132,0.4)',
+      borderColor: 'rgba(255,99,132,1)',
+      pointBorderColor: 'rgba(255,99,132,0.6)',
+      pointHoverBorderColor: 'rgba(255,99,132,1)'
     },
     {
       label: "CS4400",
       fill: false,
-      // Set the colour of the line
-      borderColor: [
-      'rgba(255,99,132,1)'
-      ],
-      // Even though the line has no underfill, need a background for the legend box
-      backgroundColor: [
-      'rgba(255, 99, 132, 0.2)'
-      ]
+
+      backgroundColor: 'rgba(100,150,255,0.4)',
+      pointBackgroundColor: 'rgba(100,150,255,0.4)',
+      pointHoverBackgroundColor: 'rgba(100,150,255,0.4)',
+      borderColor: 'rgba(100,150,255,1)',
+      pointBorderColor: 'rgba(100,150,255,0.6)',
+      pointHoverBorderColor: 'rgba(100,150,255,1)'
     }
     ];
     $scope.options = {
