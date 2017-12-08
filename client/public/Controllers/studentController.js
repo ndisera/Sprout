@@ -38,20 +38,18 @@
         }).then(function successCallback(response) {
             var x = $scope.classes;
             $scope.behaviors = response.data;
-            $scope.classBehaviorScores = [];
+            $scope.classBehaviorScores = {};
             for (var i = 0; i < $scope.behaviors.length; i++) {
+                $scope.classBehaviorScores[response.data[i].enrollment.id] = {
+                    behavior: response.data[i].behavior,
+                    effort: response.data[i].effort
+                }
                 //$scope.classBehaviorScores.push({
-                //    // this id is also used to map to title in $scope.classes
-                //    [response.data[i].enrollment.id]: {
-                //        behavior: response.data[i].behavior,
-                //        effort: response.data[i].effort
-                //    }
-                //})
-                $scope.classBehaviorScores.push({
-                    id: response.data[i].enrollment.id,
-                    behaviorValue: response.data[i].behavior,
-                    effortValue: response.data[i].effort
-                });
+                //    id: response.data[i].enrollment.id,
+                //    behaviorValue: response.data[i].behavior,
+                //    effortValue: response.data[i].effort
+                //});
+                var x = $scope.classBehaviorScores;
             }
             
 
