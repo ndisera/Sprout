@@ -25,79 +25,16 @@
                                     <label>Focus Category</label>
                                     <span class="glyphicon glyphicon-heart-empty"></span>
                                     <div class="col-sm-12 focusGraph">
-                                        <canvas class="line"></canvas>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 centerText">
-                                    <label>Progress Category</label>
-                                    <span class="glyphicon glyphicon-fire"></span>
-                                    <div class="col-sm-12 focusProgress">
-                                        <canvas class="line"></canvas>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 centerText">
-                                    <label>Caution Category</label>
-                                    <span class="glyphicon glyphicon-alert"></span>
-                                    <div class="col-sm-12 focusCaution">
-                                        <canvas class="line"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a href="">Graham Zuber</a>
-                            <span class="glyphicon glyphicon-chevron-down"
-                                  data-toggle="collapse" data-target="#collapse8" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
-                        </h4>
-                    </div>
-                    <div id="collapse8" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-sm-4 centerText">
-                                    <label>Focus Category</label>
-                                    <span class="glyphicon glyphicon-heart-empty"></span>
-                                    <div class="col-sm-12 focusGraph">
-                                        <canvas class="line"></canvas>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 centerText">
-                                    <label>Progress Category</label>
-                                    <span class="glyphicon glyphicon-fire"></span>
-                                    <div class="col-sm-12 focusProgress">
-                                        <canvas class="line"></canvas>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 centerText">
-                                    <label>Caution Category</label>
-                                    <span class="glyphicon glyphicon-alert"></span>
-                                    <div class="col-sm-12 focusCaution">
-                                        <canvas class="line"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a href="">Simon Redman</a>
-                            <span class="glyphicon glyphicon-chevron-down"
-                                  data-toggle="collapse" data-target="#collapse9" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
-                        </h4>
-                    </div>
-                    <div id="collapse9" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-sm-4 centerText">
-                                    <label>Focus Category</label>
-                                    <span class="glyphicon glyphicon-heart-empty"></span>
-                                    <div class="col-sm-12 focusGraph">
-                                        <canvas class="line"></canvas>
+                                        <canvas
+                                          id="simon_focus_progress"
+                                          class="chart chart-line"
+                                          chart-data="data"
+                                          chart-labels="labels"
+                                          chart-series="series"
+                                          chart-options="options"
+                                          chart-dataset-override="datasetOverride"
+                                          chart-click="onClick"
+                                        ></canvas>
                                     </div>
                                 </div>
                                 <div class="col-sm-4 centerText">
