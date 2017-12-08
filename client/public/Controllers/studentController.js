@@ -1,4 +1,4 @@
-﻿app.controller("studentController", function ($scope, $location, $http, $rootScope, $routeParams) {
+app.controller("studentController", function ($scope, $location, $http, $rootScope, $routeParams) {
 
     $scope.class_titles = [];
     $scope.classes = [];
