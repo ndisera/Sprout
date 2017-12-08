@@ -3,6 +3,8 @@
     $scope.classes = [];
     $scope.behaviors = [];
 
+    var x = $rootScope.student.id;
+
     // get student's classes
     $http({
         method: 'GET',
@@ -11,15 +13,14 @@
         // enrollments will contain section id (for mapping to enrollments) and student id
         $scope.enrollments = response.data;
         $scope.classes = [];
-        var index = 0;
         for (var i = 0; i < $scope.enrollments.length; i++) {
             $http({
                 method: 'GET',
-                url: 'http://localhost:8000/sections/?section=' + $scope.enrollments[i].section
+                url: 'http://localhost:8000/sections/' + $scope.enrollments[i].section + "/"
             }).then(function successCallback(response) {
                 $scope.classes.push({
-                    id: response.data[index].id,
-                    title: response.data[index++].title
+                    id: response.data.id,
+                    title: response.data.title
                 });
                 var x = $scope.classes;
             }, function errorCallback(response) {
@@ -42,15 +43,12 @@
         }).then(function successCallback(response) {
             $scope.behaviors = response.data;
             $scope.classBehaviorScores = {};
-            var index = 0;
             for (var i = 0; i < $scope.behaviors.length; i++) {
-                $scope.classBehaviorScores[response.data[i].enrollment.id] = {
+                $scope.classBehaviorScores[response.data[i].enrollment.section] = {
                     behavior: response.data[i].behavior,
                     effort: response.data[i].effort
                 }
             }
-            
-
             // now I should be able to match each behavior and effort score to each class
         }, function errorCallback(response) {
             $scope.status = response.status;
