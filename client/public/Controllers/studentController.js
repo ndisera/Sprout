@@ -84,7 +84,9 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
                     // going to post behavior object, grab from 
                     data: newBehavior
                 }).then(function successCallback(response) {
+                  var enrollment_obj = $scope.classBehaviorScores[classId].enrollment;
                   $scope.classBehaviorScores[classId] = response.data;
+                  $scope.classBehaviorScores[classId].enrollment = enrollment_obj;
                   getHardcodedPrototypeBehaviorAndEffort();
                 }, function errorCallback(response) {
                     $scope.status = response.status;
@@ -92,8 +94,11 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
                 return;
         }
 
+
+      var enrollment_obj;
         for(var j = 0; j < $scope.enrollments.length; ++j) {
             if($scope.enrollments[j].section === classId) {
+              enrollment_obj = $scope.enrollments[j];
               newBehavior.enrollment = $scope.enrollments[j].id;
             }
         }
@@ -106,6 +111,7 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
             data: newBehavior
         }).then(function successCallback(response) {
           $scope.classBehaviorScores[classId] = response.data;
+          $scope.classBehaviorScores[classId].enrollment = enrollment_obj;
           getHardcodedPrototypeBehaviorAndEffort();
         }, function errorCallback(response) {
             $scope.status = response.status;
