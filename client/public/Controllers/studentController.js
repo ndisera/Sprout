@@ -133,9 +133,8 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
         var date = new Date();
         // prepend 0 to single digit day
         var day = "";
-        if (date.getDate() < 10) {
-            day = "0" + date.getDate();
-        }
+        date.getDate() < 10 ? day = "0" + date.getDate() : day = date.getDate();
+        console.log(day);
         $scope.behaviorDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + day;
     }
 
@@ -160,8 +159,8 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
       // Use this skeleton as the body of the get
       var get_data = {
         "student": $rootScope.student.id,
-        "start_date": "2017-12-04",
-        "end_date": "2017-12-08"
+        "start_date": "2017-12-11",
+        "end_date": "2017-12-15"
       }
 
       $http({
