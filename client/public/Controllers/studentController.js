@@ -3,6 +3,8 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     $scope.section_titles = [];
     $scope.sections = [];
     $scope.behaviors = [];
+    // used for experimenting with ng-options
+    $scope.scores = [1, 2, 3, 4, 5];
     // Both behavior and effort are arrays of lists of scores,
     // where each top-level array corresponds to a section
     $scope.hardcodedBehaviorForThePrototype = [];
@@ -144,8 +146,10 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
         // prepend 0 to single digit day
         var day = "";
         date.getDate() < 10 ? day = "0" + date.getDate() : day = date.getDate();
+        var month = "";
+        date.getMonth() + 1 < 10 ? month = "0" + (date.getMonth() + 1) : month = date.getMonth() + 1;
         console.log(day);
-        $scope.behaviorDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + day;
+        $scope.behaviorDate = date.getFullYear() + "-" + month + "-" + day;
     }
 
     defaultDate();

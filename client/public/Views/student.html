@@ -109,6 +109,10 @@
                                 <option value="5" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].effort === 5">5</option>
                             </select>
                         </td>
+                        <!--<td>
+                            <select class="effortScore" id="effort-{{section.id}}" ng-model="effortScore" ng-change="changeBehaviors(section.id)" ng-options="score for score in scores">
+                            </select>
+                        </td>-->
                     </tr>
                 </tbody>
             </table>
