@@ -87,26 +87,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="class in classes">
-                        <td>{{class.title}}</td>
+                    <tr ng-repeat="section in sections">
+                        <td>{{section.title}}</td>
                         <td>
-                            <select class="behaviorScore" id="behavior-{{class.id}}" ng-model="behaviorScore" ng-change="changeBehaviors(class.id)">
-                                <option disabled ng-selected="classBehaviorScores[class.id] === undefined || classBehaviorScores[class.id].behavior === undefined || classBehaviorScores[class.id].behavior === null"></option>
-                                <option value="1" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 1">1</option>
-                                <option value="2" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 2">2</option>
-                                <option value="3" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 3">3</option>
-                                <option value="4" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 4">4</option>
-                                <option value="5" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].behavior === 5">5</option>
+                            <select class="behaviorScore" id="behavior-{{section.id}}" ng-model="behaviorScore" ng-change="changeBehaviors(section.id)">
+                                <option disabled ng-selected="sectionBehaviorScores[section.id] === undefined || sectionBehaviorScores[section.id].behavior === undefined || sectionBehaviorScores[section.id].behavior === null"></option>
+                                <option value="1" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].behavior === 1">1</option>
+                                <option value="2" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].behavior === 2">2</option>
+                                <option value="3" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].behavior === 3">3</option>
+                                <option value="4" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].behavior === 4">4</option>
+                                <option value="5" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].behavior === 5">5</option>
                             </select>
                         </td>
                         <td>
-                            <select class="effortScore" id="effort-{{class.id}}" ng-model="effortScore" ng-change="changeBehaviors(class.id)">
-                                <option disabled ng-selected="classBehaviorScores[class.id] === undefined || classBehaviorScores[class.id].effort === undefined || classBehaviorScores[class.id].effort === null"></option>
-                                <option value="1" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 1">1</option>
-                                <option value="2" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 2">2</option>
-                                <option value="3" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 3">3</option>
-                                <option value="4" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 4">4</option>
-                                <option value="5" ng-selected="classBehaviorScores[class.id] !== undefined && classBehaviorScores[class.id].effort === 5">5</option>
+                            <select class="effortScore" id="effort-{{section.id}}" ng-model="effortScore" ng-change="changeBehaviors(section.id)">
+                                <option disabled ng-selected="sectionBehaviorScores[section.id] === undefined || sectionBehaviorScores[section.id].effort === undefined || sectionBehaviorScores[section.id].effort === null"></option>
+                                <option value="1" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].effort === 1">1</option>
+                                <option value="2" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].effort === 2">2</option>
+                                <option value="3" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].effort === 3">3</option>
+                                <option value="4" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].effort === 4">4</option>
+                                <option value="5" ng-selected="sectionBehaviorScores[section.id] !== undefined && sectionBehaviorScores[section.id].effort === 5">5</option>
                             </select>
                         </td>
                     </tr>
