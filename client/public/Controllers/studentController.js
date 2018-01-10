@@ -13,7 +13,9 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     // get student's classes
     $http({
         method: 'GET',
-        url: 'http://localhost:8000/enrollments/?student=' + $rootScope.student.id
+        url: 'http://'
+            + $rootScope.backend
+            + '/enrollments/?student=' + $rootScope.student.id
     }).then(function successCallback(response) {
         // enrollments will contain section id (for mapping to enrollments) and student id
         $scope.enrollments = response.data;
@@ -21,7 +23,9 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
         for (var i = 0; i < $scope.enrollments.length; i++) {
             $http({
                 method: 'GET',
-                url: 'http://localhost:8000/sections/' + $scope.enrollments[i].section + "/"
+                url: 'http://'
+                    + $rootScope.backend
+                    + '/sections/' + $scope.enrollments[i].section + "/"
             }).then(function successCallback(response) {
                 $scope.classes.push({
                     id: response.data.id,
@@ -47,7 +51,9 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     $scope.getBehaviors = function () {
         $http({
             method: 'GET',
-            url: "http://localhost:8000/behaviors/?student=" + $rootScope.student.id + "&start_date=" + $scope.behaviorDate + "&end_date=" + $scope.behaviorDate
+            url: 'http://'
+                    + $rootScope.backend
+                    + '/behaviors/?student=' + $rootScope.student.id + "&start_date=" + $scope.behaviorDate + "&end_date=" + $scope.behaviorDate
         }).then(function successCallback(response) {
             $scope.behaviors = response.data;
             $scope.classBehaviorScores = {};
@@ -80,7 +86,9 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
                 // put if classBehaviorScores does contain id
                 $http({
                     method: 'PUT',
-                    url: "http://localhost:8000/behaviors/" + $scope.classBehaviorScores[classId].id + "/",
+                    url: 'http://'
+                        + $rootScope.backend
+                        + "/behaviors/" + $scope.classBehaviorScores[classId].id + "/",
                     // going to post behavior object, grab from 
                     data: newBehavior
                 }).then(function successCallback(response) {
@@ -109,7 +117,9 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
         // not contained, make a post, append to list first
         $http({
             method: 'POST',
-            url: "http://localhost:8000/behaviors/",
+            url: 'http://'
+                + $rootScope.backend
+                + '/behaviors/',
             // going to post behavior object, grab from 
             data: newBehavior
         }).then(function successCallback(response) {
@@ -165,7 +175,9 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
 
       $http({
         method: 'GET',
-        url: "http://localhost:8000/behaviors/?student=" + get_data["student"] + "&start_date=" + get_data["start_date"] + "&end_date=" + get_data["end_date"]
+        url: 'http://'
+            + $rootScope.backend
+            + '/behaviors/?student=' + get_data["student"] + "&start_date=" + get_data["start_date"] + "&end_date=" + get_data["end_date"]
       }).then(function successCallback(response)
       {
         var behaviors = {};
