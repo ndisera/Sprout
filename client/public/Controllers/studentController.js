@@ -1,7 +1,7 @@
 app.controller("studentController", function ($scope, $location, $http, $rootScope, $routeParams) {
 
-    $scope.class_titles = [];
-    $scope.classes = [];
+    $scope.section_titles = [];
+    $scope.sections = [];
     $scope.behaviors = [];
     // Both behavior and effort are arrays of lists of scores,
     // where each top-level array corresponds to a section
@@ -10,7 +10,7 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     // Section IDs are stored as a list of integers
     $scope.hardcodedSectionIDsForThePrototype = [];
 
-    // get student's classes
+    // get student's sections
     $http({
         method: 'GET',
         url: 'http://'
@@ -19,7 +19,7 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     }).then(function successCallback(response) {
         // enrollments will contain section id (for mapping to enrollments) and student id
         $scope.enrollments = response.data;
-        $scope.classes = [];
+        $scope.sections = [];
         for (var i = 0; i < $scope.enrollments.length; i++) {
             $http({
                 method: 'GET',
@@ -27,14 +27,14 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
                     + $rootScope.backend
                     + '/sections/' + $scope.enrollments[i].section + "/"
             }).then(function successCallback(response) {
-                $scope.classes.push({
+                $scope.sections.push({
                     id: response.data.id,
                     title: response.data.title
                 });
-                $scope.class_titles.push(
+                $scope.section_titles.push(
                   response.data.title
                 );
-                var x = $scope.classes;
+                var x = $scope.sections;
             }, function errorCallback(response) {
                 $scope.status = response.status;
             });
@@ -43,7 +43,7 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
         $scope.status = response.status;
     });
 
-    // the classes array should now contain objects with teacher and title
+    // the sections array should now contain objects with teacher and title
 
 
     // get behavior scores
@@ -56,49 +56,49 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
                     + '/behaviors/?student=' + $rootScope.student.id + "&start_date=" + $scope.behaviorDate + "&end_date=" + $scope.behaviorDate
         }).then(function successCallback(response) {
             $scope.behaviors = response.data;
-            $scope.classBehaviorScores = {};
+            $scope.sectionBehaviorScores = {};
             for (var i = 0; i < $scope.behaviors.length; i++) {
-                $scope.classBehaviorScores[response.data[i].enrollment.section] = response.data[i];
+                $scope.sectionBehaviorScores[response.data[i].enrollment.section] = response.data[i];
             }
-            // now I should be able to match each behavior and effort score to each class
+            // now I should be able to match each behavior and effort score to each section
         }, function errorCallback(response) {
             $scope.status = response.status;
         });
     }
 
     // called when user inputs a new behavior/effort score
-    $scope.changeBehaviors = function (classId) {
-        if ($scope.classBehaviorScores === undefined)
+    $scope.changeBehaviors = function (sectionId) {
+        if ($scope.sectionBehaviorScores === undefined)
             return;
-        // change my class in scope.classes locally
+        // change my section in scope.sections locally
         //console.log(newBehavior);
               var newBehavior = {
                   "date": $scope.behaviorDate,
                   "enrollment": null,
-                  "effort": document.getElementById("effort-" + classId).value === "" ? null : document.getElementById("effort-" + classId).value,
-                  "behavior": document.getElementById("behavior-" + classId).value === "" ? null : document.getElementById("behavior-" + classId).value
+                  "effort": document.getElementById("effort-" + sectionId).value === "" ? null : document.getElementById("effort-" + sectionId).value,
+                  "behavior": document.getElementById("behavior-" + sectionId).value === "" ? null : document.getElementById("behavior-" + sectionId).value
               };
 
-        if($scope.classBehaviorScores[classId] !== undefined && $scope.classBehaviorScores[classId] !== null) {
+        if($scope.sectionBehaviorScores[sectionId] !== undefined && $scope.sectionBehaviorScores[sectionId] !== null) {
 
-              newBehavior.enrollment = $scope.classBehaviorScores[classId].enrollment.id;
+              newBehavior.enrollment = $scope.sectionBehaviorScores[sectionId].enrollment.id;
               
-                // put if classBehaviorScores does contain id
+                // put if sectionBehaviorScores does contain id
                 $http({
                     method: 'PUT',
                     url: 'http://'
                         + $rootScope.backend
-                        + "/behaviors/" + $scope.classBehaviorScores[classId].id + "/",
+                        + "/behaviors/" + $scope.sectionBehaviorScores[sectionId].id + "/",
                     // going to post behavior object, grab from 
                     data: newBehavior
                 }).then(function successCallback(response) {
-                  var enrollment_obj = $scope.classBehaviorScores[classId].enrollment;
-                  $scope.classBehaviorScores[classId] = response.data;
-                  $scope.classBehaviorScores[classId].enrollment = enrollment_obj;
+                  var enrollment_obj = $scope.sectionBehaviorScores[sectionId].enrollment;
+                  $scope.sectionBehaviorScores[sectionId] = response.data;
+                  $scope.sectionBehaviorScores[sectionId].enrollment = enrollment_obj;
 
                   var date = new Date($scope.behaviorDate);
-                  $scope.hardcodedEffortForThePrototype[classId-1][date.getDay()] = $scope.classBehaviorScores[classId].effort;
-                  $scope.hardcodedBehaviorForThePrototype[classId-1][date.getDay()] = $scope.classBehaviorScores[classId].behavior;
+                  $scope.hardcodedEffortForThePrototype[sectionId-1][date.getDay()] = $scope.sectionBehaviorScores[sectionId].effort;
+                  $scope.hardcodedBehaviorForThePrototype[sectionId-1][date.getDay()] = $scope.sectionBehaviorScores[sectionId].behavior;
                 }, function errorCallback(response) {
                     $scope.status = response.status;
                 });
@@ -108,7 +108,7 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
 
       var enrollment_obj;
         for(var j = 0; j < $scope.enrollments.length; ++j) {
-            if($scope.enrollments[j].section === classId) {
+            if($scope.enrollments[j].section === sectionId) {
               enrollment_obj = $scope.enrollments[j];
               newBehavior.enrollment = $scope.enrollments[j].id;
             }
@@ -123,8 +123,8 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
             // going to post behavior object, grab from 
             data: newBehavior
         }).then(function successCallback(response) {
-          $scope.classBehaviorScores[classId] = response.data;
-          $scope.classBehaviorScores[classId].enrollment = enrollment_obj;
+          $scope.sectionBehaviorScores[sectionId] = response.data;
+          $scope.sectionBehaviorScores[sectionId].enrollment = enrollment_obj;
           //getHardcodedPrototypeBehaviorAndEffort();
         }, function errorCallback(response) {
             $scope.status = response.status;
@@ -188,7 +188,7 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
           var section_id = response.data[index]["enrollment"]["section"];
           if (behaviors[section_id] == undefined)
           {
-            // If we have not started a behavior list for this class, start one now
+            // If we have not started a behavior list for this section, start one now
             behaviors[section_id] = [];
             efforts[section_id] = [];
             sections.push(section_id)
