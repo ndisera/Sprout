@@ -14,7 +14,7 @@ killgroup()
 node ../client/server.js -f public -p 8001 &
 client=$!
 
-python ../server/manage.py runserver &
+python ../server/manage.py runserver 0.0.0.0:8000 &
 server=$!
 
 wait $server $client
