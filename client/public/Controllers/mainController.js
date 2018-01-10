@@ -18,7 +18,9 @@
 
     $http({
         method: 'GET',
-        url: 'http://localhost:8000/students/'
+        url: 'http://'
+            + $rootScope.backend
+            + '/students/'
     }).then(function successCallback(response) {
         // our collection of students
         $scope.students = response.data;
