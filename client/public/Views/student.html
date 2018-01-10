@@ -1,19 +1,19 @@
 ﻿<div class="container">
     <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
-        <li class="active"><a data-toggle="tab" data-target="#overview">Overview</a></li>
-        <li><a data-toggle="tab" data-target="#tests">Test Scores</a></li>
-        <li><a data-toggle="tab" data-target="#behavior" ng-click="getBehaviors()">Behavior</a></li>
-        <li><a data-toggle="tab" data-target="#goals">IEP Goals</a></li>
-        <li><a data-toggle="tab" data-target="#services">Services</a></li>
-        <li><a data-toggle="tab" data-target="#grades">Grades</a></li>
+        <li class="active"><a data-toggle="tab" data-target="#overview" ng-click="setActivePillAndTab('overview')">Overview</a></li>
+        <li><a data-toggle="tab" data-target="#tests" ng-click="setActivePillAndTab('tests')">Test Scores</a></li>
+        <li><a data-toggle="tab" data-target="#behavior" ng-click="getBehaviors(); setActivePillAndTab('behavior')">Behavior</a></li>
+        <li><a data-toggle="tab" data-target="#goals" ng-click="setActivePillAndTab('goals')">IEP Goals</a></li>
+        <li><a data-toggle="tab" data-target="#services" ng-click="setActivePillAndTab('services')">Services</a></li>
+        <li><a data-toggle="tab" data-target="#grades" ng-click="setActivePillAndTab('grades')">Grades</a></li>
     </ul>
     <ul class="nav nav-tabs hidden-xs">
-        <li class="active"><a data-toggle="tab" data-target="#overview">Overview</a></li>
-        <li><a data-toggle="tab" data-target="#tests">Test Scores</a></li>
-        <li><a data-toggle="tab" data-target="#behavior" ng-click="getBehaviors()">Behavior</a></li>
-        <li><a data-toggle="tab" data-target="#goals">IEP Goals</a></li>
-        <li><a data-toggle="tab" data-target="#services">Services</a></li>
-        <li><a data-toggle="tab" data-target="#grades">Grades</a></li>
+        <li class="active"><a data-toggle="tab" data-target="#overview" ng-click="setActivePillAndTab('overview')">Overview</a></li>
+        <li><a data-toggle="tab" data-target="#tests" ng-click="setActivePillAndTab('tests')">Test Scores</a></li>
+        <li><a data-toggle="tab" data-target="#behavior" ng-click="getBehaviors(); setActivePillAndTab('behavior')">Behavior</a></li>
+        <li><a data-toggle="tab" data-target="#goals" ng-click="setActivePillAndTab('goals')">IEP Goals</a></li>
+        <li><a data-toggle="tab" data-target="#services" ng-click="setActivePillAndTab('services')">Services</a></li>
+        <li><a data-toggle="tab" data-target="#grades" ng-click="setActivePillAndTab('grades')">Grades</a></li>
     </ul>
     <div class="tab-content">
         <div id="overview" class="tab-pane fade in active">
