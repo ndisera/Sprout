@@ -1,6 +1,4 @@
 # Source python environment
-#source ../server/env/bin/activate
-#SCRIPT=$(readlink "$0")
 SCRIPT_PATH=$(dirname "$0")
 source "${SCRIPT_PATH}"/../server/env/bin/activate
 
