@@ -1,4 +1,4 @@
-app.controller("studentController", function ($scope, $location, $http, $rootScope, $routeParams) {
+app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, enrollments, behaviorService) {
 
     $scope.section_titles = [];
     $scope.sections = [];
@@ -43,38 +43,28 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
         }
     }
 
-    // get student's sections
-    $http({
-        method: 'GET',
-        url: 'http://'
-            + $rootScope.backend
-            + '/enrollments/?student=' + $rootScope.student.id
-    }).then(function successCallback(response) {
-        // enrollments will contain section id (for mapping to enrollments) and student id
-        $scope.enrollments = response.data;
-        $scope.sections = [];
-        for (var i = 0; i < $scope.enrollments.length; i++) {
-            $http({
-                method: 'GET',
-                url: 'http://'
-                    + $rootScope.backend
-                    + '/sections/' + $scope.enrollments[i].section + "/"
-            }).then(function successCallback(response) {
-                $scope.sections.push({
-                    id: response.data.id,
-                    title: response.data.title
-                });
-                $scope.section_titles.push(
-                  response.data.title
-                );
-                var x = $scope.sections;
-            }, function errorCallback(response) {
-                $scope.status = response.status;
-            });
-        }
-    }, function errorCallback(response) {
-        $scope.status = response.status;
-    });
+      // enrollments will contain section id (for mapping to enrollments) and student id
+      $scope.enrollments = enrollments;
+      $scope.sections = [];
+      for (var i = 0; i < $scope.enrollments.length; i++) {
+          $http({
+              method: 'GET',
+              url: 'http://'
+                  + $rootScope.backend
+                  + '/sections/' + $scope.enrollments[i].section + "/"
+          }).then(function successCallback(response) {
+              $scope.sections.push({
+                  id: response.data.id,
+                  title: response.data.title
+              });
+              $scope.section_titles.push(
+                response.data.title
+              );
+              var x = $scope.sections;
+          }, function errorCallback(response) {
+              $scope.status = response.status;
+          });
+      }
 
     // the sections array should now contain objects with teacher and title
 
@@ -82,23 +72,19 @@ app.controller("studentController", function ($scope, $location, $http, $rootSco
     // get behavior scores
     // pass in student, start date, and end date
     $scope.getBehaviors = function () {
-        $http({
-            method: 'GET',
-            url: 'http://'
-                    + $rootScope.backend
-                    + '/behaviors/?student=' + $rootScope.student.id + "&start_date=" + $scope.behaviorDate + "&end_date=" + $scope.behaviorDate
-        }).then(function successCallback(response) {
-            $scope.behaviors = response.data;
+        var behaviorPromise = behaviorService.getStudentBehaviorByDate($routeParams.id, $scope.behaviorDate, $scope.behaviorDate);
+        behaviorPromise.then(function success(data) {
+            $scope.behaviors = data;
             $scope.sectionBehaviorScores = {};
             for (var i = 0; i < $scope.behaviors.length; i++) {
-                $scope.sectionBehaviorScores[response.data[i].enrollment.section] = response.data[i];
+                $scope.sectionBehaviorScores[data[i].enrollment.section] = data[i];
             }
             // now I should be able to match each behavior and effort score to each section
-        }, function errorCallback(response) {
-            $scope.status = response.status;
+        }, function error(message) {
+            $scope.status = message;
         });
     }
-
+  
     // called when user inputs a new behavior/effort score
     $scope.changeBehaviors = function (sectionId) {
         if ($scope.sectionBehaviorScores === undefined)

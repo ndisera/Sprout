@@ -1,16 +1,24 @@
-﻿app.factory("behaviorService", function ($http) {
+app.factory("behaviorService", function ($rootScope, $http) {
     return {
-        getBehavior: function () {
+        /**
+         * Get student behavior records, filtering by a start and end data
+         * @param {number} studentId - the student's id.
+         * @param {string} startDate - starting date bound to filter. formatted "YYYY-MM-DD".
+         * @param {string} endDate - ending date bound to filter. formatted "YYYY-MM-DD".
+         * @return {promise} promise that will resolve with data or reject with response code.
+         */
+        getStudentBehaviorByDate: function (studentId, startDate, endDate) {
             return $http({
                 method: 'GET',
-                url: 'http://localhost:8000/behaviors/'
-            }).then(function successCallback(response) {
-                return response;
-            }, function errorCallback(response) {
-                return response;
+                url: 'http://' + $rootScope.backend
+                        + '/behaviors/?student=' + studentId
+                        + "&start_date=" + startDate
+                        + "&end_date=" + endDate
+            }).then(function success(response) {
+                return response.data;
+            }, function error(response) {
+                return response.status;
             });
-
-            // return $q.when("Hello World!");
         }
     };
 });

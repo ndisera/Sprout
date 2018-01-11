@@ -7,7 +7,7 @@ app.config(function ($routeProvider) {
         // route for the settings page
         .when('/settings', {
             templateUrl: 'Views/settings.html',
-            controller: 'settingsController'
+            controller: 'settingsController',
         })
 
         // route for the focus students page
@@ -25,6 +25,11 @@ app.config(function ($routeProvider) {
         // route for the student profile page
         .when('/student/:id', {
             templateUrl: 'Views/student.html',
-            controller: 'studentController'
+            controller: 'studentController',
+            resolve: {
+                enrollments: function(enrollmentService, $route) {
+                    return enrollmentService.getStudentEnrollments($route.current.params.id);
+                }
+            }
         });
 });

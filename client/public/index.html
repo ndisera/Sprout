@@ -57,7 +57,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="index.html#!/focus" class="navbar-left" ng-click="clearSearch()"><img id="sproutLogo" src="Images/seeds-clipart-tree-sprout-6.png"></a>
+                <a href="#!/focus" class="navbar-left" ng-click="clearSearch()"><img id="sproutLogo" src="Images/seeds-clipart-tree-sprout-6.png"></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <form class="navbar-form navbar-left" ng-submit="getProfile()">
@@ -88,10 +88,10 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav hidden-sm hidden-md hidden-lg hidden-xl">
-                    <li><a href="index.html#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
-                    <li><a href="#scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
+                    <li><a href="#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
+                    <li><a href="#!/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
                     <li><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
-                    <li><a href="#settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                    <li><a href="#!/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
                     <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                 </ul>
             </div>
@@ -107,5 +107,7 @@
     <script src="Controllers/focusStudentsController.js"></script>
     <script src="Controllers/settingsController.js"></script>
     <script src="Controllers/scoresInputController.js"></script>
+    <script src="Services/behaviorService.js"></script>
+    <script src="Services/enrollmentService.js"></script>
 </body>
 </html>
