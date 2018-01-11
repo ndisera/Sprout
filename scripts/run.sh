@@ -1,5 +1,6 @@
 # Source python environment
-source ../server/env/bin/activate
+SCRIPT_PATH=$(dirname "$0")
+source "${SCRIPT_PATH}"/../server/env/bin/activate
 
 # Setup a signal handler
 trap killgroup SIGINT
@@ -11,10 +12,10 @@ killgroup()
 }
 
 # run server and client in parallel
-node ../client/server.js -f public -p 8001 &
+node "${SCRIPT_PATH}"/../client/server.js -f public -p 8001 &
 client=$!
 
-python ../server/manage.py runserver 0.0.0.0:8000 &
+python "${SCRIPT_PATH}"/../server/manage.py runserver 0.0.0.0:8000 &
 server=$!
 
 wait $server $client
