@@ -1,4 +1,4 @@
-﻿app.controller('mainController', function ($scope, $location, $http, $rootScope) {
+﻿app.controller('mainController', function ($scope, $rootScope, $location, studentService) {
 
     /**
      *  Used to determine where to make calls to the backend
@@ -16,32 +16,44 @@
      */
     $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort
 
-    $http({
-        method: 'GET',
-        url: 'http://'
-            + $rootScope.backend
-            + '/students/'
-    }).then(function successCallback(response) {
-        // our collection of students
-        $scope.students = response.data;
-    }, function errorCallback(response) {
-        $scope.status = response.status;
+    // get all students
+    var studentsPromise = studentService.getStudents();
+    studentsPromise.then(function success(data) {
+        $scope.students = data;
+        $scope.studentsLookup = {};
+
+        // create fast lookup dictionary
+        for (var i = 0; i < $scope.students.length; ++i) {
+          var lookupName = $scope.students[i].first_name + " " + $scope.students[i].last_name;
+          $scope.studentsLookup[lookupName.toUpperCase()] = $scope.students[i];
+        }
+    }, function error(code) {
+        //TODO: deal with errors
     });
 
-    // this is for refresh
-    if ($rootScope.student === undefined)
-        $rootScope.student = JSON.parse(localStorage.getItem("lastStudent"));
-    // if it's still null that's fine
+    $scope.tryNavigateToStudent = function() {
+        if ($scope.studentName.toUpperCase() in $scope.studentsLookup) {
+            $location.path('/student/' + $scope.studentsLookup[$scope.studentName.toUpperCase()].id);
+            return;
+        }
+        else {
+            //TODO: notify the user in some way
+        }
+    };
 
-    $scope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"));
-    if ($scope.loggedIn === null)
-        $scope.loggedIn = false;
-    else if ($scope.loggedIn && $location.path() === "")
+    $scope.clearSearch = function () {
+        $scope.studentName = ""
+    };
+
+    $rootScope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"));
+    if ($rootScope.loggedIn === null)
+        $rootScope.loggedIn = false;
+    else if ($rootScope.loggedIn && $location.path() === "")
         $location.path('/focus');
 
     $scope.attemptLogin = function () {
         if (($scope.username === "ndisera" || $scope.username === "sredman" || $scope.username === "gwatson" || $scope.username === "gzuber") && $scope.password === "password") {
-            $scope.loggedIn = true;
+            $rootScope.loggedIn = true;
             localStorage.setItem("loggedIn", true);
         }
         $scope.username = "";
@@ -49,7 +61,8 @@
     };
 
     $scope.logout = function () {
-        $scope.loggedIn = false;
+        console.log($scope.testValueThing);
+        $rootScope.loggedIn = false;
         localStorage.setItem("loggedIn", false);
         $location.path('')
     };
@@ -64,21 +77,5 @@
             $(this).toggleClass("active");
         });
     });
-
-    $scope.getProfile = function () {
-        for (var i = 0; i < $scope.students.length; i++) {
-            if ($scope.students[i].first_name + " " + $scope.students[i].last_name === $scope.studentName) {
-                // the currently chosen student object
-                $rootScope.student = $scope.students[i];
-                localStorage.setItem("lastStudent", JSON.stringify($rootScope.student));
-                $location.path('/student/' + $scope.students[i].id);
-                return;
-            }
-        }
-    };
-
-    $scope.clearSearch = function () {
-        $scope.studentName = ""
-    };
 
 });

@@ -1,5 +1,7 @@
-app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, enrollments, behaviorService) {
+app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, behaviorService, enrollments, student) {
 
+    $scope.student = student;
+    console.log($scope.student);
     $scope.section_titles = [];
     $scope.sections = [];
     $scope.behaviors = [];
@@ -188,7 +190,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
 
         // Use this skeleton as the body of the get
         var get_data = {
-            "student": $rootScope.student.id,
+            "student": $routeParams.id,
             "start_date": "2017-12-11",
             "end_date": "2017-12-15"
         }

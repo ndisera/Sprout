@@ -13,7 +13,12 @@ app.config(function ($routeProvider) {
         // route for the focus students page
         .when('/focus', {
             templateUrl: 'Views/focusStudents.html',
-            controller: 'focusStudentsController'
+            controller: 'focusStudentsController',
+            resolve: {
+                students: function(studentService) {
+                    return studentService.getStudents();
+                },
+            }
         })
 
         // route for the input scores page
@@ -29,7 +34,10 @@ app.config(function ($routeProvider) {
             resolve: {
                 enrollments: function(enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments($route.current.params.id);
-                }
+                },
+                student: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
+                },
             }
         });
 });
