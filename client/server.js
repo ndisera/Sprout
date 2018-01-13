@@ -53,12 +53,14 @@ const options = {
   cert: fs.readFileSync('pki/frontend_cert.pem')
 };
 
+var express_app = express();
+express_app.use(express.static(folder_path));
 var server = httpolyglot.createServer(options, function (req, res) {
   if (!req.socket.encrypted) {
       res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
       return res.end();
   }
-  express.static(folder_path)(req, res)
+  express_app(req, res);
 });
 server.listen(port);
 
