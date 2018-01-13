@@ -1,6 +1,6 @@
 var express = require('express');
 var path = require('path');
-const https = require('https'); // HTTPS server module
+const httpolyglot = require('httpolyglot');
 const fs = require('fs'); // FileSync module, for loading HTTPS keys
 
 // deal with command line arguments
@@ -13,16 +13,29 @@ if(args.length % 2 != 0) {
 
 // initialize default values and change them based on args
 var port = 8001;
+var http_port = 8003;
+var https_port = 8002;
 var folder = '/public';
 
 var cur = 0;
 while(cur < args.length) {
   switch(args[cur]) {
-    case '-p':
+    case '-p': // Main port
       cur++;
       port = args[cur];
       cur++;
       break;
+
+    case '-pu': // Port Unsecure
+        cur++;
+        http_port = args[curr];
+        cur++
+        break;
+
+    case '-ps': // Port Secure
+      cur++;
+      https_port = args[curr];
+      cur++;
 
     case '-f':
       cur++;
@@ -34,13 +47,20 @@ while(cur < args.length) {
 
 var folder_path = path.join(__dirname, folder);
 
-// Setup HTTPS server
+// Setup HTTPS(with HTTP redirect) server
 const options = {
   key: fs.readFileSync('pki/private_frontend_key.key'),
   cert: fs.readFileSync('pki/frontend_cert.pem')
 };
 
-var server = https.createServer(options, express.static(folder_path)).listen(port);
+var server = httpolyglot.createServer(options, function (req, res) {
+  if (!req.socket.encrypted) {
+      res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+      return res.end();
+  }
+  express.static(folder_path)(req, res)
+});
+server.listen(port);
 
 console.log("Sprout server is serving " + folder_path);
 console.log('Use port ' + port + ' to connect to Sprout.');
