@@ -1,7 +1,9 @@
-﻿app.controller("focusStudentsController", function ($scope, $location, $rootScope) {
+﻿app.controller("focusStudentsController", function ($scope, $rootScope, $location, students) {
     if (!JSON.parse(localStorage.getItem("loggedIn"))) {
         location.path('');
     }
+    
+    $scope.students = students;
 
     // draggable 
     $('.row').sortable({
@@ -20,18 +22,6 @@
     }).on('mouseup', function () {
         $(this).css('cursor', 'auto');
     });
-
-    $scope.goToStudent = function (event) {
-        for (var i = 0; i < $scope.students.length; i++) {
-            if ($scope.students[i].first_name + " " + $scope.students[i].last_name === event.target.text) {
-                // the currently chosen student object
-                $rootScope.student = $scope.students[i];
-                localStorage.setItem("lastStudent", JSON.stringify($rootScope.student));
-                $location.path('/student/' + $scope.students[i].id);
-                return;
-            }
-        }
-    }
 
     // All of the following belongs to the hard-coded angular-charts on the Focus Students page
     $scope.focus_labels = ["January", "February", "March", "April", "May", "June", "July"];

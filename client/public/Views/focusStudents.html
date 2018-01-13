@@ -1,69 +1,61 @@
-﻿<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-    <meta charset="utf-8" />
-</head>
-<body>
-    <div class="container">
-        <h3>Focus Students</h3>
-        <hr />
-        <div class="container-fluid">
-            <div class="row">
-                <div class="panel panel-primary" ng-repeat="s in students">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a href="" ng-click="goToStudent($event)">{{s.first_name}} {{s.last_name}}</a>
-                            <span class="glyphicon glyphicon-chevron-down"
-                                  data-toggle="collapse" data-target="#collapse-{{$index}}" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
-                        </h4>
-                    </div>
-                    <div id="collapse-{{$index}}" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-sm-4 centerText">
-                                    <label>Focus Category</label>
-                                    <span class="glyphicon glyphicon-heart-empty"></span>
-                                    <div class="col-sm-12 focusGraph">
-                                        <canvas
-                                          id="focus_graph"
-                                          class="chart chart-line"
-                                          chart-data="focus_data"
-                                          chart-labels="focus_labels"
-                                          chart-options="options"
-                                          chart-click="onClick"
-                                        ></canvas>
-                                    </div>
+﻿<div class="container">
+    <h3>Focus Students</h3>
+    <hr />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="panel panel-primary" ng-repeat="s in students">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                      <a href="#!/student/{{s.id}}">{{s.first_name}} {{s.last_name}}</a>
+                        <span class="glyphicon glyphicon-chevron-down"
+                              data-toggle="collapse" data-target="#collapse-{{$index}}" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
+                    </h4>
+                </div>
+                <div id="collapse-{{$index}}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4 centerText">
+                                <label>Focus Category</label>
+                                <span class="glyphicon glyphicon-heart-empty"></span>
+                                <div class="col-sm-12 focusGraph">
+                                    <canvas
+                                      id="focus_graph"
+                                      class="chart chart-line"
+                                      chart-data="focus_data"
+                                      chart-labels="focus_labels"
+                                      chart-options="options"
+                                      chart-click="onClick"
+                                    ></canvas>
                                 </div>
-                                <div class="col-sm-4 centerText">
-                                    <label>Progress Category</label>
-                                    <span class="glyphicon glyphicon-fire"></span>
-                                    <div class="col-sm-12 focusProgress">
-                                        <canvas
-                                          id="focus_progress_graph"
-                                          class="chart chart-line"
-                                          chart-data="progress_data"
-                                          chart-labels="progress_labels"
-                                          chart-colors="progress_colours"
-                                          chart-options="options_behavior"
-                                          chart-click="onClick"
-                                        ></canvas>
-                                    </div>
+                            </div>
+                            <div class="col-sm-4 centerText">
+                                <label>Progress Category</label>
+                                <span class="glyphicon glyphicon-fire"></span>
+                                <div class="col-sm-12 focusProgress">
+                                    <canvas
+                                      id="focus_progress_graph"
+                                      class="chart chart-line"
+                                      chart-data="progress_data"
+                                      chart-labels="progress_labels"
+                                      chart-colors="progress_colours"
+                                      chart-options="options_behavior"
+                                      chart-click="onClick"
+                                    ></canvas>
                                 </div>
-                                <div class="col-sm-4 centerText">
-                                    <label>Caution Category</label>
-                                    <span class="glyphicon glyphicon-alert"></span>
-                                    <div class="col-sm-12 focusCaution">
-                                        <canvas
-                                          id="focus_caution_graph"
-                                          class="chart chart-line"
-                                          chart-data="caution_data"
-                                          chart-labels="caution_labels"
-                                          chart-colors="caution_colours"
-                                          chart-options="options"
-                                          chart-click="onClick"
-                                        ></canvas>
-                                    </div>
+                            </div>
+                            <div class="col-sm-4 centerText">
+                                <label>Caution Category</label>
+                                <span class="glyphicon glyphicon-alert"></span>
+                                <div class="col-sm-12 focusCaution">
+                                    <canvas
+                                      id="focus_caution_graph"
+                                      class="chart chart-line"
+                                      chart-data="caution_data"
+                                      chart-labels="caution_labels"
+                                      chart-colors="caution_colours"
+                                      chart-options="options"
+                                      chart-click="onClick"
+                                    ></canvas>
                                 </div>
                             </div>
                         </div>
@@ -72,5 +64,4 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+</div>
