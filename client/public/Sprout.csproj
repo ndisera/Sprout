@@ -139,6 +139,8 @@
     <Content Include="Scripts\jquery-3.2.1.min.js" />
     <Content Include="index.html" />
     <Content Include="Services\behaviorService.js" />
+    <Content Include="Services\enrollmentService.js" />
+    <Content Include="Services\studentService.js" />
     <Content Include="Views\focusStudents.html" />
     <Content Include="Views\home.html" />
     <Content Include="Views\scoresInput.html" />
