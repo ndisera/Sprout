@@ -1,6 +1,7 @@
 var express = require('express');
-var server = express();
 var path = require('path');
+const https = require('https'); // HTTPS server module
+const fs = require('fs'); // FileSync module, for loading HTTPS keys
 
 // deal with command line arguments
 // error check for malformed arguments
@@ -32,8 +33,15 @@ while(cur < args.length) {
 }
 
 var folder_path = path.join(__dirname, folder);
-server.use(express.static(folder_path));
-server.listen(port);
+
+// Setup HTTPS server
+const options = {
+  key: fs.readFileSync('pki/private_frontend_key.key'),
+  cert: fs.readFileSync('pki/frontend_cert.pem')
+};
+
+var server = https.createServer(options, express.static(folder_path)).listen(port);
+
 console.log("Sprout server is serving " + folder_path);
 console.log('Use port ' + port + ' to connect to Sprout.');
 
