@@ -4,7 +4,7 @@
 #
 # Author: Simon Redman <simon@ergotech.com>
 # File Created: 13 January 2018
-# Last Modified: Sat 13 Jan 2018 06:30:06 PM MST
+# Last Modified: Sat 13 Jan 2018 07:57:40 PM MST
 # Description: Setup keys and certificates for use with Sprout
 #
 
@@ -16,8 +16,8 @@ CA_KEY_NAME="private_sproutCA.key" # KEEP THIS PRIVATE!! Used to sign our CA cer
 CA_CERT_NAME="rootCA_cert.pem" # Install this onto client workstations to avoid untrusted CA warnings
 FRONTEND_KEY_NAME="private_frontend_key.key" # KEEP THIS PRIVATE!! Used to encrypt Sprout's HTTPS connection
 FRONTEND_CERT_NAME="frontend_cert.pem" # Used to authenticate the HTTPS connection
-BACKEND_UWSGI_KEY_NAME="private_uwsgi_key.key" # KEEP THIS PRIVATE!!
-BACKEND_UWSGI_CERT_NAME="uwsgi_cert.pem"
+BACKEND_KEY_NAME="private_nginx_key.key" # KEEP THIS PRIVATE!!
+BACKEND_CERT_NAME="nginx_cert.pem"
 CERT_VALIDITY_DAYS=1024
 
 
@@ -126,7 +126,7 @@ generate_key "${PKI_PATH}${FRONTEND_KEY_NAME}"
 generate_cert_with_csr "${PKI_PATH}${FRONTEND_CERT_NAME}" "${PKI_PATH}${FRONTEND_KEY_NAME}" "${PKI_PATH}${CA_CERT_NAME}" "${PKI_PATH}${CA_KEY_NAME}" 
 
 # Generate the backend CA key
-generate_key "${PKI_PATH}${BACKEND_UWSGI_KEY_NAME}"
+generate_key "${PKI_PATH}${BACKEND_KEY_NAME}"
 
 # Use our CA certificate to create a signed certificate for the backend
-generate_cert_with_csr "${PKI_PATH}${BACKEND_UWSGI_CERT_NAME}" "${PKI_PATH}${BACKEND_UWSGI_KEY_NAME}" "${PKI_PATH}${CA_CERT_NAME}" "${PKI_PATH}${CA_KEY_NAME}"
+generate_cert_with_csr "${PKI_PATH}${BACKEND_CERT_NAME}" "${PKI_PATH}${BACKEND_KEY_NAME}" "${PKI_PATH}${CA_CERT_NAME}" "${PKI_PATH}${CA_KEY_NAME}"
