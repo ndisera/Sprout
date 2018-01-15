@@ -6,7 +6,6 @@
         <li><a data-toggle="tab" data-target="#goals" ng-click="setActivePillAndTab('goals')">IEP Goals</a></li>
         <li><a data-toggle="tab" data-target="#services" ng-click="setActivePillAndTab('services')">Services</a></li>
         <li><a data-toggle="tab" data-target="#grades" ng-click="setActivePillAndTab('grades')">Grades</a></li>
-        <li><a data-toggle="tab" data-target="#manage" ng-click="setActivePillAndTab('manage')">Manage</a></li>
     </ul>
     <ul class="nav nav-tabs hidden-xs">
         <li class="active"><a data-toggle="tab" data-target="#overview" ng-click="setActivePillAndTab('overview')">Overview</a></li>
@@ -15,11 +14,21 @@
         <li><a data-toggle="tab" data-target="#goals" ng-click="setActivePillAndTab('goals')">IEP Goals</a></li>
         <li><a data-toggle="tab" data-target="#services" ng-click="setActivePillAndTab('services')">Services</a></li>
         <li><a data-toggle="tab" data-target="#grades" ng-click="setActivePillAndTab('grades')">Grades</a></li>
-        <li><a data-toggle="tab" data-target="#manage" ng-click="setActivePillAndTab('manage')">Manage</a></li>
     </ul>
     <div class="tab-content">
         <div id="overview" class="tab-pane fade in active">
-            <h3>Overview</h3>
+            <h3 class="studentHeading">Overview</h3>
+            <div class="dropdown studentReassign">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                    Reassign
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li class="pointer"><a>John Doe <span class="glyphicon glyphicon-ok"></span></a></li>
+                    <li class="pointer"><a>Jane Doe</a></li>
+                    <li class="pointer"><a>Jim Doe</a></li>
+                </ul>
+            </div>
             <hr />
             <div class="container">
                 <p class="row"><label>First Name:</label> {{student.first_name}}</p>
@@ -28,7 +37,7 @@
             </div>
         </div>
         <div id="tests" class="tab-pane fade">
-            <h3>Test Scores</h3>
+            <h3 class="studentHeader">Test Scores</h3>
             <hr />
         </div>
         <div id="behavior" class="tab-pane fade">
@@ -108,9 +117,9 @@
                             </select>
                         </td>
                         <!--<td>
-                        <select class="effortScore" id="effort-{{section.id}}" ng-model="effortScore" ng-change="changeBehaviors(section.id)" ng-options="score for score in scores">
-                        </select>
-                    </td>-->
+                            <select class="effortScore" id="effort-{{section.id}}" ng-model="effortScore" ng-change="changeBehaviors(section.id)" ng-options="score for score in scores">
+                            </select>
+                        </td>-->
                     </tr>
                     tb
                 </tbody>
@@ -126,10 +135,6 @@
         </div>
         <div id="grades" class="tab-pane fade">
             <h3>Grades</h3>
-            <hr />
-        </div>
-        <div id="manage" class="tab-pane fade">
-            <h3>Manage</h3>
             <hr />
         </div>
     </div>
