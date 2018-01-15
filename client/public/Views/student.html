@@ -6,6 +6,7 @@
         <li><a data-toggle="tab" data-target="#goals" ng-click="setActivePillAndTab('goals')">IEP Goals</a></li>
         <li><a data-toggle="tab" data-target="#services" ng-click="setActivePillAndTab('services')">Services</a></li>
         <li><a data-toggle="tab" data-target="#grades" ng-click="setActivePillAndTab('grades')">Grades</a></li>
+        <li><a data-toggle="tab" data-target="#manage" ng-click="setActivePillAndTab('manage')">Manage</a></li>
     </ul>
     <ul class="nav nav-tabs hidden-xs">
         <li class="active"><a data-toggle="tab" data-target="#overview" ng-click="setActivePillAndTab('overview')">Overview</a></li>
@@ -14,6 +15,7 @@
         <li><a data-toggle="tab" data-target="#goals" ng-click="setActivePillAndTab('goals')">IEP Goals</a></li>
         <li><a data-toggle="tab" data-target="#services" ng-click="setActivePillAndTab('services')">Services</a></li>
         <li><a data-toggle="tab" data-target="#grades" ng-click="setActivePillAndTab('grades')">Grades</a></li>
+        <li><a data-toggle="tab" data-target="#manage" ng-click="setActivePillAndTab('manage')">Manage</a></li>
     </ul>
     <div class="tab-content">
         <div id="overview" class="tab-pane fade in active">
@@ -37,31 +39,27 @@
                     <div class="col-sm-6 centerText focusGraph">
                         <label>Behavior</label>
                         <div class="col-sm-12">
-                            <canvas
-                                    id="student_behavior"
+                            <canvas id="student_behavior"
                                     class="chart chart-line"
                                     chart-data="hardcodedBehaviorForThePrototype"
                                     chart-labels="graph_labels"
                                     chart-series="series"
                                     chart-options="options"
                                     chart-dataset-override="datasetOverride"
-                                    chart-click="onClick"
-                            ></canvas>
+                                    chart-click="onClick"></canvas>
                         </div>
                     </div>
                     <div class="col-sm-6 centerText focusGraph">
                         <label>Effort</label>
                         <div class="col-sm-12">
-                            <canvas
-                                    id="student_effort"
+                            <canvas id="student_effort"
                                     class="chart chart-line"
                                     chart-data="hardcodedEffortForThePrototype"
                                     chart-labels="graph_labels"
                                     chart-series="series"
                                     chart-options="options"
                                     chart-dataset-override="datasetOverride"
-                                    chart-click="onClick"
-                            ></canvas>
+                                    chart-click="onClick"></canvas>
                         </div>
                     </div>
                 </div>
@@ -110,10 +108,11 @@
                             </select>
                         </td>
                         <!--<td>
-                            <select class="effortScore" id="effort-{{section.id}}" ng-model="effortScore" ng-change="changeBehaviors(section.id)" ng-options="score for score in scores">
-                            </select>
-                        </td>-->
+                        <select class="effortScore" id="effort-{{section.id}}" ng-model="effortScore" ng-change="changeBehaviors(section.id)" ng-options="score for score in scores">
+                        </select>
+                    </td>-->
                     </tr>
+                    tb
                 </tbody>
             </table>
         </div>
@@ -127,6 +126,10 @@
         </div>
         <div id="grades" class="tab-pane fade">
             <h3>Grades</h3>
+            <hr />
+        </div>
+        <div id="manage" class="tab-pane fade">
+            <h3>Manage</h3>
             <hr />
         </div>
     </div>

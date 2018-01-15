@@ -49,6 +49,10 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
                 $('.nav-tabs a[data-target="#grades"]').tab('show');
                 $('.nav-pills a[data-target="#grades"]').tab('show');
                 break;
+            case "manage":
+                $('.nav-tabs a[data-target="#manage"]').tab('show');
+                $('.nav-pills a[data-target="#manage"]').tab('show');
+                break;
             default:
         }
     }
