@@ -80,6 +80,7 @@
                                 <img id="userPic" src="Images/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
+                                <li ng-click="clearSearch()"><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
                                 <li ng-click="clearSearch()"><a href="#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
                                 <li ng-click="clearSearch()"><a href="#!/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
                                 <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
@@ -89,6 +90,7 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav hidden-sm hidden-md hidden-lg hidden-xl">
+                        <li><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
                         <li><a href="#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
                         <li><a href="#!/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
                         <li><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
@@ -110,6 +112,7 @@
     <script src="Controllers/focusStudentsController.js"></script>
     <script src="Controllers/settingsController.js"></script>
     <script src="Controllers/scoresInputController.js"></script>
+    <script src="Controllers/manageController.js"></script>
     <script src="Services/studentService.js"></script>
     <script src="Services/behaviorService.js"></script>
     <script src="Services/enrollmentService.js"></script>

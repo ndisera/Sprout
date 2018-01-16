@@ -24,6 +24,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -99,6 +100,7 @@
     <Content Include="Content\focus.css" />
     <Content Include="Content\login.css" />
     <Content Include="Content\student.css" />
+    <Content Include="Controllers\manageController.js" />
     <Content Include="Controllers\focusStudentsController.js" />
     <Content Include="Controllers\mainController.js" />
     <Content Include="Controllers\scoresInputController.js" />
@@ -139,8 +141,10 @@
     <Content Include="Scripts\jquery-3.2.1.min.js" />
     <Content Include="index.html" />
     <Content Include="Services\behaviorService.js" />
+    <Content Include="Services\enrollmentService.js" />
+    <Content Include="Services\studentService.js" />
+    <Content Include="Views\manage.html" />
     <Content Include="Views\focusStudents.html" />
-    <Content Include="Views\home.html" />
     <Content Include="Views\scoresInput.html" />
     <Content Include="Views\settings.html" />
     <Content Include="Views\student.html" />

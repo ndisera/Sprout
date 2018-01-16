@@ -4,6 +4,17 @@
 app.config(function ($routeProvider) {
     $routeProvider
 
+        // route for the admin(manage) page
+        .when('/manage', {
+            templateUrl: 'Views/manage.html',
+            controller: 'manageController',
+            resolve: {
+                students: function (studentService) {
+                    return studentService.getStudents();
+                },
+            }
+        })
+
         // route for the settings page
         .when('/settings', {
             templateUrl: 'Views/settings.html',
