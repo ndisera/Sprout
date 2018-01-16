@@ -17,7 +17,18 @@
     </ul>
     <div class="tab-content">
         <div id="overview" class="tab-pane fade in active">
-            <h3>Overview</h3>
+            <h3 class="studentHeading">Overview</h3>
+            <div class="dropdown studentReassign">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                    Reassign
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li class="pointer"><a>John Doe <span class="glyphicon glyphicon-ok"></span></a></li>
+                    <li class="pointer"><a>Jane Doe</a></li>
+                    <li class="pointer"><a>Jim Doe</a></li>
+                </ul>
+            </div>
             <hr />
             <div class="container">
                 <p class="row"><label>First Name:</label> {{student.first_name}}</p>
@@ -26,7 +37,7 @@
             </div>
         </div>
         <div id="tests" class="tab-pane fade">
-            <h3>Test Scores</h3>
+            <h3 class="studentHeader">Test Scores</h3>
             <hr />
         </div>
         <div id="behavior" class="tab-pane fade">
@@ -37,31 +48,27 @@
                     <div class="col-sm-6 centerText focusGraph">
                         <label>Behavior</label>
                         <div class="col-sm-12">
-                            <canvas
-                                    id="student_behavior"
+                            <canvas id="student_behavior"
                                     class="chart chart-line"
                                     chart-data="hardcodedBehaviorForThePrototype"
                                     chart-labels="graph_labels"
                                     chart-series="series"
                                     chart-options="options"
                                     chart-dataset-override="datasetOverride"
-                                    chart-click="onClick"
-                            ></canvas>
+                                    chart-click="onClick"></canvas>
                         </div>
                     </div>
                     <div class="col-sm-6 centerText focusGraph">
                         <label>Effort</label>
                         <div class="col-sm-12">
-                            <canvas
-                                    id="student_effort"
+                            <canvas id="student_effort"
                                     class="chart chart-line"
                                     chart-data="hardcodedEffortForThePrototype"
                                     chart-labels="graph_labels"
                                     chart-series="series"
                                     chart-options="options"
                                     chart-dataset-override="datasetOverride"
-                                    chart-click="onClick"
-                            ></canvas>
+                                    chart-click="onClick"></canvas>
                         </div>
                     </div>
                 </div>
@@ -114,6 +121,7 @@
                             </select>
                         </td>-->
                     </tr>
+                    tb
                 </tbody>
             </table>
         </div>

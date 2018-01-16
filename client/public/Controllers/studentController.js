@@ -1,5 +1,10 @@
 app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, behaviorService, enrollments, student) {
 
+    // redirect user if not logged in
+    if (!JSON.parse(localStorage.getItem("loggedIn"))) {
+        location.path('');
+    }
+
     $scope.student = student;
     console.log($scope.student);
     $scope.section_titles = [];
@@ -14,6 +19,10 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     // Section IDs are stored as a list of integers
     $scope.hardcodedSectionIDsForThePrototype = [];
 
+    /**
+     * Set the active tab and pill based on selection of one or the other
+     * @param {string} the target of the tab selected.
+     */    
     $scope.setActivePillAndTab = function (name) {
         switch (name) {
             case "overview":
@@ -41,7 +50,6 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
                 $('.nav-pills a[data-target="#grades"]').tab('show');
                 break;
             default:
-                
         }
     }
 
@@ -70,9 +78,9 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
 
     // the sections array should now contain objects with teacher and title
 
-
-    // get behavior scores
-    // pass in student, start date, and end date
+    /**
+     * Get behavior/effort scores.
+     */
     $scope.getBehaviors = function () {
         var behaviorPromise = behaviorService.getStudentBehaviorByDate($routeParams.id, $scope.behaviorDate, $scope.behaviorDate);
         behaviorPromise.then(function success(data) {
@@ -87,7 +95,10 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
         });
     }
   
-    // called when user inputs a new behavior/effort score
+    /**
+     * Update behavior/effort score
+     * @param {number} the section id.
+     */
     $scope.changeBehaviors = function (sectionId) {
         if ($scope.sectionBehaviorScores === undefined)
             return;
@@ -152,14 +163,13 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
         });
     }
 
-    if (!JSON.parse(localStorage.getItem("loggedIn"))) {
-        location.path('');
-    }
-
     $('#datepicker').datepicker({
         format: "yyyy-mm-dd"
     });
 
+    /**
+     * Sets $scope.behaviorDate to the current date in the format "YYYY-MM-DD".
+     */
     function defaultDate() {
         var date = new Date();
         // prepend 0 to single digit day
@@ -173,12 +183,16 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
 
     defaultDate();
 
-    // called when date in datepicker is changed
+    /**
+     * Sets $scope.behaviorDate to the newly selected datepicker date
+     * and grabs the behavior and effort scores for that date.
+     */
     $scope.changeDate = function () {
         $scope.behaviorDate = document.getElementById('datepicker').value;
         $scope.getBehaviors();
     }
 
+    // call $scope.changeDate() when datepicker date is changed
     $('#datepicker').datepicker().on('changeDate', function (ev) {
         $scope.changeDate();
     });

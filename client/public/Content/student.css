@@ -13,9 +13,23 @@
     }
 
 .nav-tabs, .nav-pills {
-    text-align:center;
+    text-align: center;
 }
 
 .nav-tabs li, .nav-pills li {
+    cursor: pointer;
+}
+
+.studentHeading {
+    display: inline-block;
+}
+
+.studentReassign {
+    display: inline-block;
+    float: right;
+    padding-top: 15px;
+}
+
+.pointer {
     cursor: pointer;
 }
