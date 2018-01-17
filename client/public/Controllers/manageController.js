@@ -4,4 +4,4 @@
     }
 
     $scope.students = students;
-}
+});
