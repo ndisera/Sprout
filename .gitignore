@@ -2,4 +2,7 @@
 .idea/
 *.pyc
 
-pki/ # Secure files should not be in public repository...
+pki # Secure files should not be in public repository...
+
+server/nginx/logs
+server/nginx/temp
