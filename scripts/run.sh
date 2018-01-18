@@ -3,7 +3,7 @@ SCRIPT_PATH="${PWD}/$(dirname "$0")"
 source "${SCRIPT_PATH}"/../server/env/bin/activate
 
 # Check for dependencies
-DEPENDENCIES=( "nginx" )
+DEPENDENCIES=( "nginx" "node" )
 
 for dependency in "${DEPENDENCIES[@]}"; do
   which "${dependency}" &>/dev/null
