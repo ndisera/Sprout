@@ -1,4 +1,4 @@
-app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, behaviorService, enrollments, student) {
+app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, behaviorService, sectionService, enrollments, student) {
 
     // redirect user if not logged in
     if (!JSON.parse(localStorage.getItem("loggedIn"))) {
@@ -57,22 +57,17 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     $scope.enrollments = enrollments;
     $scope.sections = [];
     for (var i = 0; i < $scope.enrollments.length; i++) {
-        $http({
-            method: 'GET',
-            url: 'http://'
-                + $rootScope.backend
-                + '/sections/' + $scope.enrollments[i].section + "/"
-        }).then(function successCallback(response) {
+        var sectionPromise = sectionService.getSection($scope.enrollments[i].section);
+        sectionPromise.then(function success(data) {
             $scope.sections.push({
-                id: response.data.id,
-                title: response.data.title
+                id: data.id,
+                title: data.title
             });
             $scope.section_titles.push(
-              response.data.title
+              data.title
             );
-            var x = $scope.sections;
-        }, function errorCallback(response) {
-            $scope.status = response.status;
+        }, function error(message) {
+            $scope.status = message;
         });
     }
 
@@ -116,23 +111,17 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
             newBehavior.enrollment = $scope.sectionBehaviorScores[sectionId].enrollment.id;
 
             // put if sectionBehaviorScores does contain id
-            $http({
-                method: 'PUT',
-                url: 'http://'
-                    + $rootScope.backend
-                    + "/behaviors/" + $scope.sectionBehaviorScores[sectionId].id + "/",
-                // going to post behavior object, grab from 
-                data: newBehavior
-            }).then(function successCallback(response) {
+            var behaviorPromise = behaviorService.updateBehavior($scope.sectionBehaviorScores[sectionId].id, newBehavior);
+            behaviorPromise.then(function success(data) {
                 var enrollment_obj = $scope.sectionBehaviorScores[sectionId].enrollment;
-                $scope.sectionBehaviorScores[sectionId] = response.data;
+                $scope.sectionBehaviorScores[sectionId] = data;
                 $scope.sectionBehaviorScores[sectionId].enrollment = enrollment_obj;
 
                 var date = new Date($scope.behaviorDate);
                 $scope.hardcodedEffortForThePrototype[sectionId - 1][date.getDay()] = $scope.sectionBehaviorScores[sectionId].effort;
                 $scope.hardcodedBehaviorForThePrototype[sectionId - 1][date.getDay()] = $scope.sectionBehaviorScores[sectionId].behavior;
-            }, function errorCallback(response) {
-                $scope.status = response.status;
+            }, function error(message) {
+                $scope.status = message;
             });
             return;
         }
@@ -147,19 +136,12 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
         }
 
         // not contained, make a post, append to list first
-        $http({
-            method: 'POST',
-            url: 'http://'
-                + $rootScope.backend
-                + '/behaviors/',
-            // going to post behavior object, grab from 
-            data: newBehavior
-        }).then(function successCallback(response) {
-            $scope.sectionBehaviorScores[sectionId] = response.data;
+        var behaviorPromise = behaviorService.addBehavior(newBehavior);
+        behaviorPromise.then(function success(data) {
+            $scope.sectionBehaviorScores[sectionId] = data;
             $scope.sectionBehaviorScores[sectionId].enrollment = enrollment_obj;
-            //getHardcodedPrototypeBehaviorAndEffort();
-        }, function errorCallback(response) {
-            $scope.status = response.status;
+        }, function error(message) {
+            $scope.status = message;
         });
     }
 
@@ -209,25 +191,21 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
             "end_date": "2017-12-15"
         }
 
-        $http({
-            method: 'GET',
-            url: 'http://'
-                + $rootScope.backend
-                + '/behaviors/?student=' + get_data["student"] + "&start_date=" + get_data["start_date"] + "&end_date=" + get_data["end_date"]
-        }).then(function successCallback(response) {
+        var behaviorPromise = behaviorService.getStudentBehaviorByDate(get_data["student"], get_data["start_date"], get_data["end_date"]);
+        behaviorPromise.then(function success(data) {
             var behaviors = {};
             var efforts = {};
             var sections = [];
-            for (var index = 0; index < response.data.length; index++) {
-                var section_id = response.data[index]["enrollment"]["section"];
+            for (var index = 0; index < data.length; index++) {
+                var section_id = data[index]["enrollment"]["section"];
                 if (behaviors[section_id] == undefined) {
                     // If we have not started a behavior list for this section, start one now
                     behaviors[section_id] = [];
                     efforts[section_id] = [];
                     sections.push(section_id)
                 }
-                behaviors[section_id].push(response.data[index].behavior);
-                efforts[section_id].push(response.data[index].effort);
+                behaviors[section_id].push(data[index].behavior);
+                efforts[section_id].push(data[index].effort);
             }
 
             // Convert to global arrays
@@ -240,8 +218,8 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
             console.log($scope.hardcodedBehaviorForThePrototype);
 
             $scope.hardcodedSectionIDsForThePrototype = sections;
-        }, function errorCallback(response) {
-            $scope.status = response.status;
+        }, function error(message) {
+            $scope.status = message;
         });
     }
 

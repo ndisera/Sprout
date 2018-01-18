@@ -1,9 +1,10 @@
-﻿app.controller("manageController", function ($scope, $rootScope, $location, students) {
+﻿app.controller("manageController", function ($scope, $rootScope, $location, students, teachers) {
     if (!JSON.parse(localStorage.getItem("loggedIn"))) {
         location.path('');
     }
 
     $scope.students = students;
+    $scope.teachers = teachers;
 
     $scope.setActivePillAndTab = function (name) {
         switch (name) {

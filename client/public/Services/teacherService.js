@@ -1,13 +1,13 @@
-app.factory("studentService", function ($rootScope, $http) {
+﻿app.factory("teacherService", function ($rootScope, $http) {
     return {
         /**
-         * Get all student records
+         * Get all teacher records
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getStudents: function () {
+        getTeachers: function () {
             return $http({
                 method: 'GET',
-                url: 'http://' + $rootScope.backend + '/students/'
+                url: 'http://' + $rootScope.backend + '/teachers/'
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -16,14 +16,14 @@ app.factory("studentService", function ($rootScope, $http) {
         },
 
         /**
-         * Get student record
-         * @param {number} studentId - the student's id.
+         * Get teacher record
+         * @param {number} teacherId - the teacher's id.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getStudent: function (studentId) {
+        getTeacher: function (teacherId) {
             return $http({
                 method: 'GET',
-                url: 'http://' + $rootScope.backend + '/students/' + studentId
+                url: 'http://' + $rootScope.backend + '/teachers/' + teacherId
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -32,14 +32,14 @@ app.factory("studentService", function ($rootScope, $http) {
         },
 
         /**
-         * Delete student record
-         * @param {number} studentId - the student's id.
+         * Delete teacher record
+         * @param {number} teacherId - the teacher's id.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        deleteStudent: function (studentId) {
+        deleteTeacher: function (teacherId) {
             return $http({
                 method: 'DELETE',
-                url: 'http://' + $rootScope.backend + '/students/' + studentId
+                url: 'http://' + $rootScope.backend + '/teachers/' + teacherId
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -48,15 +48,15 @@ app.factory("studentService", function ($rootScope, $http) {
         },
 
         /**
-         * Add student record
-         * @param {student} studentObj - the student object.
+         * Add teacher record
+         * @param {teacher} teacherObj - the teacher object.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        addStudent: function (studentObj) {
+        addTeacher: function (teacherObj) {
             return $http({
                 method: 'POST',
-                url: 'http://' + $rootScope.backend + '/students/',
-                data: studentObj
+                url: 'http://' + $rootScope.backend + '/teachers/',
+                data: teacherObj
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -65,16 +65,16 @@ app.factory("studentService", function ($rootScope, $http) {
         },
 
         /**
-         * Update student record
-         * @param {number} studentId - the student's id.
-         * @param {student} studentObj - the student object.
+         * Update teacher record
+         * @param {number} teacherId - the teacher's id.
+         * @param {teacher} teacherObj - the teacher object.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        updateStudent: function (studentId, studentObj) {
+        updateTeacher: function (teacherId, teacherObj) {
             return $http({
                 method: 'PUT',
-                url: 'http://' + $rootScope.backend + '/students/' + studentId + '/',
-                data: studentObj
+                url: 'http://' + $rootScope.backend + '/teachers/' + teacherId,
+                data: teacherObj
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {

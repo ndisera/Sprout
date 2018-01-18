@@ -142,7 +142,9 @@
     <Content Include="index.html" />
     <Content Include="Services\behaviorService.js" />
     <Content Include="Services\enrollmentService.js" />
+    <Content Include="Services\sectionService.js" />
     <Content Include="Services\studentService.js" />
+    <Content Include="Services\teacherService.js" />
     <Content Include="Views\manage.html" />
     <Content Include="Views\focusStudents.html" />
     <Content Include="Views\scoresInput.html" />
