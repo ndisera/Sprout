@@ -5,6 +5,3 @@
 pki/ # Secure files should not be in public repository...
 pki/*
 .srl
-
-server/nginx/logs
-server/nginx/temp
