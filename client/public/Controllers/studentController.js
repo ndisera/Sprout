@@ -59,7 +59,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
       for (var i = 0; i < $scope.enrollments.length; i++) {
           $http({
               method: 'GET',
-              url: 'http://'
+              url: 'https://'
                   + $rootScope.backend
                   + '/sections/' + $scope.enrollments[i].section + "/"
           }).then(function successCallback(response) {
@@ -118,7 +118,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
             // put if sectionBehaviorScores does contain id
             $http({
                 method: 'PUT',
-                url: 'http://'
+                url: 'https://'
                     + $rootScope.backend
                     + "/behaviors/" + $scope.sectionBehaviorScores[sectionId].id + "/",
                 // going to post behavior object, grab from 
@@ -149,7 +149,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
         // not contained, make a post, append to list first
         $http({
             method: 'POST',
-            url: 'http://'
+            url: 'https://'
                 + $rootScope.backend
                 + '/behaviors/',
             // going to post behavior object, grab from 
@@ -211,7 +211,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
 
         $http({
             method: 'GET',
-            url: 'http://'
+            url: 'https://'
                 + $rootScope.backend
                 + '/behaviors/?student=' + get_data["student"] + "&start_date=" + get_data["start_date"] + "&end_date=" + get_data["end_date"]
         }).then(function successCallback(response) {
