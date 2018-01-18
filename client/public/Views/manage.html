@@ -1,3 +1,25 @@
 ﻿<div class="container">
-
-</div>
+    <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
+        <li class="active"><a data-toggle="tab" data-target="#casemanagers" ng-click="setActivePillAndTab('casemanagers')">Managers</a></li>
+        <li><a data-toggle="tab" data-target="#teachers" ng-click="setActivePillAndTab('teachers')">Teachers</a></li>
+        <li><a data-toggle="tab" data-target="#students" ng-click="setActivePillAndTab('students')">Students</a></li>
+    </ul>
+    <ul class="nav nav-tabs hidden-xs">
+        <li class="active"><a data-toggle="tab" data-target="#casemanagers" ng-click="setActivePillAndTab('casemanagers')">Managers</a></li>
+        <li><a data-toggle="tab" data-target="#teachers" ng-click="setActivePillAndTab('teachers')">Teachers</a></li>
+        <li><a data-toggle="tab" data-target="#students" ng-click="setActivePillAndTab('students')">Students</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="casemanagers" class="tab-pane fade in active">
+            <h3>Case Managers</h3>
+            <hr />
+        </div>
+        <div id="teachers" class="tab-pane fade">
+            <h3>Teachers</h3>
+            <hr />
+        </div>
+        <div id="students" class="tab-pane fade">
+            <h3>Students</h3>
+            <hr />
+        </div>
+    </div>

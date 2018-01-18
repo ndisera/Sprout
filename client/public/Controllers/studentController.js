@@ -22,7 +22,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     /**
      * Set the active tab and pill based on selection of one or the other
      * @param {string} the target of the tab selected.
-     */    
+     */
     $scope.setActivePillAndTab = function (name) {
         switch (name) {
             case "overview":
@@ -53,28 +53,28 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
         }
     }
 
-      // enrollments will contain section id (for mapping to enrollments) and student id
-      $scope.enrollments = enrollments;
-      $scope.sections = [];
-      for (var i = 0; i < $scope.enrollments.length; i++) {
-          $http({
-              method: 'GET',
-              url: 'http://'
-                  + $rootScope.backend
-                  + '/sections/' + $scope.enrollments[i].section + "/"
-          }).then(function successCallback(response) {
-              $scope.sections.push({
-                  id: response.data.id,
-                  title: response.data.title
-              });
-              $scope.section_titles.push(
-                response.data.title
-              );
-              var x = $scope.sections;
-          }, function errorCallback(response) {
-              $scope.status = response.status;
-          });
-      }
+    // enrollments will contain section id (for mapping to enrollments) and student id
+    $scope.enrollments = enrollments;
+    $scope.sections = [];
+    for (var i = 0; i < $scope.enrollments.length; i++) {
+        $http({
+            method: 'GET',
+            url: 'http://'
+                + $rootScope.backend
+                + '/sections/' + $scope.enrollments[i].section + "/"
+        }).then(function successCallback(response) {
+            $scope.sections.push({
+                id: response.data.id,
+                title: response.data.title
+            });
+            $scope.section_titles.push(
+              response.data.title
+            );
+            var x = $scope.sections;
+        }, function errorCallback(response) {
+            $scope.status = response.status;
+        });
+    }
 
     // the sections array should now contain objects with teacher and title
 
@@ -94,7 +94,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
             $scope.status = message;
         });
     }
-  
+
     /**
      * Update behavior/effort score
      * @param {number} the section id.
