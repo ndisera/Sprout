@@ -13,7 +13,6 @@ for dependency in "${DEPENDENCIES[@]}"; do
   fi
 done
 
-
 # Setup a signal handler
 trap killgroup SIGINT
 
@@ -26,6 +25,11 @@ killgroup()
 # run server and client in parallel
 node "${SCRIPT_PATH}"/../client/server.js -f public -p 8001 &
 client=$!
+
+# Check for and get any new static files for the backend
+pushd "${SCRIPT_PATH}/../server/"
+yes yes | python manage.py collectstatic > /dev/null
+popd
 
 # Start uwsgi server
 uwsgi --socket /tmp/django_api.sock --chdir="${SCRIPT_PATH}"/../server/ --module api.wsgi -H "${SCRIPT_PATH}/../server/env" &
