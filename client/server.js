@@ -49,8 +49,8 @@ var folder_path = path.join(__dirname, folder);
 
 // Setup HTTPS(with HTTP redirect) server
 const options = {
-  key: fs.readFileSync('pki/private_frontend_key.key'),
-  cert: fs.readFileSync('pki/frontend_cert.pem')
+  key: fs.readFileSync(path.join(__dirname, '../pki/private_frontend_key.key')),
+  cert: fs.readFileSync(path.join(__dirname, '../pki/frontend_cert.pem'))
 };
 
 var express_app = express();
