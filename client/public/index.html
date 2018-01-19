@@ -4,23 +4,18 @@
     <title>Sprout</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="Content/bootstrap.min.css">
-    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" rel="stylesheet" />
-    <link rel="stylesheet" href="Content/datepicker.css" />
-    <link rel="stylesheet" href="Content/app.css" />
-    <link rel="stylesheet" href="Content/navbar.css" />
-    <link rel="stylesheet" href="Content/student.css" />
-    <link rel="stylesheet" href="Content/login.css" />
-    <link rel="stylesheet" href="Content/focus.css" />
-    <script src="Scripts/jquery-3.2.1.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="Scripts/bootstrap.min.js"></script>
-    <script src="Scripts/bootstrap-datepicker.js"></script>
-    <script src="Scripts/angular.min.js"></script>
-    <script src="Scripts/angular-route.min.js"></script>
-    <script src="Scripts/Chart.bundle.min.js"></script>
-    <script src="Scripts/Chart.min.js"></script>
-    <script src="Scripts/angular-chart.min.js"></script>
+    <link rel="stylesheet" href="includes/bootstrap.min.css" />
+    <link rel="stylesheet" href="includes/jquery-ui.min.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="includes/jquery.js"></script>
+    <script src="includes/jquery-ui.js"></script>
+    <script src="includes/bootstrap.js"></script>
+    <script src="includes/bootstrap-datepicker.js"></script>
+    <script src="includes/angular.js"></script>
+    <script src="includes/angular-route.js"></script>
+    <script src="includes/Chart.bundle.js"></script>
+    <script src="includes/Chart.js"></script>
+    <script src="includes/angular-chart.js"></script>
 </head>
 <body ng-app="app">
 
@@ -58,7 +53,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a href="#!/focus" class="navbar-left" ng-click="clearSearch()"><img id="sproutLogo" src="Images/seeds-clipart-tree-sprout-6.png"></a>
+                    <a href="#!/focus" class="navbar-left" ng-click="clearSearch()"><img id="sproutLogo" src="img/seeds-clipart-tree-sprout-6.png"></a>
                 </div>
                 <div class="collapse navbar-collapse" id="myNavbar">
                     <form class="navbar-form navbar-left" ng-submit="tryNavigateToStudent()">
@@ -77,7 +72,7 @@
                     <ul class="nav navbar-nav navbar-right hidden-xs">
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" id="profileDropdown">
-                                <img id="userPic" src="Images/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
+                                <img id="userPic" src="img/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
                                 <li ng-click="clearSearch()"><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
@@ -107,14 +102,5 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="Controllers/mainController.js"></script>
-    <script src="Controllers/studentController.js"></script>
-    <script src="Controllers/focusStudentsController.js"></script>
-    <script src="Controllers/settingsController.js"></script>
-    <script src="Controllers/scoresInputController.js"></script>
-    <script src="Controllers/manageController.js"></script>
-    <script src="Services/studentService.js"></script>
-    <script src="Services/behaviorService.js"></script>
-    <script src="Services/enrollmentService.js"></script>
 </body>
 </html>

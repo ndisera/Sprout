@@ -1,8 +1,9 @@
 const gulp = require('gulp');
-const concat = require('gulp-concat');
-const filter = require('gulp-filter');
 const clean = require('gulp-clean');
 const del = require('del');
+const concat = require('gulp-concat');
+const filter = require('gulp-filter');
+const preprocess = require('gulp-preprocess');
 
 const public_path = 'public';
 
@@ -11,21 +12,35 @@ const include_paths = [
     // angular
     bower_path + 'angular/angular.min.js',
     bower_path + 'angular-route/angular-route.min.js',
-    bower_path + 'angular-chart/angular-chart.min.js',
+    bower_path + 'angular-charts-js/dist/angular-chart.min.js',
+
+    bower_path + 'angular/angular.js',
+    bower_path + 'angular-route/angular-route.js',
+    bower_path + 'angular-charts-js/dist/angular-chart.js',
 
     // bootstrap
     bower_path + 'bootstrap/dist/css/bootstrap.min.css',
     bower_path + 'bootstrap/dist/js/bootstrap.min.js',
-    bower_path + 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
+    bower_path + 'bootstrap-datepicker-eyecon/js/bootstrap-datepicker.js',
+
+    bower_path + 'bootstrap/dist/css/bootstrap.css',
+    bower_path + 'bootstrap/dist/js/bootstrap.js',
 
     // jquery and jquery-ui
     bower_path + 'jquery-ui/themes/smoothness/jquery-ui.min.css',
     bower_path + 'jquery-ui/jquery-ui.min.js',
     bower_path + 'jquery/dist/jquery.min.js',
 
+    bower_path + 'jquery-ui/themes/smoothness/jquery-ui.css',
+    bower_path + 'jquery-ui/jquery-ui.js',
+    bower_path + 'jquery/dist/jquery.js',
+
     // chart.js
     bower_path + 'chart.js/dist/Chart.min.js',
     bower_path + 'chart.js/dist/Chart.bundle.min.js',
+
+    bower_path + 'chart.js/dist/Chart.js',
+    bower_path + 'chart.js/dist/Chart.bundle.js',
 ];
 
 const paths = {
@@ -48,7 +63,7 @@ const paths = {
             'src/Services/*.js', 
             'src/Directives/*.js'
         ],
-        dest: 'public/js',
+        dest: 'public',
     },
     views: {
         src: 'src/Views/*.html',
@@ -89,6 +104,11 @@ function copy_views() {
 
 function copy_index() {
     return gulp.src(paths.index.src)
+            .pipe(preprocess({ 
+                context: {
+                    DEBUG: true,
+                }
+            }))
             .pipe(gulp.dest(paths.index.dest));
 }
 
@@ -105,7 +125,7 @@ function concat_styles() {
 
 function concat_scripts() {
     return gulp.src(paths.scripts.src)
-            .pipe(concat('main.js'))
+            .pipe(concat('script.js'))
             .pipe(gulp.dest(paths.scripts.dest));
 }
 

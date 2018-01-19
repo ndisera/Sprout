@@ -6,7 +6,7 @@ app.config(function ($routeProvider) {
 
         // route for the admin(manage) page
         .when('/manage', {
-            templateUrl: 'Views/manage.html',
+            templateUrl: 'html/manage.html',
             controller: 'manageController',
             resolve: {
                 students: function (studentService) {
@@ -17,13 +17,13 @@ app.config(function ($routeProvider) {
 
         // route for the settings page
         .when('/settings', {
-            templateUrl: 'Views/settings.html',
+            templateUrl: 'html/settings.html',
             controller: 'settingsController',
         })
 
         // route for the focus students page
         .when('/focus', {
-            templateUrl: 'Views/focusStudents.html',
+            templateUrl: 'html/focusStudents.html',
             controller: 'focusStudentsController',
             resolve: {
                 students: function(studentService) {
@@ -34,13 +34,13 @@ app.config(function ($routeProvider) {
 
         // route for the input scores page
         .when('/scores', {
-            templateUrl: 'Views/scoresInput.html',
+            templateUrl: 'html/scoresInput.html',
             controller: 'scoresInputController'
         })
 
         // route for the student profile page
         .when('/student/:id', {
-            templateUrl: 'Views/student.html',
+            templateUrl: 'html/student.html',
             controller: 'studentController',
             resolve: {
                 enrollments: function(enrollmentService, $route) {
