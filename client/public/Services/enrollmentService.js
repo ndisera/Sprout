@@ -8,7 +8,7 @@ app.factory("enrollmentService", function ($rootScope, $http) {
         getStudentEnrollments: function (studentId) {
             return $http({
                 method: 'GET',
-                url: 'http://' + $rootScope.backend + '/enrollments/?student=' + studentId
+                url: 'https://' + $rootScope.backend + '/enrollments/?student=' + studentId
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {

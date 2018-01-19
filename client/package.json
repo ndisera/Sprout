@@ -3,6 +3,7 @@
   "description": "Sprout",
   "dependencies": {
     "angular-chart.js": "^1.1.1",
-    "express": "4"
+    "express": "4",
+    "httpolyglot": "^0.1.2"
   }
 }

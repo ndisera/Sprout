@@ -7,7 +7,7 @@ app.factory("studentService", function ($rootScope, $http) {
         getStudents: function () {
             return $http({
                 method: 'GET',
-                url: 'http://' + $rootScope.backend + '/students/'
+                url: 'https://' + $rootScope.backend + '/students/'
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -23,7 +23,7 @@ app.factory("studentService", function ($rootScope, $http) {
         getStudent: function (studentId) {
             return $http({
                 method: 'GET',
-                url: 'http://' + $rootScope.backend + '/students/' + studentId
+                url: 'https://' + $rootScope.backend + '/students/' + studentId
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {

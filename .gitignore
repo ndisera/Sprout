@@ -2,3 +2,6 @@
 .idea/
 *.pyc
 
+pki/ # Secure files should not be in public repository...
+pki/*
+.srl

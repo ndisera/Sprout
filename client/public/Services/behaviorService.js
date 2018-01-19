@@ -10,7 +10,7 @@ app.factory("behaviorService", function ($rootScope, $http) {
         getStudentBehaviorByDate: function (studentId, startDate, endDate) {
             return $http({
                 method: 'GET',
-                url: 'http://' + $rootScope.backend
+                url: 'https://' + $rootScope.backend
                         + '/behaviors/?student=' + studentId
                         + "&start_date=" + startDate
                         + "&end_date=" + endDate
