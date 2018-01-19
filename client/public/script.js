@@ -12,6 +12,9 @@ app.config(function ($routeProvider) {
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
+                teachers: function (teacherService) {
+                    return teacherService.getTeachers();
+                },
             }
         })
 
