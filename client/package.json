@@ -3,6 +3,12 @@
   "description": "Sprout",
   "dependencies": {
     "angular-chart.js": "^1.1.1",
-    "express": "4"
+    "bower": "^1.8.2",
+    "del": "^3.0.0",
+    "express": "4",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-filter": "^5.1.0"
   }
 }

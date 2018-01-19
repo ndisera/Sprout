@@ -6,6 +6,9 @@
 node_modules/
 ../.idea/
 
+# bower stuffs
+src/bower_components/*
+
 # User-specific files
 *.suo
 *.user
