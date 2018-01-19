@@ -39,7 +39,7 @@ app.factory("studentService", function ($rootScope, $http) {
         deleteStudent: function (studentId) {
             return $http({
                 method: 'DELETE',
-                url: 'http://' + $rootScope.backend + '/students/' + studentId
+                url: 'https://' + $rootScope.backend + '/students/' + studentId
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -55,7 +55,7 @@ app.factory("studentService", function ($rootScope, $http) {
         addStudent: function (studentObj) {
             return $http({
                 method: 'POST',
-                url: 'http://' + $rootScope.backend + '/students/',
+                url: 'https://' + $rootScope.backend + '/students/',
                 data: studentObj
             }).then(function success(response) {
                 return response.data;
@@ -73,7 +73,7 @@ app.factory("studentService", function ($rootScope, $http) {
         updateStudent: function (studentId, studentObj) {
             return $http({
                 method: 'PUT',
-                url: 'http://' + $rootScope.backend + '/students/' + studentId + '/',
+                url: 'https://' + $rootScope.backend + '/students/' + studentId + '/',
                 data: studentObj
             }).then(function success(response) {
                 return response.data;

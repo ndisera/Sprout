@@ -29,7 +29,7 @@ app.factory("behaviorService", function ($rootScope, $http) {
         addBehavior: function (behaviorObj) {
             return $http({
                 method: 'POST',
-                url: 'http://' + $rootScope.backend + '/behaviors/',
+                url: 'https://' + $rootScope.backend + '/behaviors/',
                 data: behaviorObj
             }).then(function success(response) {
                 return response.data;
@@ -47,7 +47,7 @@ app.factory("behaviorService", function ($rootScope, $http) {
         updateBehavior: function (behaviorId, behaviorObj) {
             return $http({
                 method: 'PUT',
-                url: 'http://' + $rootScope.backend + "/behaviors/" + behaviorId + '/',
+                url: 'https://' + $rootScope.backend + "/behaviors/" + behaviorId + '/',
                 data: behaviorObj
             }).then(function success(response) {
                 return response.data;
