@@ -99,6 +99,7 @@
     <Content Include="Content\datepicker.css" />
     <Content Include="Content\focus.css" />
     <Content Include="Content\login.css" />
+    <Content Include="Content\manage.css" />
     <Content Include="Content\student.css" />
     <Content Include="Controllers\manageController.js" />
     <Content Include="Controllers\focusStudentsController.js" />
@@ -142,7 +143,9 @@
     <Content Include="index.html" />
     <Content Include="Services\behaviorService.js" />
     <Content Include="Services\enrollmentService.js" />
+    <Content Include="Services\sectionService.js" />
     <Content Include="Services\studentService.js" />
+    <Content Include="Services\teacherService.js" />
     <Content Include="Views\manage.html" />
     <Content Include="Views\focusStudents.html" />
     <Content Include="Views\scoresInput.html" />

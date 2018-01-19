@@ -9,6 +9,9 @@ node_modules/
 # bower stuffs
 src/bower_components/*
 
+# line ending stuff?
+.leu
+
 # User-specific files
 *.suo
 *.user

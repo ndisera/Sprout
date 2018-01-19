@@ -48,7 +48,7 @@
      * Clears the main navigation search bar.
      */
     $scope.clearSearch = function () {
-        $scope.studentName = ""
+        $scope.studentName = "";
     };
 
     // checks local stroage to see if user has logged in recently and redirects to focus page if so
