@@ -31,3 +31,6 @@ python manage.py migrate
 # install the node dependencies
 cd ../client
 npm install
+
+cd src
+bower install
