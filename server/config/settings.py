@@ -156,3 +156,9 @@ REST_FRAMEWORK = {
 REST_USE_JWT = True
 
 SITE_ID = 1
+
+# Enable a custom hasher which automatically scales the number of iterations over time,
+# (implicitly) disable all others
+PASSWORD_HASHERS = [
+    'api.hashers.SproutPBKDF2PasswordHasher'
+]
