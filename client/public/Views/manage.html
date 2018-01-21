@@ -22,10 +22,10 @@
                 <button id="tDeleteButton" type="button" class="btn btn-primary" ng-click="changeTeacherTask('delete')">Delete</button>
             </div>
             <hr />
-            <form ng-submit="viewTeacher()" ng-show="displayTeacherSearch">
+            <form ng-submit="viewTeacher()" ng-show="displayTeacherViewSearch">
                 <div class="input-group col-sm-offset-1 col-sm-10">
-                    <input type="text" class="form-control" placeholder="Search Teachers" list="teacher" name="teacher" ng-model="teacherSearch">
-                    <datalist id="teacher">
+                    <input type="text" class="form-control" placeholder="Search Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch">
+                    <datalist id="teacherv">
                         <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}}">
                     </datalist>
                     <div class="input-group-btn">
@@ -35,37 +35,90 @@
                     </div>
                 </div>
             </form>
-            <form class="form-horizontal" ng-show="displayTeacherForm">
+            <form ng-submit="displayDeleteTeacher()" ng-show="displayTeacherDeleteSearch">
+                <div class="input-group col-sm-offset-1 col-sm-10">
+                    <input type="text" class="form-control" placeholder="Search Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
+                    <datalist id="teacherd">
+                        <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}}">
+                    </datalist>
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <form class="form-horizontal" name="addTeacherForm" ng-show="displayTeacherForm" ng-submit="addTeacher()">
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="username">Username:</label>
+                    <label class="control-label col-sm-2" for="tusername">Username:</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="username" placeholder="Enter Username" name="username">
+                        <input required type="text" class="form-control" id="tusername" placeholder="Enter Username" name="tusername" ng-model="newTeacher.username" value="{{teacher.username}}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="tlastname">First Name:</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="tfirstname" placeholder="Enter First Name" name="tfirstname">
+                        <input required type="text" class="form-control" id="tfirstname" placeholder="Enter First Name" name="tfirstname" ng-model="newTeacher.first_name">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="tlastname">Last Name:</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="tlastname" placeholder="Enter Last Name" name="tlastname">
+                        <input required type="text" class="form-control" id="tlastname" placeholder="Enter Last Name" name="tlastname" ng-model="newTeacher.last_name">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="pwd">Email:</label>
+                    <label class="control-label col-sm-2" for="temail">Email:</label>
                     <div class="col-sm-9">
-                        <input type="email" class="form-control" id="email" placeholder="Enter Email" name="email">
+                        <input required type="email" class="form-control" id="temail" placeholder="Enter Email" name="temail" ng-model="newTeacher.email">
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">Add</button>
+                        <button ng-disabled="addTeacherForm.$invalid" type="submit" class="btn btn-success">Add</button>
                     </div>
                 </div>
             </form>
+            <form class="form-horizontal" name="deleteTeacherForm" ng-show="displayTeacherInfo" ng-submit="deleteTeacher()">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="tusername">Username:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="tusername">{{teacherD.username}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="tfirstname">First Name:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="tlastname">{{teacherD.first_name}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="tlastname">Last Name:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="tlastname">{{teacherD.last_name}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="temail">Email:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="temail">{{teacherD.email}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button ng-disabled="deleteTeacherForm.$invalid" type="submit" class="btn btn-danger">Delete</button>
+                        <button class="btn btn-default" type="button" ng-click="cancelDeleteTeacher()">Cancel</button>
+                    </div>
+                </div>
+            </form>
+            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="addTeacherSuccess">
+                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> New teacher has been added.
+            </div>
+            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="deleteTeacherSuccess">
+                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> Teacher has been deleted.
+            </div>
         </div>
         <div id="students" class="tab-pane fade">
             <h3 class="inlineHeading">Students</h3>
@@ -75,10 +128,10 @@
                 <button id="sDeleteButton" type="button" class="btn btn-primary" ng-click="changeStudentTask('delete')">Delete</button>
             </div>
             <hr />
-            <form ng-submit="viewStudent()" ng-show="displayStudentSearch">
+            <form ng-submit="viewStudent()" ng-show="displayStudentViewSearch">
                 <div class="input-group col-sm-offset-1 col-sm-10">
-                    <input type="text" class="form-control" placeholder="Search Students" list="allstudents" name="allstudents" ng-model="studentSearch">
-                    <datalist id="allstudents">
+                    <input type="text" class="form-control" placeholder="Search Students" list="studentsv" name="studentsv" ng-model="studentViewSearch">
+                    <datalist id="studentsv">
                         <option ng-repeat="s in students" value="{{s.first_name}} {{s.last_name}}">
                     </datalist>
                     <div class="input-group-btn">
@@ -88,36 +141,89 @@
                     </div>
                 </div>
             </form>
-            <form class="form-horizontal" ng-show="displayStudentForm">
+            <form ng-submit="displayDeleteStudent()" ng-show="displayStudentDeleteSearch">
+                <div class="input-group col-sm-offset-1 col-sm-10">
+                    <input type="text" class="form-control" placeholder="Search Students" list="studentsd" name="studentsd" ng-model="studentDeleteSearch">
+                    <datalist id="studentsd">
+                        <option ng-repeat="s in students" value="{{s.first_name}} {{s.last_name}}">
+                    </datalist>
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <form class="form-horizontal" name="addStudentForm" ng-show="displayStudentForm" ng-submit="addStudent()">
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="sid">Student ID:</label>
                     <div class="col-sm-9">
-                        <input type="number" class="form-control" id="sid" placeholder="Enter Student ID" name="sid">
+                        <input required type="number" class="form-control" id="sid" placeholder="Enter Student ID" name="sid" ng-model="newStudent.id">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="sfirstname">First Name:</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="sfirstname" placeholder="Enter First Name" name="sfirstname">
+                        <input required type="text" class="form-control" id="sfirstname" placeholder="Enter First Name" name="sfirstname" ng-model="newStudent.first_name">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="slastname">Last Name:</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="slastname" placeholder="Enter Last Name" name="slastname">
+                        <input required type="text" class="form-control" id="slastname" placeholder="Enter Last Name" name="slastname" ng-model="newStudent.last_name">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="birthday">Birthday:</label>
+                    <label class="control-label col-sm-2" for="sbirthday">Birthday:</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" id="birthday" placeholder="Enter Birthday (Example: '1996-05-20')" name="birthday">
+                        <input required type="text" class="form-control" id="sbirthday" placeholder="Enter Birthday (Example: '1996-05-20')" name="sbirthday" ng-model="newStudent.birthday">
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">Add</button>
+                        <button ng-disabled="addStudentForm.$invalid" type="submit" class="btn btn-success">Add</button>
                     </div>
                 </div>
             </form>
+            <form class="form-horizontal" name="deleteStudentForm" ng-show="displayStudentInfo" ng-submit="deleteStudent()">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="sid">Student ID:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="sid">{{studentD.id}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="sfirstname">First Name:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="sfirstname">{{studentD.first_name}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="slastname">Last Name:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="slastname">{{studentD.last_name}}</p>
+                    </div>
+                </div>
+                <div class="form-group"> 
+                    <label class="control-label col-sm-2" for="sbirthday">Birthday:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="sbirthday">{{studentD.birthdate}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button ng-disabled="deleteStudentForm.$invalid" type="submit" class="btn btn-danger">Delete</button>
+                        <button class="btn btn-default" type="button" ng-click="cancelDeleteStudent()">Cancel</button>
+                    </div>
+                </div>
+            </form>
+            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="addStudentSuccess">
+                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> New student has been added.
+            </div>
+            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="deleteStudentSuccess">
+                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> Student has been deleted.
+            </div>
         </div>
     </div>

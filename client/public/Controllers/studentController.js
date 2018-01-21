@@ -21,7 +21,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
 
     /**
      * Set the active tab and pill based on selection of one or the other
-     * @param {string} the target of the tab selected.
+     * @param {string} name - the target of the tab selected.
      */
     $scope.setActivePillAndTab = function (name) {
         switch (name) {

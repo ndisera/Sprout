@@ -8,7 +8,7 @@
         getSection: function (sectionId) {
             return $http({
                 method: 'GET',
-                url: 'http://' + $rootScope.backend + '/sections/' + sectionId + '/'
+                url: 'https://' + $rootScope.backend + '/sections/' + sectionId + '/'
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
