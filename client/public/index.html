@@ -64,9 +64,9 @@
                 <div class="collapse navbar-collapse" id="myNavbar">
                     <form class="navbar-form navbar-left" ng-submit="tryNavigateToStudent()">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search Students" list="student" name="student" ng-model="studentName">
+                            <input type="text" autocomplete="off" class="form-control" placeholder="Search Students" list="student" name="student" ng-model="studentName">
                             <datalist id="student">
-                                <option ng-repeat="s in students" value="{{s.first_name}} {{s.last_name}}">
+                                <option ng-repeat="s in studentInfo.students" value="{{s.first_name}} {{s.last_name}}">
                             </datalist>
                             <div class="input-group-btn">
                                 <button class="btn btn-default" type="submit">

@@ -21,7 +21,6 @@
     $scope.teachers = teachers;
     $scope.studentsLookup = {};
     $scope.teachersLookup = {};
-    $scope.studentV = {};
     $scope.teacherV = {};
     $scope.studentD = {};
     $scope.teacherD = {};
@@ -33,6 +32,7 @@
     $scope.deleteTeacherSuccess = false;
     $scope.displayStudentInfo = false;
     $scope.displayTeacherInfo = false;
+    $scope.displayTEditInfo = false;
 
     // create fast lookup student dictionary
     for (var i = 0; i < $scope.students.length; ++i) {
@@ -80,9 +80,11 @@
             case "delete":
                 $scope.displayDeleteStudent = false;
                 $scope.displayStudentDeleteSearch = false;
+                $scope.deleteStudentSuccess = false;
                 break;
             case "add":
                 $scope.displayStudentForm = false;
+                $scope.addStudentSuccess = false;
                 break;
             default:
         }
@@ -116,13 +118,16 @@
         switch (teacherTask) {
             case "view/edit":
                 $scope.displayTeacherViewSearch = false;
+                $scope.displayTEditInfo = false;
                 break;
             case "delete":
                 $scope.displayTeacherInfo = false;
                 $scope.displayTeacherDeleteSearch = false;
+                $scope.deleteTeacherSuccess = false;
                 break;
             case "add":
                 $scope.displayTeacherForm = false;
+                $scope.addTeacherSuccess = false;
                 break;
             default:
         }
@@ -130,6 +135,9 @@
         switch (task) {
             case "view/edit":
                 $scope.displayTeacherViewSearch = true;
+                if (teacherVSearchOrInfo === "info") {
+                    $scope.displayTEditInfo = true;
+                }
                 break;
             case "delete":
                 if (teacherDSearchOrInfo === "search") {
@@ -176,9 +184,9 @@
      */
     $scope.viewTeacher = function () {
         if ($scope.teacherViewSearch.toUpperCase() in $scope.teachersLookup) {
-            //$scope.teacher = $scope.teachersLookup[$scope.teacherViewSearch.toUpperCase()];
-            // display basic info that is also editable
-            return;
+            $scope.teacherV = $scope.teachersLookup[$scope.teacherViewSearch.toUpperCase()];
+            $scope.displayTEditInfo = true;
+            teacherVSearchOrInfo = "info";
         }
         else {
             //TODO: notify the user in some way
@@ -190,6 +198,9 @@
         teacherPromise.then(function success(data) {
             $scope.newTeacher = {};
             $scope.addTeacherSuccess = true;
+            $scope.teachers.push(data);
+            var lookupName = data.first_name + " " + data.last_name;
+            $scope.teachersLookup[lookupName.toUpperCase()] = data;
         }, function error(message) {
             $scope.status = message;
         });
@@ -200,6 +211,9 @@
         studentPromise.then(function success(data) {
             $scope.newStudent = {};
             $scope.addStudentSuccess = true;
+            $scope.students.push(data);
+            var lookupName = data.first_name + " " + data.last_name;
+            $scope.studentsLookup[lookupName.toUpperCase()] = data;
         }, function error(message) {
             $scope.status = message;
         });
@@ -224,11 +238,20 @@
     $scope.deleteTeacher = function () {
         var teacherPromise = teacherService.deleteTeacher($scope.teacherD.id);
         teacherPromise.then(function success(data) {
+            // remove teacher from teachers and teachersLookup
+            for (var i = 0; i < $scope.teachers.length; i++) {
+                if ($scope.teachers[i].id === $scope.teacherD.id) {
+                    $scope.teachers.splice(i, 1);
+                    var upper = $scope.teacherD.first_name.toUpperCase() + " " + $scope.teacherD.last_name.toUpperCase();
+                    delete $scope.teachersLookup[upper];
+                }
+            }
             $scope.teacherD = {};
             $scope.deleteTeacherSuccess = true;
             $scope.displayTeacherDeleteSearch = true;
-            $scope.displayDeleteTeacher = false;
+            $scope.displayTeacherInfo = false;
             teacherDSearchOrInfo = "search";
+            $scope.teacherDeleteSearch = "";
         }, function error(message) {
             $scope.status = message;
         });
@@ -237,11 +260,20 @@
     $scope.deleteStudent = function () {
         var studentPromise = studentService.deleteStudent($scope.studentD.id);
         studentPromise.then(function success(data) {
+            // remove student from students and studentsLookup
+            for (var i = 0; i < $scope.students.length; i++) {
+                if ($scope.students[i].id === $scope.studentD.id) {
+                    $scope.students.splice(i, 1);
+                    var upper = $scope.studentD.first_name.toUpperCase() + " " + $scope.studentD.last_name.toUpperCase();
+                    delete $scope.studentsLookup[upper];
+                }
+            }
             $scope.studentD = {};
             $scope.deleteStudentSuccess = true;
             $scope.displayStudentDeleteSearch = true;
-            $scope.displayDeleteStudent = false;
+            $scope.displayStudentInfo = false;
             studentDSearchOrInfo = "search";
+            $scope.studentDeleteSearch = "";
         }, function error(message) {
             $scope.status = message;
         });

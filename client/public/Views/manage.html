@@ -24,7 +24,7 @@
             <hr />
             <form ng-submit="viewTeacher()" ng-show="displayTeacherViewSearch">
                 <div class="input-group col-sm-offset-1 col-sm-10">
-                    <input type="text" class="form-control" placeholder="Search Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch">
+                    <input type="text" autocomplete="off" class="form-control" placeholder="Search Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch">
                     <datalist id="teacherv">
                         <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}}">
                     </datalist>
@@ -35,16 +35,30 @@
                     </div>
                 </div>
             </form>
-            <form ng-submit="displayDeleteTeacher()" ng-show="displayTeacherDeleteSearch">
-                <div class="input-group col-sm-offset-1 col-sm-10">
-                    <input type="text" class="form-control" placeholder="Search Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
-                    <datalist id="teacherd">
-                        <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}}">
-                    </datalist>
-                    <div class="input-group-btn">
-                        <button class="btn btn-default" type="submit">
-                            <i class="glyphicon glyphicon-search"></i>
-                        </button>
+            <form class="form-horizontal" name="editTeacherForm" ng-show="displayTEditInfo">
+                <br />
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="tusername">Username:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="tusername">{{teacherV.username}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="tfirstname">First Name:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="tlastname">{{teacherV.first_name}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="tlastname">Last Name:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="tlastname">{{teacherV.last_name}}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="temail">Email:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="temail">{{teacherV.email}}</p>
                     </div>
                 </div>
             </form>
@@ -52,30 +66,47 @@
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="tusername">Username:</label>
                     <div class="col-sm-9">
-                        <input required type="text" class="form-control" id="tusername" placeholder="Enter Username" name="tusername" ng-model="newTeacher.username" value="{{teacher.username}}">
+                        <input required autocomplete="off" type="text" class="form-control" id="tusername" placeholder="Enter Username" name="tusername" ng-model="newTeacher.username" value="{{teacher.username}}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="tlastname">First Name:</label>
                     <div class="col-sm-9">
-                        <input required type="text" class="form-control" id="tfirstname" placeholder="Enter First Name" name="tfirstname" ng-model="newTeacher.first_name">
+                        <input required autocomplete="off" type="text" class="form-control" id="tfirstname" placeholder="Enter First Name" name="tfirstname" ng-model="newTeacher.first_name">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="tlastname">Last Name:</label>
                     <div class="col-sm-9">
-                        <input required type="text" class="form-control" id="tlastname" placeholder="Enter Last Name" name="tlastname" ng-model="newTeacher.last_name">
+                        <input required autocomplete="off" type="text" class="form-control" id="tlastname" placeholder="Enter Last Name" name="tlastname" ng-model="newTeacher.last_name">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="temail">Email:</label>
                     <div class="col-sm-9">
-                        <input required type="email" class="form-control" id="temail" placeholder="Enter Email" name="temail" ng-model="newTeacher.email">
+                        <input required autocomplete="off" type="email" class="form-control" id="temail" placeholder="Enter Email" name="temail" ng-model="newTeacher.email">
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
                         <button ng-disabled="addTeacherForm.$invalid" type="submit" class="btn btn-success">Add</button>
+                    </div>
+                </div>
+            </form>
+            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="addTeacherSuccess">
+                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> New teacher has been added.
+            </div>
+            <form ng-submit="displayDeleteTeacher()" ng-show="displayTeacherDeleteSearch">
+                <div class="input-group col-sm-offset-1 col-sm-10">
+                    <input type="text" autocomplete="off" class="form-control" placeholder="Search Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
+                    <datalist id="teacherd">
+                        <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}}">
+                    </datalist>
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
                     </div>
                 </div>
             </form>
@@ -111,11 +142,7 @@
                     </div>
                 </div>
             </form>
-            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="addTeacherSuccess">
-                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                <strong>Success!</strong> New teacher has been added.
-            </div>
-            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="deleteTeacherSuccess">
+            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10 deleteSuccess" ng-show="deleteTeacherSuccess">
                 <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
                 <strong>Success!</strong> Teacher has been deleted.
             </div>
@@ -130,21 +157,8 @@
             <hr />
             <form ng-submit="viewStudent()" ng-show="displayStudentViewSearch">
                 <div class="input-group col-sm-offset-1 col-sm-10">
-                    <input type="text" class="form-control" placeholder="Search Students" list="studentsv" name="studentsv" ng-model="studentViewSearch">
+                    <input type="text" autocomplete="off" class="form-control" placeholder="Search Students" list="studentsv" name="studentsv" ng-model="studentViewSearch">
                     <datalist id="studentsv">
-                        <option ng-repeat="s in students" value="{{s.first_name}} {{s.last_name}}">
-                    </datalist>
-                    <div class="input-group-btn">
-                        <button class="btn btn-default" type="submit">
-                            <i class="glyphicon glyphicon-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <form ng-submit="displayDeleteStudent()" ng-show="displayStudentDeleteSearch">
-                <div class="input-group col-sm-offset-1 col-sm-10">
-                    <input type="text" class="form-control" placeholder="Search Students" list="studentsd" name="studentsd" ng-model="studentDeleteSearch">
-                    <datalist id="studentsd">
                         <option ng-repeat="s in students" value="{{s.first_name}} {{s.last_name}}">
                     </datalist>
                     <div class="input-group-btn">
@@ -158,25 +172,25 @@
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="sid">Student ID:</label>
                     <div class="col-sm-9">
-                        <input required type="number" class="form-control" id="sid" placeholder="Enter Student ID" name="sid" ng-model="newStudent.id">
+                        <input required autocomplete="off" type="text" class="form-control" id="sid" placeholder="Enter Student ID" name="sid" ng-model="newStudent.student_id">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="sfirstname">First Name:</label>
                     <div class="col-sm-9">
-                        <input required type="text" class="form-control" id="sfirstname" placeholder="Enter First Name" name="sfirstname" ng-model="newStudent.first_name">
+                        <input required autocomplete="off" type="text" class="form-control" id="sfirstname" placeholder="Enter First Name" name="sfirstname" ng-model="newStudent.first_name">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="slastname">Last Name:</label>
                     <div class="col-sm-9">
-                        <input required type="text" class="form-control" id="slastname" placeholder="Enter Last Name" name="slastname" ng-model="newStudent.last_name">
+                        <input required autocomplete="off" type="text" class="form-control" id="slastname" placeholder="Enter Last Name" name="slastname" ng-model="newStudent.last_name">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="sbirthday">Birthday:</label>
                     <div class="col-sm-9">
-                        <input required type="text" class="form-control" id="sbirthday" placeholder="Enter Birthday (Example: '1996-05-20')" name="sbirthday" ng-model="newStudent.birthday">
+                        <input required autocomplete="off" type="text" class="form-control" id="sbirthday" placeholder="Enter Birthday (Example: '1996-05-20')" name="sbirthday" ng-model="newStudent.birthdate">
                     </div>
                 </div>
                 <div class="form-group">
@@ -185,11 +199,28 @@
                     </div>
                 </div>
             </form>
+            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="addStudentSuccess">
+                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>Success!</strong> New student has been added.
+            </div>
+            <form ng-submit="displayDeleteStudent()" ng-show="displayStudentDeleteSearch">
+                <div class="input-group col-sm-offset-1 col-sm-10">
+                    <input type="text" class="form-control" placeholder="Search Students" list="studentsd" name="studentsd" autocomplete="off" ng-model="studentDeleteSearch">
+                    <datalist id="studentsd">
+                        <option ng-repeat="s in students" value="{{s.first_name}} {{s.last_name}}">
+                    </datalist>
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
             <form class="form-horizontal" name="deleteStudentForm" ng-show="displayStudentInfo" ng-submit="deleteStudent()">
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="sid">Student ID:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="sid">{{studentD.id}}</p>
+                        <p class="form-control-static" id="sid">{{studentD.student_id}}</p>
                     </div>
                 </div>
                 <div class="form-group">
@@ -217,11 +248,7 @@
                     </div>
                 </div>
             </form>
-            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="addStudentSuccess">
-                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                <strong>Success!</strong> New student has been added.
-            </div>
-            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="deleteStudentSuccess">
+            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10 deleteSuccess" ng-show="deleteStudentSuccess">
                 <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
                 <strong>Success!</strong> Student has been deleted.
             </div>
