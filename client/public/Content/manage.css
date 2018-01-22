@@ -11,3 +11,11 @@
 .deleteSuccess {
     margin-top: 15px;
 }
+
+.pencilEdit {
+    cursor: pointer;
+}
+
+.pencilEdit:hover {
+    color:blue;
+}

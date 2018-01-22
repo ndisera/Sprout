@@ -73,7 +73,7 @@
         updateTeacher: function (teacherId, teacherObj) {
             return $http({
                 method: 'PUT',
-                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId,
+                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId + "/",
                 data: teacherObj
             }).then(function success(response) {
                 return response.data;

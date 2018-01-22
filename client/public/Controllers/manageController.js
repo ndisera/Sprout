@@ -3,36 +3,45 @@
         location.path('');
     }
 
-    // remember to get students again after adding/editing/deleting
+    // remember to get students/teachers again after adding/editing/deleting
     // or just make change to what we already have
 
     var teacherTask = "view/edit";
     var studentTask = "view/edit";
+    var teacherVSearchOrInfo = "search";
+    var teacherDSearchOrInfo = "search";
+    var studentDSearchOrInfo = "search";
+
     $scope.displayStudentViewSearch = true;
     $scope.displayStudentDeleteSearch = false;
     $scope.displayStudentForm = false;
     $scope.displayTeacherViewSearch = true;
     $scope.displayTeacherDeleteSearch = false;
     $scope.displayTeacherForm = false;
-    var teacherVSearchOrInfo = "search";
-    var teacherDSearchOrInfo = "search";
-    var studentDSearchOrInfo = "search";
+    $scope.displayStudentInfo = false;
+    $scope.displayTeacherInfo = false;
+    $scope.displayTEditInfo = false;
+
+    $scope.viewTUsername = true;
+    $scope.viewTFirstName = true;
+    $scope.viewTLastName = true;
+    $scope.viewTEmail = true;
+
+    $scope.addStudentSuccess = false;
+    $scope.addTeacherSuccess = false;
+    $scope.deleteStudentSuccess = false;
+    $scope.deleteTeacherSuccess = false;
+
     $scope.students = students;
     $scope.teachers = teachers;
     $scope.studentsLookup = {};
     $scope.teachersLookup = {};
     $scope.teacherV = {};
+    $scope.teacherE = {};
     $scope.studentD = {};
     $scope.teacherD = {};
     $scope.newTeacher = {};
     $scope.newStudent = {};
-    $scope.addStudentSuccess = false;
-    $scope.addTeacherSuccess = false;
-    $scope.deleteStudentSuccess = false;
-    $scope.deleteTeacherSuccess = false;
-    $scope.displayStudentInfo = false;
-    $scope.displayTeacherInfo = false;
-    $scope.displayTEditInfo = false;
 
     // create fast lookup student dictionary
     for (var i = 0; i < $scope.students.length; ++i) {
@@ -185,8 +194,15 @@
     $scope.viewTeacher = function () {
         if ($scope.teacherViewSearch.toUpperCase() in $scope.teachersLookup) {
             $scope.teacherV = $scope.teachersLookup[$scope.teacherViewSearch.toUpperCase()];
+            // copy teacherV to teacherE
+            $scope.teacherE = Object.assign({}, $scope.teacherV);
             $scope.displayTEditInfo = true;
             teacherVSearchOrInfo = "info";
+            // make sure edit is still not displayed when switching
+            $scope.viewTUsername = true;
+            $scope.viewTFirstName = true;
+            $scope.viewTLastName = true;
+            $scope.viewTEmail = true;
         }
         else {
             //TODO: notify the user in some way
@@ -293,6 +309,90 @@
         $scope.displayStudentInfo = false;
         $scope.studentD = {};
         teacherDSearchOrInfo = "search";
+    };
+
+    $scope.editTeacher = function (field) {
+        switch (field) {
+            case "username":
+                $scope.viewTUsername = false;
+                break;
+            case "firstname":
+                $scope.viewTFirstName = false;
+                break;
+            case "lastname":
+                $scope.viewTLastName = false;
+                break;
+            case "email":
+                $scope.viewTEmail = false;
+                break;
+            default:
+        }
+    };
+
+    $scope.saveTEdit = function (field) {
+        switch (field) {
+            case "username":
+                $scope.viewTUsername = true;
+                $scope.teacherE.username = $scope.tUsername;
+                $scope.tUsername = "";
+                break;
+            case "firstname":
+                $scope.viewTFirstName = true;
+                $scope.teacherE.first_name = $scope.tFirstName;
+                $scope.tFirstName = "";
+                break;
+            case "lastname":
+                $scope.viewTLastName = true;
+                $scope.teacherE.last_name = $scope.tLastName;
+                $scope.tLastName = "";
+                break;
+            case "email":
+                $scope.viewTEmail = true;
+                $scope.teacherE.email = $scope.tEmail;
+                $scope.tEmail = "";
+                break;
+            default:
+        }
+        // save with teacherE
+        var tempTeacher = Object.assign({}, $scope.teacherE);
+        delete tempTeacher.id;
+        var teacherPromise = teacherService.updateTeacher($scope.teacherE.id, tempTeacher);
+        teacherPromise.then(function success(data) {
+            // set teacherV to teacherE to reflect update
+            $scope.teacherV = Object.assign({}, $scope.teacherE);
+            // then have to update teachers and lookup but I'll have them all point to teacherService teachers
+            for (var i = 0; i < $scope.teachers.length; i++) {
+                if ($scope.teachers[i].id === $scope.teacherE.id) {
+                    $scope.teachers[i] = Object.assign({}, $scope.teacherE);
+                    var upper = $scope.teacherE.first_name.toUpperCase() + " " + $scope.teacherE.last_name.toUpperCase();
+                    $scope.teachersLookup[upper] = Object.assign({}, $scope.teacherE);
+                }
+            }
+        }, function error(message) {
+            $scope.status = message;
+        });
+    };
+
+    $scope.cancelTEdit = function (field) {
+        switch (field) {
+            case "username":
+                $scope.viewTUsername = true;
+                $scope.tUsername = "";
+                break;
+            case "firstname":
+                $scope.viewTFirstName = true;
+                $scope.tFirstName = "";
+                break;
+            case "lastname":
+                $scope.viewTLastName = true;
+                $scope.tLastName = "";
+                break;
+            case "email":
+                $scope.viewTEmail = true;
+                $scope.tEmail = "";
+                break;
+            default:
+        }
     };
 
     /**

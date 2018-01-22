@@ -35,30 +35,108 @@
                     </div>
                 </div>
             </form>
-            <form class="form-horizontal" name="editTeacherForm" ng-show="displayTEditInfo">
+            <form class="form-horizontal" name="editTUsernameForm" ng-show="displayTEditInfo" ng-submit="saveTEdit('username')">
                 <br />
-                <div class="form-group">
+                <div class="form-group" ng-show="viewTUsername">
                     <label class="control-label col-sm-2" for="tusername">Username:</label>
-                    <div class="col-sm-10">
-                        <p class="form-control-static" id="tusername">{{teacherV.username}}</p>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">{{teacherV.username}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('username')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-hide="viewTUsername">
+                    <label for="tusername" class="col-sm-2 control-label">Username:</label>
+                    <div class="col-sm-9 controls">
+                        <div class="input-group">
+                            <input required autocomplete="off" type="text" class="form-control" id="tusername" placeholder="{{teacherV.username}}" name="tusername" ng-model="tUsername">
+                            <div class="input-group-btn">
+                                <button style="border-radius:0px;border-left:0px;" class="btn btn-default" type="submit" ng-disabled="editTUsernameForm.$invalid">
+                                    <i style="color:green" class="glyphicon glyphicon-ok"></i>
+                                </button>
+                            </div>
+                            <div class="input-group-btn">
+                                <button class="btn btn-default" type="button" ng-click="cancelTEdit('username')">
+                                    <i style="color:red;" class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <form class="form-horizontal" name="editTFirstNameForm" ng-show="displayTEditInfo" ng-submit="saveTEdit('firstname')">
+                <div class="form-group" ng-show="viewTFirstName">
                     <label class="control-label col-sm-2" for="tfirstname">First Name:</label>
-                    <div class="col-sm-10">
-                        <p class="form-control-static" id="tlastname">{{teacherV.first_name}}</p>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">{{teacherV.first_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('firstname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-hide="viewTFirstName">
+                    <label for="tfirstname" class="col-sm-2 control-label">First Name:</label>
+                    <div class="col-sm-9 controls">
+                        <div class="input-group">
+                            <input required autocomplete="off" type="text" class="form-control" id="tfirstname" placeholder="{{teacherV.first_name}}" name="tfirstname" ng-model="tFirstName">
+                            <div class="input-group-btn">
+                                <button style="border-radius:0px;border-left:0px;" class="btn btn-default" type="submit" ng-disabled="editTFirstNameForm.$invalid">
+                                    <i style="color:green" class="glyphicon glyphicon-ok"></i>
+                                </button>
+                            </div>
+                            <div class="input-group-btn">
+                                <button class="btn btn-default" type="button" ng-click="cancelTEdit('firstname')">
+                                    <i style="color:red;" class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <form class="form-horizontal" name="editTLastNameForm" ng-show="displayTEditInfo" ng-submit="saveTEdit('lastname')">
+                <div class="form-group" ng-show="viewTLastName">
                     <label class="control-label col-sm-2" for="tlastname">Last Name:</label>
-                    <div class="col-sm-10">
-                        <p class="form-control-static" id="tlastname">{{teacherV.last_name}}</p>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">{{teacherV.last_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('lastname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-hide="viewTLastName">
+                    <label for="tlastname" class="col-sm-2 control-label">Last Name:</label>
+                    <div class="col-sm-9 controls">
+                        <div class="input-group">
+                            <input required autocomplete="off" type="text" class="form-control" id="tlastname" placeholder="{{teacherV.last_name}}" name="tlastname" ng-model="tLastName">
+                            <div class="input-group-btn">
+                                <button style="border-radius:0px;border-left:0px;" class="btn btn-default" type="submit" ng-disabled="editTLastNameForm.$invalid">
+                                    <i style="color:green" class="glyphicon glyphicon-ok"></i>
+                                </button>
+                            </div>
+                            <div class="input-group-btn">
+                                <button class="btn btn-default" type="button" ng-click="cancelTEdit('lastname')">
+                                    <i style="color:red;" class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <form class="form-horizontal" name="editTEmailForm" ng-show="displayTEditInfo" ng-submit="saveTEdit('email')">
+                <div class="form-group" ng-show="viewTEmail">
                     <label class="control-label col-sm-2" for="temail">Email:</label>
-                    <div class="col-sm-10">
-                        <p class="form-control-static" id="temail">{{teacherV.email}}</p>
+                    <div class="col-sm-9">
+                        <p class="form-control-static">{{teacherV.email}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('email')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                    </div>
+                </div>
+                <div class="form-group" ng-hide="viewTEmail">
+                    <label for="temail" class="col-sm-2 control-label">Email:</label>
+                    <div class="col-sm-9 controls">
+                        <div class="input-group">
+                            <input required autocomplete="off" type="email" class="form-control" id="temail" placeholder="{{teacherV.email}}" name="temail" ng-model="tEmail">
+                            <div class="input-group-btn">
+                                <button style="border-radius:0px;border-left:0px;" class="btn btn-default" type="submit" ng-disabled="editTEmailForm.$invalid">
+                                    <i style="color:green" class="glyphicon glyphicon-ok"></i>
+                                </button>
+                            </div>
+                            <div class="input-group-btn">
+                                <button class="btn btn-default" type="button" ng-click="cancelTEdit('email')">
+                                    <i style="color:red;" class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -235,7 +313,7 @@
                         <p class="form-control-static" id="slastname">{{studentD.last_name}}</p>
                     </div>
                 </div>
-                <div class="form-group"> 
+                <div class="form-group">
                     <label class="control-label col-sm-2" for="sbirthday">Birthday:</label>
                     <div class="col-sm-10">
                         <p class="form-control-static" id="sbirthday">{{studentD.birthdate}}</p>
