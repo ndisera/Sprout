@@ -14,5 +14,10 @@ class SproutPBKDF2PasswordHasher(PBKDF2PasswordHasher):
 
     years_elapsed = future_year - writing_year
 
+    if (years_elapsed < 0):
+        # If we have calculated a negative time window, something is broken
+        raise ValueError("Password hasher module detected negative time passing -- Is the system "
+                         "clock set correctly?")
+
     # Double the number of iterations for every year since this was written
     iterations = recommended_iterations_2018 * (2 ** years_elapsed)
