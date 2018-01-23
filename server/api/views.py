@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import coreapi
 import coreschema
 from rest_framework import status, viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from api.models import *
@@ -83,6 +84,7 @@ class StudentViewSet(SproutViewSet):
     """
     allows interaction with the set of "Student" instances
     """
+    permission_classes = (IsAuthenticated,)
     queryset = Student.objects.all()
     serializers = {
         'default': StudentSerializer,
