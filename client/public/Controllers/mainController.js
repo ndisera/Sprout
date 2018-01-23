@@ -74,21 +74,6 @@
         $scope.studentName = "";
     };
 
-    // Try to refresh the JSON token to see if it is valid...
-    var refreshPromise = loginService.refreshToken($rootScope.JSONWebToken);
-    refreshPromise.then(
-        function success(response) {
-            // Yay! The token was valid, update our local knowledge to the new one
-            $rootScope.JSONWebToken = response.data["token"];
-            localStorage.setItem("JSONWebToken", $rootScope.JSONWebToken);
-            console.log("Auth token refreshed: " + $rootScope.JSONWebToken);
-            $rootScope.loggedIn = true;
-        }, function error(response) {
-            // Need to get a new token. Show the login screen
-            $rootScope.loggedIn = false;
-        }
-    );
-
     if ($rootScope.loggedIn && $location.path() === "")
         $location.path = '/focus';
 

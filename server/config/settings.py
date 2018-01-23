@@ -139,10 +139,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 # JWT = JSON Web Tokens -- Used for our token-based authentication
-# Configure the JWTs to expire after 1 hour, and allow users to refresh near-expiration tokens
+# Configure JWT to expire after 18 hours and not be refreshable
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
-    'JWT_ALLOW_REFRESH': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=18),
+    'JWT_ALLOW_REFRESH': False,
 }
 
 # Make JWT Auth the default authentication mechanism for Django

@@ -21,28 +21,6 @@ app.factory("loginService", function ($rootScope, $http) {
             }).then(function success(response) {
                 return response;
             });
-        },
-
-        /**
-         * Refresh a login token
-         *
-         * Response will be:
-         * 200 OK, indicating a new token has been generated. The new token is response.data["token"]
-         * 400 Bad Request, indicating the token is not valid, in which case a list of errors
-         * will be reponse.data["non_field_errors"]
-         *
-         * @param {string} token - the token to refresh
-         * @return {promise} promise that will resolve to the response
-         */
-        refreshToken: function (token) {
-            return $http({
-                method: 'POST',
-                url: 'https://' + $rootScope.backend + '/refresh-token/',
-                headers: {'Content-Type': 'application/json'},
-                data: {'token':token}
-            }).then(function success(response) {
-                return response;
-            });
         }
     };
 });

@@ -40,4 +40,3 @@ urlpatterns.append(url(r'^schema/', get_schema_view(title='Sprout Schema')))
 # URL Patterns for token authentication setup
 urlpatterns.append(url(r'^', include('rest_auth.urls')))
 urlpatterns.append(url(r'^registration/', include('rest_auth.registration.urls')))
-urlpatterns.append(url(r'^refresh-token/', refresh_jwt_token))
