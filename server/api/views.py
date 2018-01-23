@@ -75,6 +75,7 @@ class TeacherViewSet(SproutViewSet):
     """
     allows interaction with the set of "Teacher" instances
     """
+    permission_classes = (IsAuthenticated,)
     queryset = Teacher.objects.all()
     serializers = {
         'default': TeacherSerializer,
@@ -124,6 +125,7 @@ class SectionViewSet(SproutViewSet):
     delete:
     deletes the existing section specified by the path param.
     """
+    permission_classes = (IsAuthenticated,)
     serializers = {
         'default': SectionSerializer,
     }
@@ -208,6 +210,7 @@ class EnrollmentViewSet(SproutViewSet):
     delete:
     deletes the existing enrollment specified by the path param.
     """
+    permission_classes = (IsAuthenticated,)
     serializers = {
         'default': EnrollmentSerializer,
     }
@@ -322,6 +325,7 @@ class BehaviorViewSet(SproutViewSet):
     delete:
     deletes the existing behavior report specified by the path param.
     """
+    permission_classes = (IsAuthenticated,)
     serializers = {
         'list':    BehaviorRetrieveSerializer,
         'retrieve':    BehaviorRetrieveSerializer,
@@ -408,19 +412,3 @@ class BehaviorViewSet(SproutViewSet):
             description=desc_enrollment,
             schema=coreschema.Integer(title=name_enrollment)),
     )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
