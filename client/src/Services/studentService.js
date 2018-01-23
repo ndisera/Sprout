@@ -42,7 +42,7 @@ app.factory("studentService", function ($rootScope, $http) {
             return $http({
                 method: 'DELETE',
                 headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'http://' + $rootScope.backend + '/students/' + studentId
+                url: 'https://' + $rootScope.backend + '/students/' + studentId
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -59,7 +59,7 @@ app.factory("studentService", function ($rootScope, $http) {
             return $http({
                 method: 'POST',
                 headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'http://' + $rootScope.backend + '/students/',
+                url: 'https://' + $rootScope.backend + '/students/',
                 data: studentObj
             }).then(function success(response) {
                 return response.data;
@@ -78,7 +78,7 @@ app.factory("studentService", function ($rootScope, $http) {
             return $http({
                 method: 'PUT',
                 headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'http://' + $rootScope.backend + '/students/' + studentId + '/',
+                url: 'https://' + $rootScope.backend + '/students/' + studentId + '/',
                 data: studentObj
             }).then(function success(response) {
                 return response.data;
