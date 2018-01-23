@@ -157,6 +157,19 @@ REST_USE_JWT = True
 
 SITE_ID = 1
 
+# Tell Swagger to use the JWT authentication
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'description': 'Use Sprout\'s token authentication -- Get a token using the Login API below, the paste it here as: "JWT <token>" without quotes',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+    'USE_SESSION_AUTH': False,
+}
+
 # Enable a custom hasher which automatically scales the number of iterations over time,
 # (implicitly) disable all others
 PASSWORD_HASHERS = [
