@@ -128,27 +128,27 @@
             </form>
             <form class="form-horizontal" name="addTeacherForm" ng-show="displayTeacherForm" ng-submit="addTeacher()">
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="tusername">Username:</label>
+                    <label class="control-label col-sm-2" for="tusername2">Username:</label>
                     <div class="col-sm-9">
-                        <input required autocomplete="off" type="text" class="form-control" id="tusername" placeholder="Enter Username" name="tusername" ng-model="newTeacher.username" value="{{teacher.username}}">
+                        <input required autocomplete="off" type="text" class="form-control" id="tusername2" placeholder="Enter Username" name="tusername2" ng-model="newTeacher.username" value="{{teacher.username}}">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="tlastname">First Name:</label>
+                    <label class="control-label col-sm-2" for="tfirstname2">First Name:</label>
                     <div class="col-sm-9">
-                        <input required autocomplete="off" type="text" class="form-control" id="tfirstname" placeholder="Enter First Name" name="tfirstname" ng-model="newTeacher.first_name">
+                        <input required autocomplete="off" type="text" class="form-control" id="tfirstname2" placeholder="Enter First Name" name="tfirstname2" ng-model="newTeacher.first_name">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="tlastname">Last Name:</label>
+                    <label class="control-label col-sm-2" for="tlastname2">Last Name:</label>
                     <div class="col-sm-9">
-                        <input required autocomplete="off" type="text" class="form-control" id="tlastname" placeholder="Enter Last Name" name="tlastname" ng-model="newTeacher.last_name">
+                        <input required autocomplete="off" type="text" class="form-control" id="tlastname2" placeholder="Enter Last Name" name="tlastname2" ng-model="newTeacher.last_name">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="temail">Email:</label>
+                    <label class="control-label col-sm-2" for="temail2">Email:</label>
                     <div class="col-sm-9">
-                        <input required autocomplete="off" type="email" class="form-control" id="temail" placeholder="Enter Email" name="temail" ng-model="newTeacher.email">
+                        <input required autocomplete="off" type="email" class="form-control" id="temail2" placeholder="Enter Email" name="temail2" ng-model="newTeacher.email">
                     </div>
                 </div>
                 <div class="form-group">
@@ -157,8 +157,7 @@
                     </div>
                 </div>
             </form>
-            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="addTeacherSuccess">
-                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <div class="alert alert-success fade in col-sm-offset-1 col-sm-10" id="addTeacherSuccess" ng-show="addTeacherSuccess">
                 <strong>Success!</strong> New teacher has been added.
             </div>
             <form ng-submit="displayDeleteTeacher()" ng-show="displayTeacherDeleteSearch">
@@ -176,27 +175,27 @@
             </form>
             <form class="form-horizontal" name="deleteTeacherForm" ng-show="displayTeacherInfo" ng-submit="deleteTeacher()">
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="tusername">Username:</label>
+                    <label class="control-label col-sm-2" for="tusername3">Username:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="tusername">{{teacherD.username}}</p>
+                        <p class="form-control-static" id="tusername3">{{teacherD.username}}</p>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="tfirstname">First Name:</label>
+                    <label class="control-label col-sm-2" for="tfirstname3">First Name:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="tlastname">{{teacherD.first_name}}</p>
+                        <p class="form-control-static" id="tfirstname3">{{teacherD.first_name}}</p>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="tlastname">Last Name:</label>
+                    <label class="control-label col-sm-2" for="tlastname3">Last Name:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="tlastname">{{teacherD.last_name}}</p>
+                        <p class="form-control-static" id="tlastname3">{{teacherD.last_name}}</p>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="temail">Email:</label>
+                    <label class="control-label col-sm-2" for="temail3">Email:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="temail">{{teacherD.email}}</p>
+                        <p class="form-control-static" id="temail3">{{teacherD.email}}</p>
                     </div>
                 </div>
                 <div class="form-group">
@@ -206,8 +205,7 @@
                     </div>
                 </div>
             </form>
-            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10 deleteSuccess" ng-show="deleteTeacherSuccess">
-                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <div class="alert alert-success fade in col-sm-offset-1 col-sm-10 deleteSuccess" id="deleteTeacherSuccess" ng-show="deleteTeacherSuccess">
                 <strong>Success!</strong> Teacher has been deleted.
             </div>
         </div>
@@ -269,8 +267,7 @@
                     </div>
                 </div>
             </form>
-            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10" ng-show="addStudentSuccess">
-                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <div class="alert alert-success fade in col-sm-offset-1 col-sm-10" id="addStudentSuccess" ng-show="addStudentSuccess">
                 <strong>Success!</strong> New student has been added.
             </div>
             <form ng-submit="displayDeleteStudent()" ng-show="displayStudentDeleteSearch">
@@ -288,27 +285,27 @@
             </form>
             <form class="form-horizontal" name="deleteStudentForm" ng-show="displayStudentInfo" ng-submit="deleteStudent()">
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="sid">Student ID:</label>
+                    <label class="control-label col-sm-2" for="sid2">Student ID:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="sid">{{studentD.student_id}}</p>
+                        <p class="form-control-static" id="sid2">{{studentD.student_id}}</p>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="sfirstname">First Name:</label>
+                    <label class="control-label col-sm-2" for="sfirstname2">First Name:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="sfirstname">{{studentD.first_name}}</p>
+                        <p class="form-control-static" id="sfirstname2">{{studentD.first_name}}</p>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="slastname">Last Name:</label>
+                    <label class="control-label col-sm-2" for="slastname2">Last Name:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="slastname">{{studentD.last_name}}</p>
+                        <p class="form-control-static" id="slastname2">{{studentD.last_name}}</p>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label col-sm-2" for="sbirthday">Birthday:</label>
+                    <label class="control-label col-sm-2" for="sbirthday2">Birthday:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="sbirthday">{{studentD.birthdate}}</p>
+                        <p class="form-control-static" id="sbirthday2">{{studentD.birthdate}}</p>
                     </div>
                 </div>
                 <div class="form-group">
@@ -318,8 +315,7 @@
                     </div>
                 </div>
             </form>
-            <div class="alert alert-success alert-dismissable fade in col-sm-offset-1 col-sm-10 deleteSuccess" ng-show="deleteStudentSuccess">
-                <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <div class="alert alert-success fade in col-sm-offset-1 col-sm-10 deleteSuccess" id="deleteStudentSuccess" ng-show="deleteStudentSuccess">
                 <strong>Success!</strong> Student has been deleted.
             </div>
         </div>

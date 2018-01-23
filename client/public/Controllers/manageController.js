@@ -84,7 +84,7 @@
                 $scope.displayStudentViewSearch = false;
                 break;
             case "delete":
-                $scope.displayDeleteStudent = false;
+                $scope.displayStudentInfo = false;
                 $scope.displayStudentDeleteSearch = false;
                 $scope.deleteStudentSuccess = false;
                 break;
@@ -232,6 +232,9 @@
         teacherPromise.then(function success(data) {
             $scope.newTeacher = {};
             $scope.addTeacherSuccess = true;
+            $("#addTeacherSuccess").fadeTo(2000, 500).slideUp(500, function () {
+                $("#addTeacherSuccess").slideUp(500);
+            });
             $scope.teachers.push(data);
             var lookupName = data.first_name + " " + data.last_name;
             $scope.teachersLookup[lookupName.toUpperCase()] = data;
@@ -248,6 +251,9 @@
         studentPromise.then(function success(data) {
             $scope.newStudent = {};
             $scope.addStudentSuccess = true;
+            $("#addStudentSuccess").fadeTo(2000, 500).slideUp(500, function () {
+                $("#addStudentSuccess").slideUp(500);
+            });
             $scope.students.push(data);
             var lookupName = data.first_name + " " + data.last_name;
             $scope.studentsLookup[lookupName.toUpperCase()] = data;
@@ -294,6 +300,9 @@
             }
             $scope.teacherD = {};
             $scope.deleteTeacherSuccess = true;
+            $("#deleteTeacherSuccess").fadeTo(2000, 500).slideUp(500, function () {
+                $("#deleteTeacherSuccess").slideUp(500);
+            });
             $scope.displayTeacherDeleteSearch = true;
             $scope.displayTeacherInfo = false;
             teacherDSearchOrInfo = "search";
@@ -319,6 +328,9 @@
             }
             $scope.studentD = {};
             $scope.deleteStudentSuccess = true;
+            $("#deleteStudentSuccess").fadeTo(2000, 500).slideUp(500, function () {
+                $("#deleteStudentSuccess").slideUp(500);
+            });
             $scope.displayStudentDeleteSearch = true;
             $scope.displayStudentInfo = false;
             studentDSearchOrInfo = "search";
