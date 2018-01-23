@@ -1,4 +1,4 @@
-app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, behaviorService, sectionService, enrollments, student) {
+app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, studentService, behaviorService, sectionService, enrollments, student) {
 
     // redirect user if not logged in
     if (!JSON.parse(localStorage.getItem("loggedIn"))) {
@@ -6,6 +6,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     }
 
     $scope.student = student;
+    $scope.studentE = Object.assign({}, $scope.student);
     console.log($scope.student);
     $scope.section_titles = [];
     $scope.sections = [];
@@ -18,6 +19,11 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     $scope.hardcodedEffortForThePrototype = [];
     // Section IDs are stored as a list of integers
     $scope.hardcodedSectionIDsForThePrototype = [];
+
+    $scope.viewSid = true;
+    $scope.viewSFirstName = true;
+    $scope.viewSLastName = true;
+    $scope.viewSBirthday = true;
 
     /**
      * Set the active tab and pill based on selection of one or the other
@@ -72,6 +78,109 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     }
 
     // the sections array should now contain objects with teacher and title
+
+    /**
+     * Turns the displayed student field into an editable input.
+     * @param {string} field - the name of the field that the user is editing.
+     */
+    $scope.editStudent = function (field) {
+        switch (field) {
+            case "sid":
+                $scope.viewSid = false;
+                break;
+            case "firstname":
+                $scope.viewSFirstName = false;
+                break;
+            case "lastname":
+                $scope.viewSLastName = false;
+                break;
+            case "birthday":
+                $scope.viewSBirthday = false;
+                break;
+            default:
+        }
+    };
+
+
+    /**
+     * Updates the selected Student with the newly edited field.
+     * @param {string} field - the name of the field that the user is editing.
+     */
+    $scope.saveSEdit = function (field) {
+        switch (field) {
+            // update field
+            case "sid":
+                $scope.studentE.student_id = $scope.sId;
+                break;
+            case "firstname":
+                $scope.studentE.first_name = $scope.sFirstName;
+                break;
+            case "lastname":
+                $scope.studentE.last_name = $scope.sLastName;
+                break;
+            case "birthday":
+                $scope.studentE.birthdate = $scope.sBirthday;
+                break;
+            default:
+        }
+        // save with studentE
+        var tempStudent = Object.assign({}, $scope.studentE);
+        delete tempStudent.id;
+        var studentPromise = studentService.updateStudent($scope.studentE.id, tempStudent);
+        studentPromise.then(function success(data) {
+            // set student to studentE to reflect update
+            $scope.student = Object.assign({}, $scope.studentE);
+            // don't have any students field to update
+            switch (field) {
+                // set view after call returns
+                case "sid":
+                    $scope.viewSid = true;
+                    $scope.sId = "";
+                    break;
+                case "firstname":
+                    $scope.viewSFirstName = true;
+                    $scope.sFirstName = "";
+                    break;
+                case "lastname":
+                    $scope.viewSLastName = true;
+                    $scope.sLastName = "";
+                    break;
+                case "birthday":
+                    $scope.viewSBirthday = true;
+                    $scope.sBirthday = "";
+                    break;
+                default:
+            }
+        }, function error(message) {
+            $scope.status = message;
+        });
+    };
+
+    /**
+     * Restored the previous display of the selected student field and hides the editable input box.
+     * @param {string} field - the name of the field that the user is editing.
+     */
+    $scope.cancelSEdit = function (field) {
+        switch (field) {
+            case "sid":
+                $scope.viewSid = true;
+                $scope.sId = "";
+                break;
+            case "firstname":
+                $scope.viewSFirstName = true;
+                $scope.sFirstName = "";
+                break;
+            case "lastname":
+                $scope.viewSLastName = true;
+                $scope.sLastName = "";
+                break;
+            case "birthday":
+                $scope.viewSBirthday = true;
+                $scope.sBirthday = "";
+                break;
+            default:
+        }
+    };
 
     /**
      * Get behavior/effort scores.

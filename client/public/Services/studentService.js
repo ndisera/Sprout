@@ -87,12 +87,20 @@ app.factory("studentService", function ($rootScope, $http) {
         });
     }
 
+    /**
+     * Update students and studentsLookup anytime they have changed in the database
+     * @return {response} response of the http request used before calling this method.
+     */
     function refreshStudents(response) {
         return getStudents().then(function (data) {
             studentInfo.students = data;
             for (var i = 0; i < studentInfo.students.length; ++i) {
                 var lookupName = studentInfo.students[i].first_name + " " + studentInfo.students[i].last_name;
                 studentInfo.studentsLookup[lookupName.toUpperCase()] = studentInfo.students[i];
+            }
+            // fixes an error in chrome debugger, but I don't think this will ever be the case
+            if (typeof response === "undefined" || response === null || typeof response.data === "undefined") {
+                return null;
             }
             return response.data;
         });

@@ -3,9 +3,6 @@
         location.path('');
     }
 
-    // remember to get students/teachers again after adding/editing/deleting
-    // or just make change to what we already have
-
     var teacherTask = "view/edit";
     var studentTask = "view/edit";
     var teacherVSearchOrInfo = "search";
@@ -170,9 +167,27 @@
      * @param {string} task - the type of task selected.
      */
     function setActiveButton(st, task) {
-        task == 'view/edit' ? document.getElementById(st + 'ViewButton').classList.add('active') : document.getElementById(st + 'ViewButton').classList.remove('active');
-        task == 'add' ? document.getElementById(st + 'AddButton').classList.add('active') : document.getElementById(st + 'AddButton').classList.remove('active');
-        task == 'delete' ? document.getElementById(st + 'DeleteButton').classList.add('active') : document.getElementById(st + 'DeleteButton').classList.remove('active');
+        if (task === 'view/edit') {
+            document.getElementById(st + 'ViewButton').classList.add('active');
+            document.getElementById(st + 'ViewButton2').classList.add('active');
+        } else {
+            document.getElementById(st + 'ViewButton').classList.remove('active');
+            document.getElementById(st + 'ViewButton2').classList.remove('active');
+        }
+        if (task === 'add') {
+            document.getElementById(st + 'AddButton').classList.add('active');
+            document.getElementById(st + 'AddButton2').classList.add('active');
+        } else {
+            document.getElementById(st + 'AddButton').classList.remove('active');
+            document.getElementById(st + 'AddButton2').classList.remove('active');
+        }
+        if (task === 'delete') {
+            document.getElementById(st + 'DeleteButton').classList.add('active');
+            document.getElementById(st + 'DeleteButton2').classList.add('active');
+        } else {
+            document.getElementById(st + 'DeleteButton').classList.remove('active');
+            document.getElementById(st + 'DeleteButton2').classList.remove('active');
+        }
     }
 
     /**
@@ -209,6 +224,9 @@
         }
     };
 
+    /**
+     * Creates and adds a new teacher.
+     */
     $scope.addTeacher = function () {
         var teacherPromise = teacherService.addTeacher($scope.newTeacher);
         teacherPromise.then(function success(data) {
@@ -222,6 +240,9 @@
         });
     };
 
+    /**
+     * Creates and adds a new student.
+     */
     $scope.addStudent = function () {
         var studentPromise = studentService.addStudent($scope.newStudent);
         studentPromise.then(function success(data) {
@@ -235,6 +256,9 @@
         });
     };
 
+    /**
+     * Hides the delete teacher search bar and displays their info with an option to delete.
+     */
     $scope.displayDeleteTeacher = function () {
         $scope.teacherD = $scope.teachersLookup[$scope.teacherDeleteSearch.toUpperCase()];
         $scope.displayTeacherDeleteSearch = false;
@@ -243,6 +267,9 @@
         teacherDSearchOrInfo = "info";
     };
 
+    /**
+     * Hides the delete student search bar and displays their info with an option to delete.
+     */
     $scope.displayDeleteStudent = function () {
         $scope.studentD = $scope.studentsLookup[$scope.studentDeleteSearch.toUpperCase()];
         $scope.displayStudentDeleteSearch = false;
@@ -251,6 +278,9 @@
         studentDSearchOrInfo = "info";
     };
 
+    /**
+     * Deletes the selected teacher from the database.
+     */
     $scope.deleteTeacher = function () {
         var teacherPromise = teacherService.deleteTeacher($scope.teacherD.id);
         teacherPromise.then(function success(data) {
@@ -273,6 +303,9 @@
         });
     };
 
+    /**
+     * Deletes the selected student from the database.
+     */
     $scope.deleteStudent = function () {
         var studentPromise = studentService.deleteStudent($scope.studentD.id);
         studentPromise.then(function success(data) {
@@ -295,6 +328,9 @@
         });
     };
 
+    /**
+     * Restores the delete teacher search box and hides their info and delete option.
+     */
     $scope.cancelDeleteTeacher = function () {
         $scope.clearTeacherDeleteSearch();
         $scope.displayTeacherDeleteSearch = true;
@@ -303,6 +339,9 @@
         teacherDSearchOrInfo = "search";
     };
 
+    /**
+     * Restores the delete student search box and hides their info and delete option.
+     */
     $scope.cancelDeleteStudent = function () {
         $scope.clearStudentDeleteSearch();
         $scope.displayStudentDeleteSearch = true;
@@ -311,6 +350,10 @@
         teacherDSearchOrInfo = "search";
     };
 
+    /**
+     * Turns the displayed teacher field into an editable input.
+     * @param {string} field - the name of the field that the user is editing.
+     */
     $scope.editTeacher = function (field) {
         switch (field) {
             case "username":
@@ -329,27 +372,25 @@
         }
     };
 
+
+    /**
+     * Updates the selected Teacher with the newly edited field.
+     * @param {string} field - the name of the field that the user is editing.
+     */
     $scope.saveTEdit = function (field) {
         switch (field) {
+            // update field
             case "username":
-                $scope.viewTUsername = true;
                 $scope.teacherE.username = $scope.tUsername;
-                $scope.tUsername = "";
                 break;
             case "firstname":
-                $scope.viewTFirstName = true;
                 $scope.teacherE.first_name = $scope.tFirstName;
-                $scope.tFirstName = "";
                 break;
             case "lastname":
-                $scope.viewTLastName = true;
                 $scope.teacherE.last_name = $scope.tLastName;
-                $scope.tLastName = "";
                 break;
             case "email":
-                $scope.viewTEmail = true;
                 $scope.teacherE.email = $scope.tEmail;
-                $scope.tEmail = "";
                 break;
             default:
         }
@@ -368,11 +409,35 @@
                     $scope.teachersLookup[upper] = Object.assign({}, $scope.teacherE);
                 }
             }
+            switch (field) {
+                // set view after call returns
+                case "username":
+                    $scope.viewTUsername = true;
+                    $scope.tUsername = "";
+                    break;
+                case "firstname":
+                    $scope.viewTFirstName = true;
+                    $scope.tFirstName = "";
+                    break;
+                case "lastname":
+                    $scope.viewTLastName = true;
+                    $scope.tLastName = "";
+                    break;
+                case "email":
+                    $scope.viewTEmail = true;
+                    $scope.tEmail = "";
+                    break;
+                default:
+            }
         }, function error(message) {
             $scope.status = message;
         });
     };
 
+    /**
+     * Restored the previous display of the selected teacher field and hides the editable input box.
+     * @param {string} field - the name of the field that the user is editing.
+     */
     $scope.cancelTEdit = function (field) {
         switch (field) {
             case "username":
