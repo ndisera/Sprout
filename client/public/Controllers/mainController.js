@@ -95,7 +95,8 @@
     /**
      * Checks login credentials and logs the user in if valid.
      */
-    $scope.attemptLogin = function () {
+    $scope.attemptLogin = function (event) {
+        event.preventDefault();
         var loginPromise = loginService.login($scope.username, $scope.password);
         loginPromise.then(
             function success(response) {
@@ -107,7 +108,12 @@
                 $scope.password = "";
             }, function error(response) {
                 console.log("Error logging in: " + response.status);
-                console.log(response.data["non_field_errors"]);
+                if (response.data && response.data["non_field_errors"]) {
+                    for (i = 0; i < response.data["non_field_errors"].length; i++) {
+                        $scope.loginWarningField = response.data["non_field_errors"];
+                        console.log(response.data["non_field_errors"][i]);
+                    }
+                }
                 $scope.status = status;
             }
         );
