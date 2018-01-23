@@ -10,6 +10,7 @@ app.factory("behaviorService", function ($rootScope, $http) {
         getStudentBehaviorByDate: function (studentId, startDate, endDate) {
             return $http({
                 method: 'GET',
+                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'https://' + $rootScope.backend
                         + '/behaviors/?student=' + studentId
                         + "&start_date=" + startDate
@@ -29,7 +30,8 @@ app.factory("behaviorService", function ($rootScope, $http) {
         addBehavior: function (behaviorObj) {
             return $http({
                 method: 'POST',
-                url: 'http://' + $rootScope.backend + '/behaviors/',
+                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
+                url: 'https://' + $rootScope.backend + '/behaviors/',
                 data: behaviorObj
             }).then(function success(response) {
                 return response.data;
@@ -47,7 +49,8 @@ app.factory("behaviorService", function ($rootScope, $http) {
         updateBehavior: function (behaviorId, behaviorObj) {
             return $http({
                 method: 'PUT',
-                url: 'http://' + $rootScope.backend + "/behaviors/" + behaviorId + '/',
+                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
+                url: 'https://' + $rootScope.backend + "/behaviors/" + behaviorId + '/',
                 data: behaviorObj
             }).then(function success(response) {
                 return response.data;
