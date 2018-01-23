@@ -2,19 +2,42 @@
 
     /**
      *  Used to determine where to make calls to the backend
+     *
+     * @type {string}
      */
     $rootScope.backendHostname = $location.host();
 
     /**
      *  Used to determine how to make calls to the backend
+     *
+     * @type {number}
      */
     $rootScope.backendPort = 8000;
 
     /**
      *  Convenience variable - Combine backendHostname and backendPort in a manner which
      *  they will often be used
+     *
+     * @type {string}
      */
     $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort
+
+
+    /**
+     * Load the authentication token from local storage
+     *
+     * If we have never authenticated before, this is checked later and we show the login screen
+     *
+     * @type {string | null}
+     */
+    $rootScope.JSONWebToken = localStorage.getItem("JSONWebToken");
+
+    /**
+     * Store whether the user is logged in
+     *
+     * @type {boolean}
+     */
+    $rootScope.loggedIn = false;
 
     // get all students
     var studentsPromise = studentService.getStudents();
@@ -51,13 +74,23 @@
         $scope.studentName = "";
     };
 
-    // checks local storage to see if user has logged in recently and redirects to focus page if so
-    $rootScope.JSONWebToken = localStorage.getItem("JSONWebToken");
-    $rootScope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"));
-    if ($rootScope.loggedIn === null)
-        $rootScope.loggedIn = false;
-    else if ($rootScope.loggedIn && $location.path() === "")
-        $location.path('/focus');
+    // Try to refresh the JSON token to see if it is valid...
+    var refreshPromise = loginService.refreshToken($rootScope.JSONWebToken);
+    refreshPromise.then(
+        function success(response) {
+            // Yay! The token was valid, update our local knowledge to the new one
+            $rootScope.JSONWebToken = response.data["token"];
+            localStorage.setItem("JSONWebToken", $rootScope.JSONWebToken);
+            console.log("Auth token refreshed: " + $rootScope.JSONWebToken);
+            $rootScope.loggedIn = true;
+        }, function error(response) {
+            // Need to get a new token. Show the login screen
+            $rootScope.loggedIn = false;
+        }
+    );
+
+    if ($rootScope.loggedIn && $location.path() === "")
+        $location.path = '/focus';
 
     /**
      * Checks login credentials and logs the user in if valid.
@@ -69,7 +102,6 @@
                 $rootScope.JSONWebToken = response.data["token"];
                 localStorage.setItem("JSONWebToken", $rootScope.JSONWebToken);
                 console.log("Login successful: " + $rootScope.JSONWebToken);
-                localStorage.setItem("loggedIn", true);
                 $rootScope.loggedIn = true;
                 $scope.username = "";
                 $scope.password = "";
@@ -86,10 +118,7 @@
      */
     $scope.logout = function () {
         localStorage.removeItem("JSONWebToken");
-        console.log($scope.testValueThing);
-        $rootScope.loggedIn = false;
-        localStorage.setItem("loggedIn", false);
-        $location.path('')
+        $location.path('');
     };
 
     // enables autofocus in IE

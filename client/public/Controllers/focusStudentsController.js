@@ -1,7 +1,7 @@
 ﻿app.controller("focusStudentsController", function ($scope, $rootScope, $location, students) {
 
     // redirect user if not logged in
-    if (!JSON.parse(localStorage.getItem("loggedIn"))) {
+    if (!$rootScope.loggedIn) {
         location.path('');
     }
     

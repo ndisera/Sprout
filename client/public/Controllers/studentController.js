@@ -1,7 +1,7 @@
 app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, behaviorService, sectionService, enrollments, student) {
 
     // redirect user if not logged in
-    if (!JSON.parse(localStorage.getItem("loggedIn"))) {
+    if (!$rootScope.loggedIn) {
         location.path('');
     }
 

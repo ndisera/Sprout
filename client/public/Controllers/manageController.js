@@ -1,8 +1,10 @@
 ﻿app.controller("manageController", function ($scope, $rootScope, $location, students, teachers) {
-    if (!JSON.parse(localStorage.getItem("loggedIn"))) {
+
+    // redirect user if not logged in
+    if (!$rootScope.loggedIn) {
         location.path('');
     }
-
+    
     $scope.task = "";
     $scope.displayStudentSearch = true;
     $scope.displayStudentForm = false;
