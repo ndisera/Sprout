@@ -1,4 +1,4 @@
-﻿app.controller('mainController', function ($scope, $rootScope, $location, studentService) {
+﻿app.controller('mainController', function ($scope, $rootScope, $location, studentService, loginService) {
 
     /**
      *  Used to determine where to make calls to the backend
@@ -51,7 +51,8 @@
         $scope.studentName = "";
     };
 
-    // checks local stroage to see if user has logged in recently and redirects to focus page if so
+    // checks local storage to see if user has logged in recently and redirects to focus page if so
+    $rootScope.JSONWebToken = localStorage.getItem("JSONWebToken");
     $rootScope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"));
     if ($rootScope.loggedIn === null)
         $rootScope.loggedIn = false;
@@ -62,18 +63,29 @@
      * Checks login credentials and logs the user in if valid.
      */
     $scope.attemptLogin = function () {
-        if (($scope.username === "ndisera" || $scope.username === "sredman" || $scope.username === "gwatson" || $scope.username === "gzuber") && $scope.password === "password") {
-            $rootScope.loggedIn = true;
-            localStorage.setItem("loggedIn", true);
-        }
-        $scope.username = "";
-        $scope.password = "";
+        var loginPromise = loginService.login($scope.username, $scope.password);
+        loginPromise.then(
+            function success(response) {
+                $rootScope.JSONWebToken = response.data["token"];
+                localStorage.setItem("JSONWebToken", $rootScope.JSONWebToken);
+                console.log("Login successful: " + $rootScope.JSONWebToken);
+                localStorage.setItem("loggedIn", true);
+                $rootScope.loggedIn = true;
+                $scope.username = "";
+                $scope.password = "";
+            }, function error(response) {
+                console.log("Error logging in: " + response.status);
+                console.log(response.data["non_field_errors"]);
+                $scope.status = status;
+            }
+        );
     };
 
     /**
      * Logs user out, displays login page.
      */
     $scope.logout = function () {
+        localStorage.removeItem("JSONWebToken");
         console.log($scope.testValueThing);
         $rootScope.loggedIn = false;
         localStorage.setItem("loggedIn", false);
