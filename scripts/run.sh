@@ -1,13 +1,13 @@
 SCRIPT_PATH="${PWD}/$(dirname "$0")"
 
 # run gulp build
-(cd "${SCRIPT_PATH}"/../client && gulp)
+(cd "${SCRIPT_PATH}"/../client && ./node_modules/gulp/bin/gulp.js)
 
 # Source python environment
 source "${SCRIPT_PATH}"/../server/env/bin/activate
 
 # Check for dependencies
-DEPENDENCIES=( "nginx" "node" "gulp" )
+DEPENDENCIES=( "nginx" "node" )
 
 for dependency in "${DEPENDENCIES[@]}"; do
   which "${dependency}" &>/dev/null

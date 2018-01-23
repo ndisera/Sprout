@@ -30,7 +30,9 @@ python manage.py migrate
 # FRONTEND SETUP
 # install the node dependencies
 cd ../client
+pwd
 npm install
 
 cd src
-bower install
+pwd
+../node_modules/bower/bin/bower install
