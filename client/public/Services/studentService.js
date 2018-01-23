@@ -7,6 +7,7 @@ app.factory("studentService", function ($rootScope, $http) {
         getStudents: function () {
             return $http({
                 method: 'GET',
+                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'https://' + $rootScope.backend + '/students/'
             }).then(function success(response) {
                 return response.data;
@@ -23,6 +24,7 @@ app.factory("studentService", function ($rootScope, $http) {
         getStudent: function (studentId) {
             return $http({
                 method: 'GET',
+                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'https://' + $rootScope.backend + '/students/' + studentId
             }).then(function success(response) {
                 return response.data;
@@ -39,6 +41,7 @@ app.factory("studentService", function ($rootScope, $http) {
         deleteStudent: function (studentId) {
             return $http({
                 method: 'DELETE',
+                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'http://' + $rootScope.backend + '/students/' + studentId
             }).then(function success(response) {
                 return response.data;
@@ -55,6 +58,7 @@ app.factory("studentService", function ($rootScope, $http) {
         addStudent: function (studentObj) {
             return $http({
                 method: 'POST',
+                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'http://' + $rootScope.backend + '/students/',
                 data: studentObj
             }).then(function success(response) {
@@ -73,6 +77,7 @@ app.factory("studentService", function ($rootScope, $http) {
         updateStudent: function (studentId, studentObj) {
             return $http({
                 method: 'PUT',
+                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'http://' + $rootScope.backend + '/students/' + studentId + '/',
                 data: studentObj
             }).then(function success(response) {
