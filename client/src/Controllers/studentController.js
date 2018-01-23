@@ -5,8 +5,9 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
         location.path('');
     }
 
+    // set important scope variables
     $scope.student = student;
-    console.log($scope.student);
+
     $scope.section_titles = [];
     $scope.sections = [];
     $scope.behaviors = [];

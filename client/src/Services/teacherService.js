@@ -7,7 +7,7 @@
         getTeachers: function () {
             return $http({
                 method: 'GET',
-                url: 'http://' + $rootScope.backend + '/teachers/'
+                url: 'https://' + $rootScope.backend + '/teachers/'
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -23,7 +23,7 @@
         getTeacher: function (teacherId) {
             return $http({
                 method: 'GET',
-                url: 'http://' + $rootScope.backend + '/teachers/' + teacherId
+                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -39,7 +39,7 @@
         deleteTeacher: function (teacherId) {
             return $http({
                 method: 'DELETE',
-                url: 'http://' + $rootScope.backend + '/teachers/' + teacherId
+                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId
             }).then(function success(response) {
                 return response.data;
             }, function error(response) {
@@ -55,7 +55,7 @@
         addTeacher: function (teacherObj) {
             return $http({
                 method: 'POST',
-                url: 'http://' + $rootScope.backend + '/teachers/',
+                url: 'https://' + $rootScope.backend + '/teachers/',
                 data: teacherObj
             }).then(function success(response) {
                 return response.data;
@@ -73,7 +73,7 @@
         updateTeacher: function (teacherId, teacherObj) {
             return $http({
                 method: 'PUT',
-                url: 'http://' + $rootScope.backend + '/teachers/' + teacherId,
+                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId,
                 data: teacherObj
             }).then(function success(response) {
                 return response.data;
