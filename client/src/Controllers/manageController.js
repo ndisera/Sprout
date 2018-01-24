@@ -29,7 +29,6 @@
     $scope.deleteStudentSuccess = false;
     $scope.deleteTeacherSuccess = false;
 
-    // contains info for students and studentsLookup that is always updated
     $scope.studentInfo = studentService.studentInfo;
 
     $scope.teachers = teachers;
