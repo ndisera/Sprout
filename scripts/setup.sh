@@ -27,6 +27,7 @@ source env/bin/activate
 pip install -r requirements.txt
 
 # set up database
+python manage.py makemigrations
 python manage.py migrate
 
 # FRONTEND SETUP
