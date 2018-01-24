@@ -1,8 +1,11 @@
+import os
 import sys
 import datetime
 import json
 import random
 import requests
+
+CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/nginx_cert.pem")
 
 class StudentGenerator(object):
     """StudentGenerator contains various methods for generating student data
@@ -12,8 +15,9 @@ class StudentGenerator(object):
     """
 
     RANDOM_STUDENT_ID_PREFIX = "gen"
+    CERT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    def __init__(self, url="http://localhost", port_num=8000):
+    def __init__(self, url="https://localhost", port_num=8000):
         self.url = url
         self.port_num = port_num
         self.complete_uri = str(self.url) + ":" + str(self.port_num) + "/students/"
@@ -119,13 +123,13 @@ class StudentGenerator(object):
                 "first_name":first_name,
                 "last_name":last_name,
                 "birthdate":str(birthdate)}
-        response = requests.post(url=self.complete_uri, json=json)
+        response = requests.post(url=self.complete_uri, json=json, verify=CERT_PATH)
 
         if response.status_code >= 400 and response.status_code < 500:
             raise "Unable to POST student: " + str(json)
 
 def post_request(url, data):
-    response = requests.post(url=url, json=data)
+    response = requests.post(url=url, json=data, verify=CERT_PATH)
     if response.status_code > 299:
         print 'oh, crap... something went wrong. error code ' + str(response.status_code) + ' when I posted ' + url + ' with payload: ' + str(data)
         print 'response data: ' + str(response.json())
@@ -134,11 +138,10 @@ def post_request(url, data):
     
 
 def upload_basic_bitches():
-    print "it worked!"
     # teachers
     host = 'localhost'
     port = 8000
-    base_url = 'http://' + host + ':' + str(port) + '/'
+    base_url = 'https://' + host + ':' + str(port) + '/'
     teacher_url = base_url + 'teachers/'
 
     teacher_matt = {
@@ -167,7 +170,7 @@ def upload_basic_bitches():
     generator = StudentGenerator()
     generator.upload_developer_information()
 
-    students = requests.get(url=student_url).json()
+    students = requests.get(url=student_url, verify=CERT_PATH).json()
 
     # sections
     section_url = base_url + 'sections/'

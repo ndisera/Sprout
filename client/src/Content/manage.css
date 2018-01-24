@@ -1,0 +1,9 @@
+﻿.inlineHeading {
+    display: inline-block;
+}
+
+.taskSelection {
+    display: inline-block;
+    float: right;
+    padding-top: 15px;
+}

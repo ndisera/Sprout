@@ -1,3 +1,5 @@
+SCRIPT_PATH="${PWD}/$(dirname "$0")"
+
 # BACKEND SETUP
 
 # Check if virtualenv is installed
@@ -15,7 +17,7 @@ if [ ! $? -eq 0 ]; then
 fi
 
 # set up the virtualenv
-cd ../server
+cd "${SCRIPT_PATH}"/../server
 virtualenv env
 
 # activate the virtualenv
@@ -29,5 +31,10 @@ python manage.py migrate
 
 # FRONTEND SETUP
 # install the node dependencies
-cd ../client
+cd "${SCRIPT_PATH}"/../client
+pwd
 npm install
+
+cd src
+pwd
+"${SCRIPT_PATH}"/../client/node_modules/bower/bin/bower install

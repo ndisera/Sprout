@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Sprout</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="includes/bootstrap.min.css" />
+    <link rel="stylesheet" href="includes/jquery-ui.min.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <!-- @ifndef DEBUG -->
+    <script src="includes/jquery.min.js"></script>
+    <script src="includes/jquery-ui.min.js"></script>
+    <script src="includes/bootstrap.min.js"></script>
+    <script src="includes/bootstrap-datepicker.js"></script>
+    <script src="includes/angular.min.js"></script>
+    <script src="includes/angular-route.min.js"></script>
+    <script src="includes/Chart.bundle.min.js"></script>
+    <script src="includes/Chart.min.js"></script>
+    <script src="includes/angular-chart.min.js"></script>
+    <script src="includes/moment-with-locales.min.js"></script>
+    <script src="includes/underscore-min.js"></script>
+    <!-- @endif -->
+    <!-- @ifdef DEBUG -->
+    <script src="includes/jquery.js"></script>
+    <script src="includes/jquery-ui.js"></script>
+    <script src="includes/bootstrap.js"></script>
+    <script src="includes/bootstrap-datepicker.js"></script>
+    <script src="includes/angular.js"></script>
+    <script src="includes/angular-route.js"></script>
+    <script src="includes/Chart.bundle.js"></script>
+    <script src="includes/Chart.js"></script>
+    <script src="includes/angular-chart.js"></script>
+    <script src="includes/moment-with-locales.js"></script>
+    <script src="includes/underscore.js"></script>
+    <!-- @endif -->
+</head>
+<body ng-app="app">
+
+    <div ng-controller="mainController">
+        <div class="container" ng-hide="loggedIn" ng-cloak>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="well login-box">
+                        <form action="" ng-submit="attemptLogin()">
+                            <h1>Login</h1>
+                            <hr />
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input autofocus ng-model="username" placeholder="Username" type="text" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input ng-model="password" placeholder="Password" type="password" class="form-control" />
+                            </div>
+                            <div class="form-group text-center">
+                                <button class="btn btn-danger btn-cancel-action">Cancel</button>
+                                <input type="submit" class="btn btn-success btn-login-submit" value="Login" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="navbar navbar-inverse navbar-fixed-top" ng-show="loggedIn" ng-cloak>
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a href="#!/focus" class="navbar-left" ng-click="clearSearch()"><img id="sproutLogo" src="img/seeds-clipart-tree-sprout-6.png"></a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <form class="navbar-form navbar-left" ng-submit="tryNavigateToStudent()">
+                        <div class="input-group">
+                            <input type="text" autocomplete="off" class="form-control" placeholder="Search Students" list="student" name="student" ng-model="studentName">
+                            <datalist id="student">
+                                <option ng-repeat="s in studentInfo.students" value="{{s.first_name}} {{s.last_name}}">
+                            </datalist>
+                            <div class="input-group-btn">
+                                <button class="btn btn-default" type="submit">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <ul class="nav navbar-nav navbar-right hidden-xs">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" id="profileDropdown">
+                                <img id="userPic" src="img/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li ng-click="clearSearch()"><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
+                                <li ng-click="clearSearch()"><a href="#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
+                                <li ng-click="clearSearch()"><a href="#!/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
+                                <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
+                                <li ng-click="clearSearch()"><a href="#!/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                                <li ng-click="logout(); clearSearch()"><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav hidden-sm hidden-md hidden-lg hidden-xl">
+                        <li><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
+                        <li><a href="#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
+                        <li><a href="#!/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
+                        <li><a href="#!/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="main" ng-show="loggedIn" ng-cloak>
+        <div ng-view></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

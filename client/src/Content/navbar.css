@@ -1,0 +1,79 @@
+﻿#sproutLogo {
+    height: 50px;
+    width: 50px;
+}
+
+#userPic {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+
+#profileDropdown {
+    cursor: pointer;
+}
+
+@media (min-width: 0px) {
+    #sproutLogo {
+        margin-left: 15px;
+        margin-top: 0px;
+    }
+
+    .navbar-form {
+        padding-top: 10px;
+    }
+
+    body {
+        padding-top: 60px;
+    }
+}
+
+@media (min-width: 768px) {
+    .navbar-form .input-group .form-control {
+        width: 430px;
+    }
+
+    .navbar-form {
+        padding-top: 15px;
+    }
+
+    #sproutLogo {
+        margin-top: 12px;
+        margin-left: 0px;
+    }
+
+    body {
+        padding-top: 100px;
+    }
+}
+
+/* https://codepen.io/impondesk/pen/EaKoXY 
+    This is a pen by Israni, Murli
+*/
+
+.navbar-toggle .icon-bar:nth-of-type(2) {
+    top: 1px;
+}
+
+.navbar-toggle .icon-bar:nth-of-type(3) {
+    top: 2px;
+}
+
+.navbar-toggle .icon-bar {
+    position: relative;
+    transition: all 250ms ease-in-out;
+}
+
+.navbar-toggle.active .icon-bar:nth-of-type(1) {
+    top: 6px;
+    transform: rotate(45deg);
+}
+
+.navbar-toggle.active .icon-bar:nth-of-type(2) {
+    background-color: transparent;
+}
+
+.navbar-toggle.active .icon-bar:nth-of-type(3) {
+    top: -6px;
+    transform: rotate(-45deg);
+}

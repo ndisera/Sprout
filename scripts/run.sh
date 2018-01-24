@@ -1,5 +1,9 @@
-# Source python environment
 SCRIPT_PATH="${PWD}/$(dirname "$0")"
+
+# run gulp build
+(cd "${SCRIPT_PATH}"/../client && ./node_modules/gulp/bin/gulp.js)
+
+# Source python environment
 source "${SCRIPT_PATH}"/../server/env/bin/activate
 
 # Check for dependencies

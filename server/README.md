@@ -10,14 +10,14 @@ When running, it contains an sqlite database file in this folder.
 
 Prereqs:
 
-- python (version 2.7.*)
+- python (version 2.7.\*)
 - pip
 - virtualenv
 
 > The easiest way to set up both the frontend and backend at the same time is to use the 
-> setup.sh script in the \<Repo>/scripts folder. It performs the steps below automatically
+> setup.sh script in the \<Repo\>/scripts folder. It performs the steps below automatically
 
-We start in this folder (\<Repo>/server), and we run the following command
+We start in this folder (\<Repo\>/server), and we run the following command
 ```bash
 virtualenv env
 ```
@@ -81,7 +81,7 @@ ways
 #### Through the Docs
 
 As mentioned before, the docs located at [localhost:8000/docs/](http://localhost:8000/docs/) 
-and [localhost:8000/swagger/](http://localhost:8000/docs/) have widgets that let you send real
+and [localhost:8000/swagger/](http://localhost:8000/swagger/) have widgets that let you send real
 requests to the server. You can use the docs to figure out what the requests should look like, but
 if it's a POST request it may involve you writing a JSON object that looks something like...
 
