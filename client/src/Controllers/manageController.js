@@ -298,6 +298,7 @@
                     delete $scope.teachersLookup[upper];
                 }
             }
+            var id = $scope.teacherD.id;
             $scope.teacherD = {};
             $scope.deleteTeacherSuccess = true;
             $("#deleteTeacherSuccess").fadeTo(2000, 500).slideUp(500, function () {
@@ -307,6 +308,18 @@
             $scope.displayTeacherInfo = false;
             teacherDSearchOrInfo = "search";
             $scope.teacherDeleteSearch = "";
+            // check to see if teacherV/E is this deleted teacher and change view accordingly
+            if ($scope.teacherV.id === id) {
+                $scope.teacherV = {};
+                $scope.teacherE = {};
+                $scope.displayTEditInfo = false;
+                teacherVSearchOrInfo = "search";
+                $scope.clearTeacherViewSearch();
+                $scope.tUsername = "";
+                $scope.tFirstName = "";
+                $scope.tLastName = "";
+                $scope.tEmail = "";
+            }
         }, function error(message) {
             $scope.status = message;
         });
