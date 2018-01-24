@@ -21,8 +21,6 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.views import get_swagger_view
 
-from rest_framework_jwt.views import refresh_jwt_token
-
 from api.views import *
 
 router = DefaultRouter()
@@ -40,3 +38,4 @@ urlpatterns.append(url(r'^schema/', get_schema_view(title='Sprout Schema')))
 # URL Patterns for token authentication setup
 urlpatterns.append(url(r'^', include('rest_auth.urls')))
 urlpatterns.append(url(r'^registration/', include('rest_auth.registration.urls')))
+urlpatterns.append(url(r'^auth-verify/', view=AuthVerifyView.as_view(), name="auth-verify"))

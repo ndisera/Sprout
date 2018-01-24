@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 import coreapi
 import coreschema
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from api.models import *
@@ -412,3 +413,19 @@ class BehaviorViewSet(SproutViewSet):
             description=desc_enrollment,
             schema=coreschema.Integer(title=name_enrollment)),
     )
+
+
+class AuthVerifyView(generics.RetrieveAPIView):
+    # If we ever add more authentication methods, this will need to be updated...
+    authentication_classes = (JSONWebTokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        """
+        Authentication-required noop to see if authentication tokens are valid
+
+        If the authentication is valid, return some successful status
+
+        If the authentication is invalid, return some authentication failure
+        """
+        return Response(data={'message': 'Token valid'})
