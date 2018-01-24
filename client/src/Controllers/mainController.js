@@ -16,27 +16,16 @@
      */
     $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort
 
-    // get all students
-    var studentsPromise = studentService.getStudents();
-    studentsPromise.then(function success(data) {
-        $scope.students = data;
-        $scope.studentsLookup = {};
+    $scope.studentInfo = studentService.studentInfo;
 
-        // create fast lookup dictionary
-        for (var i = 0; i < $scope.students.length; ++i) {
-          var lookupName = $scope.students[i].first_name + " " + $scope.students[i].last_name;
-          $scope.studentsLookup[lookupName.toUpperCase()] = $scope.students[i];
-        }
-    }, function error(code) {
-        //TODO: deal with errors
-    });
+    studentService.refreshStudents();
 
     /**
      * Navigates to student's page if name in navigation search bar is valid.
      */
     $scope.tryNavigateToStudent = function() {
-        if ($scope.studentName.toUpperCase() in $scope.studentsLookup) {
-            $location.path('/student/' + $scope.studentsLookup[$scope.studentName.toUpperCase()].id);
+        if ($scope.studentName.toUpperCase() in $scope.studentInfo.studentsLookup) {
+            $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentName.toUpperCase()].id);
             return;
         }
         else {
