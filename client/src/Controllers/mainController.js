@@ -1,21 +1,5 @@
 ﻿app.controller('mainController', function ($scope, $rootScope, $location, studentService) {
 
-    /**
-     *  Used to determine where to make calls to the backend
-     */
-    $rootScope.backendHostname = $location.host();
-
-    /**
-     *  Used to determine how to make calls to the backend
-     */
-    $rootScope.backendPort = 8000;
-
-    /**
-     *  Convenience variable - Combine backendHostname and backendPort in a manner which
-     *  they will often be used
-     */
-    $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort
-
     // get all students
     var studentsPromise = studentService.getStudents();
     studentsPromise.then(function success(data) {
