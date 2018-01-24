@@ -20,8 +20,10 @@
      *
      * @type {string}
      */
-    $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort
+    $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort;
 
+    $scope.studentInfo = studentService.studentInfo;
+    studentService.refreshStudents();
 
     /**
      * Load the authentication token from local storage

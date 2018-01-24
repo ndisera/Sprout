@@ -144,8 +144,8 @@ var build = gulp.series(
                     copy_index,
                     copy_includes, 
                     concat_styles, 
-                    concat_scripts,
-                ),
+                    concat_scripts
+                )
             );
 
 gulp.task('default', build);

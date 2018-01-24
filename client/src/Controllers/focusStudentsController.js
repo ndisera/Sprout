@@ -2,7 +2,7 @@
 
     // redirect user if not logged in
     if (!$rootScope.loggedIn) {
-        location.path('');
+        location.path = '';
     }
     
     $scope.students = students;
