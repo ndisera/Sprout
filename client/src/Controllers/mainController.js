@@ -107,6 +107,20 @@
     };
 
     /**
+     * Test current auth token
+     */
+    var authVerifyPromise = loginService.auth_verify();
+    authVerifyPromise.then(
+        function success(response) {
+            console.log("Auth valid: " + $rootScope.JSONWebToken);
+            $rootScope.loggedIn = true;
+        }, function error(response) {
+            console.log("Auth invalid: " + response.status);
+            $rootScope.loggedIn = false;
+        }
+    );
+
+    /**
      * Logs user out, displays login page.
      */
     $scope.logout = function () {

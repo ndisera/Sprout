@@ -21,6 +21,25 @@ app.factory("loginService", function ($rootScope, $http) {
             }).then(function success(response) {
                 return response;
             });
+        },
+
+        /**
+         * Check whether the current authentication token is valid
+         *
+         * Response will be:
+         * 200 OK, indicating the passed authentication was valid
+         * 401 Unauthorized, indicating the passed authentication was invalid
+         *
+         * @return {promise} promise that will resolve to the response
+         */
+        auth_verify: function() {
+            return $http({
+                method: 'GET',
+                url: 'https://' + $rootScope.backend + '/auth-verify/',
+                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken}
+            }).then(function success(response) {
+                return response;
+            });
         }
     };
 });
