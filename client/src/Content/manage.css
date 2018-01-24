@@ -7,3 +7,25 @@
     float: right;
     padding-top: 15px;
 }
+
+.deleteSuccess {
+    margin-top: 15px;
+}
+
+.pencilEdit {
+    cursor: pointer;
+}
+
+.pencilEdit:hover {
+    color:blue;
+}
+
+.smBtnGroup {
+    display: table;
+    margin: 0 auto;
+}
+
+.checkBtn {
+    border-radius: 0px; 
+    border-left: 0px;
+}

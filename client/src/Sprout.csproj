@@ -123,10 +123,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="script.js" />
-    <Content Include="Content\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap-theme.min.css" />
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="bower_components\bootstrap\dist\css\bootstrap-theme.css" />
+    <Content Include="bower_components\bootstrap\dist\css\bootstrap-theme.min.css" />
+    <Content Include="bower_components\bootstrap\dist\css\bootstrap.css" />
+    <Content Include="bower_components\bootstrap\dist\css\bootstrap.min.css" />
     <Content Include="Content\navbar.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Images\seeds-clipart-tree-sprout-6.png" />

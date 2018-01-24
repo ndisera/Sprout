@@ -27,7 +27,7 @@ killgroup()
 }
 
 # run server and client in parallel
-# node "${SCRIPT_PATH}"/../client/server.js -f public -p 8001 &
+node "${SCRIPT_PATH}"/../client/server.js -f public -p 8001 &
 client=$!
 
 # Check for and get any new static files for the backend
