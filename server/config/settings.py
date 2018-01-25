@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'api',
     'rest_framework_swagger',
     'corsheaders',
+    'dynamic_rest',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +130,10 @@ STATIC_URL = '/static/'
 # CORS Middleware Configuration
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'dynamic_rest.renderers.DynamicBrowsableAPIRenderer',
+    ],
+}

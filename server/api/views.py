@@ -5,23 +5,9 @@ import coreschema
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
+from dynamic_rest.viewsets import DynamicModelViewSet
 from api.models import *
 from api.serializers import *
-
-class SproutViewSet(viewsets.ModelViewSet):
-    """
-    define a new class for viewsets in Sprout
-    
-    this class allows a viewset to define a 'serializers' dictionary
-    with different serializers for each action of a viewset (i.e.
-    list, create, etc...)
-    """
-    serializers = {
-        'default': None,
-    }
-
-    def get_serializer_class(self):
-        return self.serializers.get(self.action, self.serializers['default'])
 
 def union_fields(fields, new_fields):
     """
@@ -70,23 +56,19 @@ def set_link(class_id, path, method, link):
         return link
 
 
-class TeacherViewSet(SproutViewSet):
+class TeacherViewSet(DynamicModelViewSet):
     """
     allows interaction with the set of "Teacher" instances
     """
+    serializer_class = TeacherSerializer
     queryset = Teacher.objects.all()
-    serializers = {
-        'default': TeacherSerializer,
-    }
 
-class StudentViewSet(SproutViewSet):
+class StudentViewSet(DynamicModelViewSet):
     """
     allows interaction with the set of "Student" instances
     """
+    serializer_class = StudentSerializer
     queryset = Student.objects.all()
-    serializers = {
-        'default': StudentSerializer,
-    }
 
 class SectionViewSetSchema(AutoSchema):
     """
@@ -97,7 +79,7 @@ class SectionViewSetSchema(AutoSchema):
         link = super(SectionViewSetSchema, self).get_link(path, method, base_url)
         return set_link(SectionViewSet, path, method, link)
 
-class SectionViewSet(SproutViewSet):
+class SectionViewSet(DynamicModelViewSet):
     """
     allows interaction with the set of "Section" instances
 
@@ -122,30 +104,15 @@ class SectionViewSet(SproutViewSet):
     delete:
     deletes the existing section specified by the path param.
     """
-    serializers = {
-        'default': SectionSerializer,
-    }
+    serializer_class = SectionSerializer
+    queryset = Section.objects.all()
 
-    query_teacher = 'teacher'
-    def get_queryset(self):
-        queryset = Section.objects.all()
-        teacher = self.request.query_params.get(self.query_teacher, None)
-        if teacher is not None:
-            queryset = queryset.filter(teacher=teacher)
-        return queryset
-
-    """ schema related class variables """
+    """ define custom schema for documentation """
     schema = SectionViewSetSchema()
+
+    """ ensure variables show as correct types for docs """
     name_teacher = 'teacher'
     desc_teacher = "ID of the teacher of the section."
-    list_fields = (
-        coreapi.Field(
-            name=query_teacher, 
-            location="query", 
-            description="ID of teacher. Used to filter sections by teacher.",
-            schema=coreschema.String(title=query_teacher)),
-    )
-
     create_fields = (
         coreapi.Field(
             name=name_teacher, 
@@ -154,7 +121,6 @@ class SectionViewSet(SproutViewSet):
             description=desc_teacher,
             schema=coreschema.Integer(title=name_teacher)),
     )
-
     update_fields = (
         coreapi.Field(
             name=name_teacher, 
@@ -163,7 +129,6 @@ class SectionViewSet(SproutViewSet):
             description=desc_teacher,
             schema=coreschema.Integer(title=name_teacher)),
     )
-
     partial_update_fields = (
         coreapi.Field(
             name=name_teacher, 
@@ -182,7 +147,7 @@ class EnrollmentViewSetSchema(AutoSchema):
         link = super(EnrollmentViewSetSchema, self).get_link(path, method, base_url)
         return set_link(EnrollmentViewSet, path, method, link)
 
-class EnrollmentViewSet(SproutViewSet):
+class EnrollmentViewSet(DynamicModelViewSet):
     """
     allows interaction with the set of "Enrollment" instances
 
@@ -206,42 +171,17 @@ class EnrollmentViewSet(SproutViewSet):
     delete:
     deletes the existing enrollment specified by the path param.
     """
-    serializers = {
-        'default': EnrollmentSerializer,
-    }
+    serializer_class = EnrollmentSerializer
+    queryset = Enrollment.objects.all()
 
-    query_student = 'student'
-    query_section = 'section'
-    def get_queryset(self):
-        queryset = Enrollment.objects.all()
-        student = self.request.query_params.get(self.query_student, None)
-        section = self.request.query_params.get(self.query_section, None)
+    """ define custom schema """
+    schema = EnrollmentViewSetSchema()
 
-        if student is not None:
-            queryset = queryset.filter(student=student)
-        if section is not None:
-            queryset = queryset.filter(section=section)
-        return queryset
-
-    """ schema related class variables """
+    """ ensure variables show as correct type for docs """
     name_student = 'student'
     name_section = 'section'
     desc_student = 'ID of the student'
     desc_section = 'ID of the section'
-    schema = EnrollmentViewSetSchema()
-    list_fields = (
-        coreapi.Field(
-            name=query_student, 
-            location="query", 
-            description="ID of student, used to filter enrollments by student",
-            schema=coreschema.String(title=query_student)),
-        coreapi.Field(
-            name=query_section, 
-            location="query", 
-            description="ID of section, used to filter enrollments by section",
-            schema=coreschema.String(title=query_section)),
-    )
-
     create_fields = (
         coreapi.Field(
             name=name_student,
@@ -256,7 +196,6 @@ class EnrollmentViewSet(SproutViewSet):
             description=desc_section,
             schema=coreschema.Integer(title=name_section)),
     )
-
     update_fields = (
         coreapi.Field(
             name=name_student,
@@ -271,7 +210,6 @@ class EnrollmentViewSet(SproutViewSet):
             description=desc_section,
             schema=coreschema.Integer(title=name_section)),
     )
-
     partial_update_fields = (
         coreapi.Field(
             name=name_student,
@@ -295,7 +233,7 @@ class BehaviorViewSetSchema(AutoSchema):
         link = super(BehaviorViewSetSchema, self).get_link(path, method, base_url)
         return set_link(BehaviorViewSet, path, method, link)
 
-class BehaviorViewSet(SproutViewSet):
+class BehaviorViewSet(DynamicModelViewSet):
     """
     allows interaction with the set of "Behavior" instances
 
@@ -320,67 +258,15 @@ class BehaviorViewSet(SproutViewSet):
     delete:
     deletes the existing behavior report specified by the path param.
     """
-    serializers = {
-        'list':    BehaviorRetrieveSerializer,
-        'retrieve':    BehaviorRetrieveSerializer,
-        'default': BehaviorSerializer,
-    }
+    serializer_class = BehaviorSerializer
+    queryset = Behavior.objects.all()
 
-    query_student = 'student'
-    query_section = 'section'
-    query_start_date = 'start_date'
-    query_end_date = 'end_date'
-    def get_queryset(self):
-        queryset = Behavior.objects.all()
-        student = self.request.query_params.get(self.query_student, None)
-        section = self.request.query_params.get(self.query_section, None)
-        start_date = self.request.query_params.get(self.query_start_date, None)
-        end_date = self.request.query_params.get(self.query_end_date, None)
+    """ define custom schema for documentation """
+    schema = BehaviorViewSetSchema()
 
-        if student is not None:
-            enrolls = Enrollment.objects.filter(student=student)
-            queryset = queryset.filter(enrollment_id__in=enrolls)
-
-        if section is not None:
-            enrolls = Enrollment.objects.filter(section=section)
-            queryset = queryset.filter(enrollment_id__in=enrolls)
-
-        if start_date is not None:
-            queryset = queryset.filter(date__gte=start_date)
-
-        if end_date is not None:
-            queryset = queryset.filter(date__lte=end_date)
-
-        queryset.order_by('date')
-        return queryset
-
-    """ schema related class variables """
+    """ ensure variables show as correct type for docs """
     name_enrollment = 'enrollment'
     desc_enrollment = 'ID of the enrollment (student and section)'
-    schema = BehaviorViewSetSchema()
-    list_fields = (
-        coreapi.Field(
-            name=query_student, 
-            location="query", 
-            description="ID of student, used to filter behavior reports by student",
-            schema=coreschema.String(title=query_student)),
-        coreapi.Field(
-            name=query_section, 
-            location="query", 
-            description="ID of section, used to filter behavior reports by section",
-            schema=coreschema.String(title=query_section)),
-        coreapi.Field(
-            name=query_start_date, 
-            location="query", 
-            description="start date of to filter query by date, inclusive. of the format YYYY-MM-DD",
-            schema=coreschema.String(title=query_start_date)),
-        coreapi.Field(
-            name=query_end_date, 
-            location="query", 
-            description="end date of to filter query by date, inclusive. of the format YYYY-MM-DD",
-            schema=coreschema.String(title=query_end_date)),
-    )
-    
     create_fields = (
         coreapi.Field(
             name=name_enrollment,
@@ -389,7 +275,6 @@ class BehaviorViewSet(SproutViewSet):
             description=desc_enrollment,
             schema=coreschema.Integer(title=name_enrollment)),
     )
-
     update_fields = (
         coreapi.Field(
             name=name_enrollment,
@@ -398,7 +283,6 @@ class BehaviorViewSet(SproutViewSet):
             description=desc_enrollment,
             schema=coreschema.Integer(title=name_enrollment)),
     )
-
     partial_update_fields = (
         coreapi.Field(
             name=name_enrollment,
