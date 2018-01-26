@@ -26,7 +26,7 @@ SECRET_KEY = 'shtyity(%o*7qin7l%uymk$ja_&*5kzmvo@f*aruw!ehr1e6$v'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ 'localhost' ]
 
 
 # Application definition
