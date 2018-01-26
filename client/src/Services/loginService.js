@@ -1,4 +1,4 @@
-app.factory("loginService", function ($rootScope, $http) {
+app.factory("loginService", function ($rootScope, $http, $q) {
     return {
 
         /**
@@ -13,14 +13,18 @@ app.factory("loginService", function ($rootScope, $http) {
          * @return {promise} promise that will resolve to the response
          */
         login: function (username, password) {
-            return $http({
+            var deferred = $q.defer();
+            $http({
                 method: 'POST',
                 url: 'https://' + $rootScope.backend + '/login/',
                 headers: {'Content-Type': 'application/json'},
                 data: {'username':username, 'password':password}
             }).then(function success(response) {
-                return response;
+                deferred.resolve(response);
+            }, function error(response) {
+                deferred.reject(response);
             });
+            return deferred.promise;
         },
 
         /**
@@ -33,13 +37,17 @@ app.factory("loginService", function ($rootScope, $http) {
          * @return {promise} promise that will resolve to the response
          */
         auth_verify: function() {
-            return $http({
+            var deferred = $q.defer();
+            $http({
                 method: 'GET',
                 url: 'https://' + $rootScope.backend + '/auth-verify/',
                 headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken}
             }).then(function success(response) {
-                return response;
+                deferred.resolve(response);
+            }, function error(response) {
+                deferred.reject(response);
             });
+            return deferred.promise;
         }
     };
 });

@@ -126,8 +126,8 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
             }
             deferred.resolve(data);
         }, function error(response) {
-            $window.location.reload();
-            //deferred.reject(response);
+            //$window.location.reload();
+            deferred.reject(response);
         });
         return deferred.promise;
     }

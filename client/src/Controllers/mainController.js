@@ -5,6 +5,22 @@
     studentService.refreshStudents();
 
     /**
+     * Load the authentication token from local storage
+     *
+     * If we have never authenticated before, this is checked later and we show the login screen
+     *
+     * @type {string | null}
+     */
+    $rootScope.JSONWebToken = localStorage.getItem("JSONWebToken");
+
+    /**
+     * Store whether the user is logged in
+     *
+     * @type {boolean}
+     */
+    $rootScope.loggedIn = false;
+
+    /**
      * Navigates to student's page if name in navigation search bar is valid.
      */
     $scope.tryNavigateToStudent = function() {
