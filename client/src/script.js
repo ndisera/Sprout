@@ -47,7 +47,12 @@ app.config(function ($routeProvider) {
             controller: 'studentController',
             resolve: {
                 enrollments: function(enrollmentService, $route) {
-                    return enrollmentService.getStudentEnrollments($route.current.params.id);
+                    return enrollmentService.getStudentEnrollments(
+                        { 
+                            include: ['section.*'],
+                            filter: [{ name: 'student', val: $route.current.params.id },],
+                        }
+                    );
                 },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);

@@ -5,7 +5,7 @@
         location.path('');
     }
     
-    $scope.students = students;
+    $scope.students = students.students;
 
     // draggable 
     $('.row').sortable({
