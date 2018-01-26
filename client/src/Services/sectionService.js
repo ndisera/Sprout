@@ -1,20 +1,24 @@
-﻿app.factory("sectionService", function ($rootScope, $http) {
+app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
     return {
         /**
          * Get section
          * @param {number} sectionId - the section id.
+         * @param {object} config - config object for query parameters 
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getSection: function (sectionId) {
-            return $http({
+        getSection: function (sectionId, config) {
+            var query = queryService.generateQuery(config);
+            var deferred = $q.defer();
+            $http({
                 method: 'GET',
                 headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'https://' + $rootScope.backend + '/sections/' + sectionId + '/'
+                url: 'https://' + $rootScope.backend + '/sections/' + sectionId + query
             }).then(function success(response) {
-                return response.data;
+                deferred.resolve(response.data);
             }, function error(response) {
-                return response.status;
+                deferred.reject(response);
             });
+            return deferred.promise;
         }
     };
 });

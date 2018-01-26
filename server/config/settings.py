@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'api',
     'rest_framework_swagger',
     'corsheaders',
+    'dynamic_rest',
 ]
 
 MIDDLEWARE = [
@@ -175,3 +176,10 @@ SWAGGER_SETTINGS = {
 PASSWORD_HASHERS = [
     'api.hashers.SproutPBKDF2PasswordHasher'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'dynamic_rest.renderers.DynamicBrowsableAPIRenderer',
+    ],
+}

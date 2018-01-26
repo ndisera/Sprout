@@ -227,7 +227,7 @@
                 <div class="input-group col-sm-offset-1 col-sm-10">
                     <input type="text" autocomplete="off" class="form-control" placeholder="Search Students" list="studentsv" name="studentsv" ng-model="studentViewSearch">
                     <datalist id="studentsv">
-                        <option ng-repeat="s in students" value="{{s.first_name}} {{s.last_name}}">
+                        <option ng-repeat="s in studentInfo.students" value="{{s.first_name}} {{s.last_name}}">
                     </datalist>
                     <div class="input-group-btn">
                         <button class="btn btn-default" type="submit">
@@ -274,7 +274,7 @@
                 <div class="input-group col-sm-offset-1 col-sm-10">
                     <input type="text" class="form-control" placeholder="Search Students" list="studentsd" name="studentsd" autocomplete="off" ng-model="studentDeleteSearch">
                     <datalist id="studentsd">
-                        <option ng-repeat="s in students" value="{{s.first_name}} {{s.last_name}}">
+                        <option ng-repeat="s in studentInfo.students" value="{{s.first_name}} {{s.last_name}}">
                     </datalist>
                     <div class="input-group-btn">
                         <button class="btn btn-default" type="submit">

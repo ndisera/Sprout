@@ -1,25 +1,24 @@
-app.factory("behaviorService", function ($rootScope, $http) {
+app.factory("behaviorService", function ($rootScope, $http, $q, queryService) {
     return {
         /**
          * Get student behavior records, filtering by a start and end data
-         * @param {number} studentId - the student's id.
-         * @param {string} startDate - starting date bound to filter. formatted "YYYY-MM-DD".
-         * @param {string} endDate - ending date bound to filter. formatted "YYYY-MM-DD".
+         * @param {object} config - config object for query parameters (see queryService)
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getStudentBehaviorByDate: function (studentId, startDate, endDate) {
-            return $http({
+        getStudentBehavior: function (config) {
+            var query = queryService.generateQuery(config);
+            var deferred = $q.defer();
+            $http({
                 method: 'GET',
                 headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'https://' + $rootScope.backend
-                        + '/behaviors/?student=' + studentId
-                        + "&start_date=" + startDate
-                        + "&end_date=" + endDate
+                        + '/behaviors' + query
             }).then(function success(response) {
-                return response.data;
+                deferred.resolve(response.data);
             }, function error(response) {
-                return response.status;
+                deferred.reject(response);
             });
+            return deferred.promise;
         },
 
         /**
@@ -28,16 +27,18 @@ app.factory("behaviorService", function ($rootScope, $http) {
          * @return {promise} promise that will resolve with data or reject with response code.
          */
         addBehavior: function (behaviorObj) {
-            return $http({
+            var deferred = $q.defer();
+            $http({
                 method: 'POST',
                 headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'https://' + $rootScope.backend + '/behaviors/',
+                url: 'https://' + $rootScope.backend + '/behaviors',
                 data: behaviorObj
             }).then(function success(response) {
-                return response.data;
+                deferred.resolve(response.data);
             }, function error(response) {
-                return response.status;
+                deferred.reject(response);
             });
+            return deferred.promise;
         },
 
         /**
@@ -47,16 +48,18 @@ app.factory("behaviorService", function ($rootScope, $http) {
          * @return {promise} promise that will resolve with data or reject with response code.
          */
         updateBehavior: function (behaviorId, behaviorObj) {
-            return $http({
+            var deferred = $q.defer();
+            $http({
                 method: 'PUT',
                 headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'https://' + $rootScope.backend + "/behaviors/" + behaviorId + '/',
+                url: 'https://' + $rootScope.backend + "/behaviors/" + behaviorId,
                 data: behaviorObj
             }).then(function success(response) {
-                return response.data;
+                deferred.resolve(response.data);
             }, function error(response) {
-                return response.status;
+                deferred.reject(response);
             });
+            return deferred.promise;
         },
     };
 });

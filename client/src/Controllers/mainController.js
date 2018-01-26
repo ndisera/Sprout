@@ -1,67 +1,15 @@
 ﻿app.controller('mainController', function ($scope, $rootScope, $location, studentService, loginService) {
 
-    /**
-     *  Used to determine where to make calls to the backend
-     *
-     * @type {string}
-     */
-    $rootScope.backendHostname = $location.host();
-
-    /**
-     *  Used to determine how to make calls to the backend
-     *
-     * @type {number}
-     */
-    $rootScope.backendPort = 8000;
-
-    /**
-     *  Convenience variable - Combine backendHostname and backendPort in a manner which
-     *  they will often be used
-     *
-     * @type {string}
-     */
-    $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort;
-
     $scope.studentInfo = studentService.studentInfo;
+
     studentService.refreshStudents();
-
-    /**
-     * Load the authentication token from local storage
-     *
-     * If we have never authenticated before, this is checked later and we show the login screen
-     *
-     * @type {string | null}
-     */
-    $rootScope.JSONWebToken = localStorage.getItem("JSONWebToken");
-
-    /**
-     * Store whether the user is logged in
-     *
-     * @type {boolean}
-     */
-    $rootScope.loggedIn = false;
-
-    // get all students
-    var studentsPromise = studentService.getStudents();
-    studentsPromise.then(function success(data) {
-        $scope.students = data;
-        $scope.studentsLookup = {};
-
-        // create fast lookup dictionary
-        for (var i = 0; i < $scope.students.length; ++i) {
-          var lookupName = $scope.students[i].first_name + " " + $scope.students[i].last_name;
-          $scope.studentsLookup[lookupName.toUpperCase()] = $scope.students[i];
-        }
-    }, function error(code) {
-        //TODO: deal with errors
-    });
 
     /**
      * Navigates to student's page if name in navigation search bar is valid.
      */
     $scope.tryNavigateToStudent = function() {
-        if ($scope.studentName.toUpperCase() in $scope.studentsLookup) {
-            $location.path('/student/' + $scope.studentsLookup[$scope.studentName.toUpperCase()].id);
+        if ($scope.studentName.toUpperCase() in $scope.studentInfo.studentsLookup) {
+            $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentName.toUpperCase()].id);
             return;
         }
         else {

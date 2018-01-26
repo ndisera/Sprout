@@ -9,8 +9,10 @@ django-rest-auth==0.9.3
 django-rest-swagger==2.1.2
 djangorestframework==3.7.3
 djangorestframework-jwt==1.11.0
+dynamic-rest==1.6.7
 httpie==0.9.9
 idna==2.6
+inflection==0.3.1
 itypes==1.1.0
 Jinja2==2.10
 Markdown==2.6.9

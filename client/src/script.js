@@ -47,11 +47,42 @@ app.config(function ($routeProvider) {
             controller: 'studentController',
             resolve: {
                 enrollments: function(enrollmentService, $route) {
-                    return enrollmentService.getStudentEnrollments($route.current.params.id);
+                    return enrollmentService.getStudentEnrollments(
+                        { 
+                            include: ['section.*'],
+                            filter: [{ name: 'student', val: $route.current.params.id },],
+                        }
+                    );
                 },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
             }
         });
+})
+
+.run(function($rootScope, $location) {
+    
+    /**
+     *  Used to determine where to make calls to the backend
+     */
+    $rootScope.backendHostname = $location.host();
+
+    /**
+     *  Used to determine how to make calls to the backend
+     */
+    $rootScope.backendPort = 8000;
+
+    /**
+     *  Convenience variable - Combine backendHostname and backendPort in a manner which
+     *  they will often be used
+     */
+    $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort
+
 });
+
+
+
+
+
+

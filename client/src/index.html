@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Sprout</title>
@@ -35,13 +35,12 @@
     <!-- @endif -->
 </head>
 <body ng-app="app">
-
     <div ng-controller="mainController">
         <div class="container" ng-hide="loggedIn" ng-cloak>
             <div class="row">
                 <div class="col-md-12">
                     <div class="well login-box">
-                        <form action="" ng-submit="attemptLogin($event)">
+                        <form action="" ng-submit="attemptLogin()">
                             <h1>Login</h1>
                             <hr />
                             <div class="form-group">
@@ -52,9 +51,6 @@
                                 <label for="password">Password</label>
                                 <input ng-model="password" placeholder="Password" type="password" class="form-control" />
                             </div>
-                            <div class="label">
-                                <label for="loginWarning">{{ loginWarningField }}</label>
-                            </div>
                             <div class="form-group text-center">
                                 <button class="btn btn-danger btn-cancel-action">Cancel</button>
                                 <input type="submit" class="btn btn-success btn-login-submit" value="Login" />
@@ -64,7 +60,6 @@
                 </div>
             </div>
         </div>
-
         <nav class="navbar navbar-inverse navbar-fixed-top" ng-show="loggedIn" ng-cloak>
             <div class="container">
                 <div class="navbar-header">
@@ -116,11 +111,9 @@
             </div>
         </nav>
     </div>
-
     <div id="main" ng-show="loggedIn" ng-cloak>
         <div ng-view></div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

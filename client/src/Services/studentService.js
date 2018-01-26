@@ -1,4 +1,4 @@
-app.factory("studentService", function ($rootScope, $http) {
+app.factory("studentService", function ($rootScope, $http, $q, $window, queryService) {
 
     var studentInfo = {
         students: [],
@@ -7,35 +7,44 @@ app.factory("studentService", function ($rootScope, $http) {
 
     /**
      * Get all student records
+     * @param {object} config - config object for query parameters (see queryService)
      * @return {promise} promise that will resolve with data or reject with response code.
      */
-    function getStudents () {
-        return $http({
+    function getStudents (config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
             method: 'GET',
             headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-            url: 'https://' + $rootScope.backend + '/students/'
+            url: 'https://' + $rootScope.backend + '/students' + query
         }).then(function success(response) {
-            return response.data;
+            deferred.resolve(response.data);
         }, function error(response) {
-            return response.status;
+            deferred.reject(response);
         });
+        return deferred.promise;
     }
 
     /**
      * Get student record
      * @param {number} studentId - the student's id.
+     * @param {object} config - config object for query parameters (see queryService)
      * @return {promise} promise that will resolve with data or reject with response code.
      */
-    function getStudent (studentId) {
-        return $http({
+    function getStudent (studentId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
             method: 'GET',
             headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-            url: 'https://' + $rootScope.backend + '/students/' + studentId
+            url: 'https://' + $rootScope.backend 
+                    + '/students/' + studentId + query
         }).then(function success(response) {
-            return response.data;
+            deferred.resolve(response.data);
         }, function error(response) {
-            return response.status;
+            deferred.reject(response);
         });
+        return deferred.promise;
     }
 
     /**
@@ -44,15 +53,19 @@ app.factory("studentService", function ($rootScope, $http) {
      * @return {promise} promise that will resolve with data or reject with response code.
      */
     function deleteStudent (studentId) {
-        return $http({
+        var deferred = $q.defer();
+        $http({
             method: 'DELETE',
             headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
             url: 'https://' + $rootScope.backend + '/students/' + studentId
         }).then(function success(response) {
-            return refreshStudents(response);
+            refreshStudents().then(function success(data) {
+                deferred.resolve(response.data);
+            });
         }, function error(response) {
-            return response.status;
+            deferred.reject(response);
         });
+        return deferred.promise;
     }
 
     /**
@@ -61,16 +74,20 @@ app.factory("studentService", function ($rootScope, $http) {
      * @return {promise} promise that will resolve with data or reject with response code.
      */
     function addStudent (studentObj) {
-        return $http({
+        var deferred = $q.defer();
+        $http({
             method: 'POST',
             headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-            url: 'https://' + $rootScope.backend + '/students/',
+            url: 'https://' + $rootScope.backend + '/students',
             data: studentObj
         }).then(function success(response) {
-            return refreshStudents(response);
+            refreshStudents().then(function success(data) {
+                deferred.resolve(response.data);
+            });
         }, function error(response) {
-            return response.status;
+            deferred.reject(response);
         });
+        return deferred.promise;
     }
 
     /**
@@ -80,15 +97,18 @@ app.factory("studentService", function ($rootScope, $http) {
      * @return {promise} promise that will resolve with data or reject with response code.
      */
     function updateStudent (studentId, studentObj) {
-        return $http({
+        var deferred = $q.defer();
+        $http({
             method: 'PUT',
             headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId,
             data: studentObj
-        }).then(function (response) {
-            return refreshStudents(response);
+        }).then(function success(response) {
+            refreshStudents().then(function success(data) {
+                deferred.resolve(response.data);
+            });
         }, function error(response) {
-            return response.status;
+            deferred.reject(response);
         });
     }
 
@@ -96,19 +116,20 @@ app.factory("studentService", function ($rootScope, $http) {
      * Update students and studentsLookup anytime they have changed in the database
      * @return {response} response of the http request used before calling this method.
      */
-    function refreshStudents(response) {
-        return getStudents().then(function (data) {
-            studentInfo.students = data;
+    function refreshStudents() {
+        var deferred = $q.defer();
+        getStudents().then(function success(data) {
+            studentInfo.students = data.students;
             for (var i = 0; i < studentInfo.students.length; ++i) {
                 var lookupName = studentInfo.students[i].first_name + " " + studentInfo.students[i].last_name;
                 studentInfo.studentsLookup[lookupName.toUpperCase()] = studentInfo.students[i];
             }
-            // fixes an error in chrome debugger, but I don't think this will ever be the case
-            if (typeof response === "undefined" || response === null || typeof response.data === "undefined") {
-                return null;
-            }
-            return response.data;
+            deferred.resolve(data);
+        }, function error(response) {
+            $window.location.reload();
+            //deferred.reject(response);
         });
+        return deferred.promise;
     }
 
     return {

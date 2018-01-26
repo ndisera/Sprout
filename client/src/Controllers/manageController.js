@@ -25,9 +25,9 @@
     $scope.deleteStudentSuccess = false;
     $scope.deleteTeacherSuccess = false;
 
-    $scope.students = students;
+    $scope.studentInfo = studentService.studentInfo;
+
     $scope.teachers = teachers;
-    $scope.studentsLookup = {};
     $scope.teachersLookup = {};
     $scope.teacherV = {};
     $scope.teacherE = {};
@@ -36,12 +36,7 @@
     $scope.newTeacher = {};
     $scope.newStudent = {};
 
-    // create fast lookup student dictionary
-    for (var i = 0; i < $scope.students.length; ++i) {
-        var lookupName = $scope.students[i].first_name + " " + $scope.students[i].last_name;
-        $scope.studentsLookup[lookupName.toUpperCase()] = $scope.students[i];
-    }
-    $scope.teachers = teachers;
+    $scope.teachers = teachers.teachers;
     // create fast lookup teacher dictionary
     for (var i = 0; i < $scope.teachers.length; ++i) {
         var lookupName = $scope.teachers[i].first_name + " " + $scope.teachers[i].last_name;
@@ -190,8 +185,8 @@
      * Navigates to student's page if name in navigation search bar is valid.
      */
     $scope.viewStudent = function () {
-        if ($scope.studentViewSearch.toUpperCase() in $scope.studentsLookup) {
-            $location.path('/student/' + $scope.studentsLookup[$scope.studentViewSearch.toUpperCase()].id);
+        if ($scope.studentViewSearch.toUpperCase() in $scope.studentInfo.studentsLookup) {
+            $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentViewSearch.toUpperCase()].id);
             return;
         }
         else {
@@ -231,9 +226,9 @@
             $("#addTeacherSuccess").fadeTo(2000, 500).slideUp(500, function () {
                 $("#addTeacherSuccess").slideUp(500);
             });
-            $scope.teachers.push(data);
-            var lookupName = data.first_name + " " + data.last_name;
-            $scope.teachersLookup[lookupName.toUpperCase()] = data;
+            $scope.teachers.push(data.teacher);
+            var lookupName = data.teacher.first_name + " " + data.teacher.last_name;
+            $scope.teachersLookup[lookupName.toUpperCase()] = data.teacher;
         }, function error(message) {
             $scope.status = message;
         });
@@ -250,9 +245,6 @@
             $("#addStudentSuccess").fadeTo(2000, 500).slideUp(500, function () {
                 $("#addStudentSuccess").slideUp(500);
             });
-            $scope.students.push(data);
-            var lookupName = data.first_name + " " + data.last_name;
-            $scope.studentsLookup[lookupName.toUpperCase()] = data;
         }, function error(message) {
             $scope.status = message;
         });
@@ -273,7 +265,7 @@
      * Hides the delete student search bar and displays their info with an option to delete.
      */
     $scope.displayDeleteStudent = function () {
-        $scope.studentD = $scope.studentsLookup[$scope.studentDeleteSearch.toUpperCase()];
+        $scope.studentD = $scope.studentInfo.studentsLookup[$scope.studentDeleteSearch.toUpperCase()];
         $scope.displayStudentDeleteSearch = false;
         $scope.displayStudentInfo = true;
         $scope.clearStudentViewSearch();
@@ -327,14 +319,6 @@
     $scope.deleteStudent = function () {
         var studentPromise = studentService.deleteStudent($scope.studentD.id);
         studentPromise.then(function success(data) {
-            // remove student from students and studentsLookup
-            for (var i = 0; i < $scope.students.length; i++) {
-                if ($scope.students[i].id === $scope.studentD.id) {
-                    $scope.students.splice(i, 1);
-                    var upper = $scope.studentD.first_name.toUpperCase() + " " + $scope.studentD.last_name.toUpperCase();
-                    delete $scope.studentsLookup[upper];
-                }
-            }
             $scope.studentD = {};
             $scope.deleteStudentSuccess = true;
             $("#deleteStudentSuccess").fadeTo(2000, 500).slideUp(500, function () {
