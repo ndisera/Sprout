@@ -1,19 +1,22 @@
-app.factory("enrollmentService", function ($rootScope, $http) { 
+app.factory("enrollmentService", function ($rootScope, $http, $q, queryService) { 
     return {
         /**
          * Get student section enrollments
-         * @param {number} studentId - the student's id.
+         * @param {object} config - config object for query parameters (see queryService)
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getStudentEnrollments: function (studentId) {
-            return $http({
+        getStudentEnrollments: function (config) {
+            var query = queryService.generateQuery(config);
+            var deferred = $q.defer();
+            $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/enrollments/?student=' + studentId
+                url: 'https://' + $rootScope.backend + '/enrollments' + query
             }).then(function success(response) {
-                return response.data;
+                deferred.resolve(response.data);
             }, function error(response) {
-                return response.status;
+                deferred.reject(response);
             });
+            return deferred.promise;
         }
     };
 });

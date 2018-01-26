@@ -40,7 +40,7 @@
     $scope.newTeacher = {};
     $scope.newStudent = {};
 
-    $scope.teachers = teachers;
+    $scope.teachers = teachers.teachers;
     // create fast lookup teacher dictionary
     for (var i = 0; i < $scope.teachers.length; ++i) {
         var lookupName = $scope.teachers[i].first_name + " " + $scope.teachers[i].last_name;
@@ -230,9 +230,9 @@
             $("#addTeacherSuccess").fadeTo(2000, 500).slideUp(500, function () {
                 $("#addTeacherSuccess").slideUp(500);
             });
-            $scope.teachers.push(data);
-            var lookupName = data.first_name + " " + data.last_name;
-            $scope.teachersLookup[lookupName.toUpperCase()] = data;
+            $scope.teachers.push(data.teacher);
+            var lookupName = data.teacher.first_name + " " + data.teacher.last_name;
+            $scope.teachersLookup[lookupName.toUpperCase()] = data.teacher;
         }, function error(message) {
             $scope.status = message;
         });

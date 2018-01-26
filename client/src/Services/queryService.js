@@ -27,13 +27,13 @@ app.factory("queryService", function () {
          *
          * example config
          * {
-         *      include: [this],
-         *      exclude: [that],
+         *      include: ['this'],
+         *      exclude: ['that'],
          *      filter: [
-         *          { name: date.range, val: 2017-01-20 },
-         *          { name: date.range, val: 2017-01-24 },
+         *          { name: 'date.range', val: '2017-01-20' },
+         *          { name: 'date.range', val: '2017-01-24' },
          *      ],
-         *      sort: [date],
+         *      sort: ['date'],
          * }
          *
          * produces:
@@ -42,6 +42,8 @@ app.factory("queryService", function () {
          * &filter{date.range}=2017-01-24&sort[]=date
          */
         generateQuery: function (config) {
+            if (config == null || config == undefined) { return ''; }
+
             var queries = [];
             queries.push(_.map(config.include, createInclude));
             queries.push(_.map(config.exclude, createExclude));

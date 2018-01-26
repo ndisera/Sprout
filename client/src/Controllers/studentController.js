@@ -6,7 +6,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     }
 
     // set important scope variables
-    $scope.student = student;
+    $scope.student = student.student;
     $scope.studentE = Object.assign({}, $scope.student);
     console.log($scope.student);
     $scope.section_titles = [];
@@ -61,7 +61,9 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     }
 
       // enrollments will contain section id (for mapping to enrollments) and student id
-      $scope.enrollments = enrollments;
+      console.log("ENROLLMENTS");
+      console.log(enrollments);
+      $scope.enrollments = enrollments.enrollments;
       $scope.sections = [];
       for (var i = 0; i < $scope.enrollments.length; i++) {
         var sectionPromise = sectionService.getSection($scope.enrollments[i].section);
@@ -187,12 +189,21 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
      * Get behavior/effort scores.
      */
     $scope.getBehaviors = function () {
-        var behaviorPromise = behaviorService.getStudentBehaviorByDate($routeParams.id, $scope.behaviorDate, $scope.behaviorDate);
+        var config = {
+            filter: [
+                { name: 'enrollment.student', val: $routeParams.id },
+                { name: 'date', val: $scope.behaviorDate },
+            ],
+        }
+
+        var behaviorPromise = behaviorService.getStudentBehavior(config);
         behaviorPromise.then(function success(data) {
-            $scope.behaviors = data;
+            console.log("BEHAVIORS");
+            console.log(data);
+            $scope.behaviors = data.behaviors;
             $scope.sectionBehaviorScores = {};
             for (var i = 0; i < $scope.behaviors.length; i++) {
-                $scope.sectionBehaviorScores[data[i].enrollment.section] = data[i];
+                $scope.sectionBehaviorScores[$scope.behaviors[i].enrollment.section] = $scope.behaviors[i];
             }
             // now I should be able to match each behavior and effort score to each section
         }, function error(message) {
@@ -301,21 +312,31 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
             "end_date": "2017-12-15"
         }
 
-        var behaviorPromise = behaviorService.getStudentBehaviorByDate(get_data["student"], get_data["start_date"], get_data["end_date"]);
+        var config = {
+            filter: [
+                { name: 'enrollment.student', val: $routeParams.id },
+                { name: 'date.range', val: "2017-12-11" },
+                { name: 'date.range', val: "2017-12-15" },
+            ],
+        }
+
+        var behaviorPromise = behaviorService.getStudentBehavior(config);
         behaviorPromise.then(function success(data) {
+            console.log("BEHAVIORS");
+            console.log(data);
             var behaviors = {};
             var efforts = {};
             var sections = [];
             for (var index = 0; index < data.length; index++) {
-                var section_id = data[index]["enrollment"]["section"];
+                var section_id = data.behaviors[index]["enrollment"]["section"];
                 if (behaviors[section_id] == undefined) {
                     // If we have not started a behavior list for this section, start one now
                     behaviors[section_id] = [];
                     efforts[section_id] = [];
                     sections.push(section_id)
                 }
-                behaviors[section_id].push(data[index].behavior);
-                efforts[section_id].push(data[index].effort);
+                behaviors[section_id].push(data.behaviors[index].behavior);
+                efforts[section_id].push(data.behaviors[index].effort);
             }
 
             // Convert to global arrays

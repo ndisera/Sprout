@@ -47,7 +47,6 @@
      * Logs user out, displays login page.
      */
     $scope.logout = function () {
-        console.log($scope.testValueThing);
         $rootScope.loggedIn = false;
         localStorage.setItem("loggedIn", false);
         $location.path('')
