@@ -233,8 +233,12 @@
             $scope.teachers.push(data.teacher);
             var lookupName = data.teacher.first_name + " " + data.teacher.last_name;
             $scope.teachersLookup[lookupName.toUpperCase()] = data.teacher;
-        }, function error(message) {
-            $scope.status = message;
+        }, function error(response) {
+            setErrorMessage(response);
+            $scope.addTeacherFailure = true;
+            $("#addTeacherFailure").fadeTo(5000, 500).slideUp(500, function () {
+                $("#addTeacherFailure").slideUp(500);
+            });
         });
     };
 
@@ -249,8 +253,12 @@
             $("#addStudentSuccess").fadeTo(2000, 500).slideUp(500, function () {
                 $("#addStudentSuccess").slideUp(500);
             });
-        }, function error(message) {
-            $scope.status = message;
+        }, function error(response) {
+            setErrorMessage(response);
+            $scope.addStudentFailure = true;
+            $("#addStudentFailure").fadeTo(5000, 500).slideUp(500, function () {
+                $("#addStudentFailure").slideUp(500);
+            });
         });
     };
 
@@ -312,8 +320,12 @@
                 $scope.tLastName = "";
                 $scope.tEmail = "";
             }
-        }, function error(message) {
-            $scope.status = message;
+        }, function error(response) {
+            setErrorMessage(response);
+            $scope.deleteTeacherFailure = true;
+            $("#deleteTeacherFailure").fadeTo(5000, 500).slideUp(500, function () {
+                $("#deleteTeacherFailure").slideUp(500);
+            });
         });
     };
 
@@ -332,8 +344,12 @@
             $scope.displayStudentInfo = false;
             studentDSearchOrInfo = "search";
             $scope.studentDeleteSearch = "";
-        }, function error(message) {
-            $scope.status = message;
+        }, function error(response) {
+            setErrorMessage(response);
+            $scope.deleteStudentFailure = true;
+            $("#deleteStudentFailure").fadeTo(5000, 500).slideUp(500, function () {
+                $("#deleteStudentFailure").slideUp(500);
+            });
         });
     };
 
@@ -438,8 +454,8 @@
                     break;
                 default:
             }
-        }, function error(message) {
-            $scope.status = message;
+        }, function error(response) {
+            setErrorMessage(response);
         });
     };
 
@@ -468,6 +484,18 @@
             default:
         }
     };
+
+    function setErrorMessage(response) {
+        $scope.errorMessage = [];
+        for (var property in response.data) {
+            if (response.data.hasOwnProperty(property)) {
+                for (var i = 0; i < response.data[property].length; i++) {
+                    $scope.errorMessage.push(response.data[property][i]);
+                }
+            }
+        }
+        $scope.errorMessage = $scope.errorMessage.join(" ");
+    }
 
     /**
      * Clears the view student search bar.

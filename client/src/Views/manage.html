@@ -160,6 +160,9 @@
             <div class="alert alert-success fade in col-sm-offset-1 col-sm-10" id="addTeacherSuccess" ng-show="addTeacherSuccess">
                 <strong>Success!</strong> New teacher has been added.
             </div>
+            <div class="alert alert-danger fade in col-sm-offset-1 col-sm-10" id="addTeacherFailure" ng-show="addTeacherFailure">
+                <strong>Failure!</strong> {{errorMessage}}
+            </div>
             <form ng-submit="displayDeleteTeacher()" ng-show="displayTeacherDeleteSearch">
                 <div class="input-group col-sm-offset-1 col-sm-10">
                     <input type="text" autocomplete="off" class="form-control" placeholder="Search Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
@@ -205,8 +208,11 @@
                     </div>
                 </div>
             </form>
-            <div class="alert alert-success fade in col-sm-offset-1 col-sm-10 deleteSuccess" id="deleteTeacherSuccess" ng-show="deleteTeacherSuccess">
+            <div class="alert alert-success fade in col-sm-offset-1 col-sm-10 deleteAlert" id="deleteTeacherSuccess" ng-show="deleteTeacherSuccess">
                 <strong>Success!</strong> Teacher has been deleted.
+            </div>
+            <div class="alert alert-danger fade in col-sm-offset-1 col-sm-10 deleteAlert" id="deleteTeacherFailure" ng-show="deleteTeacherFailure">
+                <strong>Failure!</strong> {{errorMessage}}
             </div>
         </div>
         <div id="students" class="tab-pane fade">
@@ -270,6 +276,9 @@
             <div class="alert alert-success fade in col-sm-offset-1 col-sm-10" id="addStudentSuccess" ng-show="addStudentSuccess">
                 <strong>Success!</strong> New student has been added.
             </div>
+            <div class="alert alert-danger fade in col-sm-offset-1 col-sm-10" id="addStudentFailure" ng-show="addStudentFailure">
+                <strong>Failure!</strong> {{errorMessage}}
+            </div>
             <form ng-submit="displayDeleteStudent()" ng-show="displayStudentDeleteSearch">
                 <div class="input-group col-sm-offset-1 col-sm-10">
                     <input type="text" class="form-control" placeholder="Search Students" list="studentsd" name="studentsd" autocomplete="off" ng-model="studentDeleteSearch">
@@ -315,8 +324,11 @@
                     </div>
                 </div>
             </form>
-            <div class="alert alert-success fade in col-sm-offset-1 col-sm-10 deleteSuccess" id="deleteStudentSuccess" ng-show="deleteStudentSuccess">
+            <div class="alert alert-success fade in col-sm-offset-1 col-sm-10 deleteAlert" id="deleteStudentSuccess" ng-show="deleteStudentSuccess">
                 <strong>Success!</strong> Student has been deleted.
+            </div>
+            <div class="alert alert-danger fade in col-sm-offset-1 col-sm-10 deleteAlert" id="deleteStudentFailure" ng-show="deleteStudentFailure">
+                <strong>Failure!</strong> {{errorMessage}}
             </div>
         </div>
     </div>
