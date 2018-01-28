@@ -4,10 +4,32 @@
 app.config(function ($routeProvider) {
     $routeProvider
 
-        // route for the admin(manage) page
-        .when('/manage', {
-            templateUrl: 'html/manage.html',
-            controller: 'manageController',
+        // route for the manage students page
+        .when('/managestudents', {
+            templateUrl: 'html/manageStudents.html',
+            controller: 'manageStudentsController',
+            resolve: {
+                students: function (studentService) {
+                    return studentService.getStudents();
+                }
+            }
+        })
+
+        // route for the manage teachers page
+        .when('/manageteachers', {
+            templateUrl: 'html/manageTeachers.html',
+            controller: 'manageTeachersController',
+            resolve: {
+                teachers: function (teacherService) {
+                    return teacherService.getTeachers();
+                }
+            }
+        })
+
+        // route for the manage (cases) page
+        .when('/managecases', {
+            templateUrl: 'html/manageCases.html',
+            controller: 'manageCasesController',
             resolve: {
                 students: function (studentService) {
                     return studentService.getStudents();
@@ -29,7 +51,7 @@ app.config(function ($routeProvider) {
             templateUrl: 'html/focusStudents.html',
             controller: 'focusStudentsController',
             resolve: {
-                students: function(studentService) {
+                students: function (studentService) {
                     return studentService.getStudents();
                 },
             }
@@ -46,23 +68,23 @@ app.config(function ($routeProvider) {
             templateUrl: 'html/student.html',
             controller: 'studentController',
             resolve: {
-                enrollments: function(enrollmentService, $route) {
+                enrollments: function (enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
-                        { 
+                        {
                             include: ['section.*'],
-                            filter: [{ name: 'student', val: $route.current.params.id },],
+                            filter: [{ name: 'student', val: $route.current.params.id }, ],
                         }
                     );
                 },
-                student: function(studentService, $route) {
+                student: function (studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
             }
         });
 })
 
-.run(function($rootScope, $location) {
-    
+.run(function ($rootScope, $location) {
+
     /**
      *  Used to determine where to make calls to the backend
      */
