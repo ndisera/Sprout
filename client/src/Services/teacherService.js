@@ -1,4 +1,4 @@
-﻿app.factory("teacherService", function ($rootScope, $http, $q, queryService) {
+app.factory("teacherService", function ($rootScope, $http, $q, queryService) {
     return {
         /**
          * Get all teacher records
@@ -10,7 +10,7 @@
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/teachers' + query
+                url: 'https://' + $rootScope.backend + '/teachers' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -30,7 +30,7 @@
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId + query
+                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -48,7 +48,7 @@
             var deferred = $q.defer();
             $http({
                 method: 'DELETE',
-                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId
+                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -67,7 +67,7 @@
             $http({
                 method: 'POST',
                 url: 'https://' + $rootScope.backend + '/teachers',
-                data: teacherObj
+                data: teacherObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -87,7 +87,7 @@
             $http({
                 method: 'PUT',
                 url: 'https://' + $rootScope.backend + '/teachers/' + teacherId + "/",
-                data: teacherObj
+                data: teacherObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

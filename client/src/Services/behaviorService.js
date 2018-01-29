@@ -10,8 +10,7 @@ app.factory("behaviorService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend
-                        + '/behaviors' + query
+                url: 'https://' + $rootScope.backend + '/behaviors' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -30,7 +29,7 @@ app.factory("behaviorService", function ($rootScope, $http, $q, queryService) {
             $http({
                 method: 'POST',
                 url: 'https://' + $rootScope.backend + '/behaviors',
-                data: behaviorObj
+                data: behaviorObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -50,7 +49,7 @@ app.factory("behaviorService", function ($rootScope, $http, $q, queryService) {
             $http({
                 method: 'PUT',
                 url: 'https://' + $rootScope.backend + "/behaviors/" + behaviorId,
-                data: behaviorObj
+                data: behaviorObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

@@ -1,4 +1,20 @@
-﻿.centerText {
+this is a test
+
+
+
+
+.voffset  { margin-top: 2px; }
+.voffset1 { margin-top: 5px; }
+.voffset2 { margin-top: 10px; }
+.voffset3 { margin-top: 15px; }
+.voffset4 { margin-top: 30px; }
+.voffset5 { margin-top: 40px; }
+.voffset6 { margin-top: 60px; }
+.voffset7 { margin-top: 80px; }
+.voffset8 { margin-top: 100px; }
+.voffset9 { margin-top: 150px; }
+
+.centerText {
     text-align: center;
 }
 
@@ -8,4 +24,24 @@
 
 .red {
     color: red;
+}
+
+.border-bottom-flat {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-width: 0px;
+}
+
+.border-top-flat {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.standardized-input-group-add-on {
+    min-width: 90px;
+    text-align: left;
+}
+
+.no-bottom-margin {
+    margin-bottom: 0px;
 }

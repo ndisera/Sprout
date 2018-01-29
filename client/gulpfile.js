@@ -13,10 +13,12 @@ const include_paths = [
     bower_path + 'angular/angular.min.js',
     bower_path + 'angular-route/angular-route.min.js',
     bower_path + 'angular-charts-js/dist/angular-chart.min.js',
+    bower_path + 'angular-animate/angular-animate.min.js',
 
     bower_path + 'angular/angular.js',
     bower_path + 'angular-route/angular-route.js',
     bower_path + 'angular-charts-js/dist/angular-chart.js',
+    bower_path + 'angular-animate/angular-animate.js',
 
     // bootstrap
     bower_path + 'bootstrap/dist/css/bootstrap.min.css',

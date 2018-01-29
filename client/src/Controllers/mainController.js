@@ -1,8 +1,7 @@
-﻿app.controller('mainController', function ($scope, $rootScope, $location, studentService) {
+app.controller('mainController', function ($scope, $rootScope, $location, userService, studentService) {
 
+    $scope.user = userService.user;
     $scope.studentInfo = studentService.studentInfo;
-
-    studentService.refreshStudents();
 
     /**
      * Navigates to student's page if name in navigation search bar is valid.
@@ -24,32 +23,11 @@
         $scope.studentName = "";
     };
 
-    // checks local stroage to see if user has logged in recently and redirects to focus page if so
-    $rootScope.loggedIn = JSON.parse(localStorage.getItem("loggedIn"));
-    if ($rootScope.loggedIn === null)
-        $rootScope.loggedIn = false;
-    else if ($rootScope.loggedIn && $location.path() === "")
-        $location.path('/focus');
-
     /**
-     * Checks login credentials and logs the user in if valid.
-     */
-    $scope.attemptLogin = function () {
-        if (($scope.username === "ndisera" || $scope.username === "sredman" || $scope.username === "gwatson" || $scope.username === "gzuber") && $scope.password === "password") {
-            $rootScope.loggedIn = true;
-            localStorage.setItem("loggedIn", true);
-        }
-        $scope.username = "";
-        $scope.password = "";
-    };
-
-    /**
-     * Logs user out, displays login page.
+     * Logs user out
      */
     $scope.logout = function () {
-        $rootScope.loggedIn = false;
-        localStorage.setItem("loggedIn", false);
-        $location.path('')
+        userService.logout();
     };
 
     // enables autofocus in IE

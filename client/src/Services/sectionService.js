@@ -1,4 +1,4 @@
-﻿app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
+app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
     return {
         /**
          * Get section
@@ -11,7 +11,7 @@
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/sections/' + sectionId + query
+                url: 'https://' + $rootScope.backend + '/sections/' + sectionId + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

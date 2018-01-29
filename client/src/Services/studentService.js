@@ -6,6 +6,29 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     };
 
     /**
+     * Subscribe to authentication events to know when it's
+     * safe to get students and necessary to clear out students.
+     */
+    $rootScope.$on('user:auth', function(event, data) {
+        if(data.type === 'login') {
+            refreshStudents();
+        }
+        else if(data.type === 'logout') {
+            clearStudents();
+        }
+    });
+
+    /**
+     * Clear students data from service. Security measure.
+     *
+     * @return {void}
+     */
+    function clearStudents() {
+        studentInfo.students = [];
+        studentInfo.studentsLookup = {};
+    }
+
+    /**
      * Get all student records
      * @param {object} config - config object for query parameters (see queryService)
      * @return {promise} promise that will resolve with data or reject with response code.
@@ -15,7 +38,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         var deferred = $q.defer();
         $http({
             method: 'GET',
-            url: 'https://' + $rootScope.backend + '/students' + query
+            url: 'https://' + $rootScope.backend + '/students' + query,
         }).then(function success(response) {
             deferred.resolve(response.data);
         }, function error(response) {
@@ -35,8 +58,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         var deferred = $q.defer();
         $http({
             method: 'GET',
-            url: 'https://' + $rootScope.backend 
-                    + '/students/' + studentId + query
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + query,
         }).then(function success(response) {
             deferred.resolve(response.data);
         }, function error(response) {
@@ -54,7 +76,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         var deferred = $q.defer();
         $http({
             method: 'DELETE',
-            url: 'https://' + $rootScope.backend + '/students/' + studentId
+            url: 'https://' + $rootScope.backend + '/students/' + studentId,
         }).then(function success(response) {
             refreshStudents().then(function success(data) {
                 deferred.resolve(response.data);
@@ -121,8 +143,8 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
             }
             deferred.resolve(data);
         }, function error(response) {
-            $window.location.reload();
-            //deferred.reject(response);
+            clearStudents();
+            deferred.reject(response);
         });
         return deferred.promise;
     }
