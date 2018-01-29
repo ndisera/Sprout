@@ -1,0 +1,41 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well login-box">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="login-logo-container">
+                            <img id="login-logo" src="img/seeds-clipart-tree-sprout-6.png">
+                        </div>
+                    </div>
+                </div>
+                <div class="row voffset3">
+                    <div class="col-md-12">
+                        <form action="" ng-submit="attemptLogin($event);">
+                            <div class="input-group">
+                                <span class="input-group-addon standardized-input-group-add-on border-bottom-flat">email</span>
+                                <input autofocus type="text" class="form-control border-bottom-flat" ng-model="email" />
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon standardized-input-group-add-on border-top-flat">password</span>
+                                <input id="login-password-input" type="password" class="form-control border-top-flat" ng-model="password"/>
+                                <span class="input-group-btn">
+                                    <button id="login-form-btn" type="submit" class="btn btn-default border-top-flat">
+                                        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row ng-fade voffset3" ng-repeat="message in errors">
+                    <div class="col-sm-12">
+                        <div class="alert alert-danger no-bottom-margin" role="alert">
+                            <span><b>Error:</b> {{ message }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

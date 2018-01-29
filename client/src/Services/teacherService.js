@@ -10,8 +10,7 @@ app.factory("teacherService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'https://' + $rootScope.backend + '/teachers' + query
+                url: 'https://' + $rootScope.backend + '/teachers' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -31,8 +30,7 @@ app.factory("teacherService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId + query
+                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -50,8 +48,7 @@ app.factory("teacherService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'DELETE',
-                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId
+                url: 'https://' + $rootScope.backend + '/teachers/' + teacherId,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -69,9 +66,8 @@ app.factory("teacherService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'POST',
-                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'https://' + $rootScope.backend + '/teachers',
-                data: teacherObj
+                data: teacherObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -90,9 +86,8 @@ app.factory("teacherService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'PUT',
-                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'https://' + $rootScope.backend + '/teachers/' + teacherId + "/",
-                data: teacherObj
+                data: teacherObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

@@ -25,7 +25,8 @@
     "moment": "momentjs#^2.20.1",
     "underscore": "^1.8.3",
     "jquery-ui": "^1.12.1",
-    "bootstrap-datepicker-eyecon": "^1.0.0"
+    "bootstrap-datepicker-eyecon": "^1.0.0",
+    "angular-animate": "^1.6.8"
   },
   "overrides": {
     "jquery-ui": {

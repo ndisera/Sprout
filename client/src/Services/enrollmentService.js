@@ -10,8 +10,7 @@ app.factory("enrollmentService", function ($rootScope, $http, $q, queryService) 
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'https://' + $rootScope.backend + '/enrollments' + query
+                url: 'https://' + $rootScope.backend + '/enrollments' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

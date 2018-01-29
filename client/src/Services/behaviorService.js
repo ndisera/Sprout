@@ -10,9 +10,7 @@ app.factory("behaviorService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
-                url: 'https://' + $rootScope.backend
-                        + '/behaviors' + query
+                url: 'https://' + $rootScope.backend + '/behaviors' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -30,9 +28,8 @@ app.factory("behaviorService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'POST',
-                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'https://' + $rootScope.backend + '/behaviors',
-                data: behaviorObj
+                data: behaviorObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -51,9 +48,8 @@ app.factory("behaviorService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'PUT',
-                headers: {'Authorization': 'JWT ' + $rootScope.JSONWebToken},
                 url: 'https://' + $rootScope.backend + "/behaviors/" + behaviorId,
-                data: behaviorObj
+                data: behaviorObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
