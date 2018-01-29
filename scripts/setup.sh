@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 SCRIPT_PATH="${PWD}/$(dirname "$0")"
 
 # BACKEND SETUP
@@ -25,6 +27,13 @@ source env/bin/activate
 
 # install api server dependencies
 pip install -r requirements.txt
+
+# Install Haraka SMTP server
+pushd haraka-smtp
+
+npm install
+
+popd # End Haraka setup
 
 # set up database
 python manage.py makemigrations

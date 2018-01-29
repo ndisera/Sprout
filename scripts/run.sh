@@ -46,6 +46,15 @@ echo ""
 nginx -c api_nginx.conf -p "${SCRIPT_PATH}"/../server/nginx &
 nginx=$!
 
+echo ""
+echo "Starting Haraka SMTP server"
+echo ""
+HARAKA_EXE="${SCRIPT_PATH}/../server/haraka-smtp/node_modules/Haraka/bin/haraka"
+haraka() { "${HARAKA_EXE}" "$@" ; } # Like an alias, but cooler
+
+haraka -c "${SCRIPT_PATH}/../server/haraka-smtp/" 1>"${SCRIPT_PATH}/../server/haraka-smtp/haraka.log" 2>"${SCRIPT_PATH}/../server/haraka-smtp/haraka.err" &
+haraka=$!
+
 wait $uwsgi $client $nginx
 
 # Deactivate the python environment
