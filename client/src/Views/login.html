@@ -13,12 +13,12 @@
                     <div class="col-md-12">
                         <form action="" ng-submit="attemptLogin($event);">
                             <div class="input-group">
-                                <span class="input-group-addon standardized-input-group-add-on border-bottom-flat">email</span>
-                                <input autofocus type="text" class="form-control border-bottom-flat" ng-model="email" />
+                                <span id="login-top-label" class="input-group-addon border-bottom-flat">email</span>
+                                <input autofocus id="login-top-input" type="text" class="form-control border-bottom-flat" ng-model="email" />
                             </div>
-                            <div class="input-group">
-                                <span class="input-group-addon standardized-input-group-add-on border-top-flat">password</span>
-                                <input id="login-password-input" type="password" class="form-control border-top-flat" ng-model="password"/>
+                            <div id="login-input-group-bottom" class="input-group">
+                                <span id="login-bottom-label" class="input-group-addon border-top-flat">password</span>
+                                <input id="login-bottom-input" type="password" class="form-control border-top-flat" ng-model="password"/>
                                 <span class="input-group-btn">
                                     <button id="login-form-btn" type="submit" class="btn btn-default border-top-flat">
                                         <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
