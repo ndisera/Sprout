@@ -61,7 +61,9 @@ const paths = {
         dest: 'public/fonts',
     },
     imgs: {
-        src: 'src/Images/*',
+        src: [
+            'src/Images/**',
+        ],
         dest: 'public/img',
     },
     scripts: {

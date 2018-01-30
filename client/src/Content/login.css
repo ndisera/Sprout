@@ -16,11 +16,16 @@
 
 #login-logo-container {
     text-align: center;
-    margin-top: -4%;
 }
 
 #login-logo {
-    width: 20%;
+    width: 30%;
+}
+
+@media all and (max-width: 430px) {
+    #login-logo {
+        width: 40%;
+    }
 }
 
 #login-input-group-bottom {
