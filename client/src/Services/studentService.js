@@ -97,7 +97,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         $http({
             method: 'POST',
             url: 'https://' + $rootScope.backend + '/students',
-            data: studentObj
+            data: studentObj,
         }).then(function success(response) {
             refreshStudents().then(function success(data) {
                 deferred.resolve(response.data);
@@ -119,7 +119,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         $http({
             method: 'PUT',
             url: 'https://' + $rootScope.backend + '/students/' + studentId,
-            data: studentObj
+            data: studentObj,
         }).then(function success(response) {
             refreshStudents().then(function success(data) {
                 deferred.resolve(response.data);
@@ -127,6 +127,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         }, function error(response) {
             deferred.reject(response);
         });
+        return deferrred.promise;
     }
 
     /**

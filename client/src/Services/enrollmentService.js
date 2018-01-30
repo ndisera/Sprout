@@ -10,7 +10,7 @@ app.factory("enrollmentService", function ($rootScope, $http, $q, queryService) 
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/enrollments' + query
+                url: 'https://' + $rootScope.backend + '/enrollments' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -29,7 +29,7 @@ app.factory("enrollmentService", function ($rootScope, $http, $q, queryService) 
             $http({
                 method: 'POST',
                 url: 'https://' + $rootScope.backend + '/enrollments',
-                data: enrollmentObj
+                data: enrollmentObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -49,7 +49,7 @@ app.factory("enrollmentService", function ($rootScope, $http, $q, queryService) 
             $http({
                 method: 'UPDATE',
                 url: 'https://' + $rootScope.backend + '/enrollments/' + enrollmentId,
-                data: enrollmentObj
+                data: enrollmentObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -67,7 +67,7 @@ app.factory("enrollmentService", function ($rootScope, $http, $q, queryService) 
             var deferred = $q.defer();
             $http({
                 method: 'DELETE',
-                url: 'https://' + $rootScope.backend + '/enrollments/' + enrollmentId
+                url: 'https://' + $rootScope.backend + '/enrollments/' + enrollmentId,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

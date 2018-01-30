@@ -11,7 +11,7 @@ app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/sections/' + sectionId + query
+                url: 'https://' + $rootScope.backend + '/sections/' + sectionId + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -30,7 +30,7 @@ app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/sections' + query
+                url: 'https://' + $rootScope.backend + '/sections' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -49,7 +49,7 @@ app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
             $http({
                 method: 'POST',
                 url: 'https://' + $rootScope.backend + '/sections/',
-                data: sectionObj
+                data: sectionObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -69,7 +69,7 @@ app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
             $http({
                 method: 'PUT',
                 url: 'https://' + $rootScope.backend + '/sections/' + sectionId,
-                data: sectionObj
+                data: sectionObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -87,7 +87,7 @@ app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'DELETE',
-                url: 'https://' + $rootScope.backend + '/sections/' + sectionId
+                url: 'https://' + $rootScope.backend + '/sections/' + sectionId,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

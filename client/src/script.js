@@ -23,7 +23,10 @@ app.config(function ($routeProvider, $httpProvider) {
             resolve: {
                 students: function (studentService) {
                     return studentService.getStudents();
-                }
+                },
+                auth: function (userService) {
+                    return userService.authVerify();
+                },
             }
         })
 
@@ -34,7 +37,10 @@ app.config(function ($routeProvider, $httpProvider) {
             resolve: {
                 teachers: function (teacherService) {
                     return teacherService.getTeachers();
-                }
+                },
+                auth: function (userService) {
+                    return userService.authVerify();
+                },
             }
         })
 
@@ -48,6 +54,9 @@ app.config(function ($routeProvider, $httpProvider) {
                 },
                 teachers: function (teacherService) {
                     return teacherService.getTeachers();
+                },
+                auth: function (userService) {
+                    return userService.authVerify();
                 },
             }
         })
@@ -65,8 +74,7 @@ app.config(function ($routeProvider, $httpProvider) {
                 },
                 sections: function (sectionService) {
                     return sectionService.getSections();
-                }
-            }
+                },
                 auth: function(userService) {
                     return userService.authVerify();
                 },

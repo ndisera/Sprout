@@ -1,8 +1,5 @@
 ﻿app.controller("manageClassesController", function ($scope, $rootScope, $location, students, teachers, sections, studentService, teacherService, sectionService, enrollmentService) {
     // don't think I will need teacherService
-    if (!JSON.parse(localStorage.getItem("loggedIn"))) {
-        location.path('');
-    }
 
     // anywhere 's' or 't' was previously used for 'students' and 'teachers', 'c' will be used for 'classes'
     // another 's' for 'sections' would be confusing with 'students', which will probably use an 's' again

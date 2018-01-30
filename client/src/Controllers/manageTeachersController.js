@@ -1,7 +1,4 @@
 ﻿app.controller("manageTeachersController", function ($scope, $rootScope, $location, teachers, teacherService) {
-    if (!JSON.parse(localStorage.getItem("loggedIn"))) {
-        location.path('');
-    }
 
     var teacherTask = "view/edit";
     var teacherVSearchOrInfo = "search";
