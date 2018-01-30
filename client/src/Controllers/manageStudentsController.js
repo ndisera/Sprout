@@ -97,7 +97,7 @@
         $scope.studentD = $scope.studentInfo.studentsLookup[$scope.studentDeleteSearch.toUpperCase()];
         $scope.displayStudentDeleteSearch = false;
         $scope.displayStudentInfo = true;
-        $scope.clearStudentViewSearch();
+        $scope.clearStudentDeleteSearch();
         studentDSearchOrInfo = "info";
     };
 

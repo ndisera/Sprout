@@ -236,7 +236,7 @@
         $scope.sectionD = $scope.sectionsLookup[$scope.sectionDeleteSearch.toUpperCase()];
         $scope.displaySectionDeleteSearch = false;
         $scope.displaySectionInfo = true;
-        $scope.clearSectionViewSearch();
+        $scope.clearSectionDeleteSearch();
         sectionDSearchOrInfo = "info";
     };
 

@@ -126,7 +126,7 @@
         $scope.teacherD = $scope.teachersLookup[$scope.teacherDeleteSearch.toUpperCase()];
         $scope.displayTeacherDeleteSearch = false;
         $scope.displayTeacherInfo = true;
-        $scope.clearTeacherViewSearch();
+        $scope.clearTeacherDeleteSearch();
         teacherDSearchOrInfo = "info";
     };
 
