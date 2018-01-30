@@ -94,11 +94,13 @@
      * Hides the delete student search bar and displays their info with an option to delete.
      */
     $scope.displayDeleteStudent = function () {
-        $scope.studentD = $scope.studentInfo.studentsLookup[$scope.studentDeleteSearch.toUpperCase()];
-        $scope.displayStudentDeleteSearch = false;
-        $scope.displayStudentInfo = true;
-        $scope.clearStudentDeleteSearch();
-        studentDSearchOrInfo = "info";
+        if ($scope.studentDeleteSearch.toUpperCase() in $scope.studentInfo.studentsLookup) {
+            $scope.studentD = $scope.studentInfo.studentsLookup[$scope.studentDeleteSearch.toUpperCase()];
+            $scope.displayStudentDeleteSearch = false;
+            $scope.displayStudentInfo = true;
+            $scope.clearStudentDeleteSearch();
+            studentDSearchOrInfo = "info";
+        }
     };
 
     /**

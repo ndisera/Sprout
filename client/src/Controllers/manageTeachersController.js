@@ -123,11 +123,13 @@
      * Hides the delete teacher search bar and displays their info with an option to delete.
      */
     $scope.displayDeleteTeacher = function () {
-        $scope.teacherD = $scope.teachersLookup[$scope.teacherDeleteSearch.toUpperCase()];
-        $scope.displayTeacherDeleteSearch = false;
-        $scope.displayTeacherInfo = true;
-        $scope.clearTeacherDeleteSearch();
-        teacherDSearchOrInfo = "info";
+        if ($scope.teacherDeleteSearch.toUpperCase() in $scope.teachersLookup) {
+            $scope.teacherD = $scope.teachersLookup[$scope.teacherDeleteSearch.toUpperCase()];
+            $scope.displayTeacherDeleteSearch = false;
+            $scope.displayTeacherInfo = true;
+            $scope.clearTeacherDeleteSearch();
+            teacherDSearchOrInfo = "info";
+        }
     };
 
     /**
@@ -234,8 +236,13 @@
         delete tempTeacher.id;
         var teacherPromise = teacherService.updateTeacher($scope.teacherE.id, tempTeacher);
         teacherPromise.then(function success(data) {
+            // save previous name in case it was changed
+            var tempFirstName = $scope.teacherV.first_name.toUpperCase();
+            var tempLastName = $scope.teacherV.last_name.toUpperCase();
+            var tempFullName = tempFirstName + " " + tempLastName
             // set teacherV to teacherE to reflect update
             $scope.teacherV = Object.assign({}, $scope.teacherE);
+            var newFullName = $scope.teacherV.first_name + " " + $scope.teacherV.last_name;
             // then have to update teachers and lookup
             for (var i = 0; i < $scope.teachers.length; i++) {
                 if ($scope.teachers[i].id === $scope.teacherE.id) {
@@ -251,10 +258,16 @@
                     $scope.tUsername = "";
                     break;
                 case "firstname":
+                    // need to delete that lookup property
+                    delete $scope.teachersLookup[tempFullName];
+                    $scope.teacherViewSearch = newFullName;
                     $scope.viewTFirstName = true;
                     $scope.tFirstName = "";
                     break;
                 case "lastname":
+                    // need to delete that lookup property
+                    delete $scope.teachersLookup[tempFullName];
+                    $scope.teacherViewSearch = newFullName;
                     $scope.viewTLastName = true;
                     $scope.tLastName = "";
                     break;

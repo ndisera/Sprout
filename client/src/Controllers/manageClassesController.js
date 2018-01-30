@@ -205,19 +205,24 @@
         delete tempSection.id;
         var sectionPromise = sectionService.updateSection($scope.sectionE.id, tempSection);
         sectionPromise.then(function success(data) {
+            // save previous title in case it was changed
+            var tempTitle = $scope.sectionV.title.toUpperCase();
             // set sectionV to sectionE to reflect update
             $scope.sectionV = Object.assign({}, $scope.sectionE);
             // then have to update sections and lookup
             for (var i = 0; i < $scope.sections.length; i++) {
                 if ($scope.sections[i].id === $scope.sectionE.id) {
                     $scope.sections[i] = Object.assign({}, $scope.sectionE);
-                    var upper = $scope.sectionE.title;
+                    var upper = $scope.sectionE.title.toUpperCase();
                     $scope.sectionsLookup[upper] = Object.assign({}, $scope.sectionE);
                 }
             }
             switch (field) {
                 // set view after call returns
                 case "title":
+                    // need to delete that lookup property
+                    delete $scope.sectionsLookup[tempTitle];
+                    $scope.sectionViewSearch = $scope.sectionV.title;
                     $scope.viewCTitle = true;
                     $scope.cTitle = "";
                     break;
@@ -261,11 +266,13 @@
      * Hides the delete section search bar and displays its info with an option to delete.
      */
     $scope.displayDeleteSection = function () {
-        $scope.sectionD = $scope.sectionsLookup[$scope.sectionDeleteSearch.toUpperCase()];
-        $scope.displaySectionDeleteSearch = false;
-        $scope.displaySectionInfo = true;
-        $scope.clearSectionDeleteSearch();
-        sectionDSearchOrInfo = "info";
+        if ($scope.sectionDeleteSearch.toUpperCase() in $scope.sectionsLookup) {
+            $scope.sectionD = $scope.sectionsLookup[$scope.sectionDeleteSearch.toUpperCase()];
+            $scope.displaySectionDeleteSearch = false;
+            $scope.displaySectionInfo = true;
+            $scope.clearSectionDeleteSearch();
+            sectionDSearchOrInfo = "info";
+        }
     };
 
     /**
