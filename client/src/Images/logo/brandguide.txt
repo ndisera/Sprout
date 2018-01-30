@@ -1,5 +1,5 @@
 Main Font Font: ManifoldCF Thin
-Main Font Color: #000
+Main Font Color: #333333
 Slogan Font Font: Barkentina
 Slogan Font Color: #fff
 Monogram Font Font: ManifoldCF Thin

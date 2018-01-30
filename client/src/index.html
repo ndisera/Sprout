@@ -41,14 +41,16 @@
         <nav class="navbar navbar-inverse navbar-fixed-top" ng-show="user.auth" ng-cloak>
             <div class="container">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-target">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a href="#!/focus" class="navbar-left" ng-click="clearSearch()"><img id="sproutLogo" src="img/seeds-clipart-tree-sprout-6.png"></a>
+                    <a href="#!/focus" class="navbar-left" ng-click="clearSearch()">
+                        <img id="navbar-logo" src="img/logo/svg/color_logo_only_transparent.svg">
+                    </a>
                 </div>
-                <div class="collapse navbar-collapse" id="myNavbar">
+                <div class="collapse navbar-collapse" id="navbar-target">
                     <form class="navbar-form navbar-left" ng-submit="tryNavigateToStudent()">
                         <div class="input-group">
                             <input type="text" autocomplete="off" class="form-control" placeholder="Search Students" list="student" name="student" ng-model="studentName">
@@ -64,8 +66,8 @@
                     </form>
                     <ul class="nav navbar-nav navbar-right hidden-xs">
                         <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" id="profileDropdown">
-                                <img id="userPic" src="img/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
+                            <a class="dropdown-toggle" data-toggle="dropdown" id="navbar-profile-dropdown">
+                                <img id="navbar-user-pic" src="img/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
                                 <li ng-click="clearSearch()"><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
