@@ -70,7 +70,7 @@
                             <input required type="text" autocomplete="off" class="form-control" placeholder="{{teacherIdLookup[sectionV.teacher]}}" list="cteacher" name="cteacher" ng-model="cTeacher" ng-change="checkValidTeacher('edit')">
                             <datalist id="cteacher">
                                 <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
-                            </datalist>                            
+                            </datalist>
                             <div class="input-group-btn">
                                 <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTeacherForm.$invalid || !editValidTeacher">
                                     <i class="glyphicon glyphicon-ok green"></i>
@@ -85,6 +85,10 @@
                     </div>
                 </div>
             </form>
+            <!--<div ng-show="displayCEditInfo">
+                <hr />
+                <h4 col-sm-offset-1 col-sm-10>Students</h4>
+            </div>-->
             <form class="form-horizontal" name="addSectionForm" ng-show="displaySectionForm" ng-submit="addSection()">
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="ctitle2">Title:</label>
@@ -92,11 +96,6 @@
                         <input required autocomplete="off" type="text" class="form-control" id="ctitle2" placeholder="Enter Title" name="ctitle2" ng-model="newSection.title">
                     </div>
                 </div>
-
-
-
-
-                <!-- ng-model is supposed to be newSection.teacher, but this is going to be something different that maps to teacher id which will become newSection.teacher-->
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="cteacher2">Teacher:</label>
                     <div class="col-sm-9">
@@ -108,10 +107,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
-
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
                         <button ng-disabled="addSectionForm.$invalid || !addValidTeacher" type="submit" class="btn btn-success">Add</button>

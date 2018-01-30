@@ -145,6 +145,8 @@
             // make sure edit is still not displayed when switching
             $scope.viewCTitle = true;
             $scope.viewCTeacher = true;
+            // set enrolledStudents and unenrolledStudents
+
         }
         else {
             //TODO: notify the user in some way
@@ -205,6 +207,10 @@
         delete tempSection.id;
         var sectionPromise = sectionService.updateSection($scope.sectionE.id, tempSection);
         sectionPromise.then(function success(data) {
+            // need to see if same section is currently selected for delete and update if so
+            if ($scope.sectionE.id === $scope.sectionD.id) {
+                $scope.sectionD = Object.assign({}, $scope.sectionE);
+            }
             // save previous title in case it was changed
             var tempTitle = $scope.sectionV.title.toUpperCase();
             // set sectionV to sectionE to reflect update

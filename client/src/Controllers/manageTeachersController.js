@@ -236,6 +236,10 @@
         delete tempTeacher.id;
         var teacherPromise = teacherService.updateTeacher($scope.teacherE.id, tempTeacher);
         teacherPromise.then(function success(data) {
+            // need to see if same teacher is currently selected for delete and update if so
+            if ($scope.teacherE.id === $scope.teacherD.id) {
+                $scope.teacherD = Object.assign({}, $scope.teacherE);
+            }
             // save previous name in case it was changed
             var tempFirstName = $scope.teacherV.first_name.toUpperCase();
             var tempLastName = $scope.teacherV.last_name.toUpperCase();
