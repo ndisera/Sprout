@@ -4,6 +4,7 @@ var app = angular.module(
         "ngRoute", 
         "chart.js",
         "ngAnimate",
+        "datePicker",
     ]
 );
 
