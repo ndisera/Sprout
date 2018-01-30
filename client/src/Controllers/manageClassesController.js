@@ -25,11 +25,37 @@
     $scope.sectionD = {};
     $scope.newSection = {};
     $scope.sections = sections.sections;
+    $scope.teachers = teachers.teachers;
+    $scope.teachersLookup = {};
+    $scope.teacherIdLookup = {};
+    $scope.enrolledStudents = [];
+    $scope.unenrolledStudents = [];
+    $scope.addValidTeacher = false;
+    $scope.editValidTeacher = false;
 
     // create fast lookup sections dictionary
     for (var i = 0; i < $scope.sections.length; ++i) {
         var lookupName = $scope.sections[i].title;
         $scope.sectionsLookup[lookupName.toUpperCase()] = $scope.sections[i];
+    }
+
+    // create fast lookup teacher dictionary that will map to teacher id, and teacher id to teacher name and email
+    for (var i = 0; i < $scope.teachers.length; ++i) {
+        var lookupName = $scope.teachers[i].first_name + " " + $scope.teachers[i].last_name + " (" + $scope.teachers[i].email + ")";
+        $scope.teachersLookup[lookupName.toUpperCase()] = $scope.teachers[i].id;
+        $scope.teacherIdLookup[$scope.teachers[i].id] = lookupName;
+    }
+
+    $scope.checkValidTeacher = function (task) {
+        switch (task) {
+            case "add":
+                $scope.addValidTeacher = _.has($scope.teachersLookup, $scope.addTeacher.toUpperCase());
+                break;
+            case "edit":
+                $scope.editValidTeacher = _.has($scope.teachersLookup, $scope.cTeacher.toUpperCase());
+                break;
+            default:
+        }
     }
 
     /**
@@ -170,7 +196,7 @@
                 $scope.sectionE.title = $scope.cTitle;
                 break;
             case "teacher":
-                $scope.sectionE.teacher = $scope.cTeacher;
+                $scope.sectionE.teacher = $scope.teachersLookup[$scope.cTeacher.toUpperCase()];
                 break;
             default:
         }
@@ -210,8 +236,10 @@
      * Creates and adds a new section.
      */
     $scope.addSection = function () {
+        $scope.newSection.teacher = $scope.teachersLookup[$scope.addTeacher.toUpperCase()];
         var sectionPromise = sectionService.addSection($scope.newSection);
         sectionPromise.then(function success(data) {
+            $scope.addTeacher = "";
             $scope.newSection = {};
             $scope.addSectionSuccess = true;
             $("#addSectionSuccess").fadeTo(2000, 500).slideUp(500, function () {

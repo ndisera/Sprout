@@ -65,11 +65,14 @@
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="cteacher">Teacher:</label>
                     <div class="col-sm-9">
-                        <p class="form-control-static" ng-show="viewCTeacher">{{sectionV.teacher}}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('teacher')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                        <p class="form-control-static" ng-show="viewCTeacher">{{teacherIdLookup[sectionV.teacher]}}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('teacher')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
                         <div class="input-group" ng-hide="viewCTeacher">
-                            <input required autocomplete="off" type="text" class="form-control" id="cteacher" placeholder="{{sectionV.teacher}}" name="cteacher" ng-model="cTeacher">
+                            <input required type="text" autocomplete="off" class="form-control" placeholder="{{teacherIdLookup[sectionV.teacher]}}" list="cteacher" name="cteacher" ng-model="cTeacher" ng-change="checkValidTeacher('edit')">
+                            <datalist id="cteacher">
+                                <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
+                            </datalist>                            
                             <div class="input-group-btn">
-                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTeacherForm.$invalid">
+                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTeacherForm.$invalid || !editValidTeacher">
                                     <i class="glyphicon glyphicon-ok green"></i>
                                 </button>
                             </div>
@@ -89,15 +92,29 @@
                         <input required autocomplete="off" type="text" class="form-control" id="ctitle2" placeholder="Enter Title" name="ctitle2" ng-model="newSection.title">
                     </div>
                 </div>
+
+
+
+
+                <!-- ng-model is supposed to be newSection.teacher, but this is going to be something different that maps to teacher id which will become newSection.teacher-->
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="cteacher2">Teacher:</label>
                     <div class="col-sm-9">
-                        <input required autocomplete="off" type="text" class="form-control" id="cteacher2" placeholder="Enter Teacher" name="cteacher2" ng-model="newSection.teacher">
+                        <div class="input-group col-xs-12">
+                            <input required type="text" autocomplete="off" class="form-control" placeholder="Search Teachers" list="cteacher2" name="cteacher2" ng-model="addTeacher" ng-change="checkValidTeacher('add')">
+                            <datalist id="cteacher2">
+                                <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
+                            </datalist>
+                        </div>
                     </div>
                 </div>
+
+
+
+
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button ng-disabled="addSectionForm.$invalid" type="submit" class="btn btn-success">Add</button>
+                        <button ng-disabled="addSectionForm.$invalid || !addValidTeacher" type="submit" class="btn btn-success">Add</button>
                     </div>
                 </div>
             </form>
@@ -130,7 +147,7 @@
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="cteacher3">Teacher:</label>
                     <div class="col-sm-10">
-                        <p class="form-control-static" id="cteacher3">{{sectionD.teacher}}</p>
+                        <p class="form-control-static" id="cteacher3">{{teacherIdLookup[sectionD.teacher]}}</p>
                     </div>
                 </div>
                 <div class="form-group">
