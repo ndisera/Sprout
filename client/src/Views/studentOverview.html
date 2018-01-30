@@ -1,0 +1,210 @@
+﻿<div class="container">
+    <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
+        <li class="active"><a href="#!/student/{{student.id}}">Overview</a></li>
+        <li><a href="#!/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a href="#!/student/{{student.id}}/services">Services</a></li>
+        <li><a href="#!/student/{{student.id}}/grades">Grades</a></li>
+    </ul>
+    <ul class="nav nav-tabs hidden-xs">
+        <li class="active"><a href="#!/student/{{student.id}}">Overview</a></li>
+        <li><a href="#!/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a href="#!/student/{{student.id}}/services">Services</a></li>
+        <li><a href="#!/student/{{student.id}}/grades">Grades</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="overview" class="tab-pane fade in active voffset3">
+            <div class="row">
+                <div class="col-xs-12 col-sm-3">
+                    <div id="student-overview-pic">
+                        <img class="img-responsive" src="img/example_kid.jpeg">
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-5 center-block">
+                    <h2 id="student-overview-title">{{ student.first_name }} {{ student.last_name }}</h2>
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                    <div id="student-overview-assign-dropdown" class="input-group pull-right">
+                        <span class="input-group-addon">Assigned To</span>
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ caseManager }} <span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)">
+                                    <a class="student-overview-assign-link">{{ entry }}  <span ng-if="entry === caseManager" class="glyphicon glyphicon-ok"></span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel-wrapper">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title panel-title-with-btn">Student Info</h3>
+                                <button id="student-overview-edit-all-btn" class="btn btn-default pull-right" type="button" ng-click="beginEditStudent('all')" ng-hide="editingAll">
+                                    Edit All
+                                </button>
+                                <button id="student-overview-edit-all-btn" class="btn btn-default pull-right" type="button" ng-click="endEditStudent('all')" ng-show="editingAll">
+                                    Cancel All
+                                </button>
+                            </div>
+                            <div class="panel-body">
+                                <div ng-repeat="property in studentProperties">
+                                    <form class="form-horizontal" name="editStudentForm" ng-submit="saveStudent(property);">
+                                        <div class="form-group">
+                                            <label class="control-label col-xs-12 col-sm-3">{{ property.title }}:</label>
+                                            <p class="form-control-static col-xs-12 col-sm-9" ng-show="!property.editable">
+                                            {{ property.value }} &nbsp;&nbsp;&nbsp;
+                                            <span ng-click="beginEditStudent(property)" class="glyphicon glyphicon-pencil pencilEdit"></span>
+                                            </p>
+                                            <!--<div class="input-group" ng-show="!property.editable">-->
+                                            <!--<span class="input-group-addon student-overview-edit-label">{{ property.title }}</span>-->
+                                            <!--<input readonly type="text" class="form-control" ng-model="property.value">-->
+                                            <!--<div class="input-group-btn">-->
+                                            <!--<button class="btn btn-default" type="button" ng-click="beginEditStudent(property)">-->
+                                            <!--<span class="glyphicon glyphicon-pencil"></span>-->
+                                            <!--</button>-->
+                                            <!--</div>-->
+                                            <!--</div>-->
+                                            <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9" ng-show="property.editable">
+                                                <!--<span class="input-group-addon student-overview-edit-label">{{ property.title }}</span>-->
+                                                <input type="text" class="form-control" name="editStudentFormInput" ng-model="property.curValue">
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-default" type="submit">
+                                                        <span class="glyphicon glyphicon-ok green"></span>
+                                                    </button>
+                                                    <button class="btn btn-default" type="button" ng-click="endEditStudent(property)">
+                                                        <span class="glyphicon glyphicon-remove red"></span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel-wrapper">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Class Schedule</h3>
+                            </div>
+                            <!--<div class="panel-body">-->
+                            <!--<ul class="list-group">-->
+                            <!--<li ng-repeat="section in sections" class="list-group-item">-->
+                            <!--{{ section.title }} with {{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}-->
+                            <!--</li>-->
+                            <!--</ul>-->
+                            <!--</div>-->
+                            <table class="table">
+                                <tr>
+                                    <th>Period</th>
+                                    <th>Class Name</th>
+                                    <th>Teacher</th>
+                                </tr>
+                                <tr ng-repeat="section in sections">
+                                    <td>{{ section.id }}</td>
+                                    <td>{{ section.title }}</td>
+                                    <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--<form class="form-horizontal" name="editSFirstNameForm" ng-submit="saveSEdit('firstname')">-->
+                <!--<div class="form-group">-->
+                    <!--<label class="control-label col-sm-2" for="sfirstname">First Name:</label>-->
+                    <!--<div class="col-sm-9">-->
+                        <!--<p class="form-control-static" ng-show="viewSFirstName">{{student.first_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editStudent('firstname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>-->
+                        <!--<div class="input-group" ng-hide="viewSFirstName">-->
+                            <!--<input required autocomplete="off" type="text" class="form-control" id="sfirstname" placeholder="{{student.first_name}}" name="sfirstname" ng-model="sFirstName">-->
+                            <!--<div class="input-group-btn">-->
+                                <!--<button class="btn btn-default checkBtn" type="submit" ng-disabled="editSFirstNameForm.$invalid">-->
+                                    <!--<i class="glyphicon glyphicon-ok green"></i>-->
+                                <!--</button>-->
+                            <!--</div>-->
+                            <!--<div class="input-group-btn">-->
+                                <!--<button class="btn btn-default" type="button" ng-click="cancelSEdit('firstname')">-->
+                                    <!--<i class="glyphicon glyphicon-remove red"></i>-->
+                                <!--</button>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</form>-->
+            <!--<form class="form-horizontal" name="editSLastNameForm" ng-submit="saveSEdit('lastname')">-->
+                <!--<div class="form-group">-->
+                    <!--<label class="control-label col-sm-2" for="slastname">Last Name:</label>-->
+                    <!--<div class="col-sm-9">-->
+                        <!--<p class="form-control-static" ng-show="viewSLastName">{{student.last_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editStudent('lastname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>-->
+                        <!--<div class="input-group" ng-hide="viewSLastName">-->
+                            <!--<input required autocomplete="off" type="text" class="form-control" id="slastname" placeholder="{{student.last_name}}" name="tlastname" ng-model="sLastName">-->
+                            <!--<div class="input-group-btn">-->
+                                <!--<button class="btn btn-default checkBtn" type="submit" ng-disabled="editSLastNameForm.$invalid">-->
+                                    <!--<i class="glyphicon glyphicon-ok green"></i>-->
+                                <!--</button>-->
+                            <!--</div>-->
+                            <!--<div class="input-group-btn">-->
+                                <!--<button class="btn btn-default" type="button" ng-click="cancelSEdit('lastname')">-->
+                                    <!--<i class="glyphicon glyphicon-remove red"></i>-->
+                                <!--</button>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</form>-->
+            <!--<form class="form-horizontal" name="editSidForm" ng-submit="saveSEdit('sid')">-->
+                <!--<div class="form-group">-->
+                    <!--<label class="control-label col-sm-2" for="sid">Student ID:</label>-->
+                    <!--<div class="col-sm-9">-->
+                        <!--<p class="form-control-static" ng-show="viewSid">{{student.student_id}}&nbsp;&nbsp;&nbsp;<span ng-click="editStudent('sid')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>-->
+                        <!--<div class="input-group" ng-hide="viewSid">-->
+                            <!--<input required autocomplete="off" type="text" class="form-control" id="sid" placeholder="{{student.student_id}}" name="sid" ng-model="sId">-->
+                            <!--<div class="input-group-btn">-->
+                                <!--<button class="btn btn-default checkBtn" type="submit" ng-disabled="editSidForm.$invalid">-->
+                                    <!--<i class="glyphicon glyphicon-ok green"></i>-->
+                                <!--</button>-->
+                            <!--</div>-->
+                            <!--<div class="input-group-btn">-->
+                                <!--<button class="btn btn-default" type="button" ng-click="cancelSEdit('sid')">-->
+                                    <!--<i class="glyphicon glyphicon-remove red"></i>-->
+                                <!--</button>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</form>-->
+            <!--<form class="form-horizontal" name="editSBirthdayForm" ng-submit="saveSEdit('birthday')">-->
+                <!--<div class="form-group">-->
+                    <!--<label class="control-label col-sm-2" for="sbirthday">Birthday:</label>-->
+                    <!--<div class="col-sm-9">-->
+                        <!--<p class="form-control-static" ng-show="viewSBirthday">{{student.birthdate}}&nbsp;&nbsp;&nbsp;<span ng-click="editStudent('birthday')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>-->
+                        <!--<div class="input-group" ng-hide="viewSBirthday">-->
+                            <!--<input required autocomplete="off" type="text" class="form-control" id="sbirthday" placeholder="{{student.birthdate}}" name="sbirthday" ng-model="sBirthday">-->
+                            <!--<div class="input-group-btn">-->
+                                <!--<button class="btn btn-default checkBtn" type="submit" ng-disabled="editSBirthdayForm.$invalid">-->
+                                    <!--<i class="glyphicon glyphicon-ok green"></i>-->
+                                <!--</button>-->
+                            <!--</div>-->
+                            <!--<div class="input-group-btn">-->
+                                <!--<button class="btn btn-default" type="button" ng-click="cancelSEdit('birthday')">-->
+                                    <!--<i class="glyphicon glyphicon-remove red"></i>-->
+                                <!--</button>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</form>-->
+        </div>
+    </div>
+</div>
+</div>

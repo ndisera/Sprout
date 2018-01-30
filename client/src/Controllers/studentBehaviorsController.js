@@ -1,4 +1,4 @@
-app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, studentService, behaviorService, sectionService, enrollments, student) {
+app.controller("studentBehaviorsController", function ($scope, $rootScope, $location, $http, $routeParams, studentService, behaviorService, sectionService, enrollments, student) {
 
     // set important scope variables
     $scope.student = student.student;
