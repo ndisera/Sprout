@@ -1,4 +1,4 @@
-﻿app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
+app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
     return {
         /**
          * Get section

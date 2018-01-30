@@ -1,10 +1,5 @@
-﻿app.controller("focusStudentsController", function ($scope, $rootScope, $location, students) {
+app.controller("focusStudentsController", function ($scope, $rootScope, $location, students) {
 
-    // redirect user if not logged in
-    if (!JSON.parse(localStorage.getItem("loggedIn"))) {
-        location.path('');
-    }
-    
     $scope.students = students.students;
 
     // draggable 

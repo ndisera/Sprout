@@ -2,7 +2,9 @@
 from __future__ import unicode_literals
 import coreapi
 import coreschema
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from dynamic_rest.viewsets import DynamicModelViewSet
@@ -60,6 +62,7 @@ class TeacherViewSet(DynamicModelViewSet):
     """
     allows interaction with the set of "Teacher" instances
     """
+    permission_classes = (IsAuthenticated,)
     serializer_class = TeacherSerializer
     queryset = Teacher.objects.all()
 
@@ -67,6 +70,7 @@ class StudentViewSet(DynamicModelViewSet):
     """
     allows interaction with the set of "Student" instances
     """
+    permission_classes = (IsAuthenticated,)
     serializer_class = StudentSerializer
     queryset = Student.objects.all()
 
@@ -104,6 +108,7 @@ class SectionViewSet(DynamicModelViewSet):
     delete:
     deletes the existing section specified by the path param.
     """
+    permission_classes = (IsAuthenticated,)
     serializer_class = SectionSerializer
     queryset = Section.objects.all()
 
@@ -171,6 +176,7 @@ class EnrollmentViewSet(DynamicModelViewSet):
     delete:
     deletes the existing enrollment specified by the path param.
     """
+    permission_classes = (IsAuthenticated,)
     serializer_class = EnrollmentSerializer
     queryset = Enrollment.objects.all()
 
@@ -258,6 +264,7 @@ class BehaviorViewSet(DynamicModelViewSet):
     delete:
     deletes the existing behavior report specified by the path param.
     """
+    permission_classes = (IsAuthenticated,)
     serializer_class = BehaviorSerializer
     queryset = Behavior.objects.all()
 
@@ -292,15 +299,35 @@ class BehaviorViewSet(DynamicModelViewSet):
     )
 
 
+class AuthVerifyView(generics.RetrieveAPIView):
+    # If we ever add more authentication methods, this will need to be updated...
+    authentication_classes = (JSONWebTokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
+    def get(self, request, format=None):
+        """
+        Authentication-required noop to see if authentication tokens are valid
 
+        If the authentication is valid, return some successful status
 
+        If the authentication is invalid, return some authentication failure
+        """
+        response = {
+            'message': 'Token valid',
+        }
 
-
-
-
-
-
+        include_user = request.query_params.get('user', None)
+        print include_user
+        if include_user == 'true':
+            response['user'] = {
+                'username': request._user.username,
+                'email': request._user.email,
+                'first_name': request._user.first_name,
+                'last_name': request._user.last_name,
+                'id': request._user.id,
+            }
+            
+        return Response(data=response)
 
 
 
