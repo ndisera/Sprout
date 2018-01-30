@@ -54,7 +54,7 @@
             default:
         }
         // remove or set active property
-        setActiveButton('s', task);
+        setActiveButton(task);
     };
 
     /**
@@ -152,30 +152,29 @@
 
     /**
      * Leaves the most recently selected button active and removes the active class from the other buttons
-     * @param {string} st - 's' or 't' for student or teacher.
      * @param {string} task - the type of task selected.
      */
-    function setActiveButton(st, task) {
+    function setActiveButton(task) {
         if (task === 'view/edit') {
-            document.getElementById(st + 'ViewButton').classList.add('active');
-            document.getElementById(st + 'ViewButton2').classList.add('active');
+            document.getElementById('sViewButton').classList.add('active');
+            document.getElementById('sViewButton2').classList.add('active');
         } else {
-            document.getElementById(st + 'ViewButton').classList.remove('active');
-            document.getElementById(st + 'ViewButton2').classList.remove('active');
+            document.getElementById('sViewButton').classList.remove('active');
+            document.getElementById('sViewButton2').classList.remove('active');
         }
         if (task === 'add') {
-            document.getElementById(st + 'AddButton').classList.add('active');
-            document.getElementById(st + 'AddButton2').classList.add('active');
+            document.getElementById('sAddButton').classList.add('active');
+            document.getElementById('sAddButton2').classList.add('active');
         } else {
-            document.getElementById(st + 'AddButton').classList.remove('active');
-            document.getElementById(st + 'AddButton2').classList.remove('active');
+            document.getElementById('sAddButton').classList.remove('active');
+            document.getElementById('sAddButton2').classList.remove('active');
         }
         if (task === 'delete') {
-            document.getElementById(st + 'DeleteButton').classList.add('active');
-            document.getElementById(st + 'DeleteButton2').classList.add('active');
+            document.getElementById('sDeleteButton').classList.add('active');
+            document.getElementById('sDeleteButton2').classList.add('active');
         } else {
-            document.getElementById(st + 'DeleteButton').classList.remove('active');
-            document.getElementById(st + 'DeleteButton2').classList.remove('active');
+            document.getElementById('sDeleteButton').classList.remove('active');
+            document.getElementById('sDeleteButton2').classList.remove('active');
         }
     }
 

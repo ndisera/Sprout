@@ -40,6 +40,23 @@ app.config(function ($routeProvider) {
             }
         })
 
+        // route for the manage classes page
+        .when('/manageclasses', {
+            templateUrl: 'html/manageClasses.html',
+            controller: 'manageClassesController',
+            resolve: {
+                students: function (studentService) {
+                    return studentService.getStudents();
+                },
+                teachers: function (teacherService) {
+                    return teacherService.getTeachers();
+                },
+                sections: function (sectionService) {
+                    return sectionService.getSections();
+                }
+            }
+        })
+
         // route for the settings page
         .when('/settings', {
             templateUrl: 'html/settings.html',

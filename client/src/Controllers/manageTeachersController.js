@@ -17,7 +17,6 @@
     $scope.viewTEmail = true;
     $scope.addTeacherSuccess = false;
     $scope.deleteTeacherSuccess = false;
-    $scope.teachers = teachers;
     $scope.teachersLookup = {};
     $scope.teacherV = {};
     $scope.teacherE = {};
@@ -73,7 +72,7 @@
             default:
         }
         // remove or set active property
-        setActiveButton('t', task);
+        setActiveButton(task);
     };
 
     /**
@@ -237,7 +236,7 @@
         teacherPromise.then(function success(data) {
             // set teacherV to teacherE to reflect update
             $scope.teacherV = Object.assign({}, $scope.teacherE);
-            // then have to update teachers and lookup but I'll have them all point to teacherService teachers
+            // then have to update teachers and lookup
             for (var i = 0; i < $scope.teachers.length; i++) {
                 if ($scope.teachers[i].id === $scope.teacherE.id) {
                     $scope.teachers[i] = Object.assign({}, $scope.teacherE);
@@ -312,30 +311,29 @@
 
     /**
      * Leaves the most recently selected button active and removes the active class from the other buttons
-     * @param {string} st - 's' or 't' for student or teacher.
      * @param {string} task - the type of task selected.
      */
-    function setActiveButton(st, task) {
+    function setActiveButton(task) {
         if (task === 'view/edit') {
-            document.getElementById(st + 'ViewButton').classList.add('active');
-            document.getElementById(st + 'ViewButton2').classList.add('active');
+            document.getElementById('tViewButton').classList.add('active');
+            document.getElementById('tViewButton2').classList.add('active');
         } else {
-            document.getElementById(st + 'ViewButton').classList.remove('active');
-            document.getElementById(st + 'ViewButton2').classList.remove('active');
+            document.getElementById('tViewButton').classList.remove('active');
+            document.getElementById('tViewButton2').classList.remove('active');
         }
         if (task === 'add') {
-            document.getElementById(st + 'AddButton').classList.add('active');
-            document.getElementById(st + 'AddButton2').classList.add('active');
+            document.getElementById('tAddButton').classList.add('active');
+            document.getElementById('tAddButton2').classList.add('active');
         } else {
-            document.getElementById(st + 'AddButton').classList.remove('active');
-            document.getElementById(st + 'AddButton2').classList.remove('active');
+            document.getElementById('tAddButton').classList.remove('active');
+            document.getElementById('tAddButton2').classList.remove('active');
         }
         if (task === 'delete') {
-            document.getElementById(st + 'DeleteButton').classList.add('active');
-            document.getElementById(st + 'DeleteButton2').classList.add('active');
+            document.getElementById('tDeleteButton').classList.add('active');
+            document.getElementById('tDeleteButton2').classList.add('active');
         } else {
-            document.getElementById(st + 'DeleteButton').classList.remove('active');
-            document.getElementById(st + 'DeleteButton2').classList.remove('active');
+            document.getElementById('tDeleteButton').classList.remove('active');
+            document.getElementById('tDeleteButton2').classList.remove('active');
         }
     }
 

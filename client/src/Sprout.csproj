@@ -104,6 +104,7 @@
     <Content Include="Controllers\manageCasesController.js" />
     <Content Include="Controllers\focusStudentsController.js" />
     <Content Include="Controllers\mainController.js" />
+    <Content Include="Controllers\manageClassesController.js" />
     <Content Include="Controllers\manageStudentsController.js" />
     <Content Include="Controllers\manageTeachersController.js" />
     <Content Include="Controllers\scoresInputController.js" />
@@ -150,6 +151,7 @@
     <Content Include="Services\teacherService.js" />
     <Content Include="Views\focusStudents.html" />
     <Content Include="Views\manageCases.html" />
+    <Content Include="Views\manageClasses.html" />
     <Content Include="Views\manageStudents.html" />
     <Content Include="Views\manageTeachers.html" />
     <Content Include="Views\scoresInput.html" />
