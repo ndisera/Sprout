@@ -22,16 +22,64 @@ app.config(function ($routeProvider, $httpProvider) {
             controller: 'loginController',
         })
 
-        // route for the admin(manage) page
-        .when('/manage', {
-            templateUrl: 'html/manage.html',
-            controller: 'manageController',
+        // route for the manage students page
+        .when('/managestudents', {
+            templateUrl: 'html/manageStudents.html',
+            controller: 'manageStudentsController',
+            resolve: {
+                students: function (studentService) {
+                    return studentService.getStudents();
+                },
+                auth: function (userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+
+        // route for the manage teachers page
+        .when('/manageteachers', {
+            templateUrl: 'html/manageTeachers.html',
+            controller: 'manageTeachersController',
+            resolve: {
+                teachers: function (teacherService) {
+                    return teacherService.getTeachers();
+                },
+                auth: function (userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+
+        // route for the manage (cases) page
+        .when('/managecases', {
+            templateUrl: 'html/manageCases.html',
+            controller: 'manageCasesController',
             resolve: {
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
                 teachers: function (teacherService) {
                     return teacherService.getTeachers();
+                },
+                auth: function (userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+
+        // route for the manage classes page
+        .when('/manageclasses', {
+            templateUrl: 'html/manageClasses.html',
+            controller: 'manageClassesController',
+            resolve: {
+                students: function (studentService) {
+                    return studentService.getStudents();
+                },
+                teachers: function (teacherService) {
+                    return teacherService.getTeachers();
+                },
+                sections: function (sectionService) {
+                    return sectionService.getSections();
                 },
                 auth: function(userService) {
                     return userService.authVerify();
@@ -55,7 +103,7 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/focusStudents.html',
             controller: 'focusStudentsController',
             resolve: {
-                students: function(studentService) {
+                students: function (studentService) {
                     return studentService.getStudents();
                 },
                 auth: function(userService) {
@@ -114,15 +162,15 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/studentBehaviors.html',
             controller: 'studentBehaviorsController',
             resolve: {
-                enrollments: function(enrollmentService, $route) {
+                enrollments: function (enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
                         { 
                             include: ['section.*'],
-                            filter: [{ name: 'student', val: $route.current.params.id },],
+                            filter: [{ name: 'student', val: $route.current.params.id }, ],
                         }
                     );
                 },
-                student: function(studentService, $route) {
+                student: function (studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
                 auth: function(userService) {

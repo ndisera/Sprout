@@ -29,6 +29,9 @@ router.register('students', viewset=StudentViewSet, base_name='Students')
 router.register('sections', viewset=SectionViewSet, base_name='Sections')
 router.register('enrollments', viewset=EnrollmentViewSet, base_name='Enrollments')
 router.register('behaviors', viewset=BehaviorViewSet, base_name='Behaviors')
+router.register('standarized_tests', viewset=StandardizedTestViewSet, base_name='StandardizedTests')
+router.register('standarized_test_scores', viewset=StandardizedTestScoreViewSet, base_name='StandardizedTestScores')
+router.register('grades', viewset=GradeViewSet, base_name='Grades')
 
 urlpatterns = router.urls
 urlpatterns.append(url(r'^docs/', include_docs_urls(title='Sprout API', public=False)))

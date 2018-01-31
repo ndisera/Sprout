@@ -97,7 +97,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         $http({
             method: 'POST',
             url: 'https://' + $rootScope.backend + '/students',
-            data: studentObj
+            data: studentObj,
         }).then(function success(response) {
             refreshStudents().then(function success(data) {
                 deferred.resolve(response.data);
@@ -119,7 +119,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         $http({
             method: 'PUT',
             url: 'https://' + $rootScope.backend + '/students/' + studentId,
-            data: studentObj
+            data: studentObj,
         }).then(function success(response) {
             refreshStudents().then(function success(data) {
                 deferred.resolve(response.data);
@@ -138,6 +138,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         var deferred = $q.defer();
         getStudents().then(function success(data) {
             studentInfo.students = data.students;
+            studentInfo.studentsLookup = {};
             for (var i = 0; i < studentInfo.students.length; ++i) {
                 var lookupName = studentInfo.students[i].first_name + " " + studentInfo.students[i].last_name;
                 studentInfo.studentsLookup[lookupName.toUpperCase()] = studentInfo.students[i];
@@ -157,6 +158,6 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         refreshStudents: refreshStudents,
         addStudent: addStudent,
         updateStudent: updateStudent,
-        deleteStudent: deleteStudent
+        deleteStudent: deleteStudent,
     };
 });
