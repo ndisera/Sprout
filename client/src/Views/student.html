@@ -1,7 +1,7 @@
 ﻿<div class="container">
     <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
         <li class="active"><a data-toggle="tab" data-target="#overview" ng-click="setActivePillAndTab('overview')">Overview</a></li>
-        <li><a data-toggle="tab" data-target="#tests" ng-click="setActivePillAndTab('tests')">Test Scores</a></li>
+        <li><a data-toggle="tab" data-target="#tests" ng-click="getTestScores(); setActivePillAndTab('tests')">Test Scores</a></li>
         <li><a data-toggle="tab" data-target="#behavior" ng-click="getBehaviors(); setActivePillAndTab('behavior')">Behavior</a></li>
         <li><a data-toggle="tab" data-target="#goals" ng-click="setActivePillAndTab('goals')">IEP Goals</a></li>
         <li><a data-toggle="tab" data-target="#services" ng-click="setActivePillAndTab('services')">Services</a></li>
@@ -9,7 +9,7 @@
     </ul>
     <ul class="nav nav-tabs hidden-xs">
         <li class="active"><a data-toggle="tab" data-target="#overview" ng-click="setActivePillAndTab('overview')">Overview</a></li>
-        <li><a data-toggle="tab" data-target="#tests" ng-click="setActivePillAndTab('tests')">Test Scores</a></li>
+        <li><a data-toggle="tab" data-target="#tests" ng-click="getTestScores(); setActivePillAndTab('tests')">Test Scores</a></li>
         <li><a data-toggle="tab" data-target="#behavior" ng-click="getBehaviors(); setActivePillAndTab('behavior')">Behavior</a></li>
         <li><a data-toggle="tab" data-target="#goals" ng-click="setActivePillAndTab('goals')">IEP Goals</a></li>
         <li><a data-toggle="tab" data-target="#services" ng-click="setActivePillAndTab('services')">Services</a></li>
@@ -118,9 +118,16 @@
         <div id="tests" class="tab-pane fade">
             <h3 class="studentHeader">Test Scores</h3>
             <hr />
+            <!--Todo: add test scores display-->
+            <div class="">
+
+            </div>
+
+
         </div>
         <div id="behavior" class="tab-pane fade">
             <h3>Behavior</h3>
+            <!--<h4>derp{{student.firstName}}</h4>  todo: mark the page as belonging to a student somehow-->
             <hr />
             <div class="container-fluid">
                 <div class="row">

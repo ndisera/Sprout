@@ -163,7 +163,7 @@ app.config(function ($routeProvider, $httpProvider) {
      *  Convenience variable - Combine backendHostname and backendPort in a manner which
      *  they will often be used
      */
-    $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort
+    $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort;
 
     /**
      * Define where the auth token will be in local storage
