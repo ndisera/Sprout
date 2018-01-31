@@ -1,111 +1,31 @@
-﻿app.controller("manageController", function ($scope, $rootScope, $location, students, teachers, studentService, teacherService) {
+﻿app.controller("manageTeachersController", function ($scope, $rootScope, $location, teachers, teacherService) {
+
     var teacherTask = "view/edit";
-    var studentTask = "view/edit";
     var teacherVSearchOrInfo = "search";
     var teacherDSearchOrInfo = "search";
-    var studentDSearchOrInfo = "search";
-
-    $scope.displayStudentViewSearch = true;
-    $scope.displayStudentDeleteSearch = false;
-    $scope.displayStudentForm = false;
     $scope.displayTeacherViewSearch = true;
     $scope.displayTeacherDeleteSearch = false;
     $scope.displayTeacherForm = false;
-    $scope.displayStudentInfo = false;
     $scope.displayTeacherInfo = false;
     $scope.displayTEditInfo = false;
-
     $scope.viewTUsername = true;
     $scope.viewTFirstName = true;
     $scope.viewTLastName = true;
     $scope.viewTEmail = true;
-
-    $scope.addStudentSuccess = false;
     $scope.addTeacherSuccess = false;
-    $scope.deleteStudentSuccess = false;
     $scope.deleteTeacherSuccess = false;
-
-    $scope.studentInfo = studentService.studentInfo;
-
-    $scope.teachers = teachers;
     $scope.teachersLookup = {};
     $scope.teacherV = {};
     $scope.teacherE = {};
-    $scope.studentD = {};
     $scope.teacherD = {};
     $scope.newTeacher = {};
-    $scope.newStudent = {};
-
     $scope.teachers = teachers.teachers;
+
     // create fast lookup teacher dictionary
     for (var i = 0; i < $scope.teachers.length; ++i) {
         var lookupName = $scope.teachers[i].first_name + " " + $scope.teachers[i].last_name;
         $scope.teachersLookup[lookupName.toUpperCase()] = $scope.teachers[i];
     }
-
-    /**
-     * Set the active tab and pill based on selection of one or the other
-     * @param {string} name - the target of the tab selected.
-     */
-    $scope.setActivePillAndTab = function (name) {
-        switch (name) {
-            case "casemanagers":
-                $('.nav-tabs a[data-target="#overview"]').tab('casemanagers');
-                $('.nav-pills a[data-target="#overview"]').tab('casemanagers');
-                break;
-            case "teachers":
-                $('.nav-tabs a[data-target="#tests"]').tab('teachers');
-                $('.nav-pills a[data-target="#tests"]').tab('teachers');
-                break;
-            case "students":
-                $('.nav-tabs a[data-target="#behavior"]').tab('students');
-                $('.nav-pills a[data-target="#behavior"]').tab('students');
-                break;
-            default:
-        }
-    };
-
-    /**
-     * Display search or form depending on the student task selected and set the active button
-     * @param {string} task - the type of task selected.
-     */
-    $scope.changeStudentTask = function (task) {
-        switch (studentTask) {
-            case "view/edit":
-                $scope.displayStudentViewSearch = false;
-                break;
-            case "delete":
-                $scope.displayStudentInfo = false;
-                $scope.displayStudentDeleteSearch = false;
-                $scope.deleteStudentSuccess = false;
-                break;
-            case "add":
-                $scope.displayStudentForm = false;
-                $scope.addStudentSuccess = false;
-                break;
-            default:
-        }
-        // set to new task
-        studentTask = task;
-        switch (task) {
-            case "view/edit":
-                $scope.displayStudentViewSearch = true;
-                break;
-            case "delete":
-                if (studentDSearchOrInfo === "search") {
-                    $scope.displayStudentDeleteSearch = true;
-                } else {
-                    $scope.displayStudentInfo = true;
-                }
-                break;
-            case "add":
-                $scope.displayStudentForm = true;
-                break;
-            default:
-        }
-        // remove or set active property
-        setActiveButton('s', task);
-    };
 
     /**
      * Display search or form depending on the teacher task selected and set the active button
@@ -149,49 +69,7 @@
             default:
         }
         // remove or set active property
-        setActiveButton('t', task);
-    };
-
-    /**
-     * Leaves the most recently selected button active and removes the active class from the other buttons
-     * @param {string} st - 's' or 't' for student or teacher.
-     * @param {string} task - the type of task selected.
-     */
-    function setActiveButton(st, task) {
-        if (task === 'view/edit') {
-            document.getElementById(st + 'ViewButton').classList.add('active');
-            document.getElementById(st + 'ViewButton2').classList.add('active');
-        } else {
-            document.getElementById(st + 'ViewButton').classList.remove('active');
-            document.getElementById(st + 'ViewButton2').classList.remove('active');
-        }
-        if (task === 'add') {
-            document.getElementById(st + 'AddButton').classList.add('active');
-            document.getElementById(st + 'AddButton2').classList.add('active');
-        } else {
-            document.getElementById(st + 'AddButton').classList.remove('active');
-            document.getElementById(st + 'AddButton2').classList.remove('active');
-        }
-        if (task === 'delete') {
-            document.getElementById(st + 'DeleteButton').classList.add('active');
-            document.getElementById(st + 'DeleteButton2').classList.add('active');
-        } else {
-            document.getElementById(st + 'DeleteButton').classList.remove('active');
-            document.getElementById(st + 'DeleteButton2').classList.remove('active');
-        }
-    }
-
-    /**
-     * Navigates to student's page if name in navigation search bar is valid.
-     */
-    $scope.viewStudent = function () {
-        if ($scope.studentViewSearch.toUpperCase() in $scope.studentInfo.studentsLookup) {
-            $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentViewSearch.toUpperCase()].id);
-            return;
-        }
-        else {
-            //TODO: notify the user in some way
-        }
+        setActiveButton(task);
     };
 
     /**
@@ -229,24 +107,12 @@
             $scope.teachers.push(data.teacher);
             var lookupName = data.teacher.first_name + " " + data.teacher.last_name;
             $scope.teachersLookup[lookupName.toUpperCase()] = data.teacher;
-        }, function error(message) {
-            $scope.status = message;
-        });
-    };
-
-    /**
-     * Creates and adds a new student.
-     */
-    $scope.addStudent = function () {
-        var studentPromise = studentService.addStudent($scope.newStudent);
-        studentPromise.then(function success(data) {
-            $scope.newStudent = {};
-            $scope.addStudentSuccess = true;
-            $("#addStudentSuccess").fadeTo(2000, 500).slideUp(500, function () {
-                $("#addStudentSuccess").slideUp(500);
+        }, function error(response) {
+            setErrorMessage(response);
+            $scope.addTeacherFailure = true;
+            $("#addTeacherFailure").fadeTo(5000, 500).slideUp(500, function () {
+                $("#addTeacherFailure").slideUp(500);
             });
-        }, function error(message) {
-            $scope.status = message;
         });
     };
 
@@ -254,22 +120,13 @@
      * Hides the delete teacher search bar and displays their info with an option to delete.
      */
     $scope.displayDeleteTeacher = function () {
-        $scope.teacherD = $scope.teachersLookup[$scope.teacherDeleteSearch.toUpperCase()];
-        $scope.displayTeacherDeleteSearch = false;
-        $scope.displayTeacherInfo = true;
-        $scope.clearTeacherViewSearch();
-        teacherDSearchOrInfo = "info";
-    };
-
-    /**
-     * Hides the delete student search bar and displays their info with an option to delete.
-     */
-    $scope.displayDeleteStudent = function () {
-        $scope.studentD = $scope.studentInfo.studentsLookup[$scope.studentDeleteSearch.toUpperCase()];
-        $scope.displayStudentDeleteSearch = false;
-        $scope.displayStudentInfo = true;
-        $scope.clearStudentViewSearch();
-        studentDSearchOrInfo = "info";
+        if ($scope.teacherDeleteSearch.toUpperCase() in $scope.teachersLookup) {
+            $scope.teacherD = $scope.teachersLookup[$scope.teacherDeleteSearch.toUpperCase()];
+            $scope.displayTeacherDeleteSearch = false;
+            $scope.displayTeacherInfo = true;
+            $scope.clearTeacherDeleteSearch();
+            teacherDSearchOrInfo = "info";
+        }
     };
 
     /**
@@ -308,28 +165,12 @@
                 $scope.tLastName = "";
                 $scope.tEmail = "";
             }
-        }, function error(message) {
-            $scope.status = message;
-        });
-    };
-
-    /**
-     * Deletes the selected student from the database.
-     */
-    $scope.deleteStudent = function () {
-        var studentPromise = studentService.deleteStudent($scope.studentD.id);
-        studentPromise.then(function success(data) {
-            $scope.studentD = {};
-            $scope.deleteStudentSuccess = true;
-            $("#deleteStudentSuccess").fadeTo(2000, 500).slideUp(500, function () {
-                $("#deleteStudentSuccess").slideUp(500);
+        }, function error(response) {
+            setErrorMessage(response);
+            $scope.deleteTeacherFailure = true;
+            $("#deleteTeacherFailure").fadeTo(5000, 500).slideUp(500, function () {
+                $("#deleteTeacherFailure").slideUp(500);
             });
-            $scope.displayStudentDeleteSearch = true;
-            $scope.displayStudentInfo = false;
-            studentDSearchOrInfo = "search";
-            $scope.studentDeleteSearch = "";
-        }, function error(message) {
-            $scope.status = message;
         });
     };
 
@@ -341,17 +182,6 @@
         $scope.displayTeacherDeleteSearch = true;
         $scope.displayTeacherInfo = false;
         $scope.teacherD = {};
-        teacherDSearchOrInfo = "search";
-    };
-
-    /**
-     * Restores the delete student search box and hides their info and delete option.
-     */
-    $scope.cancelDeleteStudent = function () {
-        $scope.clearStudentDeleteSearch();
-        $scope.displayStudentDeleteSearch = true;
-        $scope.displayStudentInfo = false;
-        $scope.studentD = {};
         teacherDSearchOrInfo = "search";
     };
 
@@ -376,7 +206,6 @@
             default:
         }
     };
-
 
     /**
      * Updates the selected Teacher with the newly edited field.
@@ -404,9 +233,18 @@
         delete tempTeacher.id;
         var teacherPromise = teacherService.updateTeacher($scope.teacherE.id, tempTeacher);
         teacherPromise.then(function success(data) {
+            // need to see if same teacher is currently selected for delete and update if so
+            if ($scope.teacherE.id === $scope.teacherD.id) {
+                $scope.teacherD = Object.assign({}, $scope.teacherE);
+            }
+            // save previous name in case it was changed
+            var tempFirstName = $scope.teacherV.first_name.toUpperCase();
+            var tempLastName = $scope.teacherV.last_name.toUpperCase();
+            var tempFullName = tempFirstName + " " + tempLastName
             // set teacherV to teacherE to reflect update
             $scope.teacherV = Object.assign({}, $scope.teacherE);
-            // then have to update teachers and lookup but I'll have them all point to teacherService teachers
+            var newFullName = $scope.teacherV.first_name + " " + $scope.teacherV.last_name;
+            // then have to update teachers and lookup
             for (var i = 0; i < $scope.teachers.length; i++) {
                 if ($scope.teachers[i].id === $scope.teacherE.id) {
                     $scope.teachers[i] = Object.assign({}, $scope.teacherE);
@@ -421,10 +259,16 @@
                     $scope.tUsername = "";
                     break;
                 case "firstname":
+                    // need to delete that lookup property
+                    delete $scope.teachersLookup[tempFullName];
+                    $scope.teacherViewSearch = newFullName;
                     $scope.viewTFirstName = true;
                     $scope.tFirstName = "";
                     break;
                 case "lastname":
+                    // need to delete that lookup property
+                    delete $scope.teachersLookup[tempFullName];
+                    $scope.teacherViewSearch = newFullName;
                     $scope.viewTLastName = true;
                     $scope.tLastName = "";
                     break;
@@ -434,8 +278,8 @@
                     break;
                 default:
             }
-        }, function error(message) {
-            $scope.status = message;
+        }, function error(response) {
+            setErrorMessage(response);
         });
     };
 
@@ -466,20 +310,6 @@
     };
 
     /**
-     * Clears the view student search bar.
-     */
-    $scope.clearStudentViewSearch = function () {
-        $scope.studentViewSearch = "";
-    };
-
-    /**
-     * Clears the delete student search bar.
-     */
-    $scope.clearStudentDeleteSearch = function () {
-        $scope.studentDeleteSearch = "";
-    };
-
-    /**
      * Clears the view teacher search bar.
      */
     $scope.clearTeacherViewSearch = function () {
@@ -492,4 +322,44 @@
     $scope.clearTeacherDeleteSearch = function () {
         $scope.teacherDeleteSearch = "";
     };
-});
+
+    /**
+     * Leaves the most recently selected button active and removes the active class from the other buttons
+     * @param {string} task - the type of task selected.
+     */
+    function setActiveButton(task) {
+        if (task === 'view/edit') {
+            document.getElementById('tViewButton').classList.add('active');
+            document.getElementById('tViewButton2').classList.add('active');
+        } else {
+            document.getElementById('tViewButton').classList.remove('active');
+            document.getElementById('tViewButton2').classList.remove('active');
+        }
+        if (task === 'add') {
+            document.getElementById('tAddButton').classList.add('active');
+            document.getElementById('tAddButton2').classList.add('active');
+        } else {
+            document.getElementById('tAddButton').classList.remove('active');
+            document.getElementById('tAddButton2').classList.remove('active');
+        }
+        if (task === 'delete') {
+            document.getElementById('tDeleteButton').classList.add('active');
+            document.getElementById('tDeleteButton2').classList.add('active');
+        } else {
+            document.getElementById('tDeleteButton').classList.remove('active');
+            document.getElementById('tDeleteButton2').classList.remove('active');
+        }
+    }
+
+    function setErrorMessage(response) {
+        $scope.errorMessage = [];
+        for (var property in response.data) {
+            if (response.data.hasOwnProperty(property)) {
+                for (var i = 0; i < response.data[property].length; i++) {
+                    $scope.errorMessage.push(response.data[property][i]);
+                }
+            }
+        }
+        $scope.errorMessage = $scope.errorMessage.join(" ");
+    }
+})
