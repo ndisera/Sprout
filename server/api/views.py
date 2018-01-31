@@ -299,6 +299,139 @@ class BehaviorViewSet(DynamicModelViewSet):
     )
 
 
+class StandardizedTestViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    StandardizedTestViewSet class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(StandardizedTestViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(StandardizedTestViewSet, path, method, link)
+
+
+class StandardizedTestViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "StandardizedTests" instances
+
+    list:
+    gets all the configured standardized tests in Sprout.
+
+    create:
+    inform Sprout about a new standardized test. requires a name and minimum and maximum score
+
+    retrieve:
+    gets the standardized test specified by the id path param.
+
+    update:
+    update the parameters of a recorded standardized test
+
+    partial_update:
+    update the parameters of a recorded standardized test specified by path param.
+    does not require all values.
+
+    delete:
+    delete a specified standardized test specified by the path param.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = StandardizedTestSerializer
+    queryset = StandardizedTest.objects.all()
+
+    """ define custom schema for documentation """
+    schema = StandardizedTestViewSetSchema()
+
+
+class StandardizedTestScoreViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    StandardizedTestScoreViewSet class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(StandardizedTestScoreViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(StandardizedTestScoreViewSet, path, method, link)
+
+
+class StandardizedTestScoreViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "StandardizedTestScore" instances
+
+    list:
+    gets all the standardized test score reports in Sprout.
+
+    create:
+    creates a new standardized test score report. requires a date, standardized_test id, and a score
+
+    retrieve:
+    gets the behavior report specified by the id path param.
+
+    update:
+    updates an existing standardized test score report specified by the id path param.
+    requires a date, standardized_test id, and a score
+
+    partial_update:
+    updates an existing standardized test score report specified by the id path param.
+    does not require all values.
+
+    delete:
+    deletes the existing standardized test score report specified by the path param.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = StandardizedTestScoreSerializer
+    queryset = Behavior.objects.all()
+
+    """ define custom schema for documentation """
+    schema = StandardizedTestScoreViewSetSchema()
+
+    """ ensure variables show as correct type for docs """
+    name_student = 'student'
+    desc_student = 'ID of the graded student'
+    name_standardized_test = 'standardized_test'
+    desc_standardized_test = 'ID of the related standardized test'
+    create_fields = (
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=desc_student)),
+
+        coreapi.Field(
+            name=name_standardized_test,
+            required=True,
+            location="form",
+            description=desc_standardized_test,
+            schema=coreschema.Integer(title=desc_standardized_test)),
+    )
+    update_fields = (
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=desc_student)),
+
+        coreapi.Field(
+            name=name_standardized_test,
+            required=True,
+            location="form",
+            description=desc_standardized_test,
+            schema=coreschema.Integer(title=desc_standardized_test)),
+    )
+    partial_update_fields = (
+        coreapi.Field(
+            name=name_student,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=desc_student)),
+
+        coreapi.Field(
+            name=name_standardized_test,
+            required=True,
+            location="form",
+            description=desc_standardized_test,
+            schema=coreschema.Integer(title=desc_standardized_test)),
+    )
+
+
 class AuthVerifyView(generics.RetrieveAPIView):
     # If we ever add more authentication methods, this will need to be updated...
     authentication_classes = (JSONWebTokenAuthentication,)
@@ -328,8 +461,3 @@ class AuthVerifyView(generics.RetrieveAPIView):
             }
             
         return Response(data=response)
-
-
-
-
-
