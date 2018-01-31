@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 from django.db import models
 
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 DEFAULT_MAX_LENGTH = 100
 
 class Teacher(models.Model):
@@ -100,3 +102,22 @@ class StandardizedTestScore(models.Model):
     class Meta:
         unique_together = (('standardized_test', 'date'),)
         ordering = ('date',)
+
+class Grade(models.Model):
+    """
+    Grade
+    Represent a student grade report
+    """
+    enrollment = models.ForeignKey(Enrollment, related_name='grade_enrollment',
+                                   verbose_name="Enrollment which this grade belongs to")
+    assignment_name = models.CharField(unique=True, max_length=DEFAULT_MAX_LENGTH)
+    percent = models.IntegerField(verbose_name="Grade from 0-100", blank=False,
+                                  validators=[MinValueValidator(0), MaxValueValidator(100),])
+    due_date = models.DateField(blank=False,)
+    database_date = models.DateField(verbose_name="Date this grade was entered into Sprout",
+                                     auto_now_add=True,
+                                     blank=False)
+
+    class Meta:
+        unique_together = (('enrollment', 'assignment_name', 'due_date'),)
+        ordering = ('due_date',)
