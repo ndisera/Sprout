@@ -4,12 +4,33 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     $scope.studentInfo = studentService.studentInfo;
 
     /**
+     * Toggles navbar if it isn't collapsed and has a window width < 768px
+     */
+    $scope.closeNavbar = function () {
+        if ($(".navbar-toggle").hasClass("collapsed")) {
+            // Closed
+        } else {
+            // Open
+            if (window.innerWidth < 768) {
+                $('.btn-navbar').click(); //bootstrap 2.x
+                $('.navbar-toggle').click() //bootstrap 3.x by Richard
+            }
+        }
+    }
+
+    // closes navbar when an element is clicked in tablet/mobile view
+    $('.nav a').on('click', function () {
+        $scope.closeNavbar();
+    });
+
+    /**
      * Navigates to student's page if name in navigation search bar is valid.
      */
     $scope.tryNavigateToStudent = function() {
         if ($scope.studentName.toUpperCase() in $scope.studentInfo.studentsLookup) {
             $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentName.toUpperCase()].id);
-            return;
+            $scope.clearSearch();
+            $scope.closeNavbar();
         }
         else {
             //TODO: notify the user in some way
