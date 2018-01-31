@@ -376,7 +376,7 @@ class StandardizedTestScoreViewSet(DynamicModelViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = StandardizedTestScoreSerializer
-    queryset = Behavior.objects.all()
+    queryset = StandardizedTestScore.objects.all()
 
     """ define custom schema for documentation """
     schema = StandardizedTestScoreViewSetSchema()
