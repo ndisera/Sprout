@@ -127,7 +127,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         }, function error(response) {
             deferred.reject(response);
         });
-        return deferrred.promise;
+        return deferred.promise;
     }
 
     /**

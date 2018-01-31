@@ -101,6 +101,7 @@
     <Content Include="Content\login.css" />
     <Content Include="Content\manage.css" />
     <Content Include="Content\student.css" />
+    <Content Include="Controllers\loginController.js" />
     <Content Include="Controllers\manageCasesController.js" />
     <Content Include="Controllers\focusStudentsController.js" />
     <Content Include="Controllers\mainController.js" />
@@ -146,9 +147,12 @@
     <Content Include="index.html" />
     <Content Include="Services\behaviorService.js" />
     <Content Include="Services\enrollmentService.js" />
+    <Content Include="Services\interceptorService.js" />
+    <Content Include="Services\queryService.js" />
     <Content Include="Services\sectionService.js" />
     <Content Include="Services\studentService.js" />
     <Content Include="Services\teacherService.js" />
+    <Content Include="Services\userService.js" />
     <Content Include="Views\focusStudents.html" />
     <Content Include="Views\manageCases.html" />
     <Content Include="Views\manageClasses.html" />

@@ -16,6 +16,11 @@ app.config(function ($routeProvider, $httpProvider) {
 
     $routeProvider
 
+        .when('/login', {
+            templateUrl: 'html/login.html',
+            controller: 'loginController',
+        })
+
         // route for the manage students page
         .when('/managestudents', {
             templateUrl: 'html/manageStudents.html',
