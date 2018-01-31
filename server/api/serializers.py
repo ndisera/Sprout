@@ -51,3 +51,10 @@ class StandardizedTestScoreSerializer(DynamicModelSerializer):
         fields = ('id', 'standardized_test', 'student', 'date', 'score',)
     standardized_test = DynamicRelationField('StandardizedTestSerializer')
     student = DynamicRelationField('StudentSerializer')
+
+
+class GradeSerializer(DynamicModelSerializer):
+    class Meta:
+        model = Grade
+        fields = ('id', 'enrollment', 'due_date', 'percent', 'assignment_name')
+    enrollment = DynamicRelationField('EnrollmentSerializer')
