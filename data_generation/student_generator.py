@@ -6,6 +6,7 @@ import random
 import requests
 
 CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/nginx_cert.pem")
+headers = { }
 
 class StudentGenerator(object):
     """StudentGenerator contains various methods for generating student data
@@ -17,7 +18,8 @@ class StudentGenerator(object):
     RANDOM_STUDENT_ID_PREFIX = "gen"
     CERT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    def __init__(self, url="https://localhost", port_num=8000):
+    def __init__(self, headers={}, url="https://localhost", port_num=8000):
+        self.headers = headers
         self.url = url
         self.port_num = port_num
         self.complete_uri = str(self.url) + ":" + str(self.port_num) + "/students/"
@@ -123,13 +125,14 @@ class StudentGenerator(object):
                 "first_name":first_name,
                 "last_name":last_name,
                 "birthdate":str(birthdate)}
-        response = requests.post(url=self.complete_uri, json=json, verify=CERT_PATH)
+        response = requests.post(url=self.complete_uri, json=json, verify=False, headers=self.headers)
+        print response.json()
 
         if response.status_code >= 400 and response.status_code < 500:
             raise "Unable to POST student: " + str(json)
 
 def post_request(url, data):
-    response = requests.post(url=url, json=data, verify=CERT_PATH)
+    response = requests.post(url=url, json=data, verify=False, headers=headers)
     if response.status_code > 299:
         print 'oh, crap... something went wrong. error code ' + str(response.status_code) + ' when I posted ' + url + ' with payload: ' + str(data)
         print 'response data: ' + str(response.json())
@@ -148,29 +151,29 @@ def upload_basic_bitches():
         'username': 'mflatt',
         'first_name': 'Matthew',
         'last_name': 'Flatt',
-        'email': 'mflatt@cs.utah.edu',
+        'email': 'mflatt@totallyrealemail.edu',
     }
 
     teacher_danny = {
         'username': 'dkopta',
         'first_name': 'Daniel',
         'last_name': 'Kopta',
-        'email': 'dkopta@cs.utah.edu',
+        'email': 'dkopta@totallyrealemail.edu',
     }
 
     response = post_request(url=teacher_url, data=teacher_matt)
-    teacher_matt_id = response.json()['id']
+    teacher_matt_id = response.json()['teacher']['id']
 
     response = post_request(url=teacher_url, data=teacher_danny)
-    teacher_danny_id = response.json()['id']
+    teacher_danny_id = response.json()['teacher']['id']
 
     # students
     student_url = base_url + 'students/'
 
-    generator = StudentGenerator()
+    generator = StudentGenerator(headers=headers)
     generator.upload_developer_information()
 
-    students = requests.get(url=student_url, verify=CERT_PATH).json()
+    students = requests.get(url=student_url, verify=False, headers=headers).json()['students']
 
     # sections
     section_url = base_url + 'sections/'
@@ -186,9 +189,9 @@ def upload_basic_bitches():
     }
 
     response = post_request(url=section_url, data=section_matt)
-    section_matt_id = response.json()['id']
+    section_matt_id = response.json()['section']['id']
     response = post_request(url=section_url, data=section_danny)
-    section_danny_id = response.json()['id']
+    section_danny_id = response.json()['section']['id']
 
     # enrollments
     enrollment_url = base_url + 'enrollments/'
@@ -201,15 +204,16 @@ def upload_basic_bitches():
     enrollments_posted = []
     for enrollment in enrollments:
         response = post_request(url=enrollment_url, data=enrollment)
-        enrollments_posted.append(response.json())
+        enrollments_posted.append(response.json()['enrollment'])
 
     # behaviors
     behaviors_url = base_url + 'behaviors/'
 
+    current_date = datetime.date.today()
     for day in range(1, 32):
         for enrollment in enrollments_posted:
             to_post = {
-                'date': '2017-12-' + str(day),
+                'date': '2017-' + current_date.strftime('%m') + '-' + str(day),
                 'enrollment': enrollment['id'],
                 'effort': random.randint(1, 5),
                 'behavior': random.randint(1, 5),
@@ -222,10 +226,13 @@ if __name__ == "__main__":
         '--setup': upload_basic_bitches,
     }
 
+    if '--token' in sys.argv:
+        headers['Authorization'] = 'JWT ' + sys.argv[sys.argv.index('--token') + 1]
+
     if len(sys.argv) > 1:
-        for x in range(1, len(sys.argv)):
-            if callable(options[sys.argv[x]]):
-                options[sys.argv[x]]()
+        for x in sys.argv:
+            if x in options and callable(options[x]):
+                options[x]()
     else:
         generator = StudentGenerator()
         # generator.upload_developer_information();

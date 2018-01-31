@@ -1,0 +1,108 @@
+﻿<div class="container">
+    <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
+        <li class="active"><a href="#!/student/{{student.id}}">Overview</a></li>
+        <li><a href="#!/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a href="#!/student/{{student.id}}/services">Services</a></li>
+        <li><a href="#!/student/{{student.id}}/grades">Grades</a></li>
+    </ul>
+    <ul class="nav nav-tabs hidden-xs">
+        <li class="active"><a href="#!/student/{{student.id}}">Overview</a></li>
+        <li><a href="#!/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a href="#!/student/{{student.id}}/services">Services</a></li>
+        <li><a href="#!/student/{{student.id}}/grades">Grades</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="overview" class="tab-pane fade in active voffset3">
+            <div class="row">
+                <div class="col-xs-12 col-sm-3">
+                    <div id="student-overview-pic">
+                        <img class="img-responsive" src="img/example_kid.jpeg">
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-5 center-block">
+                    <h2 id="student-overview-title">{{ student.first_name }} {{ student.last_name }}</h2>
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                    <div id="student-overview-assign-dropdown" class="input-group pull-right">
+                        <span class="input-group-addon">Assigned To</span>
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ caseManager }} <span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)">
+                                    <a class="student-overview-assign-link">{{ entry }}  <span ng-if="entry === caseManager" class="glyphicon glyphicon-ok"></span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel-wrapper">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title panel-title-with-btn">Student Info</h3>
+                                <button id="student-overview-edit-all-btn" class="btn btn-default pull-right" type="button" ng-click="beginEditStudent('all')" ng-hide="editingAll">
+                                    Edit All
+                                </button>
+                                <button id="student-overview-edit-all-btn" class="btn btn-default pull-right" type="button" ng-click="endEditStudent('all')" ng-show="editingAll">
+                                    Cancel All
+                                </button>
+                            </div>
+                            <div class="panel-body">
+                                <div ng-repeat="property in studentProperties">
+                                    <form class="form-horizontal" name="editStudentForm{{$index}}" ng-submit="saveStudent(property);">
+                                        <div class="form-group">
+                                            <label class="control-label col-xs-12 col-sm-3">{{ property.title }}:</label>
+                                            <p class="form-control-static col-xs-12 col-sm-9" ng-show="!property.editable">
+                                            {{ property.value }} &nbsp;&nbsp;&nbsp;
+                                            <span ng-click="beginEditStudent(property)" class="glyphicon glyphicon-pencil pencilEdit"></span>
+                                            </p>
+                                            <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9" ng-show="property.editable">
+                                                <input type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                                <div class="input-group-btn">
+                                                    <button class="btn btn-default" type="submit" ng-disabled="editStudentForm{{$index}}.editStudentFormInput{{$index}}.$invalid">
+                                                        <span class="glyphicon glyphicon-ok green"></span>
+                                                    </button>
+                                                    <button class="btn btn-default" type="button" ng-click="endEditStudent(property)">
+                                                        <span class="glyphicon glyphicon-remove red"></span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel-wrapper">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Class Schedule</h3>
+                            </div>
+                            <table class="table">
+                                <tr>
+                                    <th>Period</th>
+                                    <th>Class Name</th>
+                                    <th>Teacher</th>
+                                </tr>
+                                <tr ng-repeat="section in sections">
+                                    <td>{{ section.id }}</td>
+                                    <td>{{ section.title }}</td>
+                                    <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
