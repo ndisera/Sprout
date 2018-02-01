@@ -23,11 +23,11 @@ class StudentGenerator(object):
     RANDOM_STUDENT_ID_PREFIX = "gen"
     CERT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    def __init__(self, headers={}, url="https://localhost", port_num=8000, verify=False):
+    def __init__(self, headers={}, url="localhost", port_num=8000, verify=False):
         self.headers = headers
         self.url = url
         self.port_num = port_num
-        self.complete_uri = str(self.url) + ":" + str(self.port_num) + "/students/"
+        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/students/"
         self.verify = verify
 
     def upload_many_random_students(self,
@@ -241,31 +241,35 @@ if __name__ == "__main__":
     parser.add_argument("--username", "-l", action="store", type=str,
                         help="login username")
     parser.add_argument("--password", "-s", action="store", type=str,
-                        help="login password (warning: insecure!")
+                        help="login password (warning: insecure!)")
+    parser.add_argument("--token", action="store", type=str,
+                        help="auth token -- supersedes username and password")
+    parser.add_argument("--setup", action="store_const", default=False, const=True,
+                        help="prerelease setup script")
 
     args = parser.parse_args()
-    if not args.username:
-        args.username = raw_input("Sprout Username: ")
-    if not args.password:
-        args.password = getpass.getpass("Sprout Password for {}: ".format(args.username))
 
-    authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url), port_num=args.port)
+    if not args.token:
+        if not args.username:
+            args.username = raw_input("Sprout Username: ")
+        if not args.password:
+            args.password = getpass.getpass("Sprout Password for {}: ".format(args.username))
 
-    try:
-        token = authorizationHandler.send_login_request(args.username, args.password, verify=CERT_PATH)
-    except requests.exceptions.HTTPError as err:
-        print "Unable to send login request:"
-        print err
-        sys.exit(1)
+        authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url), port_num=args.port)
 
-    headers['Authorization'] = 'JWT ' + token
+        try:
+            args.token = authorizationHandler.send_login_request(args.username, args.password, verify=CERT_PATH)
+        except requests.exceptions.HTTPError as err:
+            print "Unable to send login request:"
+            print err
+            sys.exit(1)
 
-    if len(sys.argv) > 1:
-        for x in sys.argv:
-            if x in options and callable(options[x]):
-                options[x]()
+    headers['Authorization'] = 'JWT ' + args.token
+
+    if args.setup:
+        upload_basic_bitches()
     else:
-        generator = StudentGenerator(url=url, verify=CERT_PATH, headers=headers)
+        generator = StudentGenerator(url=args.url, verify=CERT_PATH, headers=headers)
         # generator.upload_developer_information();
         generator.upload_many_random_students(5)
 
