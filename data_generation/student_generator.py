@@ -130,20 +130,19 @@ class StudentGenerator(object):
                 "first_name":first_name,
                 "last_name":last_name,
                 "birthdate":str(birthdate)}
-        response = requests.post(url=self.complete_uri, json=json, verify=False, headers=self.headers)
+        response = requests.post(url=self.complete_uri, json=json, verify=self.verify, headers=self.headers)
         print response.json()
 
         if response.status_code >= 400 and response.status_code < 500:
             raise "Unable to POST student: " + str(json)
 
-def post_request(url, data):
-    response = requests.post(url=url, json=data, verify=False, headers=headers)
+def post_request(self, url, data):
+    response = requests.post(url=url, json=data, verify=self.verify, headers=headers)
     if response.status_code > 299:
         print 'oh, crap... something went wrong. error code ' + str(response.status_code) + ' when I posted ' + url + ' with payload: ' + str(data)
         print 'response data: ' + str(response.json())
         sys.exit()
     return response
-    
 
 def upload_basic_bitches():
     # teachers
@@ -178,7 +177,7 @@ def upload_basic_bitches():
     generator = StudentGenerator(headers=headers)
     generator.upload_developer_information()
 
-    students = requests.get(url=student_url, verify=False, headers=headers).json()['students']
+    students = requests.get(url=student_url, verify=self.verify, headers=headers).json()['students']
 
     # sections
     section_url = base_url + 'sections/'
@@ -245,7 +244,7 @@ if __name__ == "__main__":
         print err
         sys.exit(1)
 
-    headers["Authorization"] = "JWT" + token
+    headers['Authorization'] = 'JWT ' + token
 
     if len(sys.argv) > 1:
         for x in sys.argv:
