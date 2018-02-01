@@ -144,6 +144,8 @@ def post_request(self, url, data):
         sys.exit()
     return response
 
+
+@staticmethod
 def upload_basic_bitches():
     # teachers
     host = 'localhost'
@@ -251,7 +253,7 @@ if __name__ == "__main__":
             if x in options and callable(options[x]):
                 options[x]()
     else:
-        generator = StudentGenerator(url=url, verify=CERT_PATH)
+        generator = StudentGenerator(url=url, verify=CERT_PATH, headers=headers)
         # generator.upload_developer_information();
         generator.upload_many_random_students(5)
 
