@@ -133,8 +133,8 @@ class StudentGenerator(object):
         response = requests.post(url=self.complete_uri, json=json, verify=self.verify, headers=self.headers)
         print response.json()
 
-        if response.status_code >= 400 and response.status_code < 500:
-            raise "Unable to POST student: " + str(json)
+        if not (response.status_code >= 200 and response.status_code < 300):
+            response.raise_for_status()
 
 def post_request(self, url, data):
     response = requests.post(url=url, json=data, verify=self.verify, headers=headers)
