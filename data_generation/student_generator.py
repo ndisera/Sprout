@@ -2,7 +2,6 @@
 
 import argparse
 import datetime
-import getpass
 import os
 import random
 import requests
@@ -250,10 +249,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if not args.token:
-        if not args.username:
-            args.username = raw_input("Sprout Username: ")
-        if not args.password:
-            args.password = getpass.getpass("Sprout Password for {}: ".format(args.username))
+        args.username, args.password = AuthorizationHandler.display_login_prompt(args.username, args.password)
 
         authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url),
                                                     port_num=args.port,

@@ -1,4 +1,5 @@
 
+import getpass
 import requests
 
 class AuthorizationHandler():
@@ -38,3 +39,22 @@ class AuthorizationHandler():
         reply = response.json()
 
         return str(reply["token"])
+
+    @staticmethod
+    def display_login_prompt(username=None, password=None):
+        """
+        Display a promt for the user to provide username and password
+
+        :param username: existing username. Do not prompt the user if passed
+        :type username: str
+        :param password: existing password. Do not prompt the user if passed
+        :type password: str
+        :return: Tuple of username and password
+        """
+
+        if not username:
+            username = raw_input("Sprout Username: ")
+        if not password:
+            password = getpass.getpass("Sprout Password for {}: ".format(username))
+
+        return username, password
