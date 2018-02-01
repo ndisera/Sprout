@@ -255,10 +255,12 @@ if __name__ == "__main__":
         if not args.password:
             args.password = getpass.getpass("Sprout Password for {}: ".format(args.username))
 
-        authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url), port_num=args.port)
+        authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url),
+                                                    port_num=args.port,
+                                                    verify=CERT_PATH)
 
         try:
-            args.token = authorizationHandler.send_login_request(args.username, args.password, verify=CERT_PATH)
+            args.token = authorizationHandler.send_login_request(args.username, args.password)
         except requests.exceptions.HTTPError as err:
             print "Unable to send login request:"
             print err

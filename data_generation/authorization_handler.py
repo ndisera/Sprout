@@ -6,12 +6,13 @@ class AuthorizationHandler():
     Helper class for containing all things to do with authorization
     """
 
-    def __init__(self, url="https://localhost", port_num=8000):
+    def __init__(self, url="https://localhost", port_num=8000, verify=False):
         self.url = url
         self.port_num = port_num
         self.complete_uri = str(self.url) + ":" + str(self.port_num) + "/students/"
+        self.verify = verify
 
-    def send_login_request(self, username, password, verify):
+    def send_login_request(self, username, password):
         # type: (str, str, bool) -> str
         """
         Send a login request using the given username and password, return the auth token as a string
@@ -29,7 +30,7 @@ class AuthorizationHandler():
 
         json = {"username" : username,
                 "password" :  password,}
-        response = requests.post(login_url, json=json, verify=verify)
+        response = requests.post(login_url, json=json, verify=self.verify)
 
         if not (response.status_code >= 200 and response.status_code < 300):
             response.raise_for_status() # Raise an HTTP error
