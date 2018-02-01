@@ -1,11 +1,12 @@
 #!/usr/bin/env python2
 
-import os
-import sys
+import argparse
 import datetime
 import getpass
+import os
 import random
 import requests
+import sys
 
 from authorization_handler import AuthorizationHandler
 
@@ -232,15 +233,26 @@ if __name__ == "__main__":
         '--setup': upload_basic_bitches,
     }
 
-    username = raw_input("Sprout Username: ")
-    password = getpass.getpass("Sprout Password: ")
+    parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
+    parser.add_argument("--url", "-u", action='store', default="localhost", type=str,
+                        help="hostname or IP address to connect to (default: localhost)")
+    parser.add_argument("--port", "-p", action='store', default=8000, type=int,
+                        help="port to connect on (default: 8000)")
+    parser.add_argument("--username", "-l", action="store", type=str,
+                        help="login username")
+    parser.add_argument("--password", "-s", action="store", type=str,
+                        help="login password (warning: insecure!")
 
-    url = "https://10.8.0.3"
+    args = parser.parse_args()
+    if not args.username:
+        args.username = raw_input("Sprout Username: ")
+    if not args.password:
+        args.password = getpass.getpass("Sprout Password for {}: ".format(args.username))
 
-    authorizationHandler = AuthorizationHandler(url=url)
+    authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url), port_num=args.port)
 
     try:
-        token = authorizationHandler.send_login_request(username, password, verify=CERT_PATH)
+        token = authorizationHandler.send_login_request(args.username, args.password, verify=CERT_PATH)
     except requests.exceptions.HTTPError as err:
         print "Unable to send login request:"
         print err
