@@ -1,11 +1,15 @@
+#!/usr/bin/env python2
+
 import os
 import sys
 import datetime
-import json
+import getpass
 import random
 import requests
 
-CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/nginx_cert.pem")
+from authorization_handler import AuthorizationHandler
+
+CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/rootCA_cert.pem")
 headers = { }
 
 class StudentGenerator(object):
@@ -18,11 +22,12 @@ class StudentGenerator(object):
     RANDOM_STUDENT_ID_PREFIX = "gen"
     CERT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    def __init__(self, headers={}, url="https://localhost", port_num=8000):
+    def __init__(self, headers={}, url="https://localhost", port_num=8000, verify=False):
         self.headers = headers
         self.url = url
         self.port_num = port_num
         self.complete_uri = str(self.url) + ":" + str(self.port_num) + "/students/"
+        self.verify = verify
 
     def upload_many_random_students(self,
                                     num_students,
@@ -226,15 +231,28 @@ if __name__ == "__main__":
         '--setup': upload_basic_bitches,
     }
 
-    if '--token' in sys.argv:
-        headers['Authorization'] = 'JWT ' + sys.argv[sys.argv.index('--token') + 1]
+    username = raw_input("Sprout Username: ")
+    password = getpass.getpass("Sprout Password: ")
+
+    url = "https://10.8.0.3"
+
+    authorizationHandler = AuthorizationHandler(url=url)
+
+    try:
+        token = authorizationHandler.send_login_request(username, password, verify=CERT_PATH)
+    except requests.exceptions.HTTPError as err:
+        print "Unable to send login request:"
+        print err
+        sys.exit(1)
+
+    headers["Authorization"] = "JWT" + token
 
     if len(sys.argv) > 1:
         for x in sys.argv:
             if x in options and callable(options[x]):
                 options[x]()
     else:
-        generator = StudentGenerator()
+        generator = StudentGenerator(url=url, verify=CERT_PATH)
         # generator.upload_developer_information();
         generator.upload_many_random_students(5)
 
