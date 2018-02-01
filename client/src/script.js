@@ -22,8 +22,12 @@ app.config(function ($routeProvider, $httpProvider) {
             controller: 'loginController',
         })
 
+        .when('/manage', {
+            redirectTo: '/manage/cases',
+        })
+
         // route for the manage students page
-        .when('/managestudents', {
+        .when('/manage/students', {
             templateUrl: 'html/manageStudents.html',
             controller: 'manageStudentsController',
             resolve: {
@@ -37,7 +41,7 @@ app.config(function ($routeProvider, $httpProvider) {
         })
 
         // route for the manage teachers page
-        .when('/manageteachers', {
+        .when('/manage/teachers', {
             templateUrl: 'html/manageTeachers.html',
             controller: 'manageTeachersController',
             resolve: {
@@ -51,7 +55,7 @@ app.config(function ($routeProvider, $httpProvider) {
         })
 
         // route for the manage (cases) page
-        .when('/managecases', {
+        .when('/manage/cases', {
             templateUrl: 'html/manageCases.html',
             controller: 'manageCasesController',
             resolve: {
@@ -68,7 +72,7 @@ app.config(function ($routeProvider, $httpProvider) {
         })
 
         // route for the manage classes page
-        .when('/manageclasses', {
+        .when('/manage/classes', {
             templateUrl: 'html/manageClasses.html',
             controller: 'manageClassesController',
             resolve: {
