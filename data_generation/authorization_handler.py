@@ -36,4 +36,4 @@ class AuthorizationHandler():
 
         reply = response.json()
 
-        return reply["token"]
+        return str(reply["token"])
