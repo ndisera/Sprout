@@ -55,3 +55,18 @@
 .no-bottom-margin {
     margin-bottom: 0px;
 }
+
+.panel-wrapper {
+    border-left: 5px solid #45B9BD;
+    border-radius: 4px 0px 0px 4px;
+}
+
+.panel-wrapper > .panel {
+    border-left-width: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.panel-title-with-btn {
+    display: inline-block;
+}

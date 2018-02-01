@@ -1,11 +1,19 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Sprout</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- @ifndef DEBUG -->
     <link rel="stylesheet" href="includes/bootstrap.min.css" />
     <link rel="stylesheet" href="includes/jquery-ui.min.css" />
+    <link rel="stylesheet" href="includes/angular-datepicker.min.css" />
+    <!-- @endif -->
+    <!-- @ifdef DEBUG -->
+    <link rel="stylesheet" href="includes/bootstrap.css" />
+    <link rel="stylesheet" href="includes/jquery-ui.css" />
+    <link rel="stylesheet" href="includes/angular-datepicker.css" />
+    <!-- @endif -->
     <link rel="stylesheet" href="css/styles.css" />
     <!-- @ifndef DEBUG -->
     <script src="includes/jquery.min.js"></script>
@@ -18,6 +26,7 @@
     <script src="includes/Chart.bundle.min.js"></script>
     <script src="includes/Chart.min.js"></script>
     <script src="includes/angular-chart.min.js"></script>
+    <script src="includes/angular-datepicker.min.js"></script>
     <script src="includes/moment-with-locales.min.js"></script>
     <script src="includes/underscore-min.js"></script>
     <!-- @endif -->
@@ -32,6 +41,7 @@
     <script src="includes/Chart.bundle.js"></script>
     <script src="includes/Chart.js"></script>
     <script src="includes/angular-chart.js"></script>
+    <script src="includes/angular-datepicker.js"></script>
     <script src="includes/moment-with-locales.js"></script>
     <script src="includes/underscore.js"></script>
     <!-- @endif -->
@@ -46,7 +56,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a href="#!/focus" class="navbar-left" ng-click="clearSearch()">
+                    <a href="#!/focus" class="navbar-left" ng-click="clearSearch(); closeNavbar()">
                         <img id="navbar-logo" src="img/logo/svg/color_logo_only_transparent.svg">
                     </a>
                 </div>
@@ -70,7 +80,7 @@
                                 <img id="navbar-user-pic" src="img/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
-                                <li ng-click="clearSearch()"><a href="#!/managecases"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
+                                <li ng-click="clearSearch()"><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
                                 <li ng-click="clearSearch()"><a href="#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
                                 <li ng-click="clearSearch()"><a href="#!/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
                                 <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
@@ -80,7 +90,7 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav hidden-sm hidden-md hidden-lg hidden-xl">
-                        <li><a href="#!/managecases"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
+                        <li><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
                         <li><a href="#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
                         <li><a href="#!/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
                         <li><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>

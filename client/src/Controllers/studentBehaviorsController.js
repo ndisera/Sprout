@@ -1,5 +1,5 @@
-app.controller("studentController", function ($scope, $rootScope, $location, $http, $routeParams, studentService, behaviorService, testScoreService, sectionService, enrollments, student) {
-//todo: DELETE ME
+app.controller("studentBehaviorsController", function ($scope, $rootScope, $location, $http, $routeParams, studentService, behaviorService, sectionService, enrollments, student) {
+
     // set important scope variables
     $scope.student = student.student;
     $scope.studentE = Object.assign({}, $scope.student);
@@ -11,7 +11,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     $scope.scores = [1, 2, 3, 4, 5];
     // Both behavior and effort are arrays of lists of scores,
     // where each top-level array corresponds to a section
-    $scope.hardcodedBehaviorForThePrototype = []; //todo:remove
+    $scope.hardcodedBehaviorForThePrototype = [];
     $scope.hardcodedEffortForThePrototype = [];
     // Section IDs are stored as a list of integers
     $scope.hardcodedSectionIDsForThePrototype = [];
@@ -24,7 +24,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     /**
      * Set the active tab and pill based on selection of one or the other
      * @param {string} name - the target of the tab selected.
-     */
+     */    
     $scope.setActivePillAndTab = function (name) {
         switch (name) {
             case "overview":
@@ -55,25 +55,25 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
         }
     }
 
-    // enrollments will contain section id (for mapping to enrollments) and student id
-    console.log("ENROLLMENTS");
-    console.log(enrollments);
-    $scope.enrollments = enrollments.enrollments;
-    $scope.sections = [];
-    for (var i = 0; i < $scope.enrollments.length; i++) {
+      // enrollments will contain section id (for mapping to enrollments) and student id
+      console.log("ENROLLMENTS");
+      console.log(enrollments);
+      $scope.enrollments = enrollments.enrollments;
+      $scope.sections = [];
+      for (var i = 0; i < $scope.enrollments.length; i++) {
         var sectionPromise = sectionService.getSection($scope.enrollments[i].section);
         sectionPromise.then(function success(data) {
-            $scope.sections.push({
+              $scope.sections.push({
                 id: data.id,
                 title: data.title
-            });
-            $scope.section_titles.push(
+              });
+              $scope.section_titles.push(
               data.title
-            );
+              );
         }, function error(message) {
             $scope.status = message;
-        });
-    }
+          });
+      }
 
     // the sections array should now contain objects with teacher and title
 
@@ -106,7 +106,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
      */
     $scope.saveSEdit = function (field) {
         switch (field) {
-          // update field
+            // update field
             case "sid":
                 $scope.studentE.student_id = $scope.sId;
                 break;
@@ -130,7 +130,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
             $scope.student = Object.assign({}, $scope.studentE);
             // don't have any students field to update
             switch (field) {
-              // set view after call returns
+                // set view after call returns
                 case "sid":
                     $scope.viewSid = true;
                     $scope.sId = "";
@@ -181,48 +181,19 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
     };
 
     /**
-     * Get standardized test scores.
-     */
-    $scope.getTestScores = function () {
-        var config = {
-            filter: [
-                {name: 'enrollment.student', val: $routeParams.id},
-                {name: 'date', val: $scope.testScoresDate},
-            ],
-        };
-
-        // var testPromise = testScoreService.getStudentTestScores(config);
-        var testPromise = testScoreService.getStudentTestScores();
-
-        testPromise.then(function success(data) {
-            console.log("TEST SCORES");
-            console.log(data);
-            //$scope.behaviors = data.behaviors;
-            //$scope.sectionBehaviorScores = {};
-            // for (var i = 0; i < $scope.behaviors.length; i++) {
-            //     $scope.sectionBehaviorScores[$scope.behaviors[i].enrollment.section] = $scope.behaviors[i];
-            // }
-            // now I should be able to match each behavior and effort score to each section
-        }, function error(message) {
-            $scope.status = message;
-        });
-    }
-
-
-    /**
      * Get behavior/effort scores.
      */
     $scope.getBehaviors = function () {
         var config = {
             filter: [
-                {name: 'enrollment.student', val: $routeParams.id},
-                {name: 'date', val: $scope.behaviorDate},
+                { name: 'enrollment.student', val: $routeParams.id },
+                { name: 'date', val: $scope.behaviorDate },
             ],
         }
 
         var behaviorPromise = behaviorService.getStudentBehavior(config);
         behaviorPromise.then(function success(data) {
-            console.log("BEHAVIORS1");
+            console.log("BEHAVIORS");
             console.log(data);
             $scope.behaviors = data.behaviors;
             $scope.sectionBehaviorScores = {};
@@ -234,7 +205,7 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
             $scope.status = message;
         });
     }
-
+  
     /**
      * Update behavior/effort score
      * @param {number} the section id.
@@ -306,7 +277,6 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
         date.getMonth() + 1 < 10 ? month = "0" + (date.getMonth() + 1) : month = date.getMonth() + 1;
         console.log(day);
         $scope.behaviorDate = date.getFullYear() + "-" + month + "-" + day;
-        $scope.testScoresDate = date.getFullYear() + "-" + month + "-" + day;
     }
 
     defaultDate();
@@ -339,15 +309,15 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
 
         var config = {
             filter: [
-                {name: 'enrollment.student', val: $routeParams.id},
-                {name: 'date.range', val: "2017-12-11"},
-                {name: 'date.range', val: "2017-12-15"},
+                { name: 'enrollment.student', val: $routeParams.id },
+                { name: 'date.range', val: "2017-12-11" },
+                { name: 'date.range', val: "2017-12-15" },
             ],
         }
 
         var behaviorPromise = behaviorService.getStudentBehavior(config);
         behaviorPromise.then(function success(data) {
-            console.log("BEHAVIORS2");
+            console.log("BEHAVIORS");
             console.log(data);
             var behaviors = {};
             var efforts = {};
@@ -386,32 +356,32 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
         console.log(points, evt);
     };
     $scope.datasetOverride = [
-        {
-            lineTension: 0.2,
+    {
+        lineTension: 0.2,
 
-            label: "CS5510",
-            fill: false,
+        label: "CS5510",
+        fill: false,
 
-            backgroundColor: 'rgba(255,99,132,0.4)',
-            pointBackgroundColor: 'rgba(255,99,132,0.4)',
-            pointHoverBackgroundColor: 'rgba(255,99,132,0.4)',
-            borderColor: 'rgba(255,99,132,1)',
-            pointBorderColor: 'rgba(255,99,132,0.6)',
-            pointHoverBorderColor: 'rgba(255,99,132,1)'
-        },
-        {
-            lineTension: 0.2,
+        backgroundColor: 'rgba(255,99,132,0.4)',
+        pointBackgroundColor: 'rgba(255,99,132,0.4)',
+        pointHoverBackgroundColor: 'rgba(255,99,132,0.4)',
+        borderColor: 'rgba(255,99,132,1)',
+        pointBorderColor: 'rgba(255,99,132,0.6)',
+        pointHoverBorderColor: 'rgba(255,99,132,1)'
+    },
+    {
+        lineTension: 0.2,
 
-            label: "CS4400",
-            fill: false,
+        label: "CS4400",
+        fill: false,
 
-            backgroundColor: 'rgba(100,150,255,0.4)',
-            pointBackgroundColor: 'rgba(100,150,255,0.4)',
-            pointHoverBackgroundColor: 'rgba(100,150,255,0.4)',
-            borderColor: 'rgba(100,150,255,1)',
-            pointBorderColor: 'rgba(100,150,255,0.6)',
-            pointHoverBorderColor: 'rgba(100,150,255,1)'
-        }
+        backgroundColor: 'rgba(100,150,255,0.4)',
+        pointBackgroundColor: 'rgba(100,150,255,0.4)',
+        pointHoverBackgroundColor: 'rgba(100,150,255,0.4)',
+        borderColor: 'rgba(100,150,255,1)',
+        pointBorderColor: 'rgba(100,150,255,0.6)',
+        pointHoverBorderColor: 'rgba(100,150,255,1)'
+    }
     ];
     $scope.options = {
         responsive: true,
@@ -427,8 +397,8 @@ app.controller("studentController", function ($scope, $rootScope, $location, $ht
             }]
         },
         legend:
-          {
-              display: true
-          }
+        {
+            display: true
+        }
     };
 });

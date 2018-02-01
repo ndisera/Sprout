@@ -4,6 +4,7 @@ var app = angular.module(
         "ngRoute", 
         "chart.js",
         "ngAnimate",
+        "datePicker",
     ]
 );
 
@@ -21,8 +22,12 @@ app.config(function ($routeProvider, $httpProvider) {
             controller: 'loginController',
         })
 
+        .when('/manage', {
+            redirectTo: '/manage/cases',
+        })
+
         // route for the manage students page
-        .when('/managestudents', {
+        .when('/manage/students', {
             templateUrl: 'html/manageStudents.html',
             controller: 'manageStudentsController',
             resolve: {
@@ -36,7 +41,7 @@ app.config(function ($routeProvider, $httpProvider) {
         })
 
         // route for the manage teachers page
-        .when('/manageteachers', {
+        .when('/manage/teachers', {
             templateUrl: 'html/manageTeachers.html',
             controller: 'manageTeachersController',
             resolve: {
@@ -50,7 +55,7 @@ app.config(function ($routeProvider, $httpProvider) {
         })
 
         // route for the manage (cases) page
-        .when('/managecases', {
+        .when('/manage/cases', {
             templateUrl: 'html/manageCases.html',
             controller: 'manageCasesController',
             resolve: {
@@ -67,7 +72,7 @@ app.config(function ($routeProvider, $httpProvider) {
         })
 
         // route for the manage classes page
-        .when('/manageclasses', {
+        .when('/manage/classes', {
             templateUrl: 'html/manageClasses.html',
             controller: 'manageClassesController',
             resolve: {
@@ -122,10 +127,44 @@ app.config(function ($routeProvider, $httpProvider) {
             },
         })
 
-        // route for the student profile page
+        // routes for the student profile pages
         .when('/student/:id', {
-            templateUrl: 'html/student.html',
-            controller: 'studentController',
+            templateUrl: 'html/studentOverview.html',
+            controller: 'studentOverviewController',
+            resolve: {
+                enrollmentData: function(enrollmentService, $route) {
+                    return enrollmentService.getStudentEnrollments(
+                        { 
+                            include: ['section.*', 'section.teacher.*'],
+                            filter: [{ name: 'student', val: $route.current.params.id },],
+                        }
+                    );
+                },
+                studentData: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+
+        .when('/student/:id/tests', {
+            templateUrl: 'html/studentTests.html',
+            controller: 'studentTestsController',
+            resolve: {
+                student: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+
+        .when('/student/:id/behaviors', {
+            templateUrl: 'html/studentBehaviors.html',
+            controller: 'studentBehaviorsController',
             resolve: {
                 enrollments: function (enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
@@ -143,6 +182,54 @@ app.config(function ($routeProvider, $httpProvider) {
                 },
             }
         })
+
+        .when('/student/:id/ieps', {
+            templateUrl: 'html/studentIeps.html',
+            controller: 'studentIepsController',
+            resolve: {
+                enrollments: function(enrollmentService, $route) {
+                    return enrollmentService.getStudentEnrollments(
+                        { 
+                            include: ['section.*'],
+                            filter: [{ name: 'student', val: $route.current.params.id },],
+                        }
+                    );
+                },
+                student: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+
+        .when('/student/:id/services', {
+            templateUrl: 'html/studentServices.html',
+            controller: 'studentServicesController',
+            resolve: {
+                student: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+
+        .when('/student/:id/grades', {
+            templateUrl: 'html/studentGrades.html',
+            controller: 'studentGradesController',
+            resolve: {
+                student: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+        
 
         .otherwise({ redirectTo: '/focus' });
 })

@@ -6,6 +6,7 @@
         *display: inline; /* ie7 fix */
         zoom: 1; /* hasLayout ie7 trigger */
     }
+
 }
 
 .nav-tabs > li, .nav-pills > li {
@@ -20,6 +21,44 @@
     cursor: pointer;
 }
 
+#student-overview-pic > img {
+    border-radius: 50%;
+    width: 100%;
+    max-width: 150px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#student-overview-title {
+    margin-top: 60px;
+    overflow-wrap: break-word;
+}
+
+#student-overview-assign-dropdown {
+    width: 50px;
+    float: right !important;
+}
+
+.student-overview-assign-link {
+    cursor: pointer;
+}
+
+
+.student-overview-edit-label {
+    min-width: 94px;
+}
+
+#student-overview-edit-all-btn {
+    margin-top: -5px;
+    margin-right: -10px;
+    font-size: 11px;
+}
+
+#student-overview-edit-input-group {
+    padding-right: 15px;
+}
+
+
 .studentHeading {
     display: inline-block;
 }
@@ -33,3 +72,22 @@
 .pointer {
     cursor: pointer;
 }
+
+@media (max-width: 768px) {
+    #student-overview-title {
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    #student-overview-assign-dropdown {
+        margin-top: 15px;
+        margin-left: auto;
+        margin-right: auto;
+        float: none !important;
+    }
+
+    #student-overview-edit-input-group {
+        padding-left: 15px;
+    }
+}
+

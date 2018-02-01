@@ -158,6 +158,6 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         refreshStudents: refreshStudents,
         addStudent: addStudent,
         updateStudent: updateStudent,
-        deleteStudent: deleteStudent
+        deleteStudent: deleteStudent,
     };
 });

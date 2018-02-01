@@ -26,7 +26,8 @@
     "underscore": "^1.8.3",
     "jquery-ui": "^1.12.1",
     "bootstrap-datepicker-eyecon": "^1.0.0",
-    "angular-animate": "^1.6.8"
+    "angular-animate": "^1.6.8",
+    "angular-datepicker": "^2.0.3"
   },
   "overrides": {
     "jquery-ui": {

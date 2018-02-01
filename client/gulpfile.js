@@ -44,6 +44,14 @@ const include_paths = [
     bower_path + 'chart.js/dist/Chart.js',
     bower_path + 'chart.js/dist/Chart.bundle.js',
 
+    // datepicker
+    bower_path + 'angular-datepicker/dist/angular-datepicker.min.css',
+    bower_path + 'angular-datepicker/dist/angular-datepicker.min.js',
+
+    bower_path + 'angular-datepicker/dist/angular-datepicker.css',
+    bower_path + 'angular-datepicker/dist/angular-datepicker.js',
+
+
     // helpers
     bower_path + 'moment/min/moment-with-locales.min.js',
     bower_path + 'moment/min/moment-with-locales.js',
