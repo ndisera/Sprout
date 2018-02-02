@@ -4,7 +4,7 @@ import requests
 from authorization_handler import CERT_PATH
 from collections import namedtuple
 
-Grade = namedtuple("Grade", ['due_date', 'enrollment', 'percent', 'assignment_name'])
+Grade = namedtuple("Grade", ['due_date', 'enrollment', 'percent', 'assignment_name', 'id'])
 
 
 class GradesService():
@@ -37,7 +37,8 @@ class GradesService():
             toReturn.append(Grade(due_date=grade['due_date'],
                                   enrollment=grade['enrollment'],
                                   percent=grade['percent'],
-                                  assignment_name=grade['assignment_name']))
+                                  assignment_name=grade['assignment_name'],
+                                  id=grade['id']))
 
         return toReturn
 
