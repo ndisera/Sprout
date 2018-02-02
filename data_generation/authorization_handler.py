@@ -1,6 +1,9 @@
 
+import os
 import getpass
 import requests
+
+CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/rootCA_cert.pem")
 
 class AuthorizationHandler():
     """

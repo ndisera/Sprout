@@ -8,8 +8,8 @@ import requests
 import sys
 
 from authorization_handler import AuthorizationHandler
+from authorization_handler import CERT_PATH
 
-CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/rootCA_cert.pem")
 headers = { }
 
 class StudentGenerator(object):
@@ -228,10 +228,6 @@ def upload_basic_bitches():
 
 
 if __name__ == "__main__":
-    options = {
-        '--setup': upload_basic_bitches,
-    }
-
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
     parser.add_argument("--url", "-u", action='store', default="localhost", type=str,
                         help="hostname or IP address to connect to (default: localhost)")
