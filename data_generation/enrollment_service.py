@@ -25,7 +25,7 @@ class EnrollmentService():
         """
         response = requests.get(self.complete_uri, verify=self.verify, headers=self.headers)
 
-        if response.status_code >= 200 and response.status_code < 299:
+        if not (response.status_code >= 200 and response.status_code < 299):
             response.raise_for_status()
 
         body = response.json()
@@ -49,5 +49,5 @@ class EnrollmentService():
         """
         response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=enrollment._asdict())
 
-        if response.status_code >= 200 and response.status_code < 299:
+        if not (response.status_code >= 200 and response.status_code < 299):
             response.raise_for_status()
