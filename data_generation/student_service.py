@@ -49,7 +49,9 @@ class GradesService():
         :param student: Student object to upload
         :type student: Student
         """
-        response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=student._asdict())
+        data = student._asdict()
+        del(data['id'])
+        response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
         if not (response.status_code >= 200 and response.status_code < 299):
             response.raise_for_status()

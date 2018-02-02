@@ -47,7 +47,9 @@ class EnrollmentService():
         :param enrollment: Enrollment object to upload
         :type enrollment: Enrollment
         """
-        response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=enrollment._asdict())
+        data = enrollment._asdict()
+        del(data['id'])
+        response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
         if not (response.status_code >= 200 and response.status_code < 299):
             response.raise_for_status()
