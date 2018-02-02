@@ -110,7 +110,7 @@ class Grade(models.Model):
     """
     enrollment = models.ForeignKey(Enrollment, related_name='grade_enrollment',
                                    verbose_name="Enrollment which this grade belongs to")
-    assignment_name = models.CharField(unique=True, max_length=DEFAULT_MAX_LENGTH)
+    assignment_name = models.CharField(max_length=DEFAULT_MAX_LENGTH)
     percent = models.IntegerField(verbose_name="Grade from 0-100", blank=False,
                                   validators=[MinValueValidator(0), MaxValueValidator(100),])
     due_date = models.DateField(blank=False,)
