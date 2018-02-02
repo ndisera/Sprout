@@ -1,4 +1,5 @@
 
+import json
 import requests
 
 from authorization_handler import CERT_PATH
@@ -49,7 +50,34 @@ class GradesService():
         :param grade: Grade object to upload
         :type grade: Grade
         """
-        response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=grade._asdict())
+        data = grade._asdict()
+        del(data['id'])
+        response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
-        if response.status_code >= 200 and response.status_code < 299:
+        if not response.status_code >= 200 and response.status_code < 299:
+            response.raise_for_status()
+
+    def add_many_grades(self, grades):
+        """
+        Upload a list of grade objects to the server
+
+        :param grades: List of grade objects
+        :return:
+        """
+
+        data = { 'grades' : []}
+
+        for grade in grades:
+            grade = grade._asdict()
+            del(grade['id'])
+            data['grades'].append(grade)
+
+        data = json.dumps(data)
+
+        headers = self.headers
+        headers['content-type'] = 'application/json'
+
+        response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
+
+        if not response.status_code >= 200 and response.status_code < 299:
             response.raise_for_status()
