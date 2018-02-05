@@ -1,11 +1,15 @@
-import os
-import sys
+#!/usr/bin/env python2
+
+import argparse
 import datetime
-import json
+import os
 import random
 import requests
+import sys
 
-CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/nginx_cert.pem")
+from authorization_handler import AuthorizationHandler
+from authorization_handler import CERT_PATH
+
 headers = { }
 
 class StudentGenerator(object):
@@ -18,11 +22,12 @@ class StudentGenerator(object):
     RANDOM_STUDENT_ID_PREFIX = "gen"
     CERT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    def __init__(self, headers={}, url="https://localhost", port_num=8000):
+    def __init__(self, headers={}, url="localhost", port_num=8000, verify=False):
         self.headers = headers
         self.url = url
         self.port_num = port_num
-        self.complete_uri = str(self.url) + ":" + str(self.port_num) + "/students/"
+        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/students/"
+        self.verify = verify
 
     def upload_many_random_students(self,
                                     num_students,
@@ -125,21 +130,22 @@ class StudentGenerator(object):
                 "first_name":first_name,
                 "last_name":last_name,
                 "birthdate":str(birthdate)}
-        response = requests.post(url=self.complete_uri, json=json, verify=False, headers=self.headers)
+        response = requests.post(url=self.complete_uri, json=json, verify=self.verify, headers=self.headers)
         print response.json()
 
-        if response.status_code >= 400 and response.status_code < 500:
-            raise "Unable to POST student: " + str(json)
+        if not (response.status_code >= 200 and response.status_code < 300):
+            response.raise_for_status()
 
-def post_request(url, data):
-    response = requests.post(url=url, json=data, verify=False, headers=headers)
+def post_request(self, url, data):
+    response = requests.post(url=url, json=data, verify=self.verify, headers=headers)
     if response.status_code > 299:
         print 'oh, crap... something went wrong. error code ' + str(response.status_code) + ' when I posted ' + url + ' with payload: ' + str(data)
         print 'response data: ' + str(response.json())
         sys.exit()
     return response
-    
 
+
+@staticmethod
 def upload_basic_bitches():
     # teachers
     host = 'localhost'
@@ -173,7 +179,7 @@ def upload_basic_bitches():
     generator = StudentGenerator(headers=headers)
     generator.upload_developer_information()
 
-    students = requests.get(url=student_url, verify=False, headers=headers).json()['students']
+    students = requests.get(url=student_url, verify=self.verify, headers=headers).json()['students']
 
     # sections
     section_url = base_url + 'sections/'
@@ -222,19 +228,42 @@ def upload_basic_bitches():
 
 
 if __name__ == "__main__":
-    options = {
-        '--setup': upload_basic_bitches,
-    }
+    parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
+    parser.add_argument("--url", "-u", action='store', default="localhost", type=str,
+                        help="hostname or IP address to connect to (default: localhost)")
+    parser.add_argument("--port", "-p", action='store', default=8000, type=int,
+                        help="port to connect on (default: 8000)")
+    parser.add_argument("--username", "-l", action="store", type=str,
+                        help="login username")
+    parser.add_argument("--password", "-s", action="store", type=str,
+                        help="login password (warning: insecure!)")
+    parser.add_argument("--token", action="store", type=str,
+                        help="auth token -- supersedes username and password")
+    parser.add_argument("--setup", action="store_const", default=False, const=True,
+                        help="prerelease setup script")
 
-    if '--token' in sys.argv:
-        headers['Authorization'] = 'JWT ' + sys.argv[sys.argv.index('--token') + 1]
+    args = parser.parse_args()
 
-    if len(sys.argv) > 1:
-        for x in sys.argv:
-            if x in options and callable(options[x]):
-                options[x]()
+    if not args.token:
+        args.username, args.password = AuthorizationHandler.display_login_prompt(args.username, args.password)
+
+        authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url),
+                                                    port_num=args.port,
+                                                    verify=CERT_PATH)
+
+        try:
+            args.token = authorizationHandler.send_login_request(args.username, args.password)
+        except requests.exceptions.HTTPError as err:
+            print "Unable to send login request:"
+            print err
+            sys.exit(1)
+
+    headers['Authorization'] = 'JWT ' + args.token
+
+    if args.setup:
+        upload_basic_bitches()
     else:
-        generator = StudentGenerator()
+        generator = StudentGenerator(url=args.url, verify=CERT_PATH, headers=headers)
         # generator.upload_developer_information();
         generator.upload_many_random_students(5)
 
