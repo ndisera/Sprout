@@ -136,8 +136,8 @@ class StudentGenerator(object):
         if not (response.status_code >= 200 and response.status_code < 300):
             response.raise_for_status()
 
-def post_request(self, url, data):
-    response = requests.post(url=url, json=data, verify=self.verify, headers=headers)
+def post_request(url, data):
+    response = requests.post(url=url, json=data, verify=False, headers=headers)
     if response.status_code > 299:
         print 'oh, crap... something went wrong. error code ' + str(response.status_code) + ' when I posted ' + url + ' with payload: ' + str(data)
         print 'response data: ' + str(response.json())
@@ -145,7 +145,7 @@ def post_request(self, url, data):
     return response
 
 
-@staticmethod
+# @staticmethod
 def upload_basic_bitches():
     # teachers
     host = 'localhost'
@@ -179,7 +179,7 @@ def upload_basic_bitches():
     generator = StudentGenerator(headers=headers)
     generator.upload_developer_information()
 
-    students = requests.get(url=student_url, verify=self.verify, headers=headers).json()['students']
+    students = requests.get(url=student_url, verify=False, headers=headers).json()['students']
 
     # sections
     section_url = base_url + 'sections/'
