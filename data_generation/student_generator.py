@@ -219,7 +219,7 @@ def upload_basic_bitches():
     for day in range(1, 32):
         for enrollment in enrollments_posted:
             to_post = {
-                'date': '2017-' + current_date.strftime('%m') + '-' + str(day),
+                'date': '2018-' + current_date.strftime('%m') + '-' + str(day),
                 'enrollment': enrollment['id'],
                 'effort': random.randint(1, 5),
                 'behavior': random.randint(1, 5),
