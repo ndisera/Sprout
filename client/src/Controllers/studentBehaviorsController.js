@@ -1,6 +1,6 @@
-app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data) {
+app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data, student) {
     // I know this will be here, because I filtered on the student ID, and only that student
-    $scope.student = data.students[0];
+    $scope.student = student.student;
 
     // for now, sort sections alphabetically
     $scope.sections       = _.sortBy(data.sections, 'title');
@@ -16,6 +16,11 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
     _.each($scope.enrollments, function(enrollmentElem) {
         $scope.enrollmentToIndex[enrollmentElem.id] = _.findIndex($scope.sections, function(sectionElem) { return enrollmentElem.section === sectionElem.id });
     });
+
+    $scope.errorMessages = [];
+    if($scope.enrollments.length === 0) {
+        $scope.errorMessages.push("It looks like this student isn't registered for any classes.");
+    }
 
 
     /**
@@ -119,16 +124,18 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                 for(var i = 0; i < dateDiff + 1; i++) {
                     $scope.sharedGraph.labels[i] = iterDate.format('MM/DD').toString();
 
-                    var behaviorDate = moment(data.behaviors[j].date);
-                    while(behaviorDate.diff(iterDate, 'd') === 0) {
-                        if(_.has($scope.enrollmentToIndex, data.behaviors[j].enrollment)) {
-                            $scope.behaviorGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].behavior;
-                            $scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
-                        }
+                    if(data.behaviors[j]) {
+                        var behaviorDate = moment(data.behaviors[j].date);
+                        while(behaviorDate.diff(iterDate, 'd') === 0) {
+                            if(_.has($scope.enrollmentToIndex, data.behaviors[j].enrollment)) {
+                                $scope.behaviorGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].behavior;
+                                $scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
+                            }
 
-                        j++;
-                        if(j >= data.behaviors.length) { break; }
-                        behaviorDate = moment(data.behaviors[j].date);
+                            j++;
+                            if(j >= data.behaviors.length) { break; }
+                            behaviorDate = moment(data.behaviors[j].date);
+                        }
                     }
 
                     iterDate.add(1, 'd');
