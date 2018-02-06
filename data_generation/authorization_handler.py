@@ -13,7 +13,6 @@ class AuthorizationHandler():
     def __init__(self, url="https://localhost", port_num=8000, verify=False):
         self.url = url
         self.port_num = port_num
-        self.complete_uri = str(self.url) + ":" + str(self.port_num) + "/students/"
         self.verify = verify
 
     def send_login_request(self, username, password):
