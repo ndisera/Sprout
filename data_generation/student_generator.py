@@ -250,7 +250,7 @@ if __name__ == "__main__":
 
         authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
                                                     port_num=args.port,
-                                                    verify=CERT_PATH)
+                                                    verify=False)
 
         try:
             args.token = authorizationHandler.send_login_request(args.username, args.password)
@@ -261,7 +261,7 @@ if __name__ == "__main__":
 
     headers['Authorization'] = 'JWT ' + args.token
 
-    generator = StudentGenerator(url=args.url, verify=CERT_PATH, headers=headers)
+    generator = StudentGenerator(url=args.url, verify=False, headers=headers)
 
     if args.setup:
         generator.upload_basic_bitches()
