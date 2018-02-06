@@ -85,10 +85,13 @@
                     </div>
                 </div>
             </form>
-            <!--<div ng-show="displayCEditInfo">
+            <!--New Stuff-->
+            <div ng-show="displayCEditInfo">
                 <hr />
                 <h4 col-sm-offset-1 col-sm-10>Students</h4>
-            </div>-->
+            </div>
+            <!--Enrolled Students: (search bar to filter table) followed by table of enrolled students with a - button on each row to remove student from class-->
+            <!--Enroll A Student (down arrow). On expansion brings up similar search bar and table with an add button instead-->
             <form class="form-horizontal" name="addSectionForm" ng-show="displaySectionForm" ng-submit="addSection()">
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="ctitle2">Title:</label>
