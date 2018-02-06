@@ -121,3 +121,17 @@ class Grade(models.Model):
     class Meta:
         unique_together = (('enrollment', 'assignment_name', 'due_date'),)
         ordering = ('due_date',)
+
+class CaseManager(models.Model):
+    """
+    CaseManager
+    Represents a case manager relationship in the system. That is, a
+    teacher who oversees a student.
+    teacher and student are a composite, unique key
+    """
+    teacher = models.ForeignKey(Teacher)
+    student = models.ForeignKey(Student)
+
+    class Meta:
+        unique_together = (('teacher', 'student'),)
+        ordering = ('teacher',)
