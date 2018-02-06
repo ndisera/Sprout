@@ -1,4 +1,5 @@
-﻿app.controller("manageTeachersController", function ($scope, $rootScope, $location, teachers, teacherService) {
+﻿
+app.controller("manageTeachersController", function($scope, $rootScope, $location, teachers, teacherService) {
 
     var teacherTask = "view/edit";
     var teacherVSearchOrInfo = "search";
@@ -31,7 +32,7 @@
      * Display search or form depending on the teacher task selected and set the active button
      * @param {string} task - the type of task selected.
      */
-    $scope.changeTeacherTask = function (task) {
+    $scope.changeTeacherTask = function(task) {
         switch (teacherTask) {
             case "view/edit":
                 $scope.displayTeacherViewSearch = false;
@@ -75,7 +76,7 @@
     /**
      * Displays teacher info if name in teacher search bar is valid.
      */
-    $scope.viewTeacher = function () {
+    $scope.viewTeacher = function() {
         if ($scope.teacherViewSearch.toUpperCase() in $scope.teachersLookup) {
             $scope.teacherV = $scope.teachersLookup[$scope.teacherViewSearch.toUpperCase()];
             // copy teacherV to teacherE
@@ -87,8 +88,7 @@
             $scope.viewTFirstName = true;
             $scope.viewTLastName = true;
             $scope.viewTEmail = true;
-        }
-        else {
+        } else {
             //TODO: notify the user in some way
         }
     };
@@ -96,12 +96,12 @@
     /**
      * Creates and adds a new teacher.
      */
-    $scope.addTeacher = function () {
+    $scope.addTeacher = function() {
         var teacherPromise = teacherService.addTeacher($scope.newTeacher);
         teacherPromise.then(function success(data) {
             $scope.newTeacher = {};
             $scope.addTeacherSuccess = true;
-            $("#addTeacherSuccess").fadeTo(2000, 500).slideUp(500, function () {
+            $("#addTeacherSuccess").fadeTo(2000, 500).slideUp(500, function() {
                 $("#addTeacherSuccess").slideUp(500);
             });
             $scope.teachers.push(data.teacher);
@@ -110,7 +110,7 @@
         }, function error(response) {
             setErrorMessage(response);
             $scope.addTeacherFailure = true;
-            $("#addTeacherFailure").fadeTo(5000, 500).slideUp(500, function () {
+            $("#addTeacherFailure").fadeTo(5000, 500).slideUp(500, function() {
                 $("#addTeacherFailure").slideUp(500);
             });
         });
@@ -119,7 +119,7 @@
     /**
      * Hides the delete teacher search bar and displays their info with an option to delete.
      */
-    $scope.displayDeleteTeacher = function () {
+    $scope.displayDeleteTeacher = function() {
         if ($scope.teacherDeleteSearch.toUpperCase() in $scope.teachersLookup) {
             $scope.teacherD = $scope.teachersLookup[$scope.teacherDeleteSearch.toUpperCase()];
             $scope.displayTeacherDeleteSearch = false;
@@ -132,7 +132,7 @@
     /**
      * Deletes the selected teacher from the database.
      */
-    $scope.deleteTeacher = function () {
+    $scope.deleteTeacher = function() {
         var teacherPromise = teacherService.deleteTeacher($scope.teacherD.id);
         teacherPromise.then(function success(data) {
             // remove teacher from teachers and teachersLookup
@@ -146,7 +146,7 @@
             var id = $scope.teacherD.id;
             $scope.teacherD = {};
             $scope.deleteTeacherSuccess = true;
-            $("#deleteTeacherSuccess").fadeTo(2000, 500).slideUp(500, function () {
+            $("#deleteTeacherSuccess").fadeTo(2000, 500).slideUp(500, function() {
                 $("#deleteTeacherSuccess").slideUp(500);
             });
             $scope.displayTeacherDeleteSearch = true;
@@ -168,7 +168,7 @@
         }, function error(response) {
             setErrorMessage(response);
             $scope.deleteTeacherFailure = true;
-            $("#deleteTeacherFailure").fadeTo(5000, 500).slideUp(500, function () {
+            $("#deleteTeacherFailure").fadeTo(5000, 500).slideUp(500, function() {
                 $("#deleteTeacherFailure").slideUp(500);
             });
         });
@@ -177,7 +177,7 @@
     /**
      * Restores the delete teacher search box and hides their info and delete option.
      */
-    $scope.cancelDeleteTeacher = function () {
+    $scope.cancelDeleteTeacher = function() {
         $scope.clearTeacherDeleteSearch();
         $scope.displayTeacherDeleteSearch = true;
         $scope.displayTeacherInfo = false;
@@ -189,7 +189,7 @@
      * Turns the displayed teacher field into an editable input.
      * @param {string} field - the name of the field that the user is editing.
      */
-    $scope.editTeacher = function (field) {
+    $scope.editTeacher = function(field) {
         switch (field) {
             case "username":
                 $scope.viewTUsername = false;
@@ -211,7 +211,7 @@
      * Updates the selected Teacher with the newly edited field.
      * @param {string} field - the name of the field that the user is editing.
      */
-    $scope.saveTEdit = function (field) {
+    $scope.saveTEdit = function(field) {
         switch (field) {
             // update field
             case "username":
@@ -287,7 +287,7 @@
      * Restored the previous display of the selected teacher field and hides the editable input box.
      * @param {string} field - the name of the field that the user is editing.
      */
-    $scope.cancelTEdit = function (field) {
+    $scope.cancelTEdit = function(field) {
         switch (field) {
             case "username":
                 $scope.viewTUsername = true;
@@ -312,14 +312,14 @@
     /**
      * Clears the view teacher search bar.
      */
-    $scope.clearTeacherViewSearch = function () {
+    $scope.clearTeacherViewSearch = function() {
         $scope.teacherViewSearch = "";
     };
 
     /**
      * Clears the delete teacher search bar.
      */
-    $scope.clearTeacherDeleteSearch = function () {
+    $scope.clearTeacherDeleteSearch = function() {
         $scope.teacherDeleteSearch = "";
     };
 
@@ -351,6 +351,10 @@
         }
     }
 
+    /**
+     * Updates the displayed error message.
+     * @param {response} response - response containing data and error message.
+     */
     function setErrorMessage(response) {
         $scope.errorMessage = [];
         for (var property in response.data) {
