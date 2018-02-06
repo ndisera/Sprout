@@ -58,3 +58,12 @@ class GradeSerializer(DynamicModelSerializer):
         model = Grade
         fields = ('id', 'enrollment', 'due_date', 'percent', 'assignment_name')
     enrollment = DynamicRelationField('EnrollmentSerializer')
+
+
+class CaseManagerSerializer(DynamicModelSerializer):
+    class Meta:
+        model = CaseManager
+        fields = ('id', 'teacher', 'student')
+
+    teacher = DynamicRelationField('TeacherSerializer')
+    student = DynamicRelationField('StudentSerializer')

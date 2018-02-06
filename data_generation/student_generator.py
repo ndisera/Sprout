@@ -7,8 +7,8 @@ import random
 import requests
 import sys
 
-from authorization_handler import AuthorizationHandler
-from authorization_handler import CERT_PATH
+from authorization_service import AuthorizationService
+from authorization_service import CERT_PATH
 
 headers = { }
 
@@ -136,8 +136,8 @@ class StudentGenerator(object):
         if not (response.status_code >= 200 and response.status_code < 300):
             response.raise_for_status()
 
-def post_request(self, url, data):
-    response = requests.post(url=url, json=data, verify=self.verify, headers=headers)
+def post_request(url, data):
+    response = requests.post(url=url, json=data, verify=False, headers=headers)
     if response.status_code > 299:
         print 'oh, crap... something went wrong. error code ' + str(response.status_code) + ' when I posted ' + url + ' with payload: ' + str(data)
         print 'response data: ' + str(response.json())
@@ -145,7 +145,7 @@ def post_request(self, url, data):
     return response
 
 
-@staticmethod
+# @staticmethod
 def upload_basic_bitches():
     # teachers
     host = 'localhost'
@@ -179,7 +179,7 @@ def upload_basic_bitches():
     generator = StudentGenerator(headers=headers)
     generator.upload_developer_information()
 
-    students = requests.get(url=student_url, verify=self.verify, headers=headers).json()['students']
+    students = requests.get(url=student_url, verify=False, headers=headers).json()['students']
 
     # sections
     section_url = base_url + 'sections/'
@@ -219,7 +219,7 @@ def upload_basic_bitches():
     for day in range(1, 32):
         for enrollment in enrollments_posted:
             to_post = {
-                'date': '2017-' + current_date.strftime('%m') + '-' + str(day),
+                'date': '2018-' + current_date.strftime('%m') + '-' + str(day),
                 'enrollment': enrollment['id'],
                 'effort': random.randint(1, 5),
                 'behavior': random.randint(1, 5),
@@ -245,9 +245,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if not args.token:
-        args.username, args.password = AuthorizationHandler.display_login_prompt(args.username, args.password)
+        args.username, args.password = AuthorizationService.display_login_prompt(args.username, args.password)
 
-        authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url),
+        authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
                                                     port_num=args.port,
                                                     verify=CERT_PATH)
 
@@ -266,7 +266,3 @@ if __name__ == "__main__":
         generator = StudentGenerator(url=args.url, verify=CERT_PATH, headers=headers)
         # generator.upload_developer_information();
         generator.upload_many_random_students(5)
-
-
-
-

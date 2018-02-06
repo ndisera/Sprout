@@ -1,5 +1,4 @@
-﻿
-app.controller("manageStudentsController", function($scope, $rootScope, $location, students, studentService) {
+﻿app.controller("manageStudentsController", function ($scope, $rootScope, $location, students, studentService) {
 
     var studentTask = "view/edit";
     var studentDSearchOrInfo = "search";
@@ -70,7 +69,8 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
     /**
      * Creates and adds a new student.
      */
-    $scope.addStudent = function() {
+    $scope.addStudent = function () {
+        $scope.newStudent.birthdate = moment($scope.newStudent.birthdate).format('YYYY-MM-DD').toString();
         var studentPromise = studentService.addStudent($scope.newStudent);
         studentPromise.then(function success(data) {
             $scope.newStudent = {};

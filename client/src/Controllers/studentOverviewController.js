@@ -1,4 +1,4 @@
-app.controller("studentOverviewController", function ($scope, $rootScope, $http, $routeParams, studentService, behaviorService, sectionService, enrollmentData, studentData) {
+app.controller("studentOverviewController", function ($scope, $rootScope, $routeParams, studentService, caseManagerService, enrollmentData, caseManagerData, teacherData, studentData) {
 
     // set important scope variables
     $scope.student = studentData.student;
@@ -35,8 +35,8 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $http,
         birthdate: {
             key: 'birthdate',
             title: 'Birthday',
-            value: $scope.student.birthdate,
-            curValue: $scope.student.birthdate,
+            value: moment($scope.student.birthdate).format('YYYY-MM-DD'),
+            curValue: moment($scope.student.birthdate).format('YYYY-MM-DD'),
             editable: false,
         },
     };
@@ -108,12 +108,23 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $http,
         _.each($scope.studentProperties, function(value, key) {
             newStudent[key] = value.value;
         });
-        newStudent[property.key] = property.curValue;
+
+        if(property.key === 'birthdate') {
+            newStudent[property.key] = moment(property.curValue).format('YYYY-MM-DD').toString();
+        }
+        else {
+            newStudent[property.key] = property.curValue;
+        }
 
         studentService.updateStudent($scope.student.id, newStudent).then(
             function success(data) {
                 _.each($scope.studentProperties, function(value, key) {
-                    value.value = data.student[key];
+                    if(value.key === 'birthdate') {
+                        value.value = moment(data.student[key]).format('YYYY-MM-DD');
+                    }
+                    else {
+                        value.value = data.student[key];
+                    }
                 });
                 $scope.student = data.student;
                 $scope.studentProperties[property.key].editable = false;
@@ -132,12 +143,70 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $http,
     };
 
     // hard coded case managers for now
-    $scope.caseManager = "John Doe";
-    $scope.caseManagers = ["John Doe", "Jane Doe", "Mr. Exampleman", "Yo There"]
+    var teacherLookup = _.indexBy(teacherData.teachers, 'id');
+    if(caseManagerData.case_managers.length > 0) {
+        // student has case manager
+        $scope.caseManagerRecordId = caseManagerData.case_managers[0].id;
+
+        var caseManagerId = caseManagerData.case_managers[0].teacher;
+        $scope.caseManager = teacherLookup[caseManagerId];
+    }
+    else {
+        $scope.caseManagerRecordId = null;
+
+        // student does not yet have case manager
+        $scope.caseManager = {
+            id: null,
+            first_name: 'NO CASE',
+            last_name: 'MANAGER',
+        };
+    }
+
+    $scope.caseManagers = _.clone(teacherData.teachers);
 
     $scope.selectCaseManager = function(caseManager) {
-        console.log(caseManager);
-        $scope.caseManager = caseManager;
+        if($scope.caseManagerRecordId === null) {
+            // add new case manager record
+            var newCaseManagerRecord = {
+                student: $scope.student.id,
+                teacher: caseManager.id,
+            };
+
+            caseManagerService.assignCaseManager(newCaseManagerRecord).then(
+                function success(data) {
+                    $scope.caseManagerRecordId = data.case_manager.id;
+                    $scope.caseManager = teacherLookup[data.case_manager.teacher];
+                },
+                function error(response) {
+                    //TODO: notify the user
+                }
+            );
+        }
+        else {
+            // edit existing case manager record
+            var newCaseManagerRecord = {
+                student: $scope.student.id,
+                teacher: caseManager.id,
+                id: $scope.caseManagerRecordId,
+            };
+
+            caseManagerService.updateCaseManager($scope.caseManagerRecordId, newCaseManagerRecord).then(
+                function success(data) {
+                    $scope.caseManagerRecordId = data.case_manager.id;
+                    $scope.caseManager = teacherLookup[data.case_manager.teacher];
+                },
+                function error(response) {
+                    //TODO: notify the user
+                }
+            );
+        }
     };
 
 });
+
+
+
+
+
+
+

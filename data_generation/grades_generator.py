@@ -6,8 +6,8 @@ import random
 import requests
 import sys
 
-from authorization_handler import AuthorizationHandler
-from authorization_handler import CERT_PATH
+from authorization_service import AuthorizationService
+from authorization_service import CERT_PATH
 
 from enrollment_service import Enrollment, EnrollmentService
 
@@ -113,13 +113,15 @@ if __name__ == "__main__":
                         help="login password (warning: insecure!)")
     parser.add_argument("--token", action="store", type=str,
                         help="auth token -- supersedes username and password")
+    parser.add_argument("--num-scores", action="store", type=int, default=5,
+                        help="number of datapoints to generate")
 
     args = parser.parse_args()
 
     if not args.token:
-        args.username, args.password = AuthorizationHandler.display_login_prompt(args.username, args.password)
+        args.username, args.password = AuthorizationService.display_login_prompt(args.username, args.password)
 
-        authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url),
+        authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
                                                     port_num=args.port,
                                                     verify=CERT_PATH)
 
@@ -134,5 +136,5 @@ if __name__ == "__main__":
 
     generator = GradesGenerator(url=args.url, port_num=args.port, headers=headers, verify=CERT_PATH)
 
-    toPost = generator.generate(5)
+    toPost = generator.generate(args.num_scores)
     generator.upload(toPost)
