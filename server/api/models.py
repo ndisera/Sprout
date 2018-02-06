@@ -144,9 +144,8 @@ class CaseManager(models.Model):
     teacher who oversees a student.
     teacher and student are a composite, unique key
     """
-    teacher = models.ForeignKey(Teacher)
-    student = models.ForeignKey(Student)
+    teacher = models.ForeignKey(Teacher, blank=False)
+    student = models.OneToOneField(Student, blank=False)
 
     class Meta:
-        unique_together = (('teacher', 'student'),)
         ordering = ('teacher',)
