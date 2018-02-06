@@ -1,4 +1,5 @@
-﻿app.controller("manageClassesController", function ($scope, $rootScope, $location, students, teachers, sections, studentService, teacherService, sectionService, enrollmentService) {
+﻿
+app.controller("manageClassesController", function($scope, $rootScope, $location, students, teachers, sections, studentService, teacherService, sectionService, enrollmentService) {
     // don't think I will need teacherService
 
     // anywhere 's' or 't' was previously used for 'students' and 'teachers', 'c' will be used for 'classes'
@@ -22,6 +23,8 @@
     $scope.sectionD = {};
     $scope.newSection = {};
     $scope.sections = sections.sections;
+    // lookup needs to be based off of id not fullname
+    $scope.students = _.indexBy(students.students, 'id');
     $scope.teachers = teachers.teachers;
     $scope.teachersLookup = {};
     $scope.teacherIdLookup = {};
@@ -43,7 +46,7 @@
         $scope.teacherIdLookup[$scope.teachers[i].id] = lookupName;
     }
 
-    $scope.checkValidTeacher = function (task) {
+    $scope.checkValidTeacher = function(task) {
         switch (task) {
             case "add":
                 $scope.addValidTeacher = _.has($scope.teachersLookup, $scope.addTeacher.toUpperCase());
@@ -59,7 +62,7 @@
      * Display search or form depending on the student task selected and set the active button
      * @param {string} task - the type of task selected.
      */
-    $scope.changeSectionTask = function (task) {
+    $scope.changeSectionTask = function(task) {
         switch (sectionTask) {
             case "view/edit":
                 $scope.displaySectionViewSearch = false;
@@ -132,7 +135,7 @@
     /**
      * Displays teacher info if name in teacher search bar is valid.
      */
-    $scope.viewSection = function () {
+    $scope.viewSection = function() {
         if ($scope.sectionViewSearch.toUpperCase() in $scope.sectionsLookup) {
             $scope.sectionV = $scope.sectionsLookup[$scope.sectionViewSearch.toUpperCase()];
             // copy sectionV to sectionE
@@ -143,9 +146,10 @@
             $scope.viewCTitle = true;
             $scope.viewCTeacher = true;
             // set enrolledStudents and unenrolledStudents
-
-        }
-        else {
+            $('#enrolledInput').val('');
+            $('#unenrolledInput').val('');
+            getEnrolledStudents();
+        } else {
             //TODO: notify the user in some way
         }
     };
@@ -154,7 +158,7 @@
      * Turns the displayed teacher field into an editable input.
      * @param {string} field - the name of the field that the user is editing.
      */
-    $scope.editSection = function (field) {
+    $scope.editSection = function(field) {
         switch (field) {
             case "title":
                 $scope.viewCTitle = false;
@@ -170,7 +174,7 @@
      * Restored the previous display of the selected section field and hides the editable input box.
      * @param {string} field - the name of the field that the user is editing.
      */
-    $scope.cancelCEdit = function (field) {
+    $scope.cancelCEdit = function(field) {
         switch (field) {
             case "title":
                 $scope.viewCTitle = true;
@@ -188,7 +192,7 @@
      * Updates the selected section with the newly edited field.
      * @param {string} field - the name of the field that the user is editing.
      */
-    $scope.saveCEdit = function (field) {
+    $scope.saveCEdit = function(field) {
         switch (field) {
             // update field
             case "title":
@@ -243,14 +247,14 @@
     /**
      * Creates and adds a new section.
      */
-    $scope.addSection = function () {
+    $scope.addSection = function() {
         $scope.newSection.teacher = $scope.teachersLookup[$scope.addTeacher.toUpperCase()];
         var sectionPromise = sectionService.addSection($scope.newSection);
         sectionPromise.then(function success(data) {
             $scope.addTeacher = "";
             $scope.newSection = {};
             $scope.addSectionSuccess = true;
-            $("#addSectionSuccess").fadeTo(2000, 500).slideUp(500, function () {
+            $("#addSectionSuccess").fadeTo(2000, 500).slideUp(500, function() {
                 $("#addSectionSuccess").slideUp(500);
             });
             $scope.sections.push(data.section);
@@ -259,7 +263,7 @@
         }, function error(response) {
             setErrorMessage(response);
             $scope.addSectionFailure = true;
-            $("#addSectionFailure").fadeTo(5000, 500).slideUp(500, function () {
+            $("#addSectionFailure").fadeTo(5000, 500).slideUp(500, function() {
                 $("#addSectionFailure").slideUp(500);
             });
         });
@@ -268,7 +272,7 @@
     /**
      * Hides the delete section search bar and displays its info with an option to delete.
      */
-    $scope.displayDeleteSection = function () {
+    $scope.displayDeleteSection = function() {
         if ($scope.sectionDeleteSearch.toUpperCase() in $scope.sectionsLookup) {
             $scope.sectionD = $scope.sectionsLookup[$scope.sectionDeleteSearch.toUpperCase()];
             $scope.displaySectionDeleteSearch = false;
@@ -281,7 +285,7 @@
     /**
      * Deletes the selected teacher from the database.
      */
-    $scope.deleteSection = function () {
+    $scope.deleteSection = function() {
         var sectionPromise = sectionService.deleteSection($scope.sectionD.id);
         sectionPromise.then(function success(data) {
             // remove teacher from teachers and teachersLookup
@@ -295,7 +299,7 @@
             var id = $scope.sectionD.id;
             $scope.sectionD = {};
             $scope.deleteSectionSuccess = true;
-            $("#deleteSectionSuccess").fadeTo(2000, 500).slideUp(500, function () {
+            $("#deleteSectionSuccess").fadeTo(2000, 500).slideUp(500, function() {
                 $("#deleteSectionSuccess").slideUp(500);
             });
             $scope.displaySectionDeleteSearch = true;
@@ -315,7 +319,7 @@
         }, function error(response) {
             setErrorMessage(response);
             $scope.deleteSectionFailure = true;
-            $("#deleteSectionFailure").fadeTo(5000, 500).slideUp(500, function () {
+            $("#deleteSectionFailure").fadeTo(5000, 500).slideUp(500, function() {
                 $("#deleteSectionFailure").slideUp(500);
             });
         });
@@ -324,7 +328,7 @@
     /**
      * Restores the delete section search box and hides its info and delete option.
      */
-    $scope.cancelDeleteSection = function () {
+    $scope.cancelDeleteSection = function() {
         $scope.clearSectionDeleteSearch();
         $scope.displaySectionDeleteSearch = true;
         $scope.displaySectionInfo = false;
@@ -333,19 +337,84 @@
     };
 
     /**
+     * Grabs all enrolled students in the selected section.
+     */
+    function getEnrolledStudents() {
+        var getStudentsPromise = enrollmentService.getStudentEnrollments({
+            include: ['student.*'],
+            filter: [{name: 'section', val: $scope.sectionV.id}],
+        });
+        getStudentsPromise.then(function success(data) {
+            $scope.enrolledStudents = _.indexBy(data.students, 'id');
+            $scope.enrollments = _.indexBy(data.enrollments, 'id');
+            // set unenrolled students to all students and then delete each enrolled student with id
+            $scope.unenrolledStudents = Object.assign({}, $scope.students);
+            for (var student in $scope.enrolledStudents) {
+                delete $scope.unenrolledStudents[student];
+            }
+        }, function error(response) {
+            $scope.errorMessage = response;
+        });
+    };
+
+    /**
+     * Enrolls a student in the selected section.
+     * @param {number} studentID - the student_id of the student to be enrolled.
+     */
+    $scope.enrollStudent = function(studentID) {
+        var enrollmentObj = {
+            section: $scope.sectionV.id,
+            student: studentID,
+        }
+        var enrollPromise = enrollmentService.addStudentEnrollment(enrollmentObj);
+        enrollPromise.then(function success(data) {
+            var enrollment = data.enrollment;
+            // add to enrollments
+            $scope.enrollments[enrollment.id] = enrollment;
+            // move student from unenrolledstudents into enrolledStudents
+            var tempStudent = $scope.unenrolledStudents[enrollment.student];
+            delete $scope.unenrolledStudents[tempStudent.id];
+            $scope.enrolledStudents[tempStudent.id] = tempStudent;
+        }, function error(response) {
+            $scope.errorMessage = response;
+        })
+    }
+
+    /**
+     * Removes a student from the selected section.
+     * @param {number} enrollment - the enrollment to be deleted.
+     */
+    $scope.unenrollStudent = function(enrollmentID) {
+        var unenrollPromise = enrollmentService.deleteStudentEnrollment(enrollmentID);
+        unenrollPromise.then(function success(data) {
+            // remove from enrollments
+            var enrollment = $scope.enrollments[enrollmentID];
+            delete $scope.enrollments[enrollmentID];
+            // move student from enrolledStudents into unenrolledStudents
+            var tempStudent = $scope.enrolledStudents[enrollment.student];
+            delete $scope.enrolledStudents[tempStudent.id];
+            $scope.unenrolledStudents[tempStudent.id] = tempStudent;
+        })
+    }
+
+    /**
      * Clears the view section search bar.
      */
-    $scope.clearSectionViewSearch = function () {
+    $scope.clearSectionViewSearch = function() {
         $scope.sectionViewSearch = "";
     };
 
     /**
      * Clears the delete section search bar.
      */
-    $scope.clearSectionDeleteSearch = function () {
+    $scope.clearSectionDeleteSearch = function() {
         $scope.sectionDeleteSearch = "";
     };
 
+    /**
+     * Updates the displayed error message.
+     * @param {response} response - response containing data and error message.
+     */
     function setErrorMessage(response) {
         $scope.errorMessage = [];
         for (var property in response.data) {
@@ -357,4 +426,20 @@
         }
         $scope.errorMessage = $scope.errorMessage.join(" ");
     }
+
+    // filter for the enrolled table
+    $("#enrolledInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#enrolledStudents tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+
+    // filter for the unenrolled table
+    $("#unenrolledInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#unenrolledStudents tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
 })
