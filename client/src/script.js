@@ -153,8 +153,13 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/studentTests.html',
             controller: 'studentTestsController',
             resolve: {
-                student: function(studentService, $route) {
-                    return studentService.getStudent($route.current.params.id);
+                data: function(enrollmentService, $route) {
+                    return enrollmentService.getStudentEnrollments(
+                      {
+                          include: ['section.*', 'student.*'],
+                          filter: [{ name: 'student', val: $route.current.params.id, },],
+                      }
+                    );
                 },
                 auth: function(userService) {
                     return userService.authVerify();

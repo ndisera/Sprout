@@ -18,7 +18,6 @@ app.factory("testScoreService", function ($rootScope, $http, $q, queryService) {
             });
             return deferred.promise;
         },
-        
 
         /**
          * Add student test record

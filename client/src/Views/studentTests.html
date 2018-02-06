@@ -1,0 +1,136 @@
+<div class="container">
+    <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
+        <li><a ng-href="#!/student/{{student.id}}">Overview</a></li>
+        <li class="active"><a ng-href="#!/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/services">Services</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/grades">Grades</a></li>
+    </ul>
+    <ul class="nav nav-tabs hidden-xs">
+        <li><a ng-href="#!/student/{{student.id}}">Overview</a></li>
+        <li class="active"><a ng-href="#!/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/services">Services</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/grades">Grades</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="tests" class="tab-pane fade in active voffset3">
+            <div class="row voffset2">
+                <div class="col-xs-12">
+                    <div class="panel-wrapper">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Test Scores</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-6 voffset2">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">From</span>
+                                            <input type="text"
+                                                   id="graphStartDate"
+                                                   class="form-control"
+                                                   date-time
+                                                   ng-model="graphStartDate"
+                                                   view="date"
+                                                   min-view="date"
+                                                   format="YYYY-MM-DD"
+                                                   date-change="graphDateRangeChange"
+                                                   max-date="graphEndDate"
+                                                   watch-direct-changes="true">
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-6 voffset2">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">To</span>
+                                            <input type="text"
+                                                   id="graphEndDate"
+                                                   class="form-control"
+                                                   date-time
+                                                   ng-model="graphEndDate"
+                                                   view="date"
+                                                   min-view="date"
+                                                   format="YYYY-MM-DD"
+                                                   date-change="graphDateRangeChange"
+                                                   min-date="graphStartDate"
+                                                   watch-direct-changes="true">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row voffset3">
+                                    <div class="col-m-12 centerText focusGraph">
+                                        <label>Test Scores</label>
+                                        <div class="col-m-12">
+                                            <canvas id="student_test_scores"
+                                                    class="chart chart-line"
+                                                    chart-data="testGraph.data"
+                                                    chart-labels="sharedGraph.labels"
+                                                    chart-series="sharedGraph.series"
+                                                    chart-options="sharedGraph.options"
+                                                    chart-dataset-override="datasetOverride"
+                                                    chart-click="onClick">
+                                            </canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="row voffset3">-->
+                <!--<div class="col-xs-12">-->
+                    <!--<div class="panel-wrapper">-->
+                        <!--<div class="panel panel-default">-->
+                            <!--<div class="panel-heading">-->
+                                <!--<h3 class="panel-title">Input Behavior Scores</h3>-->
+                            <!--</div>-->
+                            <!--<div class="panel-body">-->
+                                <!--<div class="input-group">-->
+                                    <!--<span class="input-group-addon">For Date</span>-->
+                                    <!--<input type="text"-->
+                                           <!--id="inputDate"-->
+                                           <!--class="form-control"-->
+                                           <!--date-time-->
+                                           <!--ng-model="inputDate"-->
+                                           <!--view="date"-->
+                                           <!--min-view="date"-->
+                                           <!--format="YYYY-MM-DD"-->
+                                           <!--date-change="inputDateChange"-->
+                                           <!--watch-direct-changes="true">-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<table class="table">-->
+                                <!--<tbody>-->
+                                <!--<tr>-->
+                                    <!--<th>Class</th>-->
+                                    <!--<th>Behavior</th>-->
+                                    <!--<th>Effort</th>-->
+                                <!--</tr>-->
+                                <!--<tr ng-repeat="entry in scoresInput">-->
+                                    <!--<td>{{ entry.title }}</td>-->
+                                    <!--<td>-->
+                                        <!--<select ng-model="entry.curBehavior"-->
+                                                <!--ng-options="x for x in inputOptions"-->
+                                                <!--ng-change="saveScore(entry, 'behavior')">-->
+                                        <!--</select>-->
+                                    <!--</td>-->
+                                    <!--<td>-->
+                                        <!--<select ng-model="entry.curEffort"-->
+                                                <!--ng-options="x for x in inputOptions"-->
+                                                <!--ng-change="saveScore(entry, 'effort')">-->
+                                        <!--</select>-->
+                                    <!--</td>-->
+                                <!--</tr>-->
+
+                                <!--</tbody>-->
+                            <!--</table>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+    </div>
+</div>
