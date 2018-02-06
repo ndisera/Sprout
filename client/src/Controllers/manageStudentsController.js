@@ -71,6 +71,7 @@
      * Creates and adds a new student.
      */
     $scope.addStudent = function () {
+        $scope.newStudent.birthdate = moment($scope.newStudent.birthdate).format('YYYY-MM-DD').toString();
         var studentPromise = studentService.addStudent($scope.newStudent);
         studentPromise.then(function success(data) {
             $scope.newStudent = {};
