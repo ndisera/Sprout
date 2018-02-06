@@ -69,7 +69,8 @@
                                             <span ng-click="beginEditStudent(property)" class="glyphicon glyphicon-pencil pencilEdit"></span>
                                             </p>
                                             <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9" ng-show="property.editable">
-                                                <input type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                                <input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                                <input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
                                                 <div class="input-group-btn">
                                                     <button class="btn btn-default" type="submit" ng-disabled="editStudentForm{{$index}}.editStudentFormInput{{$index}}.$invalid">
                                                         <span class="glyphicon glyphicon-ok green"></span>
