@@ -127,13 +127,23 @@ class GradesGenerator():
                 grade_max = min(grade_max, assignment.score_max)
                 grade_min = max(grade_min, assignment.score_min)
 
+                # calculate when the assignment was turned in
+                duedate = datetime.datetime.strptime(assignment.due_date, '%Y-%m-%d')
+
                 # Now generate the number of grades we were supposed to generate
                 for unused in range(num):
+                    late_modifier = random.randint(0, 9)
+                    handin = datetime.datetime.now();
+                    if late_modifier > 8:
+                        print 'assignment was late!'
+                        handin = datetime.datetime(duedate.year, duedate.month, duedate.day + 1, handin.hour, handin.minute, handin.second, handin.microsecond)
+                    else:
+                        handin = datetime.datetime(duedate.year, duedate.month, duedate.day, handin.hour, handin.minute, handin.second, handin.microsecond)
                     score = random.randint(grade_min, grade_max)
                     grade = Grade(assignment=assignment.id,
                                   score=score,
                                   student=student,
-                                  handin_datetime=str(datetime.datetime.now()),
+                                  handin_datetime=str(handin),
                                   id=None)
                     toPost.append(grade)
 
