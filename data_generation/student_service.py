@@ -7,7 +7,7 @@ from collections import namedtuple
 Student = namedtuple("Student", ['student_id', 'first_name', 'last_name', 'birthdate', 'id'])
 
 
-class GradesService():
+class StudentService():
 
     def __init__(self, headers={}, url="localhost", port_num=8000, verify=CERT_PATH):
         self.headers = headers
