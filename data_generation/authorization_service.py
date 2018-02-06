@@ -5,7 +5,7 @@ import requests
 
 CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/rootCA_cert.pem")
 
-class AuthorizationHandler():
+class AuthorizationService():
     """
     Helper class for containing all things to do with authorization
     """

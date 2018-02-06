@@ -1,7 +1,7 @@
 
 import requests
 
-from authorization_handler import CERT_PATH
+from authorization_service import CERT_PATH
 from collections import namedtuple
 
 Student = namedtuple("Student", ['student_id', 'first_name', 'last_name', 'birthdate', 'id'])
