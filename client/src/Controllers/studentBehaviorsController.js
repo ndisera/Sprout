@@ -119,16 +119,18 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                 for(var i = 0; i < dateDiff + 1; i++) {
                     $scope.sharedGraph.labels[i] = iterDate.format('MM/DD').toString();
 
-                    var behaviorDate = moment(data.behaviors[j].date);
-                    while(behaviorDate.diff(iterDate, 'd') === 0) {
-                        if(_.has($scope.enrollmentToIndex, data.behaviors[j].enrollment)) {
-                            $scope.behaviorGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].behavior;
-                            $scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
-                        }
+                    if(data.behaviors[j]) {
+                        var behaviorDate = moment(data.behaviors[j].date);
+                        while(behaviorDate.diff(iterDate, 'd') === 0) {
+                            if(_.has($scope.enrollmentToIndex, data.behaviors[j].enrollment)) {
+                                $scope.behaviorGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].behavior;
+                                $scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
+                            }
 
-                        j++;
-                        if(j >= data.behaviors.length) { break; }
-                        behaviorDate = moment(data.behaviors[j].date);
+                            j++;
+                            if(j >= data.behaviors.length) { break; }
+                            behaviorDate = moment(data.behaviors[j].date);
+                        }
                     }
 
                     iterDate.add(1, 'd');
