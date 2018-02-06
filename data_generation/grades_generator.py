@@ -113,6 +113,8 @@ if __name__ == "__main__":
                         help="login password (warning: insecure!)")
     parser.add_argument("--token", action="store", type=str,
                         help="auth token -- supersedes username and password")
+    parser.add_argument("--num-scores", action="store", type=int, default=5,
+                        help="number of datapoints to generate")
 
     args = parser.parse_args()
 
@@ -134,5 +136,5 @@ if __name__ == "__main__":
 
     generator = GradesGenerator(url=args.url, port_num=args.port, headers=headers, verify=CERT_PATH)
 
-    toPost = generator.generate(5)
+    toPost = generator.generate(args.num_scores)
     generator.upload(toPost)
