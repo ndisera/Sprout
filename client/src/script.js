@@ -166,16 +166,13 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/studentBehaviors.html',
             controller: 'studentBehaviorsController',
             resolve: {
-                enrollments: function (enrollmentService, $route) {
+                data: function(enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
-                        { 
-                            include: ['section.*'],
-                            filter: [{ name: 'student', val: $route.current.params.id }, ],
+                        {
+                            include: ['section.*', 'student.*'],
+                            filter: [{ name: 'student', val: $route.current.params.id, },],
                         }
                     );
-                },
-                student: function (studentService, $route) {
-                    return studentService.getStudent($route.current.params.id);
                 },
                 auth: function(userService) {
                     return userService.authVerify();
@@ -187,14 +184,6 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/studentIeps.html',
             controller: 'studentIepsController',
             resolve: {
-                enrollments: function(enrollmentService, $route) {
-                    return enrollmentService.getStudentEnrollments(
-                        { 
-                            include: ['section.*'],
-                            filter: [{ name: 'student', val: $route.current.params.id },],
-                        }
-                    );
-                },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
