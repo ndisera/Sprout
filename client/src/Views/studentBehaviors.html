@@ -1,4 +1,9 @@
 <div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="student-name-title">{{ student.first_name }} {{ student.last_name }}</h2>
+        </div>
+    </div>
     <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
         <li><a ng-href="#!/student/{{student.id}}">Overview</a></li>
         <li><a ng-href="#!/student/{{student.id}}/tests">Test Scores</a></li>
@@ -17,12 +22,12 @@
     </ul>
     <div class="tab-content">
         <div id="behavior" class="tab-pane fade in active voffset3">
-            <div class="row voffset2">
+            <div class="row voffset4">
                 <div class="col-xs-12">
                     <div class="panel-wrapper">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Behavior</h3>
+                                <h3 class="panel-title">Performance</h3>
                             </div>
                             <div class="panel-body">
                                 <div class="row">

@@ -21,6 +21,11 @@
     cursor: pointer;
 }
 
+.student-name-title {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
 #student-overview-pic > img {
     border-radius: 50%;
     width: 100%;
