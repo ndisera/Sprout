@@ -266,7 +266,3 @@ if __name__ == "__main__":
         generator = StudentGenerator(url=args.url, verify=CERT_PATH, headers=headers)
         # generator.upload_developer_information();
         generator.upload_many_random_students(5)
-
-
-
-
