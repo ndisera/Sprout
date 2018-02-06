@@ -140,6 +140,16 @@ app.config(function ($routeProvider, $httpProvider) {
                         }
                     );
                 },
+                caseManagerData: function(caseManagerService, $route) {
+                    return caseManagerService.getCaseManager(
+                        {
+                            filter: [{ name: 'student', val: $route.current.params.id },],
+                        }
+                    );
+                },
+                teacherData: function(teacherService, $route) {
+                    return teacherService.getTeachers();
+                },
                 studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },

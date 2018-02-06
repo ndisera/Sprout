@@ -35,10 +35,10 @@
                     <div id="student-overview-assign-dropdown" class="input-group pull-right">
                         <span class="input-group-addon">Assigned To</span>
                         <div class="input-group-btn">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ caseManager }} <span class="caret"></span></button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span></button>
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)">
-                                    <a class="student-overview-assign-link">{{ entry }}  <span ng-if="entry === caseManager" class="glyphicon glyphicon-ok"></span></a>
+                                    <a class="student-overview-assign-link">{{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.id === caseManager.id" class="glyphicon glyphicon-ok"></span></a>
                                 </li>
                             </ul>
                         </div>
