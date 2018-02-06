@@ -169,10 +169,13 @@ app.config(function ($routeProvider, $httpProvider) {
                 data: function(enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
                         {
-                            include: ['section.*', 'student.*'],
+                            include: ['section.*',],
                             filter: [{ name: 'student', val: $route.current.params.id, },],
                         }
                     );
+                },
+                student: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
                 },
                 auth: function(userService) {
                     return userService.authVerify();

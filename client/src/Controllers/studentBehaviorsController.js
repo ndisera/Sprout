@@ -1,6 +1,6 @@
-app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data) {
+app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data, student) {
     // I know this will be here, because I filtered on the student ID, and only that student
-    $scope.student = data.students[0];
+    $scope.student = student.student;
 
     // for now, sort sections alphabetically
     $scope.sections       = _.sortBy(data.sections, 'title');
@@ -16,6 +16,11 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
     _.each($scope.enrollments, function(enrollmentElem) {
         $scope.enrollmentToIndex[enrollmentElem.id] = _.findIndex($scope.sections, function(sectionElem) { return enrollmentElem.section === sectionElem.id });
     });
+
+    $scope.errorMessages = [];
+    if($scope.enrollments.length === 0) {
+        $scope.errorMessages.push("It looks like this student isn't registered for any classes.");
+    }
 
 
     /**
