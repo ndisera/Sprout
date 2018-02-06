@@ -5,7 +5,7 @@ import requests
 from authorization_service import CERT_PATH
 from collections import namedtuple
 
-Grade = namedtuple("Grade", ['due_date', 'enrollment', 'percent', 'assignment_name', 'id'])
+Grade = namedtuple("Grade", ['assignment', 'student', 'score', 'handin_datetime', 'id'])
 
 
 class GradesService():
@@ -35,10 +35,10 @@ class GradesService():
         toReturn = []
 
         for grade in grades:
-            toReturn.append(Grade(due_date=grade['due_date'],
-                                  enrollment=grade['enrollment'],
-                                  percent=grade['percent'],
-                                  assignment_name=grade['assignment_name'],
+            toReturn.append(Grade(assignment=grade['assignment'],
+                                  student=grade['student'],
+                                  score=grade['score'],
+                                  handin_datetime=grade['handin_datetime'],
                                   id=grade['id']))
 
         return toReturn
@@ -65,12 +65,12 @@ class GradesService():
         :return:
         """
 
-        data = { 'grades' : []}
+        data = []
 
         for grade in grades:
             grade = grade._asdict()
             del(grade['id'])
-            data['grades'].append(grade)
+            data.append(grade)
 
         data = json.dumps(data)
 
