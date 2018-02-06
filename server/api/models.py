@@ -100,7 +100,7 @@ class StandardizedTestScore(models.Model):
     score = models.IntegerField(blank=False, null=False)
 
     class Meta:
-        unique_together = (('standardized_test', 'date'),)
+        unique_together = (('standardized_test', 'date', 'student'),)
         ordering = ('date',)
 
 class Grade(models.Model):

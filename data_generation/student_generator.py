@@ -7,8 +7,8 @@ import random
 import requests
 import sys
 
-from authorization_handler import AuthorizationHandler
-from authorization_handler import CERT_PATH
+from authorization_service import AuthorizationService
+from authorization_service import CERT_PATH
 
 headers = { }
 
@@ -245,9 +245,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if not args.token:
-        args.username, args.password = AuthorizationHandler.display_login_prompt(args.username, args.password)
+        args.username, args.password = AuthorizationService.display_login_prompt(args.username, args.password)
 
-        authorizationHandler = AuthorizationHandler(url="https://{}".format(args.url),
+        authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
                                                     port_num=args.port,
                                                     verify=CERT_PATH)
 
@@ -266,7 +266,3 @@ if __name__ == "__main__":
         generator = StudentGenerator(url=args.url, verify=CERT_PATH, headers=headers)
         # generator.upload_developer_information();
         generator.upload_many_random_students(5)
-
-
-
-
