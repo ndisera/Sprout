@@ -1,0 +1,25 @@
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="student-name-title">{{ student.first_name }} {{ student.last_name }}</h2>
+        </div>
+    </div>
+    <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
+        <li><a ng-href="#!/student/{{student.id}}">Overview</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/grades">Grades</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li class="active"><a ng-href="#!/student/{{student.id}}/services">Services</a></li>
+    </ul>
+    <ul class="nav nav-tabs hidden-xs">
+        <li><a ng-href="#!/student/{{student.id}}">Overview</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/grades">Grades</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a ng-href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li class="active"><a ng-href="#!/student/{{student.id}}/services">Services</a></li>
+    </ul>
+    <div class="tab-content">
+    </div>
+</div>
