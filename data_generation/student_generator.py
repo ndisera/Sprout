@@ -10,6 +10,8 @@ import sys
 from authorization_service import AuthorizationService
 from authorization_service import CERT_PATH
 
+from student_service import Student, StudentService
+
 headers = { }
 
 class StudentGenerator(object):
@@ -28,6 +30,8 @@ class StudentGenerator(object):
         self.port_num = port_num
         self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/students/"
         self.verify = verify
+
+        self.studentService = StudentService(headers=headers, url=url, port_num=port_num, verify=verify)
 
     def upload_many_random_students(self,
                                     num_students,
@@ -126,105 +130,102 @@ class StudentGenerator(object):
         :type birthdate: datetime.date
         :return:
         """
-        json = {"student_id": student_id,
-                "first_name":first_name,
-                "last_name":last_name,
-                "birthdate":str(birthdate)}
-        response = requests.post(url=self.complete_uri, json=json, verify=self.verify, headers=self.headers)
-        print response.json()
+        student = Student(student_id=student_id,
+                          first_name=first_name,
+                          last_name=last_name,
+                          birthdate=birthdate,
+                          id=None)
+        self.studentService.add_student(student)
 
-        if not (response.status_code >= 200 and response.status_code < 300):
-            response.raise_for_status()
-
-def post_request(url, data):
-    response = requests.post(url=url, json=data, verify=False, headers=headers)
-    if response.status_code > 299:
-        print 'oh, crap... something went wrong. error code ' + str(response.status_code) + ' when I posted ' + url + ' with payload: ' + str(data)
-        print 'response data: ' + str(response.json())
-        sys.exit()
-    return response
+    def post_request(self, url, data):
+        response = requests.post(url=url, json=data, verify=False, headers=headers)
+        if response.status_code > 299:
+            print 'oh, crap... something went wrong. error code ' + str(response.status_code) + ' when I posted ' + url + ' with payload: ' + str(data)
+            print 'response data: ' + str(response.json())
+            sys.exit()
+        return response
 
 
-# @staticmethod
-def upload_basic_bitches():
-    # teachers
-    host = 'localhost'
-    port = 8000
-    base_url = 'https://' + host + ':' + str(port) + '/'
-    teacher_url = base_url + 'teachers/'
+    # @staticmethod
+    def upload_basic_bitches(self):
+        # teachers
+        host = 'localhost'
+        port = 8000
+        base_url = 'https://' + host + ':' + str(port) + '/'
+        teacher_url = base_url + 'teachers/'
 
-    teacher_matt = {
-        'username': 'mflatt',
-        'first_name': 'Matthew',
-        'last_name': 'Flatt',
-        'email': 'mflatt@totallyrealemail.edu',
-    }
+        teacher_matt = {
+            'username': 'mflatt',
+            'first_name': 'Matthew',
+            'last_name': 'Flatt',
+            'email': 'mflatt@totallyrealemail.edu',
+        }
 
-    teacher_danny = {
-        'username': 'dkopta',
-        'first_name': 'Daniel',
-        'last_name': 'Kopta',
-        'email': 'dkopta@totallyrealemail.edu',
-    }
+        teacher_danny = {
+            'username': 'dkopta',
+            'first_name': 'Daniel',
+            'last_name': 'Kopta',
+            'email': 'dkopta@totallyrealemail.edu',
+        }
 
-    response = post_request(url=teacher_url, data=teacher_matt)
-    teacher_matt_id = response.json()['teacher']['id']
+        response = self.post_request(url=teacher_url, data=teacher_matt)
+        teacher_matt_id = response.json()['teacher']['id']
 
-    response = post_request(url=teacher_url, data=teacher_danny)
-    teacher_danny_id = response.json()['teacher']['id']
+        response = self.post_request(url=teacher_url, data=teacher_danny)
+        teacher_danny_id = response.json()['teacher']['id']
 
-    # students
-    student_url = base_url + 'students/'
+        # students
+        student_url = base_url + 'students/'
 
-    generator = StudentGenerator(headers=headers)
-    generator.upload_developer_information()
+        generator = StudentGenerator(headers=headers)
+        generator.upload_developer_information()
 
-    students = requests.get(url=student_url, verify=False, headers=headers).json()['students']
+        students = requests.get(url=student_url, verify=False, headers=headers).json()['students']
 
-    # sections
-    section_url = base_url + 'sections/'
+        # sections
+        section_url = base_url + 'sections/'
 
-    section_matt = {
-        'teacher': teacher_matt_id,
-        'title': 'CS 5510',
-    }
+        section_matt = {
+            'teacher': teacher_matt_id,
+            'title': 'CS 5510',
+        }
 
-    section_danny = {
-        'teacher': teacher_danny_id,
-        'title': 'CS 4400',
-    }
+        section_danny = {
+            'teacher': teacher_danny_id,
+            'title': 'CS 4400',
+        }
 
-    response = post_request(url=section_url, data=section_matt)
-    section_matt_id = response.json()['section']['id']
-    response = post_request(url=section_url, data=section_danny)
-    section_danny_id = response.json()['section']['id']
+        response = self.post_request(url=section_url, data=section_matt)
+        section_matt_id = response.json()['section']['id']
+        response = self.post_request(url=section_url, data=section_danny)
+        section_danny_id = response.json()['section']['id']
 
-    # enrollments
-    enrollment_url = base_url + 'enrollments/'
+        # enrollments
+        enrollment_url = base_url + 'enrollments/'
 
-    enrollments = []
-    for student in students:
-        enrollments.append({'section': section_matt_id, 'student': student['id']})
-        enrollments.append({'section': section_danny_id, 'student': student['id']})
+        enrollments = []
+        for student in students:
+            enrollments.append({'section': section_matt_id, 'student': student['id']})
+            enrollments.append({'section': section_danny_id, 'student': student['id']})
 
-    enrollments_posted = []
-    for enrollment in enrollments:
-        response = post_request(url=enrollment_url, data=enrollment)
-        enrollments_posted.append(response.json()['enrollment'])
+        enrollments_posted = []
+        for enrollment in enrollments:
+            response = self.post_request(url=enrollment_url, data=enrollment)
+            enrollments_posted.append(response.json()['enrollment'])
 
-    # behaviors
-    behaviors_url = base_url + 'behaviors/'
+        # behaviors
+        behaviors_url = base_url + 'behaviors/'
 
-    current_date = datetime.date.today()
-    for day in range(1, 32):
-        for enrollment in enrollments_posted:
-            to_post = {
-                'date': '2018-' + current_date.strftime('%m') + '-' + str(day),
-                'enrollment': enrollment['id'],
-                'effort': random.randint(1, 5),
-                'behavior': random.randint(1, 5),
-            }
-            response = post_request(url=behaviors_url, data=to_post)
+        current_date = datetime.date.today()
+        for day in range(1, 32):
+            for enrollment in enrollments_posted:
+                to_post = {
+                    'date': '2018-' + current_date.strftime('%m') + '-' + str(day),
+                    'enrollment': enrollment['id'],
+                    'effort': random.randint(1, 5),
+                    'behavior': random.randint(1, 5),
+                }
+                response = self.post_request(url=behaviors_url, data=to_post)
 
 
 if __name__ == "__main__":
@@ -249,7 +250,7 @@ if __name__ == "__main__":
 
         authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
                                                     port_num=args.port,
-                                                    verify=CERT_PATH)
+                                                    verify=False)
 
         try:
             args.token = authorizationHandler.send_login_request(args.username, args.password)
@@ -260,9 +261,10 @@ if __name__ == "__main__":
 
     headers['Authorization'] = 'JWT ' + args.token
 
+    generator = StudentGenerator(url=args.url, verify=False, headers=headers)
+
     if args.setup:
-        upload_basic_bitches()
+        generator.upload_basic_bitches()
     else:
-        generator = StudentGenerator(url=args.url, verify=CERT_PATH, headers=headers)
         # generator.upload_developer_information();
         generator.upload_many_random_students(5)

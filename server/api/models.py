@@ -103,24 +103,39 @@ class StandardizedTestScore(models.Model):
         unique_together = (('standardized_test', 'date', 'student'),)
         ordering = ('date',)
 
+
+class Assignment(models.Model):
+    """
+    Assignment
+    Represent a class's assignment
+    """
+    section = models.ForeignKey(Section, related_name='assignment_section',
+                                   verbose_name="Section to which this assigment belongs")
+    assignment_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
+    score_min = models.IntegerField(blank=False, verbose_name="Minimum Score")
+    score_max = models.IntegerField(blank=False, verbose_name="Maximum Score")
+    due_date = models.DateField(blank=False,)
+
+    class Meta:
+        unique_together = (('section', 'assignment_name', 'due_date'),)
+        ordering = ('due_date',)
+
+
 class Grade(models.Model):
     """
     Grade
     Represent a student grade report
     """
-    enrollment = models.ForeignKey(Enrollment, related_name='grade_enrollment',
-                                   verbose_name="Enrollment which this grade belongs to")
-    assignment_name = models.CharField(max_length=DEFAULT_MAX_LENGTH)
-    percent = models.IntegerField(verbose_name="Grade from 0-100", blank=False,
-                                  validators=[MinValueValidator(0), MaxValueValidator(100),])
-    due_date = models.DateField(blank=False,)
-    database_date = models.DateField(verbose_name="Date this grade was entered into Sprout",
-                                     auto_now_add=True,
-                                     blank=False)
+    assignment = models.ForeignKey(Assignment, related_name='grade_assignment',
+                                  verbose_name="Assignment being reported")
+    student = models.ForeignKey(Student, related_name='grade_student')
+    score = models.IntegerField(blank=False, verbose_name="Assignment score")
+    handin_datetime = models.DateTimeField(blank=False)
 
     class Meta:
-        unique_together = (('enrollment', 'assignment_name', 'due_date'),)
-        ordering = ('due_date',)
+        unique_together = (('assignment', 'student', 'handin_datetime'),)
+        ordering = ('assignment',)
+
 
 class CaseManager(models.Model):
     """
@@ -129,9 +144,8 @@ class CaseManager(models.Model):
     teacher who oversees a student.
     teacher and student are a composite, unique key
     """
-    teacher = models.ForeignKey(Teacher)
-    student = models.ForeignKey(Student)
+    teacher = models.ForeignKey(Teacher, blank=False)
+    student = models.OneToOneField(Student, blank=False)
 
     class Meta:
-        unique_together = (('teacher', 'student'),)
         ordering = ('teacher',)
