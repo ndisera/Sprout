@@ -138,7 +138,7 @@ class GradesGenerator():
                         print 'assignment was late!'
                         handin = datetime.datetime(duedate.year, duedate.month, duedate.day + 1, handin.hour, handin.minute, handin.second, handin.microsecond)
                     else:
-                        handin = datetime.datetime(duedate.year, duedate.month, duedate.day, handin.hour, handin.minute, handin.second, handin.microsecond)
+                        handin = datetime.datetime(duedate.year, duedate.month, duedate.day - 1, handin.hour, handin.minute, handin.second, handin.microsecond)
 
                     score = random.randint(grade_min, grade_max)
                     grade = Grade(assignment=assignment.id,
