@@ -163,14 +163,23 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/studentTests.html',
             controller: 'studentTestsController',
             resolve: {
-                data: function(enrollmentService, $route) {
-                    return enrollmentService.getStudentEnrollments(
-                      {
-                          include: ['section.*', 'student.*'],
-                          filter: [{ name: 'student', val: $route.current.params.id, },],
-                      }
-                    );
+                studentData: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
                 },
+
+                // I'm thinking this will be gotten from inside of the tests controller, not here
+                // testData: function(testService, $route) {
+                //     return testService.getTests(); //we want them all...
+                // },
+
+                // data: function(enrollmentService, $route) {
+                //     return enrollmentService.getStudentEnrollments(
+                //       {
+                //           include: ['section.*', 'student.*'],
+                //           filter: [{ name: 'student', val: $route.current.params.id, },],
+                //       }
+                //     );
+                // },
                 auth: function(userService) {
                     return userService.authVerify();
                 },

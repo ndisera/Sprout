@@ -1,16 +1,30 @@
-app.factory("testScoreService", function ($rootScope, $http, $q, queryService) {
+app.factory("testService", function ($rootScope, $http, $q, queryService) {
     return {
         /**
          * Get student test records, filtering by a start and end data
          * @param {object} config - config object for query parameters (see queryService)
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getStudentTestScores: function (config) {
+        getTestScores: function (config) {
             var query = queryService.generateQuery(config);
             var deferred = $q.defer();
             $http({
                 method: 'GET',
                 url: 'https://' + $rootScope.backend + '/standardized_test_scores' + query,
+            }).then(function success(response) {
+                deferred.resolve(response.data);
+            }, function error(response) {
+                deferred.reject(response);
+            });
+            return deferred.promise;
+        },
+
+        getTests: function (config) {
+            var query = queryService.generateQuery(config);
+            var deferred = $q.defer();
+            $http({
+                method: 'GET',
+                url: 'https://' + $rootScope.backend + '/standardized_tests' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
