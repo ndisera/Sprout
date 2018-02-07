@@ -46,7 +46,7 @@
                     <div class="col-sm-9">
                         <p class="form-control-static" ng-show="viewTUsername">{{teacherV.username}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('username')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
                         <div class="input-group" ng-hide="viewTUsername">
-                            <input required autocomplete="off" type="text" class="form-control" id="tusername" placeholder="{{teacherV.username}}" name="tusername" ng-model="tUsername">
+                            <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" id="tusername" placeholder="{{teacherV.username}}" name="tusername" ng-model="tUsername">
                             <div class="input-group-btn">
                                 <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTUsernameForm.$invalid">
                                     <i class="glyphicon glyphicon-ok green"></i>
@@ -109,7 +109,7 @@
                     <div class="col-sm-9">
                         <p class="form-control-static" ng-show="viewTEmail">{{teacherV.email}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('email')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
                         <div class="input-group" ng-hide="viewTEmail">
-                            <input required autocomplete="off" type="email" class="form-control" id="temail" placeholder="{{teacherV.email}}" name="temail" ng-model="tEmail">
+                            <input required autocomplete="off" autocapitalize="off" type="email" class="form-control" id="temail" placeholder="{{teacherV.email}}" name="temail" ng-model="tEmail">
                             <div class="input-group-btn">
                                 <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTEmailForm.$invalid">
                                     <i class="glyphicon glyphicon-ok green"></i>
@@ -128,7 +128,7 @@
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="tusername2">Username:</label>
                     <div class="col-sm-9">
-                        <input required autocomplete="off" type="text" class="form-control" id="tusername2" placeholder="Enter Username" name="tusername2" ng-model="newTeacher.username">
+                        <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" id="tusername2" placeholder="Enter Username" name="tusername2" ng-model="newTeacher.username">
                     </div>
                 </div>
                 <div class="form-group">
@@ -146,7 +146,7 @@
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="temail2">Email:</label>
                     <div class="col-sm-9">
-                        <input required autocomplete="off" type="email" class="form-control" id="temail2" placeholder="Enter Email" name="temail2" ng-model="newTeacher.email">
+                        <input required autocomplete="off" autocapitalize="off" type="email" class="form-control" id="temail2" placeholder="Enter Email" name="temail2" ng-model="newTeacher.email">
                     </div>
                 </div>
                 <div class="form-group">
