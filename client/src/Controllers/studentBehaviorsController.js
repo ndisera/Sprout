@@ -1,29 +1,42 @@
-app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data) {
+app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data, student) {
+    // I know this will be here, because I filtered on the student ID, and only that student
+    $scope.student = student.student;
+
+    // for now, sort sections alphabetically
+    $scope.sections       = _.sortBy(data.sections, 'title');
+    $scope.sectionsLookup = _.indexBy(data.sections, 'id');
+
+    // set up lookup for enrollments
+    $scope.enrollments           = data.enrollments;
+    $scope.enrollmentsLookup     = _.indexBy(data.enrollments, 'id');
+    $scope.sectionsToEnrollments = _.indexBy(data.enrollments, 'section');
+
+    // create enrollment-to-index lookup, where order is index into graph data array
+    $scope.enrollmentToIndex = {};
+    _.each($scope.enrollments, function(enrollmentElem) {
+        $scope.enrollmentToIndex[enrollmentElem.id] = _.findIndex($scope.sections, function(sectionElem) { return enrollmentElem.section === sectionElem.id });
+    });
+
+    $scope.errorMessages = [];
+    if($scope.enrollments.length === 0) {
+        $scope.errorMessages.push("It looks like this student isn't registered for any classes.");
+    }
+
+
+    /**
+     * graph-related code
+     */
     var graphStartDateKey = 'graphStartDate';
     var graphEndDateKey   = 'graphEndDate';
 
-    $scope.inputOptions = [1, 2, 3, 4, 5];
-
-    /**
-     * start with default date calculations
-     */
     // calculate first and last days of school week
     $scope[graphStartDateKey] = moment().startOf('isoWeek');
     $scope[graphEndDateKey]   = moment().startOf('isoWeek').add(4, 'd');
 
-    // get today
-    $scope.inputDate = moment();
-
-    /**
-     * set up starting data sets
-     */
-    // I know this will be here, because I filtered on the student ID, and only that student
-    $scope.student = data.students[0];
-
     // all common behavior/effort graph settings
     $scope.sharedGraph = {
         labels: [],
-        series: [],
+        series: _.pluck($scope.sections, 'title'),
         options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -44,17 +57,19 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
         },
     };
 
-    // start off the two graphs with shared settings
+    // start off the two graphs with empty datasets
     $scope.behaviorGraph = { data: [], };
     $scope.effortGraph   = { data: [], };
 
     /**
-     * initialize everything using default dates
+     * called when start or end daterange picker changed
+     * updates min/max values of date range, updates graph
+     *
+     * @param {string} varName - name of datepicker that was change
+     * @param {datetime} newDate - new date that was selected
+     *
+     * @return {void}
      */
-    updateEnrollmentsSections(data);
-    updateGraph();
-    updateInputScores();
-
     $scope.graphDateRangeChange = function(varName, newDate) {
         // update date
         $scope[varName] = newDate;
@@ -70,49 +85,11 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
         updateGraph();
     };
 
-    $scope.inputDateChange = function(varName, newDate) {
-        $scope.inputDate = newDate;
-        updateInputScores();
-    };
-
-
-    function updateEnrollmentsSections(data) {
-        // for now, sort sections alphabetically
-        $scope.sections       = _.sortBy(data.sections, 'title');
-        $scope.sectionsLookup = _.indexBy(data.sections, 'id');
-
-        // set up lookup for enrollments
-        $scope.enrollments           = data.enrollments;
-        $scope.enrollmentsLookup     = _.indexBy(data.enrollments, 'id');
-        $scope.sectionsToEnrollments = _.indexBy(data.enrollments, 'section');
-
-        // create enrollment-to-index lookup, where order is index into graph data array
-        $scope.enrollmentToIndex = {};
-        _.each($scope.enrollments, function(enrollmentElem) {
-            $scope.enrollmentToIndex[enrollmentElem.id] = _.findIndex($scope.sections, function(sectionElem) {
-                return enrollmentElem.section === sectionElem.id
-            });
-        });
-
-        $scope.sharedGraph.series = _.pluck($scope.sections, 'title');
-
-        // update input sections object
-        $scope.scoresInput = [];
-        _.each($scope.sections, function(elem, index) {
-            $scope.scoresInput.push({
-                title: elem.title,
-                enrollment: $scope.sectionsToEnrollments[elem.id].id,
-                id: null,
-                behavior: null,
-                curBehavior: null,
-                effort: null,
-                curEffort: null,
-                date: null,
-            });
-        });
-    }
-
-
+    /**
+     * updates the graphs on the page
+     *
+     * @return {void}
+     */
     function updateGraph() {
         var config = {
             include: ['enrollment.section.*',],
@@ -127,17 +104,11 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
 
         behaviorService.getStudentBehavior(config).then(
             function success(data) {
-                // check to see if the student is enrolled in more classes, update if so
-                //if(_.union(_.pluck($scope.enrollments, 'id'), _.pluck(data.enrollments, 'id')).length !== $scope.enrollments.length) {
-                   //updateEnrollmentsSections(data);
-                //}
-
                 // calculate how many entries of data our graph will have
                 var dateDiff = $scope.graphEndDate.diff($scope.graphStartDate, 'd');
 
                 // clear labels and data
                 $scope.sharedGraph.labels = [];
-
                 $scope.behaviorGraph.data = [];
                 $scope.effortGraph.data   = [];
 
@@ -153,16 +124,18 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                 for(var i = 0; i < dateDiff + 1; i++) {
                     $scope.sharedGraph.labels[i] = iterDate.format('MM/DD').toString();
 
-                    var behaviorDate = moment(data.behaviors[j].date);
-                    while(behaviorDate.diff(iterDate, 'd') === 0) {
-                        if(_.has($scope.enrollmentToIndex, data.behaviors[j].enrollment)) {
-                            $scope.behaviorGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].behavior;
-                            $scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
-                        }
+                    if(data.behaviors[j]) {
+                        var behaviorDate = moment(data.behaviors[j].date);
+                        while(behaviorDate.diff(iterDate, 'd') === 0) {
+                            if(_.has($scope.enrollmentToIndex, data.behaviors[j].enrollment)) {
+                                $scope.behaviorGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].behavior;
+                                $scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
+                            }
 
-                        j++;
-                        if(j >= data.behaviors.length) { break; }
-                        behaviorDate = moment(data.behaviors[j].date);
+                            j++;
+                            if(j >= data.behaviors.length) { break; }
+                            behaviorDate = moment(data.behaviors[j].date);
+                        }
                     }
 
                     iterDate.add(1, 'd');
@@ -174,6 +147,49 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
         );
     }
 
+
+    /**
+     * input-scores related code
+     */
+    // update input sections object
+    $scope.scoresInput = [];
+    _.each($scope.sections, function(elem, index) {
+        $scope.scoresInput.push({
+            title: elem.title,
+            enrollment: $scope.sectionsToEnrollments[elem.id].id,
+            id: null,
+            behavior: null,
+            curBehavior: null,
+            effort: null,
+            curEffort: null,
+            date: null,
+        });
+    });
+
+    // get today for input box, set input options
+    $scope.inputDate = moment();
+    $scope.inputOptions = [1, 2, 3, 4, 5];
+
+    /**
+     * called when input datepicker is changed
+     * updates the input date and all relevant scores
+     *
+     * @param {string} varName - name of picker that was changed
+     * @param {datetime} newDate - new date that was selected
+     *
+     * @return {void}
+     */
+    $scope.inputDateChange = function(varName, newDate) {
+        $scope.inputDate = newDate;
+        updateInputScores();
+    };
+
+
+    /**
+     * updates input boxes and their scores
+     *
+     * @return {void}
+     */
     function updateInputScores() {
         var config = {
             include: ['enrollment.section.*',],
@@ -185,6 +201,7 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
 
         behaviorService.getStudentBehavior(config).then(
             function success(data) {
+                // if there's already a record for the day, set it
                 var newBehaviorsMap = _.indexBy(data.behaviors, 'enrollment');
                 _.each($scope.scoresInput, function(elem) {
                     if(_.has(newBehaviorsMap, elem.enrollment)) {
@@ -197,6 +214,7 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                         elem.date        = behaviorElem.date;
                     }
                     else {
+                        // otherwise, clear it out
                         elem.id          = null;
                         elem.behavior    = null;
                         elem.curBehavior = null;
@@ -205,17 +223,6 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                         elem.date        = $scope.inputDate.format('YYYY-MM-DD').toString();
                     }
                 });
-                //_.each(data.behaviors, function(behaviorElem, index) {
-                    //var score = _.find($scope.scoresInput, function(scoreElem) { return behaviorElem.enrollment === scoreElem.enrollment; });
-                    //if(score !== undefined) {
-                        //score.id          = behaviorElem.id;
-                        //score.behavior    = behaviorElem.behavior;
-                        //score.curBehavior = behaviorElem.behavior;
-                        //score.effort      = behaviorElem.effort;
-                        //score.curEffort   = behaviorElem.effort;
-                        //score.date        = behaviorElem.date;
-                    //}
-                //});
             },
             function error(response) {
                 //TODO: notify user
@@ -224,6 +231,16 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
     }
 
 
+    /**
+     * either saves a new score, or edits an existing score
+     * called when any value changes in score input section
+     * (I hate that there's so much repeated code...)
+     *
+     * @param {object} entry - entry from $scope.inputScores that has changed
+     * @param {string} type - either 'behavior' or 'effort'
+     *
+     * @return {void}
+     */
     $scope.saveScore = function(entry, type) {
         var newObj = {
             enrollment: entry.enrollment,
@@ -265,7 +282,7 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                     }
                 },
                 function error(response) {
-
+                    //TODO: notify the user
                 }
             );
         }
@@ -297,15 +314,21 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                     }
                 },
                 function error(response) {
-
+                    //TODO: notify the user
                 }
             );
-            // post
         }
-
-
-
     }
 
+    /**
+     * initialization
+     */
+    updateGraph();
+    updateInputScores();
 
 });
+
+
+
+
+

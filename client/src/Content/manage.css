@@ -26,6 +26,15 @@
 }
 
 .checkBtn {
-    border-radius: 0px; 
+    border-radius: 0px;
     border-left: 0px;
+}
+
+.buttonColumn {
+    width: 40px;
+}
+
+.scrollableTableDiv {
+    max-height:230px;
+    overflow-y:auto;
 }

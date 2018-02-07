@@ -53,8 +53,25 @@ class StandardizedTestScoreSerializer(DynamicModelSerializer):
     student = DynamicRelationField('StudentSerializer')
 
 
+class AssignmentSerializer(DynamicModelSerializer):
+    class Meta:
+        model = Assignment
+        fields = ('id', 'section', 'assignment_name', 'score_min', 'score_max', 'due_date')
+    section = DynamicRelationField('SectionSerializer')
+
+
 class GradeSerializer(DynamicModelSerializer):
     class Meta:
         model = Grade
-        fields = ('id', 'enrollment', 'due_date', 'percent', 'assignment_name')
-    enrollment = DynamicRelationField('EnrollmentSerializer')
+        fields = ('id', 'assignment', 'student', 'handin_datetime', 'score',)
+    assignment = DynamicRelationField('AssignmentSerializer')
+    student = DynamicRelationField('StudentSerializer')
+
+
+class CaseManagerSerializer(DynamicModelSerializer):
+    class Meta:
+        model = CaseManager
+        fields = ('id', 'teacher', 'student')
+
+    teacher = DynamicRelationField('TeacherSerializer')
+    student = DynamicRelationField('StudentSerializer')

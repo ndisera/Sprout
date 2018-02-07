@@ -61,7 +61,7 @@
                 <div class="form-group">
                     <label class="control-label col-sm-2" for="sbirthday">Birthday:</label>
                     <div class="col-sm-9">
-                        <input required autocomplete="off" type="text" class="form-control" id="sbirthday" placeholder="Enter Birthday (Example: '1996-05-20')" name="sbirthday" ng-model="newStudent.birthdate">
+                        <input required autocomplete="off" type="text" date-time class="form-control" id="sbirthday" placeholder="Enter Birthday (Example: '1996-05-20')" name="sbirthday" ng-model="newStudent.birthdate" view="year" min-view="date" format="YYYY-MM-DD">
                     </div>
                 </div>
                 <div class="form-group">

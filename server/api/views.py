@@ -361,7 +361,7 @@ class StandardizedTestScoreViewSet(DynamicModelViewSet):
     creates a new standardized test score report. requires a date, standardized_test id, and a score
 
     retrieve:
-    gets the behavior report specified by the id path param.
+    gets the standardized test report specified by the id path param.
 
     update:
     updates an existing standardized test score report specified by the id path param.
@@ -432,6 +432,75 @@ class StandardizedTestScoreViewSet(DynamicModelViewSet):
     )
 
 
+class AssignmentViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    AssignmentViewSetSchema class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(AssignmentViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(AssignmentViewSet, path, method, link)
+
+
+class AssignmentViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "Assignment" instances
+
+    list:
+    gets all the assignments in Sprout.
+
+    create:
+    creates a new assignment. requires the section, assignment name, minimum score and maximum score
+
+    retrieve:
+    gets the assignment specified by the id path param.
+
+    update:
+    updates an existing assignment specified by the id path param.
+    requires the section, assignment name, minimum score and maximum score
+
+    partial_update:
+    updates parts of an existing assignment specified by path param.
+    does not require all values.
+
+    delete:
+    deletes the existing assignment specified by the path param.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AssignmentSerializer
+    queryset = Assignment.objects.all()
+
+    """ define custom schema for documentation """
+    schema = AssignmentViewSetSchema()
+
+    """ ensure variables show as correct type for docs """
+    name_section = 'section'
+    desc_section = 'ID of the section to which this assignment belongs'
+    create_fields = (
+        coreapi.Field(
+            name=name_section,
+            required=True,
+            location="form",
+            description=desc_section,
+            schema=coreschema.Integer(title=name_section)),
+    )
+    update_fields = (
+        coreapi.Field(
+            name=name_section,
+            required=True,
+            location="form",
+            description=desc_section,
+            schema=coreschema.Integer(title=name_section)),
+    )
+    partial_update_fields = (
+        coreapi.Field(
+            name=name_section,
+            location="form",
+            description=desc_section,
+            schema=coreschema.Integer(title=name_section)),
+    )
+
+
 class GradeViewSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the
@@ -450,14 +519,14 @@ class GradeViewSet(DynamicModelViewSet):
     gets all the grade reports in Sprout.
 
     create:
-    creates a new grade report. requires the due date, enrollment, assignment name, and score from 1-100
+    creates a new grade report. requires the assignment, student, score, and handin date
 
     retrieve:
     gets the grade report specified by the id path param.
 
     update:
     updates an existing grade report specified by the id path param.
-    requires the due date, enrollment, assignment name, and score from 1-100
+    requires the assignment, student, score, and handin date
 
     partial_update:
     updates parts of an existing grade report specified by path param.
@@ -474,30 +543,52 @@ class GradeViewSet(DynamicModelViewSet):
     schema = GradeViewSetSchema()
 
     """ ensure variables show as correct type for docs """
-    name_enrollment = 'enrollment'
-    desc_enrollment = 'ID of the enrollment (student and section)'
+    name_assignment = 'assignment'
+    name_student = 'student'
+    desc_assignment = 'ID of the assignment to which this grade belongs'
+    desc_student = 'ID of the student owning this grade report'
     create_fields = (
         coreapi.Field(
-            name=name_enrollment,
+            name=name_assignment,
             required=True,
             location="form",
-            description=desc_enrollment,
-            schema=coreschema.Integer(title=name_enrollment)),
+            description=desc_assignment,
+            schema=coreschema.Integer(title=name_assignment)),
+
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
     )
     update_fields = (
         coreapi.Field(
-            name=name_enrollment,
+            name=name_assignment,
             required=True,
             location="form",
-            description=desc_enrollment,
-            schema=coreschema.Integer(title=name_enrollment)),
+            description=desc_assignment,
+            schema=coreschema.Integer(title=name_assignment)),
+
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
     )
     partial_update_fields = (
         coreapi.Field(
-            name=name_enrollment,
+            name=name_assignment,
             location="form",
-            description=desc_enrollment,
-            schema=coreschema.Integer(title=name_enrollment)),
+            description=desc_assignment,
+            schema=coreschema.Integer(title=name_assignment)),
+
+        coreapi.Field(
+            name=name_student,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
     )
 
 
@@ -530,3 +621,90 @@ class AuthVerifyView(generics.RetrieveAPIView):
             }
             
         return Response(data=response)
+
+
+class CaseManagerViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    EnrollmentViewSet class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(CaseManagerViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(CaseManagerViewSet, path, method, link)
+
+class CaseManagerViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "Enrollment" instances
+
+    list:
+    gets all the case managers registered in Sprout.
+
+    create:
+    creates a case manager. requires a student id and section id.
+
+    retrieve:
+    gets the case manager specified by the id path param.
+
+    update:
+    updates an existing case manager specified by the id path param.
+    requires an case manager id, student id, and teacher id.
+
+    partial_update:
+    updates parts of an existing case manager specified by the id path param.
+    does not require all values.
+
+    delete:
+    deletes the existing case manager specified by the path param.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = CaseManagerSerializer
+    queryset = CaseManager.objects.all()
+
+    """ define custom schema """
+    schema = CaseManagerViewSetSchema()
+
+    """ ensure variables show as correct type for docs """
+    name_student = 'student'
+    name_teacher = 'teacher'
+    desc_student = 'ID of the student'
+    desc_teacher = 'ID of the teacher'
+    create_fields = (
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+        coreapi.Field(
+            name=name_teacher,
+            required=True,
+            location="form",
+            description=desc_teacher,
+            schema=coreschema.Integer(title=name_teacher)),
+    )
+    update_fields = (
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+        coreapi.Field(
+            name=name_teacher,
+            required=True,
+            location="form",
+            description=desc_teacher,
+            schema=coreschema.Integer(title=name_teacher)),
+    )
+    partial_update_fields = (
+        coreapi.Field(
+            name=name_student,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+        coreapi.Field(
+            name=name_teacher,
+            location="form",
+            description=desc_teacher,
+            schema=coreschema.Integer(title=name_teacher)),
+    )

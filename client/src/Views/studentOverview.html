@@ -1,4 +1,9 @@
 ﻿<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="student-name-title">{{ student.first_name }} {{ student.last_name }}</h2>
+        </div>
+    </div>
     <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
         <li class="active"><a href="#!/student/{{student.id}}">Overview</a></li>
         <li><a href="#!/student/{{student.id}}/tests">Test Scores</a></li>
@@ -30,10 +35,10 @@
                     <div id="student-overview-assign-dropdown" class="input-group pull-right">
                         <span class="input-group-addon">Assigned To</span>
                         <div class="input-group-btn">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ caseManager }} <span class="caret"></span></button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span></button>
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)">
-                                    <a class="student-overview-assign-link">{{ entry }}  <span ng-if="entry === caseManager" class="glyphicon glyphicon-ok"></span></a>
+                                    <a class="student-overview-assign-link">{{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.id === caseManager.id" class="glyphicon glyphicon-ok"></span></a>
                                 </li>
                             </ul>
                         </div>
@@ -64,7 +69,8 @@
                                             <span ng-click="beginEditStudent(property)" class="glyphicon glyphicon-pencil pencilEdit"></span>
                                             </p>
                                             <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9" ng-show="property.editable">
-                                                <input type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                                <input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                                <input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
                                                 <div class="input-group-btn">
                                                     <button class="btn btn-default" type="submit" ng-disabled="editStudentForm{{$index}}.editStudentFormInput{{$index}}.$invalid">
                                                         <span class="glyphicon glyphicon-ok green"></span>
