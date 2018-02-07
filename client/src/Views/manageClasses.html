@@ -1,15 +1,15 @@
 <div class="container">
 	<ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
-		<li><a href="#!/manage/cases">Managers</a></li>
+		<li class="active"><a href="#!/manage/classes">Classes</a></li>
 		<li><a href="#!/manage/teachers">Teachers</a></li>
 		<li><a href="#!/manage/students">Students</a></li>
-		<li class="active"><a href="#!/manage/classes">Classes</a></li>
+		<li><a href="#!/manage/cases">Managers</a></li>
 	</ul>
 	<ul class="nav nav-tabs hidden-xs">
-		<li><a href="#!/manage/cases">Managers</a></li>
+		<li class="active"><a href="#!/manage/classes">Classes</a></li>
 		<li><a href="#!/manage/teachers">Teachers</a></li>
 		<li><a href="#!/manage/students">Students</a></li>
-		<li class="active"><a href="#!/manage/classes">Classes</a></li>
+		<li><a href="#!/manage/cases">Managers</a></li>
 	</ul>
 	<div class="tab-content">
 		<div id="manageclasses" class="tab-pane fade in active">
@@ -85,7 +85,6 @@
 					</div>
 				</div>
 			</form>
-			<!--New Stuff Eh-->
 			<div ng-show="displayCEditInfo">
 				<div class="panel panel-primary col-sm-offset-1 col-sm-10">
 					<div class="panel-heading row">
@@ -162,8 +161,6 @@
 					</div>
 				</div>
 			</div>
-			<!--Enrolled Students: (search bar to filter table) followed by table of enrolled students with a - button on each row to remove student from class-->
-			<!--Enroll A Student (down arrow). On expansion brings up similar search bar and table with an add button instead-->
 			<form class="form-horizontal" name="addSectionForm" ng-show="displaySectionForm" ng-submit="addSection()">
 				<div class="form-group">
 					<label class="control-label col-sm-2" for="ctitle2">Title:</label>
