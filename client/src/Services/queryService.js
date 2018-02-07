@@ -49,7 +49,6 @@ app.factory("queryService", function () {
             queries.push(_.map(config.exclude, createExclude));
             queries.push(_.map(config.filter, createFilter));
             queries.push(_.map(config.sort, createSort));
-            console.log(queries);
             var queries_flat = _.flatten(queries);
 
             return _.reduce(queries_flat, reduceQuery, '?').slice(0, -1);
