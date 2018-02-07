@@ -122,12 +122,14 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     var startDate = moment($scope[graphStartDateKey]);
                     var endDate = moment($scope[graphEndDateKey]);
                     var dateDiff = endDate.diff(startDate, 'days');
+                    var protoDataArray;
 
                     _.each(studentTestScores, function (scoreElem) {
                         if (!(_.has(testIdToIndex, scoreElem.standardized_test))) {
                             //store the ID -> index pair
                             testIdToIndex[scoreElem.standardized_test] = counter;
                             //set up all of the necessary charts by cloning the protograph
+                            //cloning copies any nested objects BY REFERENCE
                             $scope.testGraphs[counter] = _.clone($scope.protoGraph);
 
                             //set up test info in the graph
@@ -137,8 +139,11 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                                 max: testIdToInfo[scoreElem.standardized_test].max
                             };
 
+
                             //initialize the array
-                            $scope.testGraphs[counter].data.push(_.times(dateDiff + 1, _.constant(null)));
+                            protoDataArray = [];
+                            protoDataArray.push(_.times(dateDiff + 1, _.constant(null)));
+                            $scope.testGraphs[counter].data = protoDataArray;
                             //todo: test edge case of max
 
                             counter++;
@@ -157,16 +162,13 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
 
 
 
-                    _.each(_.filter(studentTestScores, function (protoScoreElem) {
-                        moment(protoScoreElem.date).isAfter(startDate)
-                        && moment(protoScoreElem.date).isBefore(endDate)
-                    }), function (scoreElem) {
+                    _.each(studentTestScores, function (scoreElem) {
                         //for each score, calculate the number of days since the start date
                         var currentDate = moment(scoreElem.date);
                         var dateIndex = currentDate.diff(startDate, 'days');
 
                         //use the test ID to put it into the right graph
-                        $scope.testGraphs[testIdToIndex[scoreElem.id]].data[dateIndex] = scoreElem.score;
+                        $scope.testGraphs[testIdToIndex[scoreElem.standardized_test]].data[dateIndex] = scoreElem.score;
                     });
 
                     _.each($scope.testGraphs, function (graphElem) {
