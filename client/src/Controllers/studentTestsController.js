@@ -14,7 +14,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     ticks: {
                         min: 0,
                         max: 100
-                         //this will change based on the test
+                        //this will change based on the test
                     },
                 }],
             },
@@ -149,20 +149,19 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     var startDate = moment($scope[graphStartDateKey]);
                     var endDate = moment($scope[graphEndDateKey]);
 
-                    _.each(_.filter(studentTestScores,
-                            moment(scoreElem.date).isAfter(startDate)
-                            && moment(scoreElem.date).isBefore(endDate)),
-                      function (scoreElem) {
+                    _.each(_.filter(studentTestScores, function (protoScoreElem) {
+                        moment(protoScoreElem.date).isAfter(startDate)
+                        && moment(protoScoreElem.date).isBefore(endDate)
+                    }), function (scoreElem) {
                         //for each score, calculate the number of days since the start date
-                          var currentDate = moment(scoreElem.date);
-                          var dateIndex = currentDate.diff(startDate, 'days');
+                        var currentDate = moment(scoreElem.date);
+                        var dateIndex = currentDate.diff(startDate, 'days');
 
                         //use the test ID to put it into the right graph
-                          $scope.testGraphs[testIdToIndex[scoreElem.id]].data[dateIndex] = scoreElem.score;
-
+                        $scope.testGraphs[testIdToIndex[scoreElem.id]].data[dateIndex] = scoreElem.score;
                     });
 
-                    _.each($scope.testGraphs, function(graphElem) {
+                    _.each($scope.testGraphs, function (graphElem) {
                         console.log(graphElem);
                     })
 
