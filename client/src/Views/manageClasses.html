@@ -85,7 +85,6 @@
 					</div>
 				</div>
 			</form>
-			<!--New Stuff Eh-->
 			<div ng-show="displayCEditInfo">
 				<div class="panel panel-primary col-sm-offset-1 col-sm-10">
 					<div class="panel-heading row">
@@ -94,7 +93,7 @@
                     </h4>
 					</div>
 					<div class="panel-body row">
-						<input class="form-control" id="enrolledInput" type="text" placeholder="Search">
+						<input autocomplete="off" autocapitalize="off" class="form-control" id="enrolledInput" type="text" placeholder="Search">
 						<br>
 						<div class="table-responsive scrollableTableDiv">
 							<table class="table table-striped">
@@ -132,7 +131,7 @@
 					</div>
 					<div id="collapse-{{$index}}" class="panel-collapse collapse">
 						<div class="panel-body row">
-							<input class="form-control" id="unenrolledInput" type="text" placeholder="Search">
+							<input autocomplete="off" autocapitalize="off" class="form-control" id="unenrolledInput" type="text" placeholder="Search">
 							<br>
 							<div class="table-responsive scrollableTableDiv">
 								<table class="table table-striped">
@@ -162,8 +161,6 @@
 					</div>
 				</div>
 			</div>
-			<!--Enrolled Students: (search bar to filter table) followed by table of enrolled students with a - button on each row to remove student from class-->
-			<!--Enroll A Student (down arrow). On expansion brings up similar search bar and table with an add button instead-->
 			<form class="form-horizontal" name="addSectionForm" ng-show="displaySectionForm" ng-submit="addSection()">
 				<div class="form-group">
 					<label class="control-label col-sm-2" for="ctitle2">Title:</label>
