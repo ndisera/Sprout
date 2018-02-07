@@ -139,6 +139,7 @@ class GradesGenerator():
                         handin = datetime.datetime(duedate.year, duedate.month, duedate.day + 1, handin.hour, handin.minute, handin.second, handin.microsecond)
                     else:
                         handin = datetime.datetime(duedate.year, duedate.month, duedate.day, handin.hour, handin.minute, handin.second, handin.microsecond)
+
                     score = random.randint(grade_min, grade_max)
                     grade = Grade(assignment=assignment.id,
                                   score=score,
@@ -174,7 +175,7 @@ if __name__ == "__main__":
 
         authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
                                                     port_num=args.port,
-                                                    verify=CERT_PATH)
+                                                    verify=False)
 
         try:
             args.token = authorizationHandler.send_login_request(args.username, args.password)
@@ -185,7 +186,7 @@ if __name__ == "__main__":
 
     headers = { 'Authorization': 'JWT {}'.format(args.token)}
 
-    generator = GradesGenerator(url=args.url, port_num=args.port, headers=headers, verify=CERT_PATH)
+    generator = GradesGenerator(url=args.url, port_num=args.port, headers=headers, verify=False)
 
     if args.setup:
         assignments = generator.generate_assignments(args.num_scores)
