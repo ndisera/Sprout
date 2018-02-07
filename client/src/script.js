@@ -223,7 +223,15 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/studentGrades.html',
             controller: 'studentGradesController',
             resolve: {
-                student: function(studentService, $route) {
+                enrollmentData: function(enrollmentService, $route) {
+                    return enrollmentService.getStudentEnrollments(
+                        { 
+                            include: ['section.*', 'section.teacher.*'],
+                            filter: [{ name: 'student', val: $route.current.params.id },],
+                        }
+                    );
+                },
+                studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
                 auth: function(userService) {
@@ -231,7 +239,6 @@ app.config(function ($routeProvider, $httpProvider) {
                 },
             }
         })
-        
 
         .otherwise({ redirectTo: '/focus' });
 })
