@@ -81,6 +81,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
               //todo: reset relevant data
               //reset relevant data
 
+
               //set up lookups for info
               var testIdToInfo = {}; //name, max, min
               //todo: should I use index or id here?
@@ -118,13 +119,16 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     //two passes for now: could be optimized to 1 pass if we wanted to
                     var testIdToIndex = {};
                     var counter = 0; //counter for test id -> index
+                    var startDate = moment($scope[graphStartDateKey]);
+                    var endDate = moment($scope[graphEndDateKey]);
+                    var dateDiff = endDate.diff(startDate, 'days');
 
                     _.each(studentTestScores, function (scoreElem) {
                         if (!(_.has(testIdToIndex, scoreElem.standardized_test))) {
                             //store the ID -> index pair
                             testIdToIndex[scoreElem.standardized_test] = counter;
                             //set up all of the necessary charts by cloning the protograph
-                            $scope.testGraphs[counter] = _.clone($scope.protoGraph, true);
+                            $scope.testGraphs[counter] = _.clone($scope.protoGraph);
 
                             //set up test info in the graph
                             $scope.testGraphs[counter].options.title.text = testIdToInfo[scoreElem.standardized_test].name;
@@ -132,6 +136,10 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                                 min: testIdToInfo[scoreElem.standardized_test].min,
                                 max: testIdToInfo[scoreElem.standardized_test].max
                             };
+
+                            //initialize the array
+                            $scope.testGraphs[counter].data.push(_.times(dateDiff + 1, _.constant(null)));
+                            //todo: test edge case of max
 
                             counter++;
                         }
@@ -145,9 +153,9 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
 
 
                     //todo: check:
-                    // let's see what happens if I don't initialize the data array
-                    var startDate = moment($scope[graphStartDateKey]);
-                    var endDate = moment($scope[graphEndDateKey]);
+                    // initialize the data array
+
+
 
                     _.each(_.filter(studentTestScores, function (protoScoreElem) {
                         moment(protoScoreElem.date).isAfter(startDate)
