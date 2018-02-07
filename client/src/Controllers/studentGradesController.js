@@ -201,10 +201,3 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
     }
 
 });
-
-
-
-
-
-
-
