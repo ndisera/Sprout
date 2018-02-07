@@ -65,27 +65,27 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
         colors: [],
         datasetOverride: {
             backgroundColor: [
-                "rgba(255,99,132,0.2)",
-                "rgba(255,159,64,0.2)",
                 "rgba(75,192,192,0.2)",
+                "rgba(255,159,64,0.2)",
+                "rgba(255,99,132,0.2)",
                 "rgba(54,162,235,0.2)",
                 "rgba(153,102,255,0.2)",
                 "rgba(201,203,207,0.2)",
                 "rgba(255,205,86,0.2)",
             ],
             hoverBackgroundColor: [
-                "rgba(255,99,132,0.4)",
-                "rgba(255,159,64,0.4)",
                 "rgba(75,192,192,0.4)",
+                "rgba(255,159,64,0.4)",
+                "rgba(255,99,132,0.4)",
                 "rgba(54,162,235,0.4)",
                 "rgba(153,102,255,0.4)",
                 "rgba(201,203,207,0.4)",
                 "rgba(255,205,86,0.4)",
             ],
             borderColor: [
-                "rgba(255,99,132,0.7)",
-                "rgba(255,159,64,0.7)",
                 "rgba(75,192,192,0.7)",
+                "rgba(255,159,64,0.7)",
+                "rgba(255,99,132,0.7)",
                 "rgba(54,162,235,0.7)",
                 "rgba(153,102,255,0.7)",
                 "rgba(201,203,207,0.7)",
@@ -96,7 +96,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
 
 
     $scope.selectSection = function(section) {
-        $scope.showPanels = false;
 
         var assignmentConfig = {
             filter: [
@@ -183,8 +182,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                         $scope.classGrade /= $scope.assignments.length;
                         $scope.classGrade = $scope.classGrade.toString().slice(0, _.indexOf($scope.classGrade.toString(), '.') + 3);
 
-                        setTimeout(showThings, 250);
-
                     },
                     function error(response) {
                     }
@@ -196,12 +193,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
         );
     }
 
-
-    function showThings() {
-        $scope.showPanels = true;
-        $scope.$digest();
-    }
-
     if($scope.sections.length > 0) {
         $scope.selectSection($scope.sections[0]);
     }
@@ -210,23 +201,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
     }
 
 });
-
-
-//app.animation('.panel-wrapper', function() {
-    //return {
-        //show: function(elem, done) {
-            //elem.css('display', 'none');
-            //$(element).fadeIn(1000, function() {
-                //done();
-            //});
-        //},
-        //hide: function(elem, done) {
-            //$(element).fadeOut(1000, function() {
-                //done();
-            //});
-        //},
-    //};
-//});
 
 
 
