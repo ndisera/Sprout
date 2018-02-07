@@ -120,16 +120,18 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     var counter = 0; //counter for test id -> index
 
                     _.each(studentTestScores, function (scoreElem) {
-                        if (!(_.has(testIdToIndex, scoreElem.id))) {
+                        if (!(_.has(testIdToIndex, scoreElem.standardized_test))) {
                             //store the ID -> index pair
-                            testIdToIndex[scoreElem.id] = counter;
+                            testIdToIndex[scoreElem.standardized_test] = counter;
                             //set up all of the necessary charts by cloning the protograph
-                            $scope.testGraphs[counter] = _.clone($scope.protoGraph);
+                            $scope.testGraphs[counter] = _.clone($scope.protoGraph, true);
 
                             //set up test info in the graph
                             $scope.testGraphs[counter].options.title.text = testIdToInfo[scoreElem.standardized_test].name;
-                            $scope.testGraphs[counter].options.scales.yAxes.ticks.min = testIdToInfo[scoreElem.standardized_test].min;
-                            $scope.testGraphs[counter].options.scales.yAxes.ticks.max = testIdToInfo[scoreElem.standardized_test].max;
+                            $scope.testGraphs[counter].options.scales.yAxes.ticks = {
+                                min: testIdToInfo[scoreElem.standardized_test].min,
+                                max: testIdToInfo[scoreElem.standardized_test].max
+                            };
 
                             counter++;
                         }
