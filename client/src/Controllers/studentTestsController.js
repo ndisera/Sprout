@@ -141,9 +141,15 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                                     scales: {
                                         yAxes: [{
                                             ticks: {
+                                                //this will change based on the test
                                                 min: testIdToInfo[scoreElem.standardized_test].min,
                                                 max: testIdToInfo[scoreElem.standardized_test].max,
-                                                //this will change based on the test
+                                            },
+                                        }],
+                                        xAxes: [{
+                                            ticks: {
+                                                //specify more space around each label
+                                                autoSkipPadding : 20
                                             },
                                         }],
                                     },
