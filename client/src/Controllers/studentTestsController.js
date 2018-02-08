@@ -78,13 +78,8 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
           function success(testInfoData) {
               console.log(testInfoData);
 
-              //todo: reset relevant data
-              //reset relevant data
-
-
               //set up lookups for info
               var testIdToInfo = {}; //name, max, min
-              //todo: should I use index or id here?
 
               _.each(testInfoData.standardized_tests, function (testElem) {
                   //map the id to an index
@@ -109,12 +104,11 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
 
               testService.getTestScores(testScoresConfig).then(
                 function success(studentTestScoresRaw) {
-                    console.log(studentTestScoresRaw);
+                    // console.log(studentTestScoresRaw);
 
                     var studentTestScores = _.sortBy(studentTestScoresRaw.standardized_test_scores, 'date');
 
-                    //minimal working console prints todo: remove
-                    console.log(testIdToInfo);
+                    // console.log(testIdToInfo);
 
                     //two passes for now: could be optimized to 1 pass if we wanted to
                     var testIdToIndex = {};
@@ -132,12 +126,14 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
 
                             //create a new graph data object
                             $scope.testGraphs[counter] = {
+
                                 data: [],
                                 labels: [],
                                 options: {
                                     responsive: true,
                                     maintainAspectRatio: false,
                                     spanGaps: true, //skip values of null or NaN
+
                                     scales: {
                                         yAxes: [{
                                             ticks: {
@@ -236,12 +232,11 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     _.each($scope.testGraphs, function (graphElem) {
                         var iterDate = $scope.graphStartDate.clone();
                         for (var i = 0; i < dateDiff + 1; i++) {
-                            var dateLabel = iterDate.format('MM/DD').toString();
-                            graphElem.labels[i] = dateLabel;
+                            graphElem.labels[i] = iterDate.format('MM/DD').toString();
                             iterDate.add(1, 'd');
                         }
 
-                        console.log(graphElem);
+                        // console.log(graphElem);
                     })
 
 
