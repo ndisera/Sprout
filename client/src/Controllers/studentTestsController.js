@@ -121,29 +121,83 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     var counter = 0; //counter for test id -> index
                     var startDate = moment($scope[graphStartDateKey]);
                     var endDate = moment($scope[graphEndDateKey]);
-                    var dateDiff = endDate.diff(startDate, 'days');
+                    var dateDiff = endDate.diff(startDate, 'd');
                     var protoDataArray;
+                    var protoLabelsArray;
 
                     _.each(studentTestScores, function (scoreElem) {
                         if (!(_.has(testIdToIndex, scoreElem.standardized_test))) {
                             //store the ID -> index pair
                             testIdToIndex[scoreElem.standardized_test] = counter;
-                            //set up all of the necessary charts by cloning the protograph
-                            //cloning copies any nested objects BY REFERENCE
-                            $scope.testGraphs[counter] = _.clone($scope.protoGraph);
 
-                            //set up test info in the graph
-                            $scope.testGraphs[counter].options.title.text = testIdToInfo[scoreElem.standardized_test].name;
-                            $scope.testGraphs[counter].options.scales.yAxes.ticks = {
-                                min: testIdToInfo[scoreElem.standardized_test].min,
-                                max: testIdToInfo[scoreElem.standardized_test].max
+                            //create a new graph data object
+                            $scope.testGraphs[counter] = {
+                                data: [],
+                                labels: [],
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    spanGaps: true, //skip values of null or NaN
+                                    scales: {
+                                        yAxes: [{
+                                            ticks: {
+                                                min: testIdToInfo[scoreElem.standardized_test].min,
+                                                max: testIdToInfo[scoreElem.standardized_test].max,
+                                                //this will change based on the test
+                                            },
+                                        }],
+                                    },
+
+                                    title: {
+                                        display: true,
+                                        text: testIdToInfo[scoreElem.standardized_test].name
+                                    }
+                                },
+                                colors: [],
+                                datasetOverride: {
+                                    //todo: set a different color for each graph
+                                    backgroundColor: [
+                                        "rgba(255,99,132,0.2)",
+                                        "rgba(255,159,64,0.2)",
+                                        "rgba(255,205,86,0.2)",
+                                        "rgba(75,192,192,0.2)",
+                                        "rgba(54,162,235,0.2)",
+                                        "rgba(153,102,255,0.2)",
+                                        "rgba(201,203,207,0.2)",
+                                    ],
+                                    hoverBackgroundColor: [
+                                        "rgba(255,99,132,0.4)",
+                                        "rgba(255,159,64,0.4)",
+                                        "rgba(255,205,86,0.4)",
+                                        "rgba(75,192,192,0.4)",
+                                        "rgba(54,162,235,0.4)",
+                                        "rgba(153,102,255,0.4)",
+                                        "rgba(201,203,207,0.4)",
+                                    ],
+                                    borderColor: [
+                                        "rgba(255,99,132,0.7)",
+                                        "rgba(255,159,64,0.7)",
+                                        "rgba(255,205,86,0.7)",
+                                        "rgba(75,192,192,0.7)",
+                                        "rgba(54,162,235,0.7)",
+                                        "rgba(153,102,255,0.7)",
+                                        "rgba(201,203,207,0.7)",
+                                    ],
+                                },
                             };
 
 
                             //initialize the array
                             protoDataArray = [];
-                            protoDataArray.push(_.times(dateDiff + 1, _.constant(null)));
+                            protoDataArray = _.times(dateDiff + 1, _.constant(null));
+                            // protoDataArray = _.times(dateDiff + 1, _.constant(4));
                             $scope.testGraphs[counter].data = protoDataArray;
+
+                            //make a labels array in order to display our data
+                            protoLabelsArray = [];
+                            protoLabelsArray = _.times(dateDiff + 1, _.constant(null));
+                            $scope.testGraphs[counter].labels = protoLabelsArray;
+
                             //todo: test edge case of max
 
                             counter++;
@@ -161,7 +215,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     // initialize the data array
 
 
-
+                    // put in existing scores
                     _.each(studentTestScores, function (scoreElem) {
                         //for each score, calculate the number of days since the start date
                         var currentDate = moment(scoreElem.date);
@@ -169,9 +223,18 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
 
                         //use the test ID to put it into the right graph
                         $scope.testGraphs[testIdToIndex[scoreElem.standardized_test]].data[dateIndex] = scoreElem.score;
+
                     });
 
+                    //put in all labels
                     _.each($scope.testGraphs, function (graphElem) {
+                        var iterDate = $scope.graphStartDate.clone();
+                        for (var i = 0; i < dateDiff + 1; i++) {
+                            var dateLabel = iterDate.format('MM/DD').toString();
+                            graphElem.labels[i] = dateLabel;
+                            iterDate.add(1, 'd');
+                        }
+
                         console.log(graphElem);
                     })
 

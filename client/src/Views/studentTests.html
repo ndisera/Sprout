@@ -21,13 +21,20 @@
         <li><a ng-href="#!/student/{{student.id}}/grades">Grades</a></li>
     </ul>
     <div class="tab-content">
-        <div id="tests" class="tab-pane fade in active voffset3">
-            <div class="row voffset2">
+        <div id="behavior" class="tab-pane fade in active voffset3">
+            <div class="row voffset4" ng-repeat="error in errorMessages">
+                <div class="col-xs-12">
+                    <div class="alert alert-danger no-bottom-margin" role="alert">
+                        <span><b>Error:</b> {{ error }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row voffset4">
                 <div class="col-xs-12">
                     <div class="panel-wrapper">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Test Scores</h3>
+                                <h3 class="panel-title">Performance</h3>
                             </div>
                             <div class="panel-body">
                                 <div class="row">
@@ -37,8 +44,7 @@
                                             <input type="text"
                                                    id="graphStartDate"
                                                    class="form-control"
-                                                   date-time
-                                                   ng-model="graphStartDate"
+                                                   date-time ng-model="graphStartDate"
                                                    view="date"
                                                    min-view="date"
                                                    format="YYYY-MM-DD"
@@ -53,8 +59,7 @@
                                             <input type="text"
                                                    id="graphEndDate"
                                                    class="form-control"
-                                                   date-time
-                                                   ng-model="graphEndDate"
+                                                   date-time ng-model="graphEndDate"
                                                    view="date"
                                                    min-view="date"
                                                    format="YYYY-MM-DD"
@@ -65,15 +70,15 @@
                                     </div>
                                 </div>
                                 <div class="row voffset3">
-                                    <div class="col-m-12 centerText focusGraph">
-                                        <label>Test Scores</label>
-                                        <div class="col-m-12">
-                                            <canvas id="student_test_scores"
+                                    <div class="col-sm-12 centerText focusGraph">
+                                        <label>Test 1</label>
+                                        <div class="col-sm-12">
+                                            <canvas id="test_0"
                                                     class="chart chart-line"
-                                                    chart-data="testGraph.data"
-                                                    chart-labels="sharedGraph.labels"
-                                                    chart-series="sharedGraph.series"
-                                                    chart-options="sharedGraph.options"
+                                                    chart-data="testGraphs[0].data"
+                                                    chart-labels="testGraphs[0].labels"
+                                                    chart-series="testGraphs[0].series"
+                                                    chart-options="testGraphs[0].options"
                                                     chart-dataset-override="datasetOverride"
                                                     chart-click="onClick">
                                             </canvas>
@@ -85,57 +90,6 @@
                     </div>
                 </div>
             </div>
-            <!--<div class="row voffset3">-->
-                <!--<div class="col-xs-12">-->
-                    <!--<div class="panel-wrapper">-->
-                        <!--<div class="panel panel-default">-->
-                            <!--<div class="panel-heading">-->
-                                <!--<h3 class="panel-title">Input Behavior Scores</h3>-->
-                            <!--</div>-->
-                            <!--<div class="panel-body">-->
-                                <!--<div class="input-group">-->
-                                    <!--<span class="input-group-addon">For Date</span>-->
-                                    <!--<input type="text"-->
-                                           <!--id="inputDate"-->
-                                           <!--class="form-control"-->
-                                           <!--date-time-->
-                                           <!--ng-model="inputDate"-->
-                                           <!--view="date"-->
-                                           <!--min-view="date"-->
-                                           <!--format="YYYY-MM-DD"-->
-                                           <!--date-change="inputDateChange"-->
-                                           <!--watch-direct-changes="true">-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <!--<table class="table">-->
-                                <!--<tbody>-->
-                                <!--<tr>-->
-                                    <!--<th>Class</th>-->
-                                    <!--<th>Behavior</th>-->
-                                    <!--<th>Effort</th>-->
-                                <!--</tr>-->
-                                <!--<tr ng-repeat="entry in scoresInput">-->
-                                    <!--<td>{{ entry.title }}</td>-->
-                                    <!--<td>-->
-                                        <!--<select ng-model="entry.curBehavior"-->
-                                                <!--ng-options="x for x in inputOptions"-->
-                                                <!--ng-change="saveScore(entry, 'behavior')">-->
-                                        <!--</select>-->
-                                    <!--</td>-->
-                                    <!--<td>-->
-                                        <!--<select ng-model="entry.curEffort"-->
-                                                <!--ng-options="x for x in inputOptions"-->
-                                                <!--ng-change="saveScore(entry, 'effort')">-->
-                                        <!--</select>-->
-                                    <!--</td>-->
-                                <!--</tr>-->
-
-                                <!--</tbody>-->
-                            <!--</table>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
         </div>
     </div>
 </div>
