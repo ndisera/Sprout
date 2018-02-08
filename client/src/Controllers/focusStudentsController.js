@@ -36,7 +36,7 @@ app.controller("focusStudentsController", function ($scope, $rootScope, $locatio
     ];
     $scope.caution_colours = [
       "rgba(255,99,132,1)"
-    ]
+    ];
     $scope.onClick = function (points, evt) {
       console.log(points, evt);
     };

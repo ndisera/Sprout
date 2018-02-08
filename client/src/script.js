@@ -163,9 +163,23 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/studentTests.html',
             controller: 'studentTestsController',
             resolve: {
-                student: function(studentService, $route) {
+                studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
+
+                // I'm thinking this will be gotten from inside of the tests controller, not here
+                // testData: function(testService, $route) {
+                //     return testService.getTests(); //we want them all...
+                // },
+
+                // data: function(enrollmentService, $route) {
+                //     return enrollmentService.getStudentEnrollments(
+                //       {
+                //           include: ['section.*', 'student.*'],
+                //           filter: [{ name: 'student', val: $route.current.params.id, },],
+                //       }
+                //     );
+                // },
                 auth: function(userService) {
                     return userService.authVerify();
                 },
@@ -259,7 +273,7 @@ app.config(function ($routeProvider, $httpProvider) {
      *  Convenience variable - Combine backendHostname and backendPort in a manner which
      *  they will often be used
      */
-    $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort
+    $rootScope.backend = $rootScope.backendHostname + ':' + $rootScope.backendPort;
 
     /**
      * Define where the auth token will be in local storage
