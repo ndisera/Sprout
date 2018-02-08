@@ -87,6 +87,9 @@ class StandardizedTestScoreGenerator():
         self.stdtest_score_service.add_many_standardized_test_scores(toPost)
 
 
+def date_arg(date_str):
+    return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload random grade information to Sprout")
     parser.add_argument("--url", "-u", action='store', default="localhost", type=str,
@@ -101,6 +104,12 @@ if __name__ == "__main__":
                         help="auth token -- supersedes username and password")
     parser.add_argument("--num-scores", action="store", type=int, default=3,
                         help="number of datapoints to generate")
+    parser.add_argument("--start-date", action="store", type=date_arg,
+                        default=datetime.date(year=2018, month=01, day=01),
+                        help="data generation range start as YYYY-MM-DD")
+    parser.add_argument("--end-date", action="store", type=date_arg,
+                        default=datetime.date.today(),
+                        help="data generation range end as YYYY-MM-DD")
     parser.add_argument("--setup", action="store_true",
                         help="upload initial standardized tests as well as scores")
 
@@ -127,5 +136,5 @@ if __name__ == "__main__":
     if args.setup:
         generator.setup_tests()
 
-    toPost = generator.generate(args.num_scores)
+    toPost = generator.generate(args.num_scores, range_start=args.start_date, range_end=args.end_date)
     generator.upload(toPost)

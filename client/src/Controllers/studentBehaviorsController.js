@@ -38,6 +38,11 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
         labels: [],
         series: _.pluck($scope.sections, 'title'),
         options: {
+            elements: {
+                line: {
+                    fill: false,
+                },
+            },
             responsive: true,
             maintainAspectRatio: false,
             scales: {
@@ -55,6 +60,15 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                 display: true
             }
         },
+        colors: [
+            "rgba(255,99,132,0.7)",
+            "rgba(255,159,64,0.7)",
+            "rgba(255,205,86,0.7)",
+            "rgba(75,192,192,0.7)",
+            "rgba(54,162,235,0.7)",
+            "rgba(153,102,255,0.7)",
+            "rgba(201,203,207,0.7)",
+        ],
     };
 
     // start off the two graphs with empty datasets

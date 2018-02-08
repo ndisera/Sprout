@@ -17,7 +17,7 @@
 }
 
 .pencilEdit:hover {
-    color:blue;
+    color: #3F7DB1;
 }
 
 .smBtnGroup {
@@ -37,4 +37,14 @@
 .scrollableTableDiv {
     max-height:230px;
     overflow-y:auto;
+}
+
+.heading-btn {
+    margin-top: -5px;
+    margin-right: -10px;
+    font-size: 11px;
+}
+
+#roundBorder {
+    border-radius:4px
 }

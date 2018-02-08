@@ -1,7 +1,7 @@
 var app = angular.module(
-    "app", 
+    "app",
     [
-        "ngRoute", 
+        "ngRoute",
         "chart.js",
         "ngAnimate",
         "datePicker",
@@ -23,7 +23,7 @@ app.config(function ($routeProvider, $httpProvider) {
         })
 
         .when('/manage', {
-            redirectTo: '/manage/cases',
+            redirectTo: '/manage/classes',
         })
 
         // route for the manage students page
@@ -134,7 +134,7 @@ app.config(function ($routeProvider, $httpProvider) {
             resolve: {
                 enrollmentData: function(enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
-                        { 
+                        {
                             include: ['section.*', 'section.teacher.*'],
                             filter: [{ name: 'student', val: $route.current.params.id },],
                         }
@@ -239,7 +239,7 @@ app.config(function ($routeProvider, $httpProvider) {
             resolve: {
                 enrollmentData: function(enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
-                        { 
+                        {
                             include: ['section.*', 'section.teacher.*'],
                             filter: [{ name: 'student', val: $route.current.params.id },],
                         }
@@ -258,7 +258,7 @@ app.config(function ($routeProvider, $httpProvider) {
 })
 
 .run(function($rootScope, $location, userService) {
-    
+
     /**
      *  Used to determine where to make calls to the backend
      */
@@ -299,9 +299,3 @@ app.config(function ($routeProvider, $httpProvider) {
     userService.loadToken();
 
 });
-
-
-
-
-
-
