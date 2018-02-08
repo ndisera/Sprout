@@ -70,15 +70,14 @@
                                     </div>
                                 </div>
                                 <div class="row voffset3">
-                                    <div class="col-sm-12 centerText focusGraph">
-                                        <label>Test 1</label>
+                                    <div class="col-sm-12 centerText " ng-repeat="graph in testGraphs">
                                         <div class="col-sm-12">
-                                            <canvas id="test_0"
-                                                    class="chart chart-line"
-                                                    chart-data="testGraphs[0].data"
-                                                    chart-labels="testGraphs[0].labels"
-                                                    chart-series="testGraphs[0].series"
-                                                    chart-options="testGraphs[0].options"
+                                            <canvas id="testGraph-{{$index}}"
+                                                    class="chart chart-line student-tests-graph"
+                                                    chart-data="graph.data"
+                                                    chart-labels="graph.labels"
+                                                    chart-series="graph.series"
+                                                    chart-options="graph.options"
                                                     chart-dataset-override="datasetOverride"
                                                     chart-click="onClick">
                                             </canvas>
