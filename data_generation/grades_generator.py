@@ -165,8 +165,8 @@ if __name__ == "__main__":
                         help="auth token -- supersedes username and password")
     parser.add_argument("--num-scores", action="store", type=int, default=5,
                         help="number of datapoints to generate")
-    parser.add_argument("--setup", action="store_true",
-                        help="generate and upload assignments as well as scores")
+    parser.add_argument("--setup-num-assign", action="store", type=int,
+                        help="generate and upload this number of assignments")
 
     args = parser.parse_args()
 
@@ -188,9 +188,9 @@ if __name__ == "__main__":
 
     generator = GradesGenerator(url=args.url, port_num=args.port, headers=headers, verify=False)
 
-    if args.setup:
-        assignments = generator.generate_assignments(args.num_scores)
+    if args.setup_num_assign is not None:
+        assignments = generator.generate_assignments(args.setup_num_assign)
         generator.assignmentService.add_many_assignments(assignments)
-
-    grades = generator.generate_grades(args.num_scores)
-    generator.gradeService.add_many_grades(grades)
+    else:
+        grades = generator.generate_grades(args.num_scores)
+        generator.gradeService.add_many_grades(grades)
