@@ -18,43 +18,27 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     },
                 }],
             },
+            elements: {
+                line: {
+                    fill: false,
+                },
+            },
 
             title: {
                 display: true,
                 text: ''
             }
         },
-        colors: [],
-        datasetOverride: {
-            //todo: set a different color for each graph
-            backgroundColor: [
-                "rgba(255,99,132,0.2)",
-                "rgba(255,159,64,0.2)",
-                "rgba(255,205,86,0.2)",
-                "rgba(75,192,192,0.2)",
-                "rgba(54,162,235,0.2)",
-                "rgba(153,102,255,0.2)",
-                "rgba(201,203,207,0.2)",
-            ],
-            hoverBackgroundColor: [
-                "rgba(255,99,132,0.4)",
-                "rgba(255,159,64,0.4)",
-                "rgba(255,205,86,0.4)",
-                "rgba(75,192,192,0.4)",
-                "rgba(54,162,235,0.4)",
-                "rgba(153,102,255,0.4)",
-                "rgba(201,203,207,0.4)",
-            ],
-            borderColor: [
-                "rgba(255,99,132,0.7)",
-                "rgba(255,159,64,0.7)",
-                "rgba(255,205,86,0.7)",
-                "rgba(75,192,192,0.7)",
-                "rgba(54,162,235,0.7)",
-                "rgba(153,102,255,0.7)",
-                "rgba(201,203,207,0.7)",
-            ],
-        },
+        colors: [
+            "rgba(255,99,132,0.7)",
+            "rgba(255,159,64,0.7)",
+            "rgba(255,205,86,0.7)",
+            "rgba(75,192,192,0.7)",
+            "rgba(54,162,235,0.7)",
+            "rgba(153,102,255,0.7)",
+            "rgba(201,203,207,0.7)",
+        ],
+        //
     };
 
     $scope.testGraphs = {};
@@ -65,7 +49,34 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
     $scope[graphStartDateKey] = moment().startOf('year');
     $scope[graphEndDateKey] = moment().startOf('year').add(6, 'months');
 
-    $scope.updateGraphs = function () {
+    /**
+     * called when start or end daterange picker changed
+     * updates min/max values of date range, updates graph
+     *
+     * @param {string} varName - name of datepicker that was change
+     * @param {newDate} newDate - new date that was selected
+     *
+     * @return {void}
+     */
+    $scope.graphDateRangeChange = function(varName, newDate) {
+        // update date
+        $scope[varName] = newDate;
+
+        // broadcast event to update min/max values
+        if(varName === graphStartDateKey) {
+            $scope.$broadcast('pickerUpdate', graphEndDateKey, { minDate: $scope[graphStartDateKey] });
+        }
+        else if(varName === graphEndDateKey) {
+            $scope.$broadcast('pickerUpdate', graphStartDateKey, { maxDate: $scope[graphEndDateKey] });
+        }
+
+        updateGraphs();
+    };
+
+    /**
+     * Updates the graphs on the page
+     */
+    function updateGraphs() {
 
         //Start by getting all of the tests, and mapping test IDs to indexes and names
         var testConfig = {
@@ -155,37 +166,8 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                                         text: testIdToInfo[scoreElem.standardized_test].name
                                     }
                                 },
-                                colors: [],
-                                datasetOverride: {
-                                    //todo: set a different color for each graph
-                                    backgroundColor: [
-                                        "rgba(255,99,132,0.2)",
-                                        "rgba(255,159,64,0.2)",
-                                        "rgba(255,205,86,0.2)",
-                                        "rgba(75,192,192,0.2)",
-                                        "rgba(54,162,235,0.2)",
-                                        "rgba(153,102,255,0.2)",
-                                        "rgba(201,203,207,0.2)",
-                                    ],
-                                    hoverBackgroundColor: [
-                                        "rgba(255,99,132,0.4)",
-                                        "rgba(255,159,64,0.4)",
-                                        "rgba(255,205,86,0.4)",
-                                        "rgba(75,192,192,0.4)",
-                                        "rgba(54,162,235,0.4)",
-                                        "rgba(153,102,255,0.4)",
-                                        "rgba(201,203,207,0.4)",
-                                    ],
-                                    borderColor: [
-                                        "rgba(255,99,132,0.7)",
-                                        "rgba(255,159,64,0.7)",
-                                        "rgba(255,205,86,0.7)",
-                                        "rgba(75,192,192,0.7)",
-                                        "rgba(54,162,235,0.7)",
-                                        "rgba(153,102,255,0.7)",
-                                        "rgba(201,203,207,0.7)",
-                                    ],
-                                },
+
+
                             };
 
 
@@ -249,5 +231,19 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
 
     };
 
-    $scope.updateGraphs();
+    /**
+     * called when input datepicker is changed
+     * updates the input date and all relevant scores
+     *
+     * @param {string} varName - name of picker that was changed
+     * @param {newDate} newDate - new date that was selected
+     *
+     * @return {void}
+     */
+    $scope.inputDateChange = function(varName, newDate) {
+        $scope.inputDate = newDate;
+        updateI ();
+    };
+
+    updateGraphs();
 });
