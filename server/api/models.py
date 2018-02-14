@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 
+from sprout_user import SproutUser
 
 class Teacher(models.Model):
     """
@@ -31,7 +32,7 @@ class Student(models.Model):
     last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
-    case_manager = models.ForeignKey(User, blank=False)
+    case_manager = models.ForeignKey(SproutUser, blank=False)
 
     class Meta:
         ordering = ('id',)

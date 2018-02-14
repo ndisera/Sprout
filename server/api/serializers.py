@@ -1,8 +1,8 @@
-from rest_framework import serializers
 from dynamic_rest.serializers import DynamicModelSerializer
 from dynamic_rest.fields import DynamicRelationField
-from django.db import models
 from api.models import *
+from rest_auth.serializers import LoginSerializer
+from rest_auth.registration.serializers import RegisterSerializer
 
 
 class TeacherSerializer(DynamicModelSerializer):
@@ -14,7 +14,7 @@ class TeacherSerializer(DynamicModelSerializer):
 class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
-        fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate', 'case-manager')
+        fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate', 'case_manager')
     #case_manager = DynamicRelationField('UserSerializer')
 
 
@@ -67,3 +67,15 @@ class GradeSerializer(DynamicModelSerializer):
         fields = ('id', 'assignment', 'student', 'handin_datetime', 'score',)
     assignment = DynamicRelationField('AssignmentSerializer')
     student = DynamicRelationField('StudentSerializer')
+
+
+class SproutLoginSerializer(LoginSerializer):
+    class Meta:
+        excluse = ('username', )
+
+
+class SproutRegisterSerializer(RegisterSerializer):
+    class Meta:
+        exclude = ('username', )
+        fields = ('id', 'email', 'first_name', 'last_name', )
+

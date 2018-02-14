@@ -89,7 +89,7 @@ class StudentViewSet(DynamicModelViewSet):
     schema = StudentViewSetSchema()
 
     """ ensure variables show as correct types for docs """
-    name_case_manager = 'case manager'
+    name_case_manager = 'case_manager'
     desc_case_manager = "ID of the User who oversees this student"
     create_fields = (
         coreapi.Field(

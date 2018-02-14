@@ -16,7 +16,6 @@ Including another URLconf
 
 from django.conf.urls import url
 from django.conf.urls import include
-from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.views import get_swagger_view

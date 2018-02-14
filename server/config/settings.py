@@ -186,4 +186,20 @@ EMAIL_HOST_PASSWORD = 'sprout'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
 
+# Declare that we are using a custom user object
+AUTH_USER_MODEL = 'api.SproutUser'
+ACCOUNT_USERNAME_REQUIRED=False
+ACCOUNT_USER_MODEL_USERNAME_FIELD=None
+ACCOUNT_EMAIL_REQUIRED=True
+ACCOUNT_AUTHENTICATION_METHOD='email'
+
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER' :  'api.serializers.SproutLoginSerializer',
+    'USER_DETAILS_SERIALIZER' : 'api.serializers.SproutRegisterSerializer' # This would be different than REGISTER_SERIALIZER if name, etc. were in a different model
+}
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER' : 'api.serializers.SproutRegisterSerializer'
+}
+
 DEFAULT_MAX_CHARFIELD_LENGTH = 100
