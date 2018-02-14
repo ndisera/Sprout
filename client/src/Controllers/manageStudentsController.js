@@ -1,11 +1,10 @@
-﻿app.controller("manageStudentsController", function ($scope, $rootScope, $location, students, studentService) {
+﻿
+app.controller("manageStudentsController", function($scope, $rootScope, $location, students, studentService) {
 
     var studentTask = "view/edit";
-    var studentDSearchOrInfo = "search";
     $scope.displayStudentViewSearch = true;
     $scope.displayStudentDeleteSearch = false;
     $scope.displayStudentForm = false;
-    $scope.displayStudentInfo = false;
     $scope.addStudentSuccess = false;
     $scope.deleteStudentSuccess = false;
     $scope.studentD = {};
@@ -22,13 +21,14 @@
                 $scope.displayStudentViewSearch = false;
                 break;
             case "delete":
-                $scope.displayStudentInfo = false;
                 $scope.displayStudentDeleteSearch = false;
                 $scope.deleteStudentSuccess = false;
+                $scope.deleteStudentFailure = false;
                 break;
             case "add":
                 $scope.displayStudentForm = false;
                 $scope.addStudentSuccess = false;
+                $scope.addStudentFailure = false;
                 break;
             default:
         }
@@ -39,11 +39,7 @@
                 $scope.displayStudentViewSearch = true;
                 break;
             case "delete":
-                if (studentDSearchOrInfo === "search") {
-                    $scope.displayStudentDeleteSearch = true;
-                } else {
-                    $scope.displayStudentInfo = true;
-                }
+                $scope.displayStudentDeleteSearch = true;
                 break;
             case "add":
                 $scope.displayStudentForm = true;
@@ -57,19 +53,14 @@
     /**
      * Navigates to student's page if name in navigation search bar is valid.
      */
-    $scope.viewStudent = function() {
-        if ($scope.studentViewSearch.toUpperCase() in $scope.studentInfo.studentsLookup) {
-            $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentViewSearch.toUpperCase()].id);
-            return;
-        } else {
-            //TODO: notify the user in some way
-        }
+    $scope.viewStudent = function(id) {
+        $location.path('/student/' + id);
     };
 
     /**
      * Creates and adds a new student.
      */
-    $scope.addStudent = function () {
+    $scope.addStudent = function() {
         $scope.newStudent.birthdate = moment($scope.newStudent.birthdate).format('YYYY-MM-DD').toString();
         var studentPromise = studentService.addStudent($scope.newStudent);
         studentPromise.then(function success(data) {
@@ -90,14 +81,13 @@
     /**
      * Hides the delete student search bar and displays their info with an option to delete.
      */
-    $scope.displayDeleteStudent = function() {
-        if ($scope.studentDeleteSearch.toUpperCase() in $scope.studentInfo.studentsLookup) {
-            $scope.studentD = $scope.studentInfo.studentsLookup[$scope.studentDeleteSearch.toUpperCase()];
-            $scope.displayStudentDeleteSearch = false;
-            $scope.displayStudentInfo = true;
-            $scope.clearStudentDeleteSearch();
-            studentDSearchOrInfo = "info";
-        }
+    $scope.displayDeleteStudent = function(student) {
+        $scope.studentD = student;
+        $scope.studentDeleteSearch = student.first_name + ' ' + student.last_name;
+    };
+
+    $scope.setStudentD = function(student) {
+        $scope.studentD = student;
     };
 
     /**
@@ -112,8 +102,6 @@
                 $("#deleteStudentSuccess").slideUp(500);
             });
             $scope.displayStudentDeleteSearch = true;
-            $scope.displayStudentInfo = false;
-            studentDSearchOrInfo = "search";
             $scope.studentDeleteSearch = "";
         }, function error(response) {
             setErrorMessage(response);
@@ -125,28 +113,10 @@
     };
 
     /**
-     * Restores the delete student search box and hides their info and delete option.
-     */
-    $scope.cancelDeleteStudent = function() {
-        $scope.clearStudentDeleteSearch();
-        $scope.displayStudentDeleteSearch = true;
-        $scope.displayStudentInfo = false;
-        $scope.studentD = {};
-        teacherDSearchOrInfo = "search";
-    };
-
-    /**
      * Clears the view student search bar.
      */
     $scope.clearStudentViewSearch = function() {
         $scope.studentViewSearch = "";
-    };
-
-    /**
-     * Clears the delete student search bar.
-     */
-    $scope.clearStudentDeleteSearch = function() {
-        $scope.studentDeleteSearch = "";
     };
 
     /**

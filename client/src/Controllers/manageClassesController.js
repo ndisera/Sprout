@@ -6,8 +6,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     // another 's' for 'sections' would be confusing with 'students', which will probably use an 's' again
 
     var sectionTask = "view/edit";
-    var sectionVSearchOrInfo = "search";
-    var sectionDSearchOrInfo = "search";
     $scope.displaySectionViewSearch = true;
     $scope.displaySectionDeleteSearch = false;
     $scope.displaySectionForm = false;
@@ -32,6 +30,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.unenrolledStudents = [];
     $scope.addValidTeacher = false;
     $scope.editValidTeacher = false;
+    $scope.editingAll = true;
 
     // create fast lookup sections dictionary
     for (var i = 0; i < $scope.sections.length; ++i) {
@@ -84,16 +83,12 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         switch (task) {
             case "view/edit":
                 $scope.displaySectionViewSearch = true;
-                if (sectionVSearchOrInfo === "info") {
+                if ($scope.sectionV.title === $scope.sectionViewSearch) {
                     $scope.displayCEditInfo = true;
                 }
                 break;
             case "delete":
-                if (sectionDSearchOrInfo === "search") {
-                    $scope.displaySectionDeleteSearch = true;
-                } else {
-                    $scope.displaySectionInfo = true;
-                }
+                $scope.displaySectionDeleteSearch = true;
                 break;
             case "add":
                 $scope.displaySectionForm = true;
@@ -135,23 +130,19 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     /**
      * Displays teacher info if name in teacher search bar is valid.
      */
-    $scope.viewSection = function() {
-        if ($scope.sectionViewSearch.toUpperCase() in $scope.sectionsLookup) {
-            $scope.sectionV = $scope.sectionsLookup[$scope.sectionViewSearch.toUpperCase()];
-            // copy sectionV to sectionE
-            $scope.sectionE = Object.assign({}, $scope.sectionV);
-            $scope.displayCEditInfo = true;
-            sectionVSearchOrInfo = "info";
-            // make sure edit is still not displayed when switching
-            $scope.viewCTitle = true;
-            $scope.viewCTeacher = true;
-            // set enrolledStudents and unenrolledStudents
-            $('#enrolledInput').val('');
-            $('#unenrolledInput').val('');
-            getEnrolledStudents();
-        } else {
-            //TODO: notify the user in some way
-        }
+    $scope.viewSection = function(section) {
+        $scope.sectionViewSearch = section.title;
+        $scope.sectionV = section;
+        // copy sectionV to sectionE
+        $scope.sectionE = Object.assign({}, $scope.sectionV);
+        $scope.displayCEditInfo = true;
+        // make sure edit is still not displayed when switching
+        $scope.viewCTitle = true;
+        $scope.viewCTeacher = true;
+        // set enrolledStudents and unenrolledStudents
+        $('#enrolledInput').val('');
+        $('#unenrolledInput').val('');
+        getEnrolledStudents();
     };
 
     /**
@@ -162,13 +153,36 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         switch (field) {
             case "title":
                 $scope.viewCTitle = false;
+                checkIfAllSelected()
                 break;
             case "teacher":
                 $scope.viewCTeacher = false;
+                checkIfAllSelected()
+                break;
+            case "none":
+                $scope.viewCTitle = true;
+                $scope.viewCTeacher = true;
+                $scope.editingAll = true;
+                break;
+            case "all":
+                $scope.viewCTitle = false;
+                $scope.viewCTeacher = false;
+                $scope.editingAll = false;
                 break;
             default:
         }
     };
+
+    /**
+     * Sets edit all button according to what edit fields are ready to edit.
+     */
+    function checkIfAllSelected() {
+        if ($scope.viewCTitle === true && $scope.viewCTeacher === true) {
+            $scope.editingAll = true;
+        } else if ($scope.viewCTitle === false && $scope.viewCTeacher === false) {
+            $scope.editingAll = false;
+        }
+    }
 
     /**
      * Restored the previous display of the selected section field and hides the editable input box.
@@ -186,6 +200,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 break;
             default:
         }
+        checkIfAllSelected()
     };
 
     /**
@@ -278,7 +293,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             $scope.displaySectionDeleteSearch = false;
             $scope.displaySectionInfo = true;
             $scope.clearSectionDeleteSearch();
-            sectionDSearchOrInfo = "info";
         }
     };
 
@@ -304,14 +318,11 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             });
             $scope.displaySectionDeleteSearch = true;
             $scope.displaySectionInfo = false;
-            sectionDSearchOrInfo = "search";
             $scope.sectionDeleteSearch = "";
             // check to see if sectionV/E is this deleted section and change view accordingly
             if ($scope.sectionV.id === id) {
                 $scope.sectionV = {};
                 $scope.sectionE = {};
-                $scope.displayCEditInfo = false;
-                sectionVSearchOrInfo = "search";
                 $scope.clearSectionViewSearch();
                 $scope.cTitle = "";
                 $scope.cTeacher = "";
@@ -325,16 +336,9 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         });
     };
 
-    /**
-     * Restores the delete section search box and hides its info and delete option.
-     */
-    $scope.cancelDeleteSection = function() {
-        $scope.clearSectionDeleteSearch();
-        $scope.displaySectionDeleteSearch = true;
-        $scope.displaySectionInfo = false;
-        $scope.sectionD = {};
-        sectionDSearchOrInfo = "search";
-    };
+    $scope.setSectionD = function(section) {
+        $scope.sectionD = section;
+    }
 
     /**
      * Grabs all enrolled students in the selected section.
@@ -342,7 +346,10 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     function getEnrolledStudents() {
         var getStudentsPromise = enrollmentService.getStudentEnrollments({
             include: ['student.*'],
-            filter: [{name: 'section', val: $scope.sectionV.id}],
+            filter: [{
+                name: 'section',
+                val: $scope.sectionV.id
+            }],
         });
         getStudentsPromise.then(function success(data) {
             $scope.enrolledStudents = _.indexBy(data.students, 'id');
@@ -401,7 +408,10 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Clears the view section search bar.
      */
     $scope.clearSectionViewSearch = function() {
-        $scope.sectionViewSearch = "";
+        if ($scope.displayCEditInfo) {
+            $scope.sectionViewSearch = "";
+            $scope.displayCEditInfo = false;
+        }
     };
 
     /**

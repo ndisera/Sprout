@@ -1,13 +1,10 @@
 ﻿
-app.controller("manageTeachersController", function($scope, $rootScope, $location, teachers, teacherService) {
+app.controller("manageTeachersController", function($scope, $rootScope, $location, teachers, teacherService, sectionService) {
 
     var teacherTask = "view/edit";
-    var teacherVSearchOrInfo = "search";
-    var teacherDSearchOrInfo = "search";
     $scope.displayTeacherViewSearch = true;
     $scope.displayTeacherDeleteSearch = false;
     $scope.displayTeacherForm = false;
-    $scope.displayTeacherInfo = false;
     $scope.displayTEditInfo = false;
     $scope.viewTUsername = true;
     $scope.viewTFirstName = true;
@@ -21,6 +18,28 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
     $scope.teacherD = {};
     $scope.newTeacher = {};
     $scope.teachers = teachers.teachers;
+    $scope.editingAll = true;
+
+    $scope.setTeacherD = function(teacher) {
+        $scope.teacherD = teacher;
+    };
+
+    /**
+     * Grabs all classes taught by the selected teacher.
+     */
+    function getTeacherClasses() {
+        var sectionsPromise = sectionService.getSections({
+            filter: [{
+                name: 'teacher',
+                val: $scope.teacherV.id
+            }],
+        });
+        sectionsPromise.then(function success(data) {
+            $scope.sections = data.sections;
+        }, function error(response) {
+            $scope.errorMessage = response;
+        });
+    };
 
     // create fast lookup teacher dictionary
     for (var i = 0; i < $scope.teachers.length; ++i) {
@@ -39,13 +58,14 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
                 $scope.displayTEditInfo = false;
                 break;
             case "delete":
-                $scope.displayTeacherInfo = false;
                 $scope.displayTeacherDeleteSearch = false;
                 $scope.deleteTeacherSuccess = false;
+                $scope.deleteTeacherFailure = false;
                 break;
             case "add":
                 $scope.displayTeacherForm = false;
                 $scope.addTeacherSuccess = false;
+                $scope.addTeacherFailure = false;
                 break;
             default:
         }
@@ -53,16 +73,12 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         switch (task) {
             case "view/edit":
                 $scope.displayTeacherViewSearch = true;
-                if (teacherVSearchOrInfo === "info") {
+                if ($scope.teacherV.username === $scope.teacherViewSearch) {
                     $scope.displayTEditInfo = true;
                 }
                 break;
             case "delete":
-                if (teacherDSearchOrInfo === "search") {
-                    $scope.displayTeacherDeleteSearch = true;
-                } else {
-                    $scope.displayTeacherInfo = true;
-                }
+                $scope.displayTeacherDeleteSearch = true;
                 break;
             case "add":
                 $scope.displayTeacherForm = true;
@@ -76,21 +92,18 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
     /**
      * Displays teacher info if name in teacher search bar is valid.
      */
-    $scope.viewTeacher = function() {
-        if ($scope.teacherViewSearch.toUpperCase() in $scope.teachersLookup) {
-            $scope.teacherV = $scope.teachersLookup[$scope.teacherViewSearch.toUpperCase()];
-            // copy teacherV to teacherE
-            $scope.teacherE = Object.assign({}, $scope.teacherV);
-            $scope.displayTEditInfo = true;
-            teacherVSearchOrInfo = "info";
-            // make sure edit is still not displayed when switching
-            $scope.viewTUsername = true;
-            $scope.viewTFirstName = true;
-            $scope.viewTLastName = true;
-            $scope.viewTEmail = true;
-        } else {
-            //TODO: notify the user in some way
-        }
+    $scope.viewTeacher = function(teacher) {
+        $scope.teacherViewSearch = teacher.username;
+        $scope.teacherV = teacher;
+        // copy teacherV to teacherE
+        $scope.teacherE = Object.assign({}, $scope.teacherV);
+        $scope.displayTEditInfo = true;
+        // make sure edit is still not displayed when switching
+        $scope.viewTUsername = true;
+        $scope.viewTFirstName = true;
+        $scope.viewTLastName = true;
+        $scope.viewTEmail = true;
+        getTeacherClasses();
     };
 
     /**
@@ -123,9 +136,7 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         if ($scope.teacherDeleteSearch.toUpperCase() in $scope.teachersLookup) {
             $scope.teacherD = $scope.teachersLookup[$scope.teacherDeleteSearch.toUpperCase()];
             $scope.displayTeacherDeleteSearch = false;
-            $scope.displayTeacherInfo = true;
             $scope.clearTeacherDeleteSearch();
-            teacherDSearchOrInfo = "info";
         }
     };
 
@@ -150,15 +161,11 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
                 $("#deleteTeacherSuccess").slideUp(500);
             });
             $scope.displayTeacherDeleteSearch = true;
-            $scope.displayTeacherInfo = false;
-            teacherDSearchOrInfo = "search";
             $scope.teacherDeleteSearch = "";
             // check to see if teacherV/E is this deleted teacher and change view accordingly
             if ($scope.teacherV.id === id) {
                 $scope.teacherV = {};
                 $scope.teacherE = {};
-                $scope.displayTEditInfo = false;
-                teacherVSearchOrInfo = "search";
                 $scope.clearTeacherViewSearch();
                 $scope.tUsername = "";
                 $scope.tFirstName = "";
@@ -175,17 +182,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
     };
 
     /**
-     * Restores the delete teacher search box and hides their info and delete option.
-     */
-    $scope.cancelDeleteTeacher = function() {
-        $scope.clearTeacherDeleteSearch();
-        $scope.displayTeacherDeleteSearch = true;
-        $scope.displayTeacherInfo = false;
-        $scope.teacherD = {};
-        teacherDSearchOrInfo = "search";
-    };
-
-    /**
      * Turns the displayed teacher field into an editable input.
      * @param {string} field - the name of the field that the user is editing.
      */
@@ -193,19 +189,48 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         switch (field) {
             case "username":
                 $scope.viewTUsername = false;
+                checkIfAllSelected();
                 break;
             case "firstname":
                 $scope.viewTFirstName = false;
+                checkIfAllSelected();
                 break;
             case "lastname":
                 $scope.viewTLastName = false;
+                checkIfAllSelected();
                 break;
             case "email":
                 $scope.viewTEmail = false;
+                checkIfAllSelected();
+                break;
+            case "none":
+                $scope.viewTUsername = true;
+                $scope.viewTFirstName = true;
+                $scope.viewTLastName = true;
+                $scope.viewTEmail = true;
+                $scope.editingAll = true;
+                break;
+            case "all":
+                $scope.viewTUsername = false;
+                $scope.viewTFirstName = false;
+                $scope.viewTLastName = false;
+                $scope.viewTEmail = false;
+                $scope.editingAll = false;
                 break;
             default:
         }
     };
+
+    /**
+     * Sets edit all button according to what edit fields are ready to edit.
+     */
+    function checkIfAllSelected() {
+        if ($scope.viewTUsername === true && $scope.viewTFirstName === true && $scope.viewTLastName === true && $scope.viewTEmail === true) {
+            $scope.editingAll = true;
+        } else if ($scope.viewTUsername === false && $scope.viewTFirstName === false && $scope.viewTLastName === false && $scope.viewTEmail === false) {
+            $scope.editingAll = false;
+        }
+    }
 
     /**
      * Updates the selected Teacher with the newly edited field.
@@ -307,13 +332,17 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
                 break;
             default:
         }
+        checkIfAllSelected();
     };
 
     /**
      * Clears the view teacher search bar.
      */
     $scope.clearTeacherViewSearch = function() {
-        $scope.teacherViewSearch = "";
+        if ($scope.displayTEditInfo === true) {
+            $scope.teacherViewSearch = "";
+            $scope.displayTEditInfo = false;
+        }
     };
 
     /**

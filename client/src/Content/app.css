@@ -32,6 +32,10 @@
     color: #45B9BD;
 }
 
+.grey {
+    background-color: #F5F5F5;
+}
+
 .tealOnGrey {
     background-color: #F5F5F5;
     color:#45B9BD
@@ -81,6 +85,10 @@
     border-radius: 4px 0px 0px 4px;
 }
 
+.modal-wrapper {
+    border-bottom: 5px solid #45B9BD;
+}
+
 .panel-wrapper > .panel {
     border-left-width: 0px;
     border-top-left-radius: 0px;
@@ -93,4 +101,8 @@
 
 [date-picker] {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.pointer {
+    cursor: pointer;
 }
