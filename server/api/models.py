@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
+from django.conf import settings
 
-from django.contrib.auth.models import User
-
-DEFAULT_MAX_LENGTH = 100
 
 class Teacher(models.Model):
     """
@@ -12,14 +10,15 @@ class Teacher(models.Model):
     Represents a teacher in the system (also a Sprout user).
     username and email must be unique.
     """
-    username = models.CharField(unique=True, max_length=DEFAULT_MAX_LENGTH, blank=False)
+    username = models.CharField(unique=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH, blank=False)
     email = models.EmailField(unique=True, blank=False)
-    first_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
-    last_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
+    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ('id',)
+
 
 class Student(models.Model):
     """
@@ -27,9 +26,9 @@ class Student(models.Model):
     Represents a student in the system.
     student_id must be unique
     """
-    student_id = models.CharField(unique=True, blank=False, max_length=DEFAULT_MAX_LENGTH)
-    first_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
-    last_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
+    student_id = models.CharField(unique=True, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     case_manager = models.ForeignKey(User, blank=False)
@@ -43,7 +42,7 @@ class Section(models.Model):
     Represents a section (most likely class) in the system.
     teacher is a foreign key to Teacher
     """
-    title = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
+    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     teacher = models.ForeignKey(Teacher)
 
     class Meta:
@@ -83,7 +82,7 @@ class StandardizedTest(models.Model):
     StandardizedTest
     Represent a standardized test as enabled by the school
     """
-    test_name = models.CharField(unique=True, max_length=DEFAULT_MAX_LENGTH)
+    test_name = models.CharField(unique=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     min_score = models.IntegerField(verbose_name="Minimum possible score", blank=False)
     max_score = models.IntegerField(verbose_name="Maximum possible score", blank=False)
 
@@ -112,7 +111,7 @@ class Assignment(models.Model):
     """
     section = models.ForeignKey(Section, related_name='assignment_section',
                                    verbose_name="Section to which this assigment belongs")
-    assignment_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
+    assignment_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     score_min = models.IntegerField(blank=False, verbose_name="Minimum Score")
     score_max = models.IntegerField(blank=False, verbose_name="Maximum Score")
     due_date = models.DateField(blank=False,)
