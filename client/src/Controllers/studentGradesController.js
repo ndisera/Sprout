@@ -1,6 +1,10 @@
 app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, assignmentService, gradeService, studentData, enrollmentData) {
-    $scope.student = studentData.student;
-    $scope.sections = _.sortBy(enrollmentData.sections, 'title');
+    $scope.student  = studentData.student;
+    $scope.sections = [];
+
+    if(enrollmentData.sections !== null && enrollmentData.sections !== undefined) {
+        $scope.sections = _.sortBy(enrollmentData.sections, 'title');
+    }
 
     $scope.assignmentsGraph = {
         data: [],

@@ -1,9 +1,16 @@
 app.controller("studentOverviewController", function ($scope, $rootScope, $routeParams, studentService, caseManagerService, enrollmentData, caseManagerData, teacherData, studentData) {
 
     // set important scope variables
-    $scope.student = studentData.student;
-    $scope.enrollments = enrollmentData.enrollments;
-    $scope.sections = enrollmentData.sections;
+    $scope.student     = studentData.student;
+    $scope.enrollments = [];
+    $scope.sections    = [];
+
+    if(enrollmentData.enrollments !== null && enrollmentData.enrollments !== undefined) {
+        $scope.enrollments = enrollmentData.enrollments;
+    }
+    if(enrollmentData.sections !== null && enrollmentData.sections !== undefined) {
+        $scope.sections = enrollmentData.sections;
+    }
 
     // create class schedule
     $scope.teachers = _.indexBy(enrollmentData.teachers, 'id');
