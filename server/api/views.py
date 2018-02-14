@@ -770,3 +770,94 @@ class NotificationViewSet(DynamicModelViewSet):
             description=desc_student,
             schema=coreschema.Integer(title=name_student)),
     )
+
+
+class FocusStudentViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    FocusStudentViewSetSchema class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(FocusStudentViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(FocusStudentViewSet, path, method, link)
+
+
+class FocusStudentViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "FocusStudent" instances
+
+    list:
+    gets all the focus students in Sprout.
+
+    create:
+    creates a new focus students. requires the title, body, date, student, user, and category
+
+    retrieve:
+    gets the focus students specified by the id path param.
+
+    update:
+    updates an existing focus students specified by the id path param.
+    requires the student, user, and focus_category
+
+    partial_update:
+    updates parts of an existing focus students specified by path param.
+    does not require all values.
+
+    delete:
+    deletes the existing focus students specified by the path param.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FocusStudentSerializer
+    queryset = FocusStudent.objects.all()
+
+    """ define custom schema for documentation """
+    schema = FocusStudentViewSetSchema()
+
+    """ ensure variables show as correct type for docs """
+    name_user = 'user'
+    name_student = 'student'
+    desc_user = 'ID of the user who wants to focus on this student'
+    desc_student = 'ID of the student being focused'
+    create_fields = (
+        coreapi.Field(
+            name=name_user,
+            required=True,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+    )
+    update_fields = (
+        coreapi.Field(
+            name=name_user,
+            required=True,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+    )
+    partial_update_fields = (
+        coreapi.Field(
+            name=name_user,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
+            name=name_student,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+    )

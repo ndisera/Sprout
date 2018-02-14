@@ -92,3 +92,11 @@ class NotificationSerializer(DynamicModelSerializer):
         fields = ('id', 'title', 'body', 'date', 'student', 'user', 'category', 'unread', )
     user = DynamicRelationField('SproutUserSerializer')
     student = DynamicRelationField('StudentSerializer')
+
+
+class FocusStudentSerializer(DynamicModelSerializer):
+    class Meta:
+        model = FocusStudent
+        fields = ('id', 'student', 'user', 'ordering', 'focus_category', 'progress_category', 'caution_category', )
+    user = DynamicRelationField('SproutUserSerializer')
+    student = DynamicRelationField('StudentSerializer')

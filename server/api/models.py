@@ -32,7 +32,7 @@ class Student(models.Model):
     last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
-    case_manager = models.ForeignKey(SproutUser, blank=False)
+    case_manager = models.ForeignKey(SproutUser)
 
     class Meta:
         ordering = ('id',)
@@ -148,9 +148,28 @@ class Notification(models.Model):
     date = models.DateTimeField(blank=False)
     student = models.ForeignKey(Student, blank=False)
     user = models.ForeignKey(SproutUser, blank=False)
-    category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                help_text="Partial string of an API call, combined with student to create a URL from this notification")
     unread = models.BooleanField(blank=False, default=False)
 
     class Meta:
         # Do we want to enforce any uniqueness for notifications?
         ordering = ('date', 'user',)
+
+
+class FocusStudent(models.Model):
+    student = models.ForeignKey(Student, blank=False)
+    user = models.ForeignKey(SproutUser, blank=False)
+    ordering = models.IntegerField(blank=False)
+    focus_category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                      help_text="Category selected by the user to display")
+    progress_category = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                         help_text="Category Sprout has identified is going well")
+    caution_category = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="Category Sprout has identified needs attention")
+    refresh_date = models.DateTimeField(auto_now=True,
+                                        help_text="Record the last time this entry was updated, to ensure it is updated regularly")
+
+    class Meta:
+        ordering = ('user', 'ordering', )
+        unique_together = (('user', 'student'), )
