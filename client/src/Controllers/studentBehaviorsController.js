@@ -1,6 +1,15 @@
 app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data, student) {
     // I know this will be here, because I filtered on the student ID, and only that student
-    $scope.student = student.student;
+    $scope.student     = student.student;
+    $scope.enrollments = [];
+    $scope.sections    = [];
+
+    if(data.enrollments !== null && data.enrollments !== undefined) {
+        $scope.enrollments = data.enrollments;
+    }
+    if(data.sections !== null && data.sections !== undefined) {
+        $scope.sections = data.sections;
+    }
 
     // for now, sort sections alphabetically
     $scope.sections       = _.sortBy(data.sections, 'title');

@@ -104,10 +104,6 @@
     margin-bottom: 20px;
 }
 
-#student-grades-no-missing {
-    text-align: center;
-}
-
 .panel-wrapper.ng-enter {
     transition: 0.4s linear all;
     opacity: 0;
