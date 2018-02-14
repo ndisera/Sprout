@@ -14,7 +14,8 @@ class TeacherSerializer(DynamicModelSerializer):
 class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
-        fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate')
+        fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate', 'case-manager')
+    #case_manager = DynamicRelationField('UserSerializer')
 
 
 class SectionSerializer(DynamicModelSerializer):
@@ -65,13 +66,4 @@ class GradeSerializer(DynamicModelSerializer):
         model = Grade
         fields = ('id', 'assignment', 'student', 'handin_datetime', 'score',)
     assignment = DynamicRelationField('AssignmentSerializer')
-    student = DynamicRelationField('StudentSerializer')
-
-
-class CaseManagerSerializer(DynamicModelSerializer):
-    class Meta:
-        model = CaseManager
-        fields = ('id', 'teacher', 'student')
-
-    teacher = DynamicRelationField('TeacherSerializer')
     student = DynamicRelationField('StudentSerializer')

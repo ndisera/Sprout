@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.db import models
 
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import User
 
 DEFAULT_MAX_LENGTH = 100
 
@@ -32,6 +32,7 @@ class Student(models.Model):
     last_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
+    case_manager = models.ForeignKey(User, blank=False)
 
     class Meta:
         ordering = ('id',)
@@ -135,17 +136,3 @@ class Grade(models.Model):
     class Meta:
         unique_together = (('assignment', 'student', 'handin_datetime'),)
         ordering = ('assignment',)
-
-
-class CaseManager(models.Model):
-    """
-    CaseManager
-    Represents a case manager relationship in the system. That is, a
-    teacher who oversees a student.
-    teacher and student are a composite, unique key
-    """
-    teacher = models.ForeignKey(Teacher, blank=False)
-    student = models.OneToOneField(Student, blank=False)
-
-    class Meta:
-        ordering = ('teacher',)
