@@ -4,7 +4,6 @@ app.factory("userService", function ($rootScope, $http, $q) {
 
     // establish default unauthorized user
     var user = {
-        username: null, 
         token: null,
         email: null,
         firstName: null,
@@ -29,7 +28,6 @@ app.factory("userService", function ($rootScope, $http, $q) {
 
     function saveUser(userObj) {
         user.id        = _.has(userObj, 'id') ? userObj.id : null;
-        user.username  = _.has(userObj, 'username') ? userObj.username : null;
         user.email     = _.has(userObj, 'email') ? userObj.email : null;
         user.firstName = _.has(userObj, 'first_name') ? userObj.first_name : null;
         user.lastName  = _.has(userObj, 'last_name') ? userObj.last_name : null;
@@ -44,18 +42,18 @@ app.factory("userService", function ($rootScope, $http, $q) {
      * 400 Bad Request, indicating a failed login, in which case a list of errors will
      * be response.data["non_field_errors"]
      *
-     * @param {string} username - the user's username
+     * @param {string} email - the user's email
      * @param {string} password - the user's password
      *
      * @return {promise} promise that will resolve to the response
      */
-    userService.login = function(username, password) {
+    userService.login = function(email, password) {
         var deferred = $q.defer();
         $http({
             method: 'POST',
             url: 'https://' + $rootScope.backend + '/login/',
             headers: { 'Content-Type': 'application/json' },
-            data: { 'username': username, 'password': password },
+            data: { 'email': email, 'password': password },
         }).then(function success(response) {
             // save token and user
             saveToken(response.data.token);
