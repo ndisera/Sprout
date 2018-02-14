@@ -679,3 +679,94 @@ class SproutUserViewSet(DynamicModelViewSet):
         queryset = SproutUser.objects.all()
         serializer = SproutUserSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class NotificationViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    NotificationViewSetSchema class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(NotificationViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(NotificationViewSet, path, method, link)
+
+
+class NotificationViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "Notification" instances
+
+    list:
+    gets all the notifications in Sprout.
+
+    create:
+    creates a new notification. requires the title, body, date, student, user, and category
+
+    retrieve:
+    gets the notification specified by the id path param.
+
+    update:
+    updates an existing notification specified by the id path param.
+    requires the title, body, date, student, user, and category
+
+    partial_update:
+    updates parts of an existing notification specified by path param.
+    does not require all values.
+
+    delete:
+    deletes the existing notification specified by the path param.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = NotificationSerializer
+    queryset = Notification.objects.all()
+
+    """ define custom schema for documentation """
+    schema = NotificationViewSetSchema()
+
+    """ ensure variables show as correct type for docs """
+    name_user = 'user'
+    name_student = 'student'
+    desc_user = 'ID of the user to whom this notification should be displayed'
+    desc_student = 'ID of the student to whom this notification refers'
+    create_fields = (
+        coreapi.Field(
+            name=name_user,
+            required=True,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+    )
+    update_fields = (
+        coreapi.Field(
+            name=name_user,
+            required=True,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+    )
+    partial_update_fields = (
+        coreapi.Field(
+            name=name_user,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
+            name=name_student,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+    )

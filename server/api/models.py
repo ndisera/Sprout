@@ -136,3 +136,21 @@ class Grade(models.Model):
     class Meta:
         unique_together = (('assignment', 'student', 'handin_datetime'),)
         ordering = ('assignment',)
+
+
+class Notification(models.Model):
+    """
+    Notification
+    Represent and store a notification which should be displayed to a User
+    """
+    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    date = models.DateTimeField(blank=False)
+    student = models.ForeignKey(Student, blank=False)
+    user = models.ForeignKey(SproutUser, blank=False)
+    category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    unread = models.BooleanField(blank=False, default=False)
+
+    class Meta:
+        # Do we want to enforce any uniqueness for notifications?
+        ordering = ('date', 'user',)

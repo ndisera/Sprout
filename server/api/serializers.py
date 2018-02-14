@@ -15,7 +15,7 @@ class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
         fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate', 'case_manager')
-    #case_manager = DynamicRelationField('UserSerializer')
+    case_manager = DynamicRelationField('SproutUserSerializer')
 
 
 class SectionSerializer(DynamicModelSerializer):
@@ -85,3 +85,10 @@ class SproutUserSerializer(DynamicModelSerializer):
         model = SproutUser
         fields = ('id', 'email', 'first_name', 'last_name', )
 
+
+class NotificationSerializer(DynamicModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ('id', 'title', 'body', 'date', 'student', 'user', 'category', 'unread', )
+    user = DynamicRelationField('SproutUserSerializer')
+    student = DynamicRelationField('StudentSerializer')
