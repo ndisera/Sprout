@@ -24,16 +24,16 @@ from dynamic_rest.routers import DynamicRouter
 from api.views import *
 
 router = DynamicRouter()
-router.register('teachers', viewset=TeacherViewSet, base_name='Teachers')
-router.register('students', viewset=StudentViewSet, base_name='Students')
-router.register('sections', viewset=SectionViewSet, base_name='Sections')
-router.register('enrollments', viewset=EnrollmentViewSet, base_name='Enrollments')
-router.register('behaviors', viewset=BehaviorViewSet, base_name='Behaviors')
-router.register('standardized_tests', viewset=StandardizedTestViewSet, base_name='StandardizedTests')
-router.register('standardized_test_scores', viewset=StandardizedTestScoreViewSet, base_name='StandardizedTestScores')
 router.register('assignments', viewset=AssignmentViewSet, base_name='Assignment')
+router.register('behaviors', viewset=BehaviorViewSet, base_name='Behaviors')
+router.register('enrollments', viewset=EnrollmentViewSet, base_name='Enrollments')
 router.register('grades', viewset=GradeViewSet, base_name='Grades')
 router.register('managers/case', viewset=CaseManagerViewSet, base_name='CaseManagers')
+router.register('sections', viewset=SectionViewSet, base_name='Sections')
+router.register('standardized_tests', viewset=StandardizedTestViewSet, base_name='StandardizedTests')
+router.register('standardized_test_scores', viewset=StandardizedTestScoreViewSet, base_name='StandardizedTestScores')
+router.register('students', viewset=StudentViewSet, base_name='Students')
+router.register('teachers', viewset=TeacherViewSet, base_name='Teachers')
 
 urlpatterns = router.urls
 urlpatterns.append(url(r'^docs/', include_docs_urls(title='Sprout API', public=False)))
