@@ -663,3 +663,19 @@ class AuthVerifyView(generics.RetrieveAPIView):
             }
             
         return Response(data=response)
+
+
+class SproutUserViewSet(DynamicModelViewSet):
+    """
+    allows reading all registered Users in Sprout
+
+    list:
+    gets all the registered Users in Sprout
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SproutUserSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = SproutUser.objects.all()
+        serializer = SproutUserSerializer(queryset, many=True)
+        return Response(serializer.data)

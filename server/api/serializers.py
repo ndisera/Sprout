@@ -71,11 +71,17 @@ class GradeSerializer(DynamicModelSerializer):
 
 class SproutLoginSerializer(LoginSerializer):
     class Meta:
-        excluse = ('username', )
+        exclude = ('username', )
 
 
 class SproutRegisterSerializer(RegisterSerializer):
     class Meta:
         exclude = ('username', )
+        fields = ('id', 'email', 'first_name', 'last_name', )
+
+
+class SproutUserSerializer(DynamicModelSerializer):
+    class Meta:
+        model = SproutUser
         fields = ('id', 'email', 'first_name', 'last_name', )
 
