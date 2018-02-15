@@ -55,6 +55,9 @@ const options = {
 
 var express_app = express();
 express_app.use(express.static(folder_path));
+express_app.all('*', function(req, res) {
+  res.sendFile(folder_path + '/index.html');
+});
 var server = httpolyglot.createServer(options, function (req, res) {
   if (!req.socket.encrypted) {
       res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });

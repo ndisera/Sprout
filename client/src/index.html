@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <title>Sprout</title>
+    <base href="/">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- @ifndef DEBUG -->
@@ -56,7 +57,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a href="#!/focus" class="navbar-left" ng-click="clearSearch(); closeNavbar()">
+                    <a href="/focus" class="navbar-left" ng-click="clearSearch(); closeNavbar()">
                         <img id="navbar-logo" src="img/logo/svg/color_logo_only_transparent.svg">
                     </a>
                 </div>
@@ -80,22 +81,22 @@
                                 <img id="navbar-user-pic" src="img/Twenty_One_Pilots_album_cover.jpg">&nbsp;<b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu">
-                                <li ng-click="clearSearch()"><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
-                                <li ng-click="clearSearch()"><a href="#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
-                                <li ng-click="clearSearch()"><a href="#!/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
+                                <li ng-click="clearSearch()"><a href="/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
+                                <li ng-click="clearSearch()"><a href="/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
+                                <li ng-click="clearSearch()"><a href="/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
                                 <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
-                                <li ng-click="clearSearch()"><a href="#!/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
-                                <li ng-click="logout(); clearSearch()"><a href="#!/login"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                                <li ng-click="clearSearch()"><a href="/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                                <li ng-click="logout(); clearSearch()"><a href="/login"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                             </ul>
                         </li>
                     </ul>
                     <ul class="nav navbar-nav hidden-sm hidden-md hidden-lg hidden-xl">
-                        <li ng-click="clearSearch()"><a href="#!/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
-                        <li ng-click="clearSearch()"><a href="#!/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
-                        <li ng-click="clearSearch()"><a href="#!/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
+                        <li ng-click="clearSearch()"><a href="/manage"><span class="glyphicon glyphicon-briefcase"></span> Manage</a></li>
+                        <li ng-click="clearSearch()"><a href="/focus"><span class="glyphicon glyphicon-screenshot"></span> Focus Students</a></li>
+                        <li ng-click="clearSearch()"><a href="/scores"><span class="glyphicon glyphicon-pencil"></span> Scores Input</a></li>
                         <li ng-click="clearSearch()"><a href="#"><span class="glyphicon glyphicon-bell"></span> Notifications</a></li>
-                        <li ng-click="clearSearch()"><a href="#!/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
-                        <li ng-click="logout(); clearSearch()"><a href="#!/login"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                        <li ng-click="clearSearch()"><a href="/settings"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+                        <li ng-click="logout(); clearSearch()"><a href="/login"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                     </ul>
                 </div>
             </div>
