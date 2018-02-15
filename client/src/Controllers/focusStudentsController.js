@@ -1,24 +1,32 @@
-app.controller("focusStudentsController", function ($scope, $rootScope, $location, students) {
+app.controller("focusStudentsController", function ($scope, students) {
 
-    $scope.students = students.students;
+    // set students if there are any
+    $scope.students = [];
+    if(students.students !== null && students.students !== undefined) {
+        $scope.students = students.students;
+    }
 
-    // draggable 
-    $('.row').sortable({
-        connectWith: ".panel",
-        handle: ".panel-heading",
-        placeholder: "panel-placeholder",
-        start: function (e, ui) {
-            ui.placeholder.width(ui.item.find('.panel').width());
-            ui.placeholder.height(ui.item.find('.panel').height());
-            ui.placeholder.addClass(ui.item.attr("class"));
-        }
-    });
+    $scope.editing = false;
 
-    $('.panel').on('mousedown', function () {
-        $(this).css('cursor', 'move');
-    }).on('mouseup', function () {
-        $(this).css('cursor', 'auto');
-    });
+    $scope.toggleEdit = function() {
+        $scope.editing = !$scope.editing;
+    };
+
+    $scope.sortableOptions = {
+        update: function(e, ui) {
+            //TODO(gzuber): use dropindex to save to server
+            console.log(ui.item.sortable.dropindex);
+        },
+    };
+
+
+    //TODO(gzuber): add in check to not allow them to add more than 5 focus students
+
+
+
+
+
+
 
     // All of the following belongs to the hard-coded angular-charts on the Focus Students page
     $scope.focus_labels = ["January", "February", "March", "April", "May", "June", "July"];
@@ -57,4 +65,16 @@ app.controller("focusStudentsController", function ($scope, $rootScope, $locatio
         }]
       }
     };
+
+
+
+
+
+
+
+    $('.panel').on('mousedown', function () {
+        $(this).css('cursor', 'move');
+    }).on('mouseup', function () {
+        $(this).css('cursor', 'auto');
+    });
 });

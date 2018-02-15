@@ -1,10 +1,11 @@
 var app = angular.module(
-    "app",
+    'app',
     [
-        "ngRoute",
-        "chart.js",
-        "ngAnimate",
-        "datePicker",
+        'ngRoute',
+        'chart.js',
+        'ngAnimate',
+        'datePicker',
+        'ui.sortable',
     ]
 );
 

@@ -80,6 +80,10 @@
     margin-bottom: 0px;
 }
 
+.no-bottom-border {
+    border-bottom: none;
+}
+
 .panel-wrapper {
     border-left: 5px solid #45B9BD;
     border-radius: 4px 0px 0px 4px;
@@ -97,6 +101,18 @@
 
 .panel-title-with-btn {
     display: inline-block;
+}
+
+.panel-add {
+    border: 3px dashed #CCC;
+}
+
+.panel-add > .panel-heading {
+    border-bottom: none;
+}
+
+.zero-width {
+    width: 0px;
 }
 
 [date-picker] {
