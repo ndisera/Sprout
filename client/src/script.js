@@ -9,11 +9,13 @@ var app = angular.module(
 );
 
 // configure our routes
-app.config(function ($routeProvider, $httpProvider) {
+app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     /**
      * Set our interceptor to add auth token to all requests
      */
     $httpProvider.interceptors.push('interceptorService');
+
+    $locationProvider.html5Mode(true);
 
     $routeProvider
 
