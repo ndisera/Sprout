@@ -2,32 +2,17 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
 
     $scope.student = studentData.student;
 
-    $scope.protoGraph = {
-        data: [],
+
+    $scope.sharedGraph = {
         labels: [],
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            spanGaps: true, //skip values of null or NaN
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        min: 0,
-                        max: 100
-                        //this will change based on the test
-                    },
-                }],
-            },
             elements: {
                 line: {
-                    fill: false,
+                    fill: true,
                 },
             },
-
-            title: {
-                display: true,
-                text: ''
-            }
+            responsive: true,
+            maintainAspectRatio: false,
         },
         colors: [
             "rgba(255,99,132,0.7)",
@@ -38,7 +23,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
             "rgba(153,102,255,0.7)",
             "rgba(201,203,207,0.7)",
         ],
-        //
+
     };
 
     $scope.testGraphs = {};
@@ -58,16 +43,16 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
      *
      * @return {void}
      */
-    $scope.graphDateRangeChange = function(varName, newDate) {
+    $scope.graphDateRangeChange = function (varName, newDate) {
         // update date
         $scope[varName] = newDate;
 
         // broadcast event to update min/max values
-        if(varName === graphStartDateKey) {
-            $scope.$broadcast('pickerUpdate', graphEndDateKey, { minDate: $scope[graphStartDateKey] });
+        if (varName === graphStartDateKey) {
+            $scope.$broadcast('pickerUpdate', graphEndDateKey, {minDate: $scope[graphStartDateKey]});
         }
-        else if(varName === graphEndDateKey) {
-            $scope.$broadcast('pickerUpdate', graphStartDateKey, { maxDate: $scope[graphEndDateKey] });
+        else if (varName === graphEndDateKey) {
+            $scope.$broadcast('pickerUpdate', graphStartDateKey, {maxDate: $scope[graphEndDateKey]});
         }
 
         updateGraphs();
@@ -137,16 +122,23 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
 
                             //create a new graph data object
                             $scope.testGraphs[counter] = {
-
                                 data: [],
                                 labels: [],
+                                // series: ["1", "2", "3"],
                                 options: {
+                                    elements: {
+                                        line: {
+                                            fill: false,
+                                            tension: 0.2,
+                                        },
+                                    },
                                     responsive: true,
                                     maintainAspectRatio: false,
                                     spanGaps: true, //skip values of null or NaN
 
                                     scales: {
                                         yAxes: [{
+                                            display: true,
                                             ticks: {
                                                 //this will change based on the test
                                                 min: testIdToInfo[scoreElem.standardized_test].min,
@@ -156,9 +148,12 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                                         xAxes: [{
                                             ticks: {
                                                 //specify more space around each label
-                                                autoSkipPadding : 20
+                                                autoSkipPadding: 20
                                             },
                                         }],
+                                    },
+                                    legend: {
+                                          display: false
                                     },
 
                                     title: {
@@ -166,8 +161,15 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                                         text: testIdToInfo[scoreElem.standardized_test].name
                                     }
                                 },
-
-
+                                colors: [
+                                    "rgba(255,99,132,0.7)",
+                                    "rgba(255,159,64,0.7)",
+                                    "rgba(255,205,86,0.7)",
+                                    "rgba(75,192,192,0.7)",
+                                    "rgba(54,162,235,0.7)",
+                                    "rgba(153,102,255,0.7)",
+                                    "rgba(201,203,207,0.7)",
+                                ],
                             };
 
 
@@ -240,9 +242,9 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
      *
      * @return {void}
      */
-    $scope.inputDateChange = function(varName, newDate) {
+    $scope.inputDateChange = function (varName, newDate) {
         $scope.inputDate = newDate;
-        updateI ();
+        updateGraphs();
     };
 
     updateGraphs();
