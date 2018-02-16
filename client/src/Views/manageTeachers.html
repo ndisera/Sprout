@@ -46,7 +46,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:teacherViewSearch" ng-click="viewTeacher(teacher)" class="pointer">
+                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter" ng-click="viewTeacher(teacher)" class="pointer">
                                         <td>{{ teacher.username }}</td>
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
@@ -241,7 +241,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:teacherDeleteSearch" class="pointer">
+                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter" class="pointer">
                                         <td>{{ teacher.username }}</td>
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>

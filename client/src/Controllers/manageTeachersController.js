@@ -20,6 +20,10 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
     $scope.teachers = teachers.teachers;
     $scope.editingAll = true;
 
+    /**
+     * Sets teacherD.
+     * @param {teacher} teacher - teacher used to set.
+     */
     $scope.setTeacherD = function(teacher) {
         $scope.teacherD = teacher;
     };
@@ -93,7 +97,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      * Displays teacher info if name in teacher search bar is valid.
      */
     $scope.viewTeacher = function(teacher) {
-        $scope.teacherViewSearch = teacher.username;
         $scope.teacherV = teacher;
         // copy teacherV to teacherE
         $scope.teacherE = Object.assign({}, $scope.teacherV);
@@ -139,6 +142,42 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             $scope.clearTeacherDeleteSearch();
         }
     };
+
+    /**
+     * Filter used for viewing teachers
+     * @param {teacher} teacher - teacher to be filtered.
+     */
+    $scope.viewTeacherFilter = function(teacher) {
+        if ($scope.teacherViewSearch == null) {
+            return true;
+        }
+        var input = $scope.teacherViewSearch.toUpperCase();
+        var fullname = teacher.first_name + " " + teacher.last_name;
+        if (teacher.username.toUpperCase().includes(input) || teacher.first_name.toUpperCase().includes(input) ||
+            teacher.last_name.toUpperCase().includes(input) || teacher.email.toUpperCase().includes(input) ||
+            fullname.toUpperCase().includes(input)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Filter used for deleting teachers
+     * @param {teacher} teacher - teacher to be filtered.
+     */
+    $scope.deleteTeacherFilter = function(teacher) {
+        if ($scope.teacherDeleteSearch == null) {
+            return true;
+        }
+        var input = $scope.teacherDeleteSearch.toUpperCase();
+        var fullname = teacher.first_name + " " + teacher.last_name;
+        if (teacher.username.toUpperCase().includes(input) || teacher.first_name.toUpperCase().includes(input) ||
+            teacher.last_name.toUpperCase().includes(input) || teacher.email.toUpperCase().includes(input) ||
+            fullname.toUpperCase().includes(input)) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Deletes the selected teacher from the database.
@@ -340,7 +379,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      */
     $scope.clearTeacherViewSearch = function() {
         if ($scope.displayTEditInfo === true) {
-            $scope.teacherViewSearch = "";
             $scope.displayTEditInfo = false;
         }
     };
