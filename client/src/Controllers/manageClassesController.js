@@ -26,8 +26,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.teachers = teachers.teachers;
     $scope.teachersLookup = {};
     $scope.teacherIdLookup = {};
-    $scope.enrolledStudents = [];
-    $scope.unenrolledStudents = [];
+    $scope.enrolledStudentsArray = [];
+    $scope.unenrolledStudentsArray = [];
     $scope.addValidTeacher = false;
     $scope.editValidTeacher = false;
     $scope.editingAll = true;
@@ -45,6 +45,10 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         $scope.teacherIdLookup[$scope.teachers[i].id] = lookupName;
     }
 
+    /**
+     * Make sure teacher text is an actual teacher.
+     * @param {string} task - the type of task selected.
+     */
     $scope.checkValidTeacher = function(task) {
         switch (task) {
             case "add":
@@ -131,7 +135,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Displays teacher info if name in teacher search bar is valid.
      */
     $scope.viewSection = function(section) {
-        $scope.sectionViewSearch = section.title;
         $scope.sectionV = section;
         // copy sectionV to sectionE
         $scope.sectionE = Object.assign({}, $scope.sectionV);
@@ -312,13 +315,13 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             }
             var id = $scope.sectionD.id;
             $scope.sectionD = {};
+            $scope.sectionDeleteSearch = "";
             $scope.deleteSectionSuccess = true;
             $("#deleteSectionSuccess").fadeTo(2000, 500).slideUp(500, function() {
                 $("#deleteSectionSuccess").slideUp(500);
             });
             $scope.displaySectionDeleteSearch = true;
             $scope.displaySectionInfo = false;
-            $scope.sectionDeleteSearch = "";
             // check to see if sectionV/E is this deleted section and change view accordingly
             if ($scope.sectionV.id === id) {
                 $scope.sectionV = {};
@@ -336,6 +339,10 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         });
     };
 
+    /**
+     * Sets sectionD.
+     * @param {section} section - section used to set.
+     */
     $scope.setSectionD = function(section) {
         $scope.sectionD = section;
     }
@@ -354,11 +361,13 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         getStudentsPromise.then(function success(data) {
             $scope.enrolledStudents = _.indexBy(data.students, 'id');
             $scope.enrollments = _.indexBy(data.enrollments, 'id');
+            refreshEnrollmentsArray();
             // set unenrolled students to all students and then delete each enrolled student with id
             $scope.unenrolledStudents = Object.assign({}, $scope.students);
             for (var student in $scope.enrolledStudents) {
                 delete $scope.unenrolledStudents[student];
             }
+            refreshStudentArrays();
         }, function error(response) {
             $scope.errorMessage = response;
         });
@@ -378,13 +387,30 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             var enrollment = data.enrollment;
             // add to enrollments
             $scope.enrollments[enrollment.id] = enrollment;
+            refreshEnrollmentsArray();
             // move student from unenrolledstudents into enrolledStudents
             var tempStudent = $scope.unenrolledStudents[enrollment.student];
             delete $scope.unenrolledStudents[tempStudent.id];
             $scope.enrolledStudents[tempStudent.id] = tempStudent;
+            refreshStudentArrays();
         }, function error(response) {
             $scope.errorMessage = response;
         })
+    }
+
+    /**
+     * Sets student arrays equal to their lookup values.
+     */
+    function refreshStudentArrays() {
+        $scope.enrolledStudentsArray = _.values($scope.enrolledStudents);
+        $scope.unenrolledStudentsArray = _.values($scope.unenrolledStudents);
+    }
+
+    /**
+     * Sets enrollment array equal to its lookup values.
+     */
+    function refreshEnrollmentsArray() {
+        $scope.enrollmentsArray = _.values($scope.enrollments);
     }
 
     /**
@@ -397,10 +423,12 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             // remove from enrollments
             var enrollment = $scope.enrollments[enrollmentID];
             delete $scope.enrollments[enrollmentID];
+            refreshEnrollmentsArray();
             // move student from enrolledStudents into unenrolledStudents
             var tempStudent = $scope.enrolledStudents[enrollment.student];
             delete $scope.enrolledStudents[tempStudent.id];
             $scope.unenrolledStudents[tempStudent.id] = tempStudent;
+            refreshStudentArrays();
         })
     }
 
@@ -409,7 +437,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      */
     $scope.clearSectionViewSearch = function() {
         if ($scope.displayCEditInfo) {
-            $scope.sectionViewSearch = "";
             $scope.displayCEditInfo = false;
         }
     };
@@ -437,19 +464,64 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         $scope.errorMessage = $scope.errorMessage.join(" ");
     }
 
-    // filter for the enrolled table
-    $("#enrolledInput").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $("#enrolledStudents tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
+    /**
+     * Filter used for viewing sections.
+     * @param {section} section - section to be filtered.
+     */
+    $scope.viewSectionFilter = function(section) {
+        if ($scope.sectionViewSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionViewSearch.toUpperCase())
+            || section.title.toUpperCase().includes($scope.sectionViewSearch.toUpperCase())) {
+            return true;
+        }
+        return false; // otherwise it won't be within the results
+    };
 
-    // filter for the unenrolled table
-    $("#unenrolledInput").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $("#unenrolledStudents tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
+    /**
+     * Filter used for deleting sections.
+     * @param {section} section - section to be filtered.
+     */
+    $scope.deleteSectionFilter = function(section) {
+        if ($scope.sectionDeleteSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase())
+            || section.title.toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase())) {
+            return true;
+        }
+        return false; // otherwise it won't be within the results
+    };
+
+    /**
+     * Filter used for unenrolled students.
+     * @param {student} student - student to be filtered.
+     */
+    $scope.unenrolledStudentFilter = function(student) {
+        if ($scope.unenrolledInput == null) {
+            return true;
+        }
+        var input = $scope.unenrolledInput.toUpperCase();
+        var fullname = student.first_name + " " + student.last_name;
+        if (student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
+            student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
+            fullname.toUpperCase().includes(input)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Filter used for enrolled students.
+     * @param {enrollment} enrollment - enrollment to be filtered.
+     */
+    $scope.enrolledStudentFilter = function(enrollment) {
+        var student = $scope.enrolledStudents[enrollment.student];
+        if ($scope.enrolledInput == null) {
+            return true;
+        }
+        var input = $scope.enrolledInput.toUpperCase();
+        var fullname = student.first_name + " " + student.last_name;
+        if (student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
+            student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
+            fullname.toUpperCase().includes(input)) {
+            return true;
+        }
+        return false;
+    }
 })
