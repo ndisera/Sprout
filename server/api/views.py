@@ -512,6 +512,9 @@ class AssignmentViewSet(DynamicModelViewSet):
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
 
+    def get_queryset(self, queryset=None):
+        return Assignment.objects.filter(section=self.kwargs['sections_pk'])
+
     """ define custom schema for documentation """
     schema = AssignmentViewSetSchema()
 
@@ -579,7 +582,9 @@ class GradeViewSet(DynamicModelViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = GradeSerializer
-    queryset = Grade.objects.all()
+
+    def get_queryset(self, queryset=None):
+        return Grade.objects.filter(assignment=self.kwargs['assignments_pk'])
 
     """ define custom schema for documentation """
     schema = GradeViewSetSchema()

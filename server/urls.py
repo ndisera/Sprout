@@ -20,13 +20,12 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.views import get_swagger_view
 from dynamic_rest.routers import DynamicRouter
+from api.routers import NestedDynamicRouter
 from api.views import *
 
 router = DynamicRouter()
-router.register('assignments', viewset=AssignmentViewSet, base_name='Assignment')
 router.register('behaviors', viewset=BehaviorViewSet, base_name='Behaviors')
 router.register('enrollments', viewset=EnrollmentViewSet, base_name='Enrollments')
-router.register('grades', viewset=GradeViewSet, base_name='Grades')
 router.register('notifications', viewset=NotificationViewSet, base_name='Notifications')
 router.register('sections', viewset=SectionViewSet, base_name='Sections')
 router.register('standardized_tests', viewset=StandardizedTestViewSet, base_name='StandardizedTests')
@@ -36,6 +35,15 @@ router.register('teachers', viewset=TeacherViewSet, base_name='Teachers')
 router.register('focus', viewset=FocusStudentViewSet, base_name='FocusStudents')
 
 urlpatterns = router.urls
+
+sections_router = NestedDynamicRouter(router, 'sections', lookup='sections')
+sections_router.register('assignments', viewset=AssignmentViewSet, base_name='section-assignments')
+assignments_router = NestedDynamicRouter(sections_router, 'assignments', lookup='assignments')
+assignments_router.register('grades', viewset=GradeViewSet, base_name='assignment-grades')
+
+urlpatterns.append(url(r'^', include(sections_router.urls)))
+urlpatterns.append(url(r'^', include(assignments_router.urls)))
+
 urlpatterns.append(url(r'^docs/', include_docs_urls(title='Sprout API', public=False)))
 urlpatterns.append(url(r'^swagger/', get_swagger_view(title='Sprout API')))
 urlpatterns.append(url(r'^schema/', get_schema_view(title='Sprout Schema')))
