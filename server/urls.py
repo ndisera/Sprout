@@ -26,23 +26,30 @@ from api.views import *
 router = DynamicRouter()
 router.register('behaviors', viewset=BehaviorViewSet, base_name='Behaviors')
 router.register('enrollments', viewset=EnrollmentViewSet, base_name='Enrollments')
-router.register('notifications', viewset=NotificationViewSet, base_name='Notifications')
 router.register('sections', viewset=SectionViewSet, base_name='Sections')
 router.register('standardized_tests', viewset=StandardizedTestViewSet, base_name='StandardizedTests')
 router.register('standardized_test_scores', viewset=StandardizedTestScoreViewSet, base_name='StandardizedTestScores')
 router.register('students', viewset=StudentViewSet, base_name='Students')
 router.register('teachers', viewset=TeacherViewSet, base_name='Teachers')
-router.register('focus', viewset=FocusStudentViewSet, base_name='FocusStudents')
+router.register('users', viewset=SproutUserViewSet, base_name="Users")
 
 urlpatterns = router.urls
 
+# Add nested route for assignments as /sections/{pk}/assignments
 sections_router = NestedDynamicRouter(router, 'sections', lookup='sections')
 sections_router.register('assignments', viewset=AssignmentViewSet, base_name='section-assignments')
+urlpatterns.append(url(r'^', include(sections_router.urls)))
+
+# Add nested route for grades as /sections/{pk}/assignments/{pk}/grades
 assignments_router = NestedDynamicRouter(sections_router, 'assignments', lookup='assignments')
 assignments_router.register('grades', viewset=GradeViewSet, base_name='assignment-grades')
-
-urlpatterns.append(url(r'^', include(sections_router.urls)))
 urlpatterns.append(url(r'^', include(assignments_router.urls)))
+
+# Add nested route for notifications as /users/{pk}/notifications
+users_router = NestedDynamicRouter(router, 'users', lookup='users')
+users_router.register('notifications', viewset=NotificationViewSet, base_name='users-notifications')
+users_router.register('focus', viewset=FocusStudentViewSet, base_name='users-focus')
+urlpatterns.append(url(r'^', include(users_router.urls)))
 
 urlpatterns.append(url(r'^docs/', include_docs_urls(title='Sprout API', public=False)))
 urlpatterns.append(url(r'^swagger/', get_swagger_view(title='Sprout API')))
@@ -52,4 +59,3 @@ urlpatterns.append(url(r'^schema/', get_schema_view(title='Sprout Schema')))
 urlpatterns.append(url(r'^', include('rest_auth.urls')))
 urlpatterns.append(url(r'^registration/', include('rest_auth.registration.urls')))
 urlpatterns.append(url(r'^auth-verify/', view=AuthVerifyView.as_view(), name="auth-verify"))
-urlpatterns.append(url(r'^users/', view=SproutUserViewSet.as_view({'get': 'list'}), name="users"))

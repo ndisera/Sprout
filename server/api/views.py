@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
-from dynamic_rest.viewsets import DynamicModelViewSet
+from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from api.models import *
 from api.serializers import *
 
@@ -670,20 +671,19 @@ class AuthVerifyView(generics.RetrieveAPIView):
         return Response(data=response)
 
 
-class SproutUserViewSet(DynamicModelViewSet):
+class SproutUserViewSet(WithDynamicViewSetMixin, ReadOnlyModelViewSet):
     """
-    allows reading all registered Users in Sprout
+    allows read-only access to the registered Users in Sprout
 
     list:
     gets all the registered Users in Sprout
+
+    retrieve:
+    get a specific registered User in Sprout
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = SproutUserSerializer
-
-    def list(self, request, *args, **kwargs):
-        queryset = SproutUser.objects.all()
-        serializer = SproutUserSerializer(queryset, many=True)
-        return Response(serializer.data)
+    queryset = SproutUser.objects.all()
 
 
 class NotificationViewSetSchema(AutoSchema):
@@ -723,6 +723,9 @@ class NotificationViewSet(DynamicModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
+
+    def get_queryset(self, queryset=None):
+        return Notification.objects.filter(user=self.kwargs['users_pk'])
 
     """ define custom schema for documentation """
     schema = NotificationViewSetSchema()
@@ -813,7 +816,9 @@ class FocusStudentViewSet(DynamicModelViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = FocusStudentSerializer
-    queryset = FocusStudent.objects.all()
+
+    def get_queryset(self, queryset=None):
+        return FocusStudent.objects.filter(user=self.kwargs['users_pk'])
 
     """ define custom schema for documentation """
     schema = FocusStudentViewSetSchema()
