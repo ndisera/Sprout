@@ -50,14 +50,20 @@ class SproutUser(AbstractBaseUser):
     Represent and store the account information of anyone who uses Sprout
     """
     email = models.EmailField(unique=True, blank=False)
-    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = AbstractBaseUser.get_email_field_name()
-    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     objects = SproutUserManager()
 
     def __str__(self):
         return self.__getattribute__(AbstractBaseUser.get_email_field_name())
+
+
+class SproutUserProfile(models.Model):
+    user = models.OneToOneField(SproutUser, on_delete=models.CASCADE,
+                                help_text="User to which this profile information belongs")
+    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="User first name")
+    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                 help_text="User last name")

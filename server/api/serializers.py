@@ -1,7 +1,8 @@
-from dynamic_rest.serializers import DynamicModelSerializer
+from dynamic_rest.serializers import DynamicModelSerializer, WithDynamicModelSerializerMixin
 from dynamic_rest.fields import DynamicRelationField
 from api.models import *
-from rest_auth.serializers import LoginSerializer
+from rest_framework import serializers
+from rest_auth.serializers import LoginSerializer, UserDetailsSerializer
 from rest_auth.registration.serializers import RegisterSerializer
 
 
@@ -75,15 +76,69 @@ class SproutLoginSerializer(LoginSerializer):
 
 
 class SproutRegisterSerializer(RegisterSerializer):
+    first_name = serializers.CharField(source='sproutuserprofile.first_name')
+    last_name = serializers.CharField(source='sproutuserprofile.last_name')
+
+    def custom_signup(self, request, user):
+        profile_data = self.validated_data.pop('sproutuserprofile', {})
+        first_name = profile_data.get('first_name')
+        last_name = profile_data.get('last_name')
+        profile = SproutUserProfile(user=user, first_name=first_name, last_name=last_name)
+        profile.save()
+        self.instance = user
+
+    def to_representation(self, instance):
+        representation = super(SproutRegisterSerializer, self).to_representation(instance)
+        user_profile = {'first_name' : instance.sproutuserprofile.first_name,
+                        'last_name' : instance.sproutuserprofile.last_name,
+                        }
+        representation['sproutuserprofile'] = user_profile
+        return representation
+
     class Meta:
-        exclude = ('username', )
-        fields = ('id', 'email', 'first_name', 'last_name', )
+        fields = ('email', )
+        optional_fields = ('password1', 'password2', )
+
+        pass
 
 
-class SproutUserSerializer(DynamicModelSerializer):
-    class Meta:
-        model = SproutUser
-        fields = ('id', 'email', 'first_name', 'last_name', )
+class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerializer):
+    first_name = serializers.CharField(source='sproutuserprofile.first_name')
+    last_name = serializers.CharField(source='sproutuserprofile.last_name')
+
+    class Meta(UserDetailsSerializer.Meta):
+        fields = []
+        fields.extend(UserDetailsSerializer.Meta.fields)
+        fields.extend(('first_name', 'last_name', ))
+        if 'username' in fields:
+            del fields[fields.index('username')]
+
+    def create(self, validated_data):
+        instance = super(SproutUserSerializer, self).create(validated_data)
+        pass
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('sproutuserprofile', {})
+        first_name = profile_data.get('first_name')
+        last_name = profile_data.get('last_name')
+
+        instance = super(SproutUserSerializer, self).update(instance, validated_data)
+        try:
+            profile = instance.sproutuserprofile
+        except SproutUserProfile.DoesNotExist:
+            profile = SproutUserProfile(user=instance, first_name=first_name, last_name=last_name)
+
+        profile_changed = False
+        if first_name:
+            profile.first_name = first_name
+            profile_changed = True
+        if last_name:
+            profile.last_name = last_name
+            profile_changed = True
+        if profile_changed:
+            profile.save()
+
+        return instance
 
 
 class NotificationSerializer(DynamicModelSerializer):

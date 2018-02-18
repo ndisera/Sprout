@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 
-from sprout_user import SproutUser
+from sprout_user import SproutUser, SproutUserProfile
 
 class Teacher(models.Model):
     """

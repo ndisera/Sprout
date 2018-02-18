@@ -683,7 +683,9 @@ class SproutUserViewSet(WithDynamicViewSetMixin, ReadOnlyModelViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = SproutUserSerializer
-    queryset = SproutUser.objects.all()
+    def get_queryset(self, queryset=None):
+        queryset = SproutUser.objects.all()
+        return queryset
 
 
 class NotificationViewSetSchema(AutoSchema):
