@@ -59,15 +59,6 @@ def set_link(class_id, path, method, link):
         return link
 
 
-class TeacherViewSet(DynamicModelViewSet):
-    """
-    allows interaction with the set of "Teacher" instances
-    """
-    permission_classes = (IsAuthenticated,)
-    serializer_class = TeacherSerializer
-    queryset = Teacher.objects.all()
-
-
 class StudentViewSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the

@@ -6,12 +6,6 @@ from rest_auth.serializers import LoginSerializer, UserDetailsSerializer
 from rest_auth.registration.serializers import RegisterSerializer
 
 
-class TeacherSerializer(DynamicModelSerializer):
-    class Meta:
-        model = Teacher
-        fields = ('id', 'username', 'email', 'first_name', 'last_name')
-
-
 class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
@@ -23,7 +17,7 @@ class SectionSerializer(DynamicModelSerializer):
     class Meta:
         model = Section
         fields = ('id', 'title', 'teacher')
-    teacher = DynamicRelationField('TeacherSerializer')
+    teacher = DynamicRelationField('SproutUserSerializer')
 
 
 class EnrollmentSerializer(DynamicModelSerializer):

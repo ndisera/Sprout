@@ -5,21 +5,6 @@ from django.conf import settings
 
 from sprout_user import SproutUser, SproutUserProfile
 
-class Teacher(models.Model):
-    """
-    Teacher
-    Represents a teacher in the system (also a Sprout user).
-    username and email must be unique.
-    """
-    username = models.CharField(unique=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH, blank=False)
-    email = models.EmailField(unique=True, blank=False)
-    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    created = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ('id',)
-
 
 class Student(models.Model):
     """
@@ -41,10 +26,10 @@ class Section(models.Model):
     """
     Section
     Represents a section (most likely class) in the system.
-    teacher is a foreign key to Teacher
+    teacher is a foreign key to the User who teaches leads the section
     """
     title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    teacher = models.ForeignKey(Teacher)
+    teacher = models.ForeignKey(SproutUser)
 
     class Meta:
         ordering = ('id',)
