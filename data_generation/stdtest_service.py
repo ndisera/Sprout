@@ -35,10 +35,7 @@ class StandardizedTestService():
         toReturn = []
 
         for standardized_test in standardized_tests:
-            toReturn.append(StandardizedTest(test_name=standardized_test['test_name'],
-                                             min_score=standardized_test['min_score'],
-                                             max_score=standardized_test['max_score'],
-                                             id=standardized_test['id']))
+            toReturn.append(StandardizedTest(**standardized_test))
 
         return toReturn
 
@@ -53,8 +50,9 @@ class StandardizedTestService():
         del(data['id'])
         response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
+        response.raise_for_status()
+
+        return response
 
     def add_many_standardized_tests(self, standardized_tests):
         """
@@ -78,5 +76,6 @@ class StandardizedTestService():
 
         response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
 
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
+        response.raise_for_status()
+
+        return response

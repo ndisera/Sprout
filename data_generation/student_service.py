@@ -35,12 +35,7 @@ class StudentService():
         toReturn = []
 
         for student in students:
-            toReturn.append(Student(student_id=student['student_id'],
-                                    first_name=student['first_name'],
-                                    last_name=student['last_name'],
-                                    birthdate=student['birthdate'],
-                                    case_manager=student['case_manager'],
-                                    id=student['id']))
+            toReturn.append(Student(**student))
 
         return toReturn
 
@@ -57,6 +52,8 @@ class StudentService():
 
         if not (response.status_code >= 200 and response.status_code < 299):
             response.raise_for_status()
+
+        return response
 
     def add_many_students(self, students):
         """
@@ -81,3 +78,5 @@ class StudentService():
         response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
 
         response.raise_for_status()
+
+        return response

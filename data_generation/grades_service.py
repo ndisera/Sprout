@@ -54,8 +54,9 @@ class GradesService():
         del(data['id'])
         response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
+        response.raise_for_status()
+
+        return response
 
     def add_many_grades(self, grades):
         """
@@ -79,5 +80,6 @@ class GradesService():
 
         response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
 
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
+        response.raise_for_status()
+
+        return response
