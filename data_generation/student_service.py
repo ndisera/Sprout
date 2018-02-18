@@ -1,10 +1,11 @@
 
+import json
 import requests
 
 from authorization_service import CERT_PATH
 from collections import namedtuple
 
-Student = namedtuple("Student", ['student_id', 'first_name', 'last_name', 'birthdate', 'id'])
+Student = namedtuple("Student", ['student_id', 'first_name', 'last_name', 'birthdate', 'case_manager', 'id'])
 
 
 class StudentService():
@@ -38,6 +39,7 @@ class StudentService():
                                     first_name=student['first_name'],
                                     last_name=student['last_name'],
                                     birthdate=student['birthdate'],
+                                    case_manager=student['case_manager'],
                                     id=student['id']))
 
         return toReturn
@@ -55,3 +57,27 @@ class StudentService():
 
         if not (response.status_code >= 200 and response.status_code < 299):
             response.raise_for_status()
+
+    def add_many_students(self, students):
+        """
+        Upload a list of student objects to the server
+
+        :param students: List of student objects
+        :return:
+        """
+
+        data = []
+
+        for student in students:
+            student = student._asdict()
+            del(student['id'])
+            data.append(student)
+
+        data = json.dumps(data)
+
+        headers = self.headers
+        headers['content-type'] = 'application/json'
+
+        response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
+
+        response.raise_for_status()
