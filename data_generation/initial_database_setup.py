@@ -8,9 +8,9 @@ from behavior_generator import BehaviorGenerator
 from student_generator import Student, StudentGenerator
 from teacher_generator import TeacherGenerator
 
-from authorization_service import AuthorizationService
-from enrollment_service import Enrollment, EnrollmentService
-from section_service import Section, SectionService
+from services.authorization import AuthorizationService
+from services.enrollment import Enrollment, EnrollmentService
+from services.section import Section, SectionService
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")

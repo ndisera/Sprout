@@ -6,14 +6,13 @@ import random
 import requests
 import sys
 
-from authorization_service import AuthorizationService
-from authorization_service import CERT_PATH
+from services.authorization import AuthorizationService
 
-from assignment_service import Assignment, AssignmentService
+from services.assignment import Assignment, AssignmentService
 
-from enrollment_service import Enrollment, EnrollmentService
+from services.enrollment import EnrollmentService
 
-from grades_service import GradesService, Grade
+from services.grades import GradesService, Grade
 
 ASSIGNMENT_NAMES = ['Homework',  'Quiz', 'Worksheet']
 

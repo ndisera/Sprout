@@ -7,10 +7,9 @@ import random
 import requests
 import sys
 
-from authorization_service import AuthorizationService
-from authorization_service import CERT_PATH
+from services.authorization import AuthorizationService
 
-from student_service import Student, StudentService
+from services.student import Student, StudentService
 
 class StudentGenerator(object):
     """StudentGenerator contains various methods for generating student data

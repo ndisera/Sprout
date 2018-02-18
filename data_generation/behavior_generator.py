@@ -2,7 +2,7 @@
 import datetime
 import random
 
-from behavior_service import Behavior, BehaviorService
+from services.behavior import Behavior, BehaviorService
 
 class BehaviorGenerator:
 

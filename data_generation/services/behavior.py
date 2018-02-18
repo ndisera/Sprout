@@ -2,7 +2,7 @@
 import json
 import requests
 
-from authorization_service import CERT_PATH
+from authorization import CERT_PATH
 from collections import namedtuple
 
 Behavior = namedtuple("Behavior", ['date', 'enrollment', 'behavior', 'effort', 'id', ])

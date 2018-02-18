@@ -1,7 +1,7 @@
 
 import requests
 
-from authorization_service import CERT_PATH
+from authorization import CERT_PATH
 from collections import namedtuple
 import json
 

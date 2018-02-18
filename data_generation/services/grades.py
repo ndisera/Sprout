@@ -2,7 +2,7 @@
 import json
 import requests
 
-from authorization_service import CERT_PATH
+from authorization import CERT_PATH
 from collections import namedtuple
 
 Grade = namedtuple("Grade", ['assignment', 'student', 'score', 'handin_datetime', 'id'])

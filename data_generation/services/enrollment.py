@@ -2,27 +2,27 @@
 import json
 import requests
 
-from authorization_service import CERT_PATH
+from authorization import CERT_PATH
 from collections import namedtuple
 
-Section = namedtuple("Section", ['teacher', 'title', 'id', ])
+Enrollment = namedtuple("Enrollment", ['section', 'student', 'id'])
 
 
-class SectionService():
+class EnrollmentService():
 
     def __init__(self, headers={}, url="localhost", port_num=8000, verify=CERT_PATH):
         self.headers = headers
         self.url = url
         self.port_num = port_num
-        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/sections/"
+        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/enrollments/"
         self.verify = verify
 
-    def get_sections(self):
+    def get_enrollments(self):
         """
-        Download a complete list of sections
+        Download a complete list of enrollments
 
-        :return: list of section objects
-        :rtype: list[Section]
+        :return: list of enrollment objects
+        :rtype: list[Enrollment]
         """
         response = requests.get(self.complete_uri, verify=self.verify, headers=self.headers)
 
@@ -30,23 +30,23 @@ class SectionService():
             response.raise_for_status()
 
         body = response.json()
-        sections = body['sections']
+        enrollments = body['enrollments']
 
         toReturn = []
 
-        for section in sections:
-            toReturn.append(Section(**section))
+        for enrollment in enrollments:
+            toReturn.append(Enrollment(**enrollment))
 
         return toReturn
 
-    def add_section(self, section):
+    def add_enrollment(self, enrollment):
         """
-        Upload a section object to the server
+        Upload a enrollment object to the server
 
-        :param section: Section object to upload
-        :type section: Section
+        :param enrollment: Enrollment object to upload
+        :type enrollment: Enrollment
         """
-        data = section._asdict()
+        data = enrollment._asdict()
         del(data['id'])
         response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
@@ -54,20 +54,20 @@ class SectionService():
 
         return response
 
-    def add_many_sections(self, sections):
+    def add_many_enrollments(self, enrollments):
         """
-        Upload a list of section objects to the server
+        Upload a list of enrollment objects to the server
 
-        :param sections: List of section objects
+        :param enrollments: List of enrollment objects
         :return:
         """
 
         data = []
 
-        for section in sections:
-            section = section._asdict()
-            del(section['id'])
-            data.append(section)
+        for enrollment in enrollments:
+            enrollment = enrollment._asdict()
+            del(enrollment['id'])
+            data.append(enrollment)
 
         data = json.dumps(data)
 

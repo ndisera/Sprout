@@ -1,7 +1,7 @@
 
 import random
 
-from users_service import User, UsersService
+from services.users import User, UsersService
 
 class TeacherGenerator:
 

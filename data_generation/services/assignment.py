@@ -2,27 +2,27 @@
 import json
 import requests
 
-from authorization_service import CERT_PATH
+from authorization import CERT_PATH
 from collections import namedtuple
 
-Enrollment = namedtuple("Enrollment", ['section', 'student', 'id'])
+Assignment = namedtuple("Assignment", ['section', 'assignment_name', 'score_min', 'score_max', 'due_date', 'id'])
 
 
-class EnrollmentService():
+class AssignmentService():
 
     def __init__(self, headers={}, url="localhost", port_num=8000, verify=CERT_PATH):
         self.headers = headers
         self.url = url
         self.port_num = port_num
-        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/enrollments/"
+        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/assignments/"
         self.verify = verify
 
-    def get_enrollments(self):
+    def get_assignments(self):
         """
-        Download a complete list of enrollments
+        Download a complete list of assignments
 
-        :return: list of enrollment objects
-        :rtype: list[Enrollment]
+        :return: list of assignment objects
+        :rtype: list[Assignment]
         """
         response = requests.get(self.complete_uri, verify=self.verify, headers=self.headers)
 
@@ -30,23 +30,23 @@ class EnrollmentService():
             response.raise_for_status()
 
         body = response.json()
-        enrollments = body['enrollments']
+        assignments = body['assignments']
 
         toReturn = []
 
-        for enrollment in enrollments:
-            toReturn.append(Enrollment(**enrollment))
+        for assignment in assignments:
+            toReturn.append(Assignment(**assignment))
 
         return toReturn
 
-    def add_enrollment(self, enrollment):
+    def add_assignment(self, assignment):
         """
-        Upload a enrollment object to the server
+        Upload a grade object to the server
 
-        :param enrollment: Enrollment object to upload
-        :type enrollment: Enrollment
+        :param assignment: Grade object to upload
+        :type assignment: Grade
         """
-        data = enrollment._asdict()
+        data = assignment._asdict()
         del(data['id'])
         response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
@@ -54,20 +54,20 @@ class EnrollmentService():
 
         return response
 
-    def add_many_enrollments(self, enrollments):
+    def add_many_assignments(self, assignments):
         """
-        Upload a list of enrollment objects to the server
+        Upload a list of assignment objects to the server
 
-        :param enrollments: List of enrollment objects
+        :param assignments: List of grade objects
         :return:
         """
 
         data = []
 
-        for enrollment in enrollments:
-            enrollment = enrollment._asdict()
-            del(enrollment['id'])
-            data.append(enrollment)
+        for assignment in assignments:
+            assignment = assignment._asdict()
+            del(assignment['id'])
+            data.append(assignment)
 
         data = json.dumps(data)
 
