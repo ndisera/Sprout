@@ -5,6 +5,7 @@ import requests
 import sys
 
 from behavior_generator import BehaviorGenerator
+from standardized_test_score_generator import StandardizedTestScoreGenerator
 from student_generator import Student, StudentGenerator
 from teacher_generator import TeacherGenerator
 
@@ -84,3 +85,8 @@ if __name__ == "__main__":
         behavior = behavior_generator.generate_random_behavior(enrollment)
         behaviors.extend(behavior)
     behavior_generator.behaviorService.add_many_behaviors(behaviors)
+
+    std_test_score_generator = StandardizedTestScoreGenerator(url=args.url, verify=False, headers=headers)
+    std_test_score_generator.setup_tests()
+    toPost = std_test_score_generator.generate(10, range_start="2018-01-01", range_end="2018-07-01")
+    std_test_score_generator.upload(toPost)
