@@ -31,7 +31,7 @@ class AuthorizationService():
         """
         login_url = str(self.url) + ":" + str(self.port_num) + "/login/"
 
-        json = {"username" : username,
+        json = {"email" : username,
                 "password" :  password,}
         response = requests.post(login_url, json=json, verify=self.verify)
 
@@ -55,7 +55,7 @@ class AuthorizationService():
         """
 
         if not username:
-            username = raw_input("Sprout Username: ")
+            username = raw_input("Sprout Login Email: ")
         if not password:
             password = getpass.getpass("Sprout Password for {}: ".format(username))
 
