@@ -76,6 +76,7 @@ class SproutLoginSerializer(LoginSerializer):
 
 
 class SproutRegisterSerializer(RegisterSerializer):
+    username = None
     first_name = serializers.CharField(source='sproutuserprofile.first_name')
     last_name = serializers.CharField(source='sproutuserprofile.last_name')
 
