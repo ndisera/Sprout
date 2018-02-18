@@ -79,6 +79,8 @@ class SproutRegisterSerializer(RegisterSerializer):
     username = None
     first_name = serializers.CharField(source='sproutuserprofile.first_name')
     last_name = serializers.CharField(source='sproutuserprofile.last_name')
+    password1 = serializers.CharField(write_only=True, required=False)
+    password2 = serializers.CharField(write_only=True, required=False)
 
     def custom_signup(self, request, user):
         profile_data = self.validated_data.pop('sproutuserprofile', {})
@@ -96,11 +98,31 @@ class SproutRegisterSerializer(RegisterSerializer):
         representation['sproutuserprofile'] = user_profile
         return representation
 
+    def validate(self, data):
+        """
+        Allow the password fields to be left off
+        """
+        if 'password1' in data or 'password2' in data:
+            if not ('password1' in data and 'password2' in data):
+                raise serializers.ValidationError(_("Both password fields must be provided if one is"))
+            if data['password1'] != data['password2']:
+                raise serializers.ValidationError(_("The two password fields didn't match."))
+        return data
+
+    def get_cleaned_data(self):
+        """
+        Allow the password fields to be left off
+        """
+        to_return = {
+            'username': self.validated_data.get('username', ''),
+            'email': self.validated_data.get('email', '')
+        }
+        if 'password1' in self.validated_data:
+            to_return['password1'] = self.validated_data.get('password1', '')
+        return to_return
+
     class Meta:
         fields = ('email', )
-        optional_fields = ('password1', 'password2', )
-
-        pass
 
 
 class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerializer):
@@ -114,10 +136,6 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
         if 'username' in fields:
             del fields[fields.index('username')]
 
-    def create(self, validated_data):
-        instance = super(SproutUserSerializer, self).create(validated_data)
-        pass
-
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('sproutuserprofile', {})
         first_name = profile_data.get('first_name')
@@ -127,6 +145,7 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
         try:
             profile = instance.sproutuserprofile
         except SproutUserProfile.DoesNotExist:
+            # Try/Catch should not be necessary because the user profile should never not exist
             profile = SproutUserProfile(user=instance, first_name=first_name, last_name=last_name)
 
         profile_changed = False
