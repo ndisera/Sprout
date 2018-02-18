@@ -14,7 +14,7 @@ class StandardizedTestService():
         self.headers = headers
         self.url = url
         self.port_num = port_num
-        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/standardized_tests"
+        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/tests/standardized"
         self.verify = verify
 
     def get_standardized_tests(self):
