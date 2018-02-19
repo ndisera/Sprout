@@ -65,8 +65,8 @@ class GradeSerializer(DynamicModelSerializer):
 
 
 class SproutLoginSerializer(LoginSerializer):
-    class Meta:
-        exclude = ('username', )
+    username = None
+    email = serializers.EmailField(required=True)
 
 
 class SproutRegisterSerializer(RegisterSerializer):
