@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import coreapi
 import coreschema
-from rest_framework import status, viewsets, generics
+from rest_framework import mixins, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.response import Response
@@ -662,7 +662,10 @@ class AuthVerifyView(generics.RetrieveAPIView):
         return Response(data=response)
 
 
-class SproutUserViewSet(WithDynamicViewSetMixin, ReadOnlyModelViewSet):
+class SproutUserViewSet(WithDynamicViewSetMixin,
+                        mixins.UpdateModelMixin,
+                        mixins.DestroyModelMixin,
+                        ReadOnlyModelViewSet):
     """
     allows read-only access to the registered Users in Sprout
 
@@ -671,6 +674,15 @@ class SproutUserViewSet(WithDynamicViewSetMixin, ReadOnlyModelViewSet):
 
     retrieve:
     get a specific registered User in Sprout
+
+    delete:
+    remove a specified User from Sprout
+
+    update:
+    change the particulars of a User in Sprout
+
+    partial_update:
+    change the particulars of a User in Sprout
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = SproutUserSerializer
