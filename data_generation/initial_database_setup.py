@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import argparse
+import datetime
 import requests
 import sys
 
@@ -88,5 +89,7 @@ if __name__ == "__main__":
 
     std_test_score_generator = StandardizedTestScoreGenerator(url=args.url, verify=False, headers=headers)
     std_test_score_generator.setup_tests()
-    toPost = std_test_score_generator.generate(10, range_start="2018-01-01", range_end="2018-07-01")
+    toPost = std_test_score_generator.generate(10,
+                                               range_start=datetime.date(year=2018, month=01, day=01),
+                                               range_end=datetime.date(year=2018, month=07, day=01))
     std_test_score_generator.upload(toPost)
