@@ -195,11 +195,11 @@ ACCOUNT_AUTHENTICATION_METHOD='email'
 
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER' :  'api.serializers.SproutLoginSerializer',
-    'USER_DETAILS_SERIALIZER' : 'api.serializers.SproutRegisterSerializer' # This would be different than REGISTER_SERIALIZER if name, etc. were in a different model
+    'USER_DETAILS_SERIALIZER' : 'api.serializers.SproutUserSerializer',
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER' : 'api.serializers.SproutRegisterSerializer'
+    'REGISTER_SERIALIZER' : 'api.serializers.SproutRegisterSerializer',
 }
 
 DEFAULT_MAX_CHARFIELD_LENGTH = 100
