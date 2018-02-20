@@ -1,4 +1,4 @@
-app.factory("userService", function ($rootScope, $http, $q) {
+app.factory("userService", function ($rootScope, $http, $q, queryService) {
 
     var userService = {};
 
@@ -27,11 +27,38 @@ app.factory("userService", function ($rootScope, $http, $q) {
     }
 
     function saveUser(userObj) {
-        user.id        = _.has(userObj, 'id') ? userObj.id : null;
+        user.id        = _.has(userObj, 'pk') ? userObj.pk : null;
         user.email     = _.has(userObj, 'email') ? userObj.email : null;
         user.firstName = _.has(userObj, 'first_name') ? userObj.first_name : null;
         user.lastName  = _.has(userObj, 'last_name') ? userObj.last_name : null;
     }
+
+    /**
+     * Add a user to the system
+     * @param {user} userObj - the user object. example -
+     * {
+     *     email: 'example@fake.com',
+     *     first_name: 'example',
+     *     last_name: 'exampleton',
+     *     password1: 'pw123', // optional
+     *     password2: 'pw123', // optional
+     * }
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.createUser = function(userObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/registration',
+            data: userObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
 
     /**
      * Send a login attempt
@@ -147,6 +174,299 @@ app.factory("userService", function ($rootScope, $http, $q) {
             // notify app that there was a problem, assume user is not auth-ed
             $rootScope.$emit('user:auth', { type: 'logout' });
 
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Get all user records
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.getUsers = function(config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/users' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Get user record
+     * @param {number} userId - the user's id.
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.getUser = function (userId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Delete user record
+     * @param {number} userId - the user's id.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.deleteUser = function (userId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/users/' + userId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Update user record
+     * @param {number} userId - the user's id.
+     * @param {user} userObj - the user object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.updateUser = function (userId, userObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/users/' + userId,
+            data: userObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /** FOCUS RECORDS **/
+    
+    /**
+     * Get all of a user's focus records
+     * @param {number} userId - ID of the user
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.getAllFocusForUser = function(userId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+                '/focus' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Get a focus record for user
+     * @param {number} userId - the user's id.
+     * @param {number} focusId - the focus's id.
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.getFocusForUser = function (userId, focusId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
+                '/focus/' + focusId + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Create a focus for a user
+     * @param {number} userId - the user's id.
+     * @param {focus} focusObj - the focus object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.createFocusForUser = function (userId, focusObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+                '/focus',
+            data: focusObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Delete a focus for a user
+     * @param {number} userId - the user's id.
+     * @param {number} focusId - the focus's id.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.deleteFocusForUser = function (userId, focusId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
+                '/focus/' + focusId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Update a focus for a user
+     * @param {number} userId - the user's id.
+     * @param {number} focusId - the focus's id.
+     * @param {focus} focusObj - the focus object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.updateFocusForUser = function (userId, focusId, focusObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+                '/focus/' + focusId,
+            data: focusObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /*** NOTIFICATION RECORDS ***/
+
+    /**
+     * Get all of a user's notifications
+     * @param {number} userId - ID of the user
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.getAllNotificationsForUser = function(userId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+                '/notifications' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Get a notification for user
+     * @param {number} userId - the user's id.
+     * @param {number} notificationId - the notification's id.
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.getNotificationForUser = function (userId, notificationId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
+                '/notifications/' + notificationId + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Create a notification for a user
+     * @param {number} userId - the user's id.
+     * @param {focus} notificationObj - the notification object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.createNotificationForUser = function (userId, notificationObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+                '/notifications',
+            data: notificationObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Delete a notification for a user
+     * @param {number} userId - the user's id.
+     * @param {number} notificationId - the notification's id.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.deleteNotificationForUser = function (userId, notificationId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
+                '/notifications/' + notificationId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Update a notification for a user
+     * @param {number} userId - the user's id.
+     * @param {number} notificationId - the notification's id.
+     * @param {focus} notificationObj - the notification object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.updateNotificationForUser = function (userId, notificationId, notificationObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+                '/notifications/' + notificationId,
+            data: notificationObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
             deferred.reject(response);
         });
         return deferred.promise;
