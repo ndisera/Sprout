@@ -1,4 +1,4 @@
-app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, assignmentService, gradeService, studentData, enrollmentData) {
+app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, sectionService, studentService, studentData, enrollmentData) {
     $scope.student = studentData.student;
     $scope.sections = _.sortBy(enrollmentData.sections, 'title');
 
@@ -103,22 +103,26 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
             ],
         };
 
-        assignmentService.getAssignments(assignmentConfig).then(
+        sectionService.getAssignmentsForSection(section.id).then(
             function success(data) {
-                console.log(data);
 
                 $scope.selectedSection = section;
+
+                if(data.assignments.length === 0) {
+                    $scope.noAssignments = true;
+                    return;
+                }
+                $scope.noAssignments = false;
                 $scope.assignments = _.sortBy(data.assignments, function(elem) { return moment(elem.due_date); });
 
                 // get all the grades for this class
                 var gradesConfig = {
                     filter: [
                         { name: 'assignment.section', val: section.id, },
-                        { name: 'student', val: $scope.student.id, },
                     ],
                 };
 
-                gradeService.getGrades(gradesConfig).then(
+                studentService.getGradesForStudent($scope.student.id, gradesConfig).then(
                     function success(data) {
                         console.log(data);
 

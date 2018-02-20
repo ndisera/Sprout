@@ -94,6 +94,26 @@ app.factory("sectionService", function ($rootScope, $http, $q, queryService) {
                 deferred.reject(response);
             });
             return deferred.promise;
-        }
+        },
+
+        /**
+         * Get assignments for a section
+         * @param {number} sectionId - the section id.
+         * @param {object} config - config object for query parameters (see queryService)
+         * @return {promise} promise that will resolve with data or reject with response code.
+         */
+        getAssignmentsForSection: function (sectionId, config) {
+            var query = queryService.generateQuery(config);
+            var deferred = $q.defer();
+            $http({
+                method: 'GET',
+                url: 'https://' + $rootScope.backend + '/sections/' + sectionId + '/assignments' + query,
+            }).then(function success(response) {
+                deferred.resolve(response.data);
+            }, function error(response) {
+                deferred.reject(response);
+            });
+            return deferred.promise;
+        },
     };
 });

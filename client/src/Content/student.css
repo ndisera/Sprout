@@ -98,7 +98,7 @@
     width: 100%;
 }
 
-#student-grades-class-grade {
+.student-grades-box-content {
     text-align: center;
     margin-top: 20px;
     margin-bottom: 20px;

@@ -151,6 +151,26 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         return deferred.promise;
     }
 
+    /**
+     * Get grades for a specific student
+     * @param {number} studentId - ID of the student
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function getGradesForStudent(studentId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/grades' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
     return {
         studentInfo: studentInfo,
         getStudents: getStudents,
@@ -159,5 +179,6 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         addStudent: addStudent,
         updateStudent: updateStudent,
         deleteStudent: deleteStudent,
+        getGradesForStudent: getGradesForStudent,
     };
 });
