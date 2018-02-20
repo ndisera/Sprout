@@ -89,7 +89,7 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
      * updates min/max values of date range, updates graph
      *
      * @param {string} varName - name of datepicker that was change
-     * @param {datetime} newDate - new date that was selected
+     * @param {newDate} newDate - new date that was selected
      *
      * @return {void}
      */
