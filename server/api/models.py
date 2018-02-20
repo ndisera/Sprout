@@ -17,7 +17,7 @@ class Student(models.Model):
     last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
-    case_manager = models.ForeignKey(SproutUser)
+    case_manager = models.ForeignKey(SproutUser, blank=True, null=True)
 
     class Meta:
         ordering = ('id',)
