@@ -86,6 +86,7 @@ class SproutRegisterSerializer(RegisterSerializer):
 
     def to_representation(self, instance):
         representation = super(SproutRegisterSerializer, self).to_representation(instance)
+        representation['active'] = instance.is_active
         user_profile = {'first_name' : instance.sproutuserprofile.first_name,
                         'last_name' : instance.sproutuserprofile.last_name,
                         }
@@ -126,7 +127,7 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
     class Meta(UserDetailsSerializer.Meta):
         fields = []
         fields.extend(UserDetailsSerializer.Meta.fields)
-        fields.extend(('first_name', 'last_name', ))
+        fields.extend(('first_name', 'last_name', 'is_active'))
         if 'username' in fields:
             del fields[fields.index('username')]
 
