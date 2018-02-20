@@ -576,7 +576,22 @@ class GradeViewSet(DynamicModelViewSet):
     serializer_class = GradeSerializer
 
     def get_queryset(self, queryset=None):
-        return Grade.objects.filter(assignment=self.kwargs['assignments_pk'])
+        """
+        Get a queryset for grades, possibly by filtering for grades for a particular student or assignment
+
+        :param queryset: Simon has no idea. Hopefully something useful.
+        :return:
+        """
+        if queryset is None:
+            queryset = Grade.objects.all()
+
+        if 'assignments_pk' in self.kwargs:
+            queryset = queryset.filter(assignment=self.kwargs['assignments_pk'])
+
+        if 'students_pk' in self.kwargs:
+            queryset = queryset.filter(student_id=self.kwargs['students_pk'])
+
+        return queryset
 
     """ define custom schema for documentation """
     schema = GradeViewSetSchema()
