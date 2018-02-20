@@ -49,7 +49,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         var deferred = $q.defer();
         $http({
             method: 'POST',
-            url: 'https://' + $rootScope.backend + '/registration',
+            url: 'https://' + $rootScope.backend + '/registration/',
             data: userObj,
         }).then(function success(response) {
             deferred.resolve(response.data);
@@ -257,7 +257,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
     };
 
     /** FOCUS RECORDS **/
-    
+
     /**
      * Get all of a user's focus records
      * @param {number} userId - ID of the user
@@ -269,7 +269,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         var deferred = $q.defer();
         $http({
             method: 'GET',
-            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
                 '/focus' + query,
         }).then(function success(response) {
             deferred.resolve(response.data);
@@ -311,7 +311,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         var deferred = $q.defer();
         $http({
             method: 'POST',
-            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
                 '/focus',
             data: focusObj,
         }).then(function success(response) {
@@ -353,7 +353,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         var deferred = $q.defer();
         $http({
             method: 'PUT',
-            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
                 '/focus/' + focusId,
             data: focusObj,
         }).then(function success(response) {
@@ -377,7 +377,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         var deferred = $q.defer();
         $http({
             method: 'GET',
-            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
                 '/notifications' + query,
         }).then(function success(response) {
             deferred.resolve(response.data);
@@ -419,7 +419,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         var deferred = $q.defer();
         $http({
             method: 'POST',
-            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
                 '/notifications',
             data: notificationObj,
         }).then(function success(response) {
@@ -461,7 +461,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         var deferred = $q.defer();
         $http({
             method: 'PUT',
-            url: 'https://' + $rootScope.backend + '/users/' + userId + 
+            url: 'https://' + $rootScope.backend + '/users/' + userId +
                 '/notifications/' + notificationId,
             data: notificationObj,
         }).then(function success(response) {
@@ -479,7 +479,3 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
 
     return userService;
 });
-
-
-
-

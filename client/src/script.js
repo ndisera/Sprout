@@ -45,8 +45,8 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/manageTeachers.html',
             controller: 'manageTeachersController',
             resolve: {
-                teachers: function (teacherService) {
-                    return teacherService.getTeachers();
+                userData: function(userService) {
+                    return userService.getUsers();
                 },
                 auth: function (userService) {
                     return userService.authVerify();
@@ -62,8 +62,8 @@ app.config(function ($routeProvider, $httpProvider) {
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
-                teachers: function (teacherService) {
-                    return teacherService.getTeachers();
+                userData: function(userService) {
+                    return userService.getUsers();
                 },
                 auth: function (userService) {
                     return userService.authVerify();
@@ -79,8 +79,8 @@ app.config(function ($routeProvider, $httpProvider) {
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
-                teachers: function (teacherService) {
-                    return teacherService.getTeachers();
+                userData: function(userService) {
+                    return userService.getUsers();
                 },
                 sections: function (sectionService) {
                     return sectionService.getSections();
