@@ -173,16 +173,20 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                             };
 
 
+                            //since there's only one series per chart, we just initialize the structure without looping
+
                             //initialize the array
-                            protoDataArray = [];
-                            protoDataArray = _.times(dateDiff + 1, _.constant(null));
+                            $scope.testGraphs[counter].data = [];
+                            // protoDataArray = _.times(dateDiff + 1, _.constant(null));
                             // protoDataArray = _.times(dateDiff + 1, _.constant(4));
-                            $scope.testGraphs[counter].data = protoDataArray;
+                            $scope.testGraphs[counter].data.push(_.times(dateDiff + 1, _.constant(null)));
+                            // $scope.testGraphs[counter].data = protoDataArray;
 
                             //make a labels array in order to display our data
-                            protoLabelsArray = [];
-                            protoLabelsArray = _.times(dateDiff + 1, _.constant(null));
-                            $scope.testGraphs[counter].labels = protoLabelsArray;
+                            // protoLabelsArray = [];
+                            // protoLabelsArray = _.times(dateDiff + 1, _.constant(null));
+                            $scope.testGraphs[counter].labels = [];
+                            $scope.testGraphs[counter].labels.push(_.times(dateDiff + 1, _.constant(null)));
 
                             //todo: test edge case of max
 
@@ -208,7 +212,10 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                         var dateIndex = currentDate.diff(startDate, 'days');
 
                         //use the test ID to put it into the right graph
-                        $scope.testGraphs[testIdToIndex[scoreElem.standardized_test]].data[dateIndex] = scoreElem.score;
+                        //tag: color problems
+                        //todo: the main problem with the colors is that on the behavior graphs, there's sub-arrays for
+                        // the data, while here, it's on the top level.
+                        $scope.testGraphs[testIdToIndex[scoreElem.standardized_test]].data[0][dateIndex] = scoreElem.score;
 
                     });
 
@@ -220,7 +227,8 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                             iterDate.add(1, 'd');
                         }
 
-                        // console.log(graphElem);
+                        console.log("Test graphs:")
+                        console.log(graphElem);
                     })
 
 
