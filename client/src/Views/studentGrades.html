@@ -128,7 +128,7 @@
                                 <!--todo: get the upcoming assignments instead of the missing ones.-->
                             </div>
                             <div class="panel-body">
-                                <table ng-if="missingAssignments.length > 0" class="table">
+                                <table ng-if="upcomingAssignments.length > 0" class="table">
                                     <thead>
                                     <tr>
                                         <th>Name</th>
@@ -136,14 +136,14 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="assignment in missingAssignments">
+                                    <tr ng-repeat="assignment in upcomingAssignments">
                                         <td>{{ assignment.assignment_name }}</td>
                                         <td>{{ assignment.due_date.format('MM/DD').toString() }}</td>
                                     </tr>
                                     </tbody>
 
                                 </table>
-                                <div ng-if="missingAssignments.length === 0" class="panel-body">
+                                <div ng-if="upcomingAssignments.length === 0" class="panel-body">
                                     <h4 class="centerText">No Missing Assignments</h4>
                                 </div>
                             </div>
