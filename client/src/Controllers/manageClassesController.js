@@ -1,6 +1,4 @@
-﻿
-app.controller("manageClassesController", function($scope, $rootScope, $location, students, teachers, sections, studentService, teacherService, sectionService, enrollmentService) {
-    // don't think I will need teacherService
+app.controller("manageClassesController", function($scope, $rootScope, $location, students, userData, sections, studentService, sectionService, enrollmentService) {
 
     // anywhere 's' or 't' was previously used for 'students' and 'teachers', 'c' will be used for 'classes'
     // another 's' for 'sections' would be confusing with 'students', which will probably use an 's' again
@@ -23,7 +21,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.sections = sections.sections;
     // lookup needs to be based off of id not fullname
     $scope.students = _.indexBy(students.students, 'id');
-    $scope.teachers = teachers.teachers;
+    $scope.teachers = userData.sprout_users;
     $scope.teachersLookup = {};
     $scope.teacherIdLookup = {};
     $scope.enrolledStudentsArray = [];
@@ -41,8 +39,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     // create fast lookup teacher dictionary that will map to teacher id, and teacher id to teacher name and email
     for (var i = 0; i < $scope.teachers.length; ++i) {
         var lookupName = $scope.teachers[i].first_name + " " + $scope.teachers[i].last_name + " (" + $scope.teachers[i].email + ")";
-        $scope.teachersLookup[lookupName.toUpperCase()] = $scope.teachers[i].id;
-        $scope.teacherIdLookup[$scope.teachers[i].id] = lookupName;
+        $scope.teachersLookup[lookupName.toUpperCase()] = $scope.teachers[i].pk;
+        $scope.teacherIdLookup[$scope.teachers[i].pk] = lookupName;
     }
 
     /**
@@ -247,7 +245,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 case "title":
                     // need to delete that lookup property
                     delete $scope.sectionsLookup[tempTitle];
-                    $scope.sectionViewSearch = $scope.sectionV.title;
                     $scope.viewCTitle = true;
                     $scope.cTitle = "";
                     break;

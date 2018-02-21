@@ -24,7 +24,7 @@ app.factory("testService", function ($rootScope, $http, $q, queryService) {
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/standardized_tests' + query,
+                url: 'https://' + $rootScope.backend + '/tests/standardized' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

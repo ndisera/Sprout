@@ -32,14 +32,12 @@
                         <h3 class="panel-title">All Teachers</h3>
                     </div>
                     <div class="panel-body">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherv" name="teacherv"
-                            ng-model="teacherViewSearch" ng-focus="clearTeacherViewSearch()">
+                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch" ng-focus="clearTeacherViewSearch()">
                         <br />
                         <div class="table-responsive scrollableTableDiv">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Username</th>
                                         <th>First Name</th>
                                         <th>Last Name</th>
                                         <th>Email</th>
@@ -47,7 +45,6 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter" ng-click="viewTeacher(teacher)" class="pointer">
-                                        <td>{{ teacher.username }}</td>
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
@@ -72,27 +69,6 @@
                                 </button>
                             </div>
                             <div class="panel-body">
-                                <form class="form-horizontal" name="editTUsernameForm" ng-submit="saveTEdit('username')">
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-2" for="tusername">Username:</label>
-                                        <div class="col-sm-10">
-                                            <p class="form-control-static" ng-show="viewTUsername">{{teacherV.username}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('username')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                                            <div class="input-group" ng-hide="viewTUsername">
-                                                <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" id="tusername" placeholder="{{teacherV.username}}" name="tusername" ng-model="tUsername">
-                                                <div class="input-group-btn">
-                                                    <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTUsernameForm.$invalid">
-                                                        <i class="glyphicon glyphicon-ok green"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="input-group-btn">
-                                                    <button class="btn btn-default" type="button" ng-click="cancelTEdit('username')">
-                                                        <i class="glyphicon glyphicon-remove red"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
                                 <form class="form-horizontal" name="editTFirstNameForm" ng-submit="saveTEdit('firstname')">
                                     <div class="form-group">
                                         <label class="control-label col-sm-2" for="tfirstname">First Name:</label>
@@ -183,12 +159,6 @@
                     <div class="panel-body">
                         <form class="form-horizontal" name="addTeacherForm" ng-submit="addTeacher()">
                             <div class="form-group">
-                                <label class="control-label col-sm-2" for="tusername2">Username:</label>
-                                <div class="col-sm-10">
-                                    <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" id="tusername2" placeholder="Enter Username" name="tusername2" ng-model="newTeacher.username">
-                                </div>
-                            </div>
-                            <div class="form-group">
                                 <label class="control-label col-sm-2" for="tfirstname2">First Name:</label>
                                 <div class="col-sm-10">
                                     <input required autocomplete="off" type="text" class="form-control" id="tfirstname2" placeholder="Enter First Name" name="tfirstname2" ng-model="newTeacher.first_name">
@@ -233,7 +203,6 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Username</th>
                                         <th>First Name</th>
                                         <th>Last Name</th>
                                         <th>Email</th>
@@ -242,7 +211,6 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter" class="pointer">
-                                        <td>{{ teacher.username }}</td>
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
@@ -271,12 +239,6 @@
                         </div>
                         <div class="modal-body">
                             <form class="form-horizontal" name="deleteTeacherForm" ng-submit="deleteTeacher()">
-                                <div class="form-group">
-                                    <label class="control-label col-sm-4" for="tusername3">Username:</label>
-                                    <div class="col-sm-8">
-                                        <p class="form-control-static" id="tusername3">{{teacherD.username}}</p>
-                                    </div>
-                                </div>
                                 <div class="form-group">
                                     <label class="control-label col-sm-4" for="tfirstname3">First Name:</label>
                                     <div class="col-sm-8">

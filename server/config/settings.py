@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount', # Not actually needed/wanted, but required to work around a bug in django-rest-auth
     'rest_auth.registration',
     # End requirements for token-based authentication
     'api',
@@ -178,10 +179,29 @@ PASSWORD_HASHERS = [
 ]
 
 # Email configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 8025
 EMAIL_HOST_USER = 'sprout'
 EMAIL_HOST_PASSWORD = 'sprout'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
+
+# Declare that we are using a custom user object
+AUTH_USER_MODEL = 'api.SproutUser'
+ACCOUNT_USERNAME_REQUIRED=False
+ACCOUNT_USER_MODEL_USERNAME_FIELD=None
+ACCOUNT_EMAIL_REQUIRED=True
+ACCOUNT_AUTHENTICATION_METHOD='email'
+
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER' :  'api.serializers.SproutLoginSerializer',
+    'USER_DETAILS_SERIALIZER' : 'api.serializers.SproutUserSerializer',
+}
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER' : 'api.serializers.SproutRegisterSerializer',
+}
+
+DEFAULT_MAX_CHARFIELD_LENGTH = 100

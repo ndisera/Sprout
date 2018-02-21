@@ -2,7 +2,7 @@
 import json
 import requests
 
-from authorization_service import CERT_PATH
+from authorization import CERT_PATH
 from collections import namedtuple
 
 Assignment = namedtuple("Assignment", ['section', 'assignment_name', 'score_min', 'score_max', 'due_date', 'id'])
@@ -35,12 +35,7 @@ class AssignmentService():
         toReturn = []
 
         for assignment in assignments:
-            toReturn.append(Assignment(section=assignment['section'],
-                                       assignment_name=assignment['assignment_name'],
-                                       score_min=assignment['score_min'],
-                                       score_max=assignment['score_max'],
-                                       due_date=assignment['due_date'],
-                                       id=assignment['id']))
+            toReturn.append(Assignment(**assignment))
 
         return toReturn
 
@@ -55,8 +50,9 @@ class AssignmentService():
         del(data['id'])
         response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
+        response.raise_for_status()
+
+        return response
 
     def add_many_assignments(self, assignments):
         """
@@ -80,5 +76,6 @@ class AssignmentService():
 
         response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
 
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
+        response.raise_for_status()
+
+        return response

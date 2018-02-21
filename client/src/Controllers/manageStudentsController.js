@@ -1,4 +1,3 @@
-﻿
 app.controller("manageStudentsController", function($scope, $rootScope, $location, students, studentService) {
 
     var studentTask = "view/edit";

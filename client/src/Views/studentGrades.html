@@ -61,9 +61,14 @@
                                 <h3 class="panel-title">Class Grade</h3>
                             </div>
                             <div class="panel-body">
-                                <div class="row">
+                                <div ng-if="!noAssignments" class="row">
                                     <div class="col-xs-12">
-                                        <h1 id="student-grades-class-grade">{{ classGrade }}</h1>
+                                        <h1 class="student-grades-box-content">{{ classGrade }}</h1>
+                                    </div>
+                                </div>
+                                <div ng-if="noAssignments" class="row">
+                                    <div class="col-xs-12">
+                                        <h3 class="student-grades-box-content">No Assignments</h3>
                                     </div>
                                 </div>
                             </div>
@@ -77,7 +82,7 @@
                                 <h3 class="panel-title">Assignment Completion</h3>
                             </div>
                             <div class="panel-body">
-                                <div class="row">
+                                <div ng-if="!noAssignments" class="row">
                                     <div class="col-xs-12">
                                         <canvas id="student-grades-completion-graph"
                                                 class="chart chart-doughnut"
@@ -87,6 +92,11 @@
                                                 chart-colors="completionGraph.colors"
                                                 chart-dataset-override="completionGraph.datasetOverride">
                                         </canvas>
+                                    </div>
+                                </div>
+                                <div ng-if="noAssignments" class="row">
+                                    <div class="col-xs-12">
+                                        <h3 class="student-grades-box-content">No Assignments</h3>
                                     </div>
                                 </div>
                             </div>
@@ -102,7 +112,7 @@
                                 <h3 class="panel-title">Grades on Assignments</h3>
                             </div>
                             <div class="panel-body">
-                                <div class="row">
+                                <div ng-if="!noAssignments" class="row">
                                     <div class="col-xs-12">
                                         <canvas id="student-grades-assignment-graph"
                                                 class="chart chart-bar"
@@ -112,6 +122,11 @@
                                                 chart-colors="assignmentsGraph.colors"
                                                 chart-dataset-override="assignmentsGraph.datasetOverride">
                                         </canvas>
+                                    </div>
+                                </div>
+                                <div ng-if="noAssignments" class="row">
+                                    <div class="col-xs-12">
+                                        <h2 class="student-grades-box-content">No Assignments</h2>
                                     </div>
                                 </div>
                             </div>
@@ -171,10 +186,9 @@
                                         </tr>
                                     </tbody>
 
-                                </table>
-                                <div ng-if="missingAssignments.length === 0" class="panel-body">
-                                    <h4 class="centerText">No Missing Assignments</h4>
-                                </div>
+                            </table>
+                            <div ng-if="missingAssignments.length === 0 || noAssignments" class="panel-body">
+                                <h4 id="student-grades-no-missing">No Missing Assignments</h4>
                             </div>
                         </div>
                     </div>

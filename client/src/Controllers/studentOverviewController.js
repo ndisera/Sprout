@@ -1,4 +1,4 @@
-app.controller("studentOverviewController", function ($scope, $rootScope, $routeParams, studentService, caseManagerService, enrollmentData, caseManagerData, teacherData, studentData) {
+app.controller("studentOverviewController", function ($scope, $rootScope, $routeParams, studentService, enrollmentData, userData, studentData) {
 
     // set important scope variables
     $scope.student     = studentData.student;
@@ -13,7 +13,7 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $route
     }
 
     // create class schedule
-    $scope.teachers = _.indexBy(enrollmentData.teachers, 'id');
+    $scope.teachers = _.indexBy(enrollmentData.teachers, 'pk');
 
     // define structure for editing student fields
     $scope.editingAll = false;
@@ -149,64 +149,34 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $route
 
     };
 
-    // hard coded case managers for now
-    var teacherLookup = _.indexBy(teacherData.teachers, 'id');
-    if(caseManagerData.case_managers.length > 0) {
+    var teacherLookup = _.indexBy(userData.sprout_users, 'pk');
+    if($scope.student.case_manager !== null && $scope.student.case_manager !== undefined) {
         // student has case manager
-        $scope.caseManagerRecordId = caseManagerData.case_managers[0].id;
-
-        var caseManagerId = caseManagerData.case_managers[0].teacher;
-        $scope.caseManager = teacherLookup[caseManagerId];
+        $scope.caseManager = teacherLookup[$scope.student.case_manager];
     }
     else {
-        $scope.caseManagerRecordId = null;
-
         // student does not yet have case manager
         $scope.caseManager = {
-            id: null,
+            pk: null,
             first_name: 'NO CASE',
             last_name: 'MANAGER',
         };
     }
 
-    $scope.caseManagers = _.clone(teacherData.teachers);
+    $scope.caseManagers = _.clone(userData.sprout_users);
 
     $scope.selectCaseManager = function(caseManager) {
-        if($scope.caseManagerRecordId === null) {
-            // add new case manager record
-            var newCaseManagerRecord = {
-                student: $scope.student.id,
-                teacher: caseManager.id,
-            };
-
-            caseManagerService.assignCaseManager(newCaseManagerRecord).then(
-                function success(data) {
-                    $scope.caseManagerRecordId = data.case_manager.id;
-                    $scope.caseManager = teacherLookup[data.case_manager.teacher];
-                },
-                function error(response) {
-                    //TODO: notify the user
-                }
-            );
-        }
-        else {
-            // edit existing case manager record
-            var newCaseManagerRecord = {
-                student: $scope.student.id,
-                teacher: caseManager.id,
-                id: $scope.caseManagerRecordId,
-            };
-
-            caseManagerService.updateCaseManager($scope.caseManagerRecordId, newCaseManagerRecord).then(
-                function success(data) {
-                    $scope.caseManagerRecordId = data.case_manager.id;
-                    $scope.caseManager = teacherLookup[data.case_manager.teacher];
-                },
-                function error(response) {
-                    //TODO: notify the user
-                }
-            );
-        }
+        var editedStudent = _.clone($scope.student);
+        editedStudent.case_manager = caseManager.pk;
+        studentService.updateStudent(editedStudent.id, editedStudent).then(
+            function success(data) {
+                $scope.student = editedStudent;
+                $scope.caseManager = teacherLookup[$scope.student.case_manager];
+            },
+            function error(response) {
+                //TODO: notify the user
+            }
+        );
     };
 
 });

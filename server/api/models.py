@@ -1,25 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
+from django.conf import settings
 
-from django.core.validators import MaxValueValidator, MinValueValidator
+from sprout_user import SproutUser, SproutUserProfile
 
-DEFAULT_MAX_LENGTH = 100
-
-class Teacher(models.Model):
-    """
-    Teacher
-    Represents a teacher in the system (also a Sprout user).
-    username and email must be unique.
-    """
-    username = models.CharField(unique=True, max_length=DEFAULT_MAX_LENGTH, blank=False)
-    email = models.EmailField(unique=True, blank=False)
-    first_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
-    last_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
-    created = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ('id',)
 
 class Student(models.Model):
     """
@@ -27,11 +12,12 @@ class Student(models.Model):
     Represents a student in the system.
     student_id must be unique
     """
-    student_id = models.CharField(unique=True, blank=False, max_length=DEFAULT_MAX_LENGTH)
-    first_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
-    last_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
+    student_id = models.CharField(unique=True, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
+    case_manager = models.ForeignKey(SproutUser, blank=True, null=True)
 
     class Meta:
         ordering = ('id',)
@@ -40,10 +26,10 @@ class Section(models.Model):
     """
     Section
     Represents a section (most likely class) in the system.
-    teacher is a foreign key to Teacher
+    teacher is a foreign key to the User who teaches leads the section
     """
-    title = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
-    teacher = models.ForeignKey(Teacher)
+    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    teacher = models.ForeignKey(SproutUser)
 
     class Meta:
         ordering = ('id',)
@@ -82,7 +68,7 @@ class StandardizedTest(models.Model):
     StandardizedTest
     Represent a standardized test as enabled by the school
     """
-    test_name = models.CharField(unique=True, max_length=DEFAULT_MAX_LENGTH)
+    test_name = models.CharField(unique=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     min_score = models.IntegerField(verbose_name="Minimum possible score", blank=False)
     max_score = models.IntegerField(verbose_name="Maximum possible score", blank=False)
 
@@ -111,7 +97,7 @@ class Assignment(models.Model):
     """
     section = models.ForeignKey(Section, related_name='assignment_section',
                                    verbose_name="Section to which this assigment belongs")
-    assignment_name = models.CharField(blank=False, max_length=DEFAULT_MAX_LENGTH)
+    assignment_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     score_min = models.IntegerField(blank=False, verbose_name="Minimum Score")
     score_max = models.IntegerField(blank=False, verbose_name="Maximum Score")
     due_date = models.DateField(blank=False,)
@@ -137,15 +123,38 @@ class Grade(models.Model):
         ordering = ('assignment',)
 
 
-class CaseManager(models.Model):
+class Notification(models.Model):
     """
-    CaseManager
-    Represents a case manager relationship in the system. That is, a
-    teacher who oversees a student.
-    teacher and student are a composite, unique key
+    Notification
+    Represent and store a notification which should be displayed to a User
     """
-    teacher = models.ForeignKey(Teacher, blank=False)
-    student = models.OneToOneField(Student, blank=False)
+    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    date = models.DateTimeField(blank=False)
+    student = models.ForeignKey(Student, blank=False)
+    user = models.ForeignKey(SproutUser, blank=False)
+    category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                help_text="Partial string of an API call, combined with student to create a URL from this notification")
+    unread = models.BooleanField(blank=False, default=False)
 
     class Meta:
-        ordering = ('teacher',)
+        # Do we want to enforce any uniqueness for notifications?
+        ordering = ('date', 'user',)
+
+
+class FocusStudent(models.Model):
+    student = models.ForeignKey(Student, blank=False)
+    user = models.ForeignKey(SproutUser, blank=False)
+    ordering = models.IntegerField(blank=False)
+    focus_category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                      help_text="Category selected by the user to display")
+    progress_category = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                         help_text="Category Sprout has identified is going well")
+    caution_category = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="Category Sprout has identified needs attention")
+    refresh_date = models.DateTimeField(auto_now=True,
+                                        help_text="Record the last time this entry was updated, to ensure it is updated regularly")
+
+    class Meta:
+        ordering = ('user', 'ordering', )
+        unique_together = (('user', 'student'), )

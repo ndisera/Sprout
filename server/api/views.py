@@ -2,12 +2,13 @@
 from __future__ import unicode_literals
 import coreapi
 import coreschema
-from rest_framework import status, viewsets, generics
+from rest_framework import mixins, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
-from dynamic_rest.viewsets import DynamicModelViewSet
+from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from api.models import *
 from api.serializers import *
 
@@ -58,13 +59,15 @@ def set_link(class_id, path, method, link):
         return link
 
 
-class TeacherViewSet(DynamicModelViewSet):
+class StudentViewSetSchema(AutoSchema):
     """
-    allows interaction with the set of "Teacher" instances
+    class that allows specification of more detailed schema for the
+    BehaviorViewSet class in the coreapi documentation.
     """
-    permission_classes = (IsAuthenticated,)
-    serializer_class = TeacherSerializer
-    queryset = Teacher.objects.all()
+    def get_link(self, path, method, base_url):
+        link = super(StudentViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(StudentViewSet, path, method, link)
+
 
 class StudentViewSet(DynamicModelViewSet):
     """
@@ -73,6 +76,37 @@ class StudentViewSet(DynamicModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = StudentSerializer
     queryset = Student.objects.all()
+
+    """ define custom schema for documentation """
+    schema = StudentViewSetSchema()
+
+    """ ensure variables show as correct types for docs """
+    name_case_manager = 'case_manager'
+    desc_case_manager = "ID of the User who oversees this student"
+    create_fields = (
+        coreapi.Field(
+            name=name_case_manager,
+            required=True,
+            location="form",
+            description=desc_case_manager,
+            schema=coreschema.Integer(title=name_case_manager)),
+    )
+    update_fields = (
+        coreapi.Field(
+            name=name_case_manager,
+            required=True,
+            location="form",
+            description=desc_case_manager,
+            schema=coreschema.Integer(title=name_case_manager)),
+    )
+    partial_update_fields = (
+        coreapi.Field(
+            name=name_case_manager,
+            location="form",
+            description=desc_case_manager,
+            schema=coreschema.Integer(title=name_case_manager)),
+    )
+
 
 class SectionViewSetSchema(AutoSchema):
     """
@@ -470,6 +504,9 @@ class AssignmentViewSet(DynamicModelViewSet):
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
 
+    def get_queryset(self, queryset=None):
+        return Assignment.objects.filter(section=self.kwargs['sections_pk'])
+
     """ define custom schema for documentation """
     schema = AssignmentViewSetSchema()
 
@@ -537,7 +574,24 @@ class GradeViewSet(DynamicModelViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = GradeSerializer
-    queryset = Grade.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        Get a queryset for grades, possibly by filtering for grades for a particular student or assignment
+
+        :param queryset: Simon has no idea. Hopefully something useful.
+        :return:
+        """
+        if queryset is None:
+            queryset = Grade.objects.all()
+
+        if 'assignments_pk' in self.kwargs:
+            queryset = queryset.filter(assignment=self.kwargs['assignments_pk'])
+
+        if 'students_pk' in self.kwargs:
+            queryset = queryset.filter(student_id=self.kwargs['students_pk'])
+
+        return queryset
 
     """ define custom schema for documentation """
     schema = GradeViewSetSchema()
@@ -623,88 +677,217 @@ class AuthVerifyView(generics.RetrieveAPIView):
         return Response(data=response)
 
 
-class CaseManagerViewSetSchema(AutoSchema):
+class SproutUserViewSet(WithDynamicViewSetMixin,
+                        mixins.UpdateModelMixin,
+                        mixins.DestroyModelMixin,
+                        ReadOnlyModelViewSet):
     """
-    class that allows specification of more detailed schema for the
-    EnrollmentViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(CaseManagerViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(CaseManagerViewSet, path, method, link)
-
-class CaseManagerViewSet(DynamicModelViewSet):
-    """
-    allows interaction with the set of "Enrollment" instances
+    allows read-only access to the registered Users in Sprout
 
     list:
-    gets all the case managers registered in Sprout.
-
-    create:
-    creates a case manager. requires a student id and section id.
+    gets all the registered Users in Sprout
 
     retrieve:
-    gets the case manager specified by the id path param.
+    get a specific registered User in Sprout
+
+    delete:
+    remove a specified User from Sprout
 
     update:
-    updates an existing case manager specified by the id path param.
-    requires an case manager id, student id, and teacher id.
+    change the particulars of a User in Sprout
 
     partial_update:
-    updates parts of an existing case manager specified by the id path param.
+    change the particulars of a User in Sprout
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SproutUserSerializer
+    def get_queryset(self, queryset=None):
+        queryset = SproutUser.objects.all()
+        return queryset
+
+
+class NotificationViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    NotificationViewSetSchema class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(NotificationViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(NotificationViewSet, path, method, link)
+
+
+class NotificationViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "Notification" instances
+
+    list:
+    gets all the notifications in Sprout.
+
+    create:
+    creates a new notification. requires the title, body, date, student, user, and category
+
+    retrieve:
+    gets the notification specified by the id path param.
+
+    update:
+    updates an existing notification specified by the id path param.
+    requires the title, body, date, student, user, and category
+
+    partial_update:
+    updates parts of an existing notification specified by path param.
     does not require all values.
 
     delete:
-    deletes the existing case manager specified by the path param.
+    deletes the existing notification specified by the path param.
     """
     permission_classes = (IsAuthenticated,)
-    serializer_class = CaseManagerSerializer
-    queryset = CaseManager.objects.all()
+    serializer_class = NotificationSerializer
+    queryset = Notification.objects.all()
 
-    """ define custom schema """
-    schema = CaseManagerViewSetSchema()
+    def get_queryset(self, queryset=None):
+        return Notification.objects.filter(user=self.kwargs['users_pk'])
+
+    """ define custom schema for documentation """
+    schema = NotificationViewSetSchema()
 
     """ ensure variables show as correct type for docs """
+    name_user = 'user'
     name_student = 'student'
-    name_teacher = 'teacher'
-    desc_student = 'ID of the student'
-    desc_teacher = 'ID of the teacher'
+    desc_user = 'ID of the user to whom this notification should be displayed'
+    desc_student = 'ID of the student to whom this notification refers'
     create_fields = (
+        coreapi.Field(
+            name=name_user,
+            required=True,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
         coreapi.Field(
             name=name_student,
             required=True,
             location="form",
             description=desc_student,
             schema=coreschema.Integer(title=name_student)),
-        coreapi.Field(
-            name=name_teacher,
-            required=True,
-            location="form",
-            description=desc_teacher,
-            schema=coreschema.Integer(title=name_teacher)),
     )
     update_fields = (
         coreapi.Field(
+            name=name_user,
+            required=True,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
             name=name_student,
             required=True,
             location="form",
             description=desc_student,
             schema=coreschema.Integer(title=name_student)),
-        coreapi.Field(
-            name=name_teacher,
-            required=True,
-            location="form",
-            description=desc_teacher,
-            schema=coreschema.Integer(title=name_teacher)),
     )
     partial_update_fields = (
         coreapi.Field(
+            name=name_user,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
             name=name_student,
             location="form",
             description=desc_student,
             schema=coreschema.Integer(title=name_student)),
+    )
+
+
+class FocusStudentViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    FocusStudentViewSetSchema class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(FocusStudentViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(FocusStudentViewSet, path, method, link)
+
+
+class FocusStudentViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "FocusStudent" instances
+
+    list:
+    gets all the focus students in Sprout.
+
+    create:
+    creates a new focus students. requires the title, body, date, student, user, and category
+
+    retrieve:
+    gets the focus students specified by the id path param.
+
+    update:
+    updates an existing focus students specified by the id path param.
+    requires the student, user, and focus_category
+
+    partial_update:
+    updates parts of an existing focus students specified by path param.
+    does not require all values.
+
+    delete:
+    deletes the existing focus students specified by the path param.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FocusStudentSerializer
+
+    def get_queryset(self, queryset=None):
+        return FocusStudent.objects.filter(user=self.kwargs['users_pk'])
+
+    """ define custom schema for documentation """
+    schema = FocusStudentViewSetSchema()
+
+    """ ensure variables show as correct type for docs """
+    name_user = 'user'
+    name_student = 'student'
+    desc_user = 'ID of the user who wants to focus on this student'
+    desc_student = 'ID of the student being focused'
+    create_fields = (
         coreapi.Field(
-            name=name_teacher,
+            name=name_user,
+            required=True,
             location="form",
-            description=desc_teacher,
-            schema=coreschema.Integer(title=name_teacher)),
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+    )
+    update_fields = (
+        coreapi.Field(
+            name=name_user,
+            required=True,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
+    )
+    partial_update_fields = (
+        coreapi.Field(
+            name=name_user,
+            location="form",
+            description=desc_user,
+            schema=coreschema.Integer(title=name_user)),
+
+        coreapi.Field(
+            name=name_student,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student)),
     )

@@ -27,33 +27,32 @@
 			</div>
 			<hr />
 			<div class="panel-wrapper" ng-show="displaySectionViewSearch">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">All Classes</h3>
-                    </div>
-                    <div class="panel-body">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Classes" list="sectionv" name="sectionv"
-							ng-model="sectionViewSearch" ng-focus="clearSectionViewSearch()">
-                        </br>
-                        <div class="table-responsive scrollableTableDiv">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Teacher</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="section in sections | filter:viewSectionFilter" ng-click="viewSection(section)" class="pointer">
-                                        <td>{{ section.title }}</td>
-                                        <td>{{ teacherIdLookup[section.teacher] }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">All Classes</h3>
+					</div>
+					<div class="panel-body">
+						<input type="text" autocomplete="off" class="form-control" placeholder="Filter Classes" list="sectionv" name="sectionv" ng-model="sectionViewSearch" ng-focus="clearSectionViewSearch()">
+						</br>
+						<div class="table-responsive scrollableTableDiv">
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th>Title</th>
+										<th>Teacher</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="section in sections | filter:viewSectionFilter" ng-click="viewSection(section)" class="pointer">
+										<td>{{ section.title }}</td>
+										<td>{{ teacherIdLookup[section.teacher] }}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div ng-show="displayCEditInfo">
 				<div class="panel-wrapper">
 					<div class="panel panel-default">
@@ -299,5 +298,4 @@
 			</div>
 		</div>
 	</div>
-</div>
 </div>
