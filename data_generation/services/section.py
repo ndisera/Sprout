@@ -5,7 +5,7 @@ import requests
 from authorization import CERT_PATH
 from collections import namedtuple
 
-Section = namedtuple("Section", ['teacher', 'title', 'id', ])
+Section = namedtuple("Section", ['teacher', 'title', 'term', 'id', ])
 
 
 class SectionService():
