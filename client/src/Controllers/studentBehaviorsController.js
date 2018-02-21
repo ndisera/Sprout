@@ -163,11 +163,16 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
 
                     iterDate.add(1, 'd');
                 }
+                //debugging help:
+                // console.log("Behavior and effort graphs:");
+                // console.log($scope.behaviorGraph);
+                // console.log($scope.effortGraph);
             },
             function error(response) {
                 //TODO: notify the user
             }
         );
+
     }
 
 

@@ -1,38 +1,14 @@
 app.controller("studentTestsController", function ($scope, $rootScope, $routeParams, testService, studentData) {
 
     $scope.student = studentData.student;
-
-
-    $scope.sharedGraph = {
-        labels: [],
-        options: {
-            elements: {
-                line: {
-                    fill: true,
-                },
-            },
-            responsive: true,
-            maintainAspectRatio: false,
-        },
-        colors: [
-            "rgba(255,99,132,0.7)",
-            "rgba(255,159,64,0.7)",
-            "rgba(255,205,86,0.7)",
-            "rgba(75,192,192,0.7)",
-            "rgba(54,162,235,0.7)",
-            "rgba(153,102,255,0.7)",
-            "rgba(201,203,207,0.7)",
-        ],
-
-    };
-
     $scope.testGraphs = {};
+    $scope.testGraphTitles = {};
 
     var graphStartDateKey = 'graphStartDate';
     var graphEndDateKey = 'graphEndDate';
 
     $scope[graphStartDateKey] = moment().startOf('year');
-    $scope[graphEndDateKey] = moment().startOf('year').add(6, 'months');
+    $scope[graphEndDateKey] = moment().startOf('year').add(6, 'M');
 
     /**
      * called when start or end daterange picker changed
@@ -67,7 +43,6 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
         var testConfig = {
             //nothing, since we want all of the tests
             //TODO(Guy): Figure out if we need to filter on something here
-            //maybe filter on tests that the student has taken
         };
 
         testService.getTests(testConfig).then(
@@ -78,8 +53,6 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
               var testIdToInfo = {}; //name, max, min
 
               _.each(testInfoData.standardized_tests, function (testElem) {
-                  //map the id to an index
-
                   //map the id to test info
                   testIdToInfo[testElem.id] = {
                       name: testElem.test_name,
@@ -112,19 +85,20 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                     var startDate = moment($scope[graphStartDateKey]);
                     var endDate = moment($scope[graphEndDateKey]);
                     var dateDiff = endDate.diff(startDate, 'd');
-                    var protoDataArray;
-                    var protoLabelsArray;
 
                     _.each(studentTestScores, function (scoreElem) {
+                        //Initialize the graphs if they aren't already made.
                         if (!(_.has(testIdToIndex, scoreElem.standardized_test))) {
                             //store the ID -> index pair
                             testIdToIndex[scoreElem.standardized_test] = counter;
+
+                            //save the title of the test
+                            $scope.testGraphTitles[counter] = testIdToInfo[scoreElem.standardized_test].name;
 
                             //create a new graph data object
                             $scope.testGraphs[counter] = {
                                 data: [],
                                 labels: [],
-                                // series: ["1", "2", "3"],
                                 options: {
                                     elements: {
                                         line: {
@@ -152,14 +126,17 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                                             },
                                         }],
                                     },
+
+                                    layout: {
+                                        padding: {
+                                            left: 10,
+                                            top: 5,
+                                        }
+                                    },
+
                                     legend: {
                                           display: false
                                     },
-
-                                    title: {
-                                        display: true,
-                                        text: testIdToInfo[scoreElem.standardized_test].name
-                                    }
                                 },
                                 colors: [
                                     "rgba(255,99,132,0.7)",
@@ -173,43 +150,25 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                             };
 
 
+                            //since there's only one series per chart, we just initialize the structure without looping
+
                             //initialize the array
-                            protoDataArray = [];
-                            protoDataArray = _.times(dateDiff + 1, _.constant(null));
-                            // protoDataArray = _.times(dateDiff + 1, _.constant(4));
-                            $scope.testGraphs[counter].data = protoDataArray;
+                            $scope.testGraphs[counter].data = [];
+                            $scope.testGraphs[counter].data.push(_.times(dateDiff + 1, _.constant(null)));
 
                             //make a labels array in order to display our data
-                            protoLabelsArray = [];
-                            protoLabelsArray = _.times(dateDiff + 1, _.constant(null));
-                            $scope.testGraphs[counter].labels = protoLabelsArray;
-
-                            //todo: test edge case of max
+                            $scope.testGraphs[counter].labels = [];
+                            $scope.testGraphs[counter].labels.push(_.times(dateDiff + 1, _.constant(null)));
 
                             counter++;
                         }
 
-                    });
-
-                    //todo: combine: we could be generating an empty graph if the only tests are outside our date range
-                    // the only thing is, I need the testIdToIndex to be already generated.... maybe.
-                    //   I think that for any score, it will at the minimum be put into the lookup array
-                    //   right before it's needed
-
-
-                    //todo: check:
-                    // initialize the data array
-
-
-                    // put in existing scores
-                    _.each(studentTestScores, function (scoreElem) {
                         //for each score, calculate the number of days since the start date
                         var currentDate = moment(scoreElem.date);
-                        var dateIndex = currentDate.diff(startDate, 'days');
+                        var dateIndex = currentDate.diff(startDate, 'd');
 
                         //use the test ID to put it into the right graph
-                        $scope.testGraphs[testIdToIndex[scoreElem.standardized_test]].data[dateIndex] = scoreElem.score;
-
+                        $scope.testGraphs[testIdToIndex[scoreElem.standardized_test]].data[0][dateIndex] = scoreElem.score;
                     });
 
                     //put in all labels
@@ -220,18 +179,14 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
                             iterDate.add(1, 'd');
                         }
 
-                        // console.log(graphElem);
+                        // console.log("Test graphs:");
+                        console.log(graphElem);
                     })
-
-
                 }
               )
-
-
           }
         )
-
-    };
+    }
 
     /**
      * called when input datepicker is changed
