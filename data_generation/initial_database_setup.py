@@ -13,6 +13,8 @@ from teacher_generator import TeacherGenerator
 from services.authorization import AuthorizationService
 from services.enrollment import Enrollment, EnrollmentService
 from services.section import Section, SectionService
+from services.term import Term, TermService
+from services.users import User, UsersService
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
@@ -26,10 +28,9 @@ if __name__ == "__main__":
                         help="login password (warning: insecure!)")
     parser.add_argument("--token", action="store", type=str,
                         help="auth token -- supersedes username and password")
-    parser.add_argument("--setup", action="store_const", default=False, const=True,
-                        help="prerelease setup script")
 
     args = parser.parse_args()
+
 
     if not args.token:
         args.username, args.password = AuthorizationService.display_login_prompt(args.username, args.password)
@@ -41,9 +42,17 @@ if __name__ == "__main__":
         try:
             args.token = authorizationHandler.send_login_request(args.username, args.password)
         except requests.exceptions.HTTPError as err:
-            print "Unable to send login request:"
-            print err
-            sys.exit(1)
+            # Attempt to add an account with the given credentials
+            try:
+                print "Unable to send login request, attempting to register user"
+                user_service = UsersService(headers={}, url=args.url, verify=False, port_num=args.port)
+                user = User(id=None, email=args.username, first_name='Admin', last_name='Admin')
+                response = user_service.register_user(user, args.password)
+                args.token = response.json()['token']
+            except requests.exceptions.HTTPError as err:
+                print "Unable to register: "
+                print err
+                sys.exit(1)
 
     headers = {}
     headers['Authorization'] = 'JWT ' + args.token
@@ -61,9 +70,14 @@ if __name__ == "__main__":
     response = student_generator.studentService.add_many_students(students)
     students = [Student(**data) for data in response.json()['students']]
 
+    term_service = TermService(headers=headers, url=args.url, verify=False, port_num=args.port)
+    term = Term(name="Spring", start_date="2018-01-06", end_date="2018-04-24", id=None)
+    response = term_service.add_term(term)
+    terms = [term['id'] for term in response.json()['terms']]
+
     sections = []
-    cs5510_section = Section(teacher=teacher_ids[0], title="CS 5510", id=None)
-    cs4400_section = Section(teacher=teacher_ids[1], title="CS 4400", id=None)
+    cs5510_section = Section(teacher=teacher_ids[0], title="CS 5510", term=terms[0], id=None)
+    cs4400_section = Section(teacher=teacher_ids[1], title="CS 4400", term=terms[0], id=None)
     sections.extend((cs5510_section, cs4400_section,))
 
     sections_service = SectionService(headers=headers, url=args.url, verify=False, port_num=args.port)

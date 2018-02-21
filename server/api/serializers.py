@@ -38,7 +38,7 @@ class HolidaySerializer(DynamicModelSerializer):
 class SectionSerializer(DynamicModelSerializer):
     class Meta:
         model = Section
-        fields = ('id', 'title', 'teacher')
+        fields = '__all__'
     teacher = DynamicRelationField('SproutUserSerializer')
 
 
