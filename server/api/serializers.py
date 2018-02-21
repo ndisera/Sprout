@@ -13,6 +13,17 @@ class StudentSerializer(DynamicModelSerializer):
     case_manager = DynamicRelationField('SproutUserSerializer')
 
 
+class TermSerializer(DynamicModelSerializer):
+    class Meta:
+        model = Term
+        fields = '__all__'
+
+    def validate(self, data):
+        if data['end_date'] < data['start_date']:
+            raise serializers.ValidationError("A semester cannot end before it starts!")
+        return data
+
+
 class SectionSerializer(DynamicModelSerializer):
     class Meta:
         model = Section

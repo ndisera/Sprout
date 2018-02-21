@@ -108,6 +108,28 @@ class StudentViewSet(DynamicModelViewSet):
     )
 
 
+class TermViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    BehaviorViewSet class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(TermViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(TermViewSet, path, method, link)
+
+
+class TermViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "Student" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TermSerializer
+    queryset = Term.objects.all()
+
+    """ define custom schema for documentation """
+    schema = TermViewSetSchema()
+
+
 class SectionViewSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the

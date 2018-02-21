@@ -22,6 +22,21 @@ class Student(models.Model):
     class Meta:
         ordering = ('id',)
 
+
+class Term(models.Model):
+    """
+    Term
+    Represent a school term, such as a particular semester, quarter, etc.
+    """
+    name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                            help_text="Term name, such as \"Fall\" or \"First Quarter\"")
+    start_date = models.DateField(blank=False,
+                                  help_text="Term start date, such as 2018-01-18 for the 18th of January, 2018")
+    end_date = models.DateField(blank=False,
+                                help_text="Term end date")
+    # TODO: Some 'versioning' on a School Schedule object
+
+
 class Section(models.Model):
     """
     Section
@@ -30,9 +45,15 @@ class Section(models.Model):
     """
     title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     teacher = models.ForeignKey(SproutUser)
+    term = models.ForeignKey(Term, on_delete=models.CASCADE,
+                             help_text="Term this section takes place in")
+    # TODO: Uncomment when Schedule model exists
+    # schedule = models.ForeignKey(Schedule,
+    #                              help_text="Class start/end schedule used in this semester")
 
     class Meta:
         ordering = ('id',)
+
 
 class Enrollment(models.Model):
     """
@@ -47,6 +68,7 @@ class Enrollment(models.Model):
     class Meta:
         unique_together = (('section', 'student'),)
         ordering = ('section',)
+
 
 class Behavior(models.Model):
     """
