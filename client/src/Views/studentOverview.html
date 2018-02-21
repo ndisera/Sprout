@@ -5,20 +5,20 @@
         </div>
     </div>
     <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
-        <li class="active"><a href="#!/student/{{student.id}}">Overview</a></li>
-        <li><a href="#!/student/{{student.id}}/tests">Test Scores</a></li>
-        <li><a href="#!/student/{{student.id}}/grades">Grades</a></li>
-        <li><a href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
-        <li><a href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
-        <li><a href="#!/student/{{student.id}}/services">Services</a></li>
+        <li class="active"><a href="/student/{{student.id}}">Overview</a></li>
+        <li><a href="/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a href="/student/{{student.id}}/grades">Grades</a></li>
+        <li><a href="/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a href="/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a href="/student/{{student.id}}/services">Services</a></li>
     </ul>
     <ul class="nav nav-tabs hidden-xs">
-        <li class="active"><a href="#!/student/{{student.id}}">Overview</a></li>
-        <li><a href="#!/student/{{student.id}}/tests">Test Scores</a></li>
-        <li><a href="#!/student/{{student.id}}/grades">Grades</a></li>
-        <li><a href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
-        <li><a href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
-        <li><a href="#!/student/{{student.id}}/services">Services</a></li>
+        <li class="active"><a href="/student/{{student.id}}">Overview</a></li>
+        <li><a href="/student/{{student.id}}/tests">Test Scores</a></li>
+        <li><a href="/student/{{student.id}}/grades">Grades</a></li>
+        <li><a href="/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a href="/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a href="/student/{{student.id}}/services">Services</a></li>
     </ul>
     <div class="tab-content">
         <div id="overview" class="tab-pane fade in active voffset3">
@@ -93,18 +93,27 @@
                             <div class="panel-heading">
                                 <h3 class="panel-title">Class Schedule</h3>
                             </div>
-                            <table class="table">
-                                <tr>
-                                    <th>Period</th>
-                                    <th>Class Name</th>
-                                    <th>Teacher</th>
-                                </tr>
-                                <tr ng-repeat="section in sections">
-                                    <td>{{ section.id }}</td>
-                                    <td>{{ section.title }}</td>
-                                    <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
-                                </tr>
-                            </table>
+                            <div class="panel-body">
+                                <table ng-if="sections.length > 0" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Period</th>
+                                            <th>Class Name</th>
+                                            <th>Teacher</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="section in sections">
+                                            <td>{{ section.id }}</td>
+                                            <td>{{ section.title }}</td>
+                                            <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div ng-if="sections.length === 0">
+                                    <h4 class="centerText">No Classes</h4>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

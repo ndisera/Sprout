@@ -5,23 +5,32 @@
         </div>
     </div>
     <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
-        <li><a ng-href="#!/student/{{student.id}}">Overview</a></li>
-        <li><a ng-href="#!/student/{{student.id}}/tests">Test Scores</a></li>
-        <li class="active"><a ng-href="#!/student/{{student.id}}/grades">Grades</a></li>
-        <li><a ng-href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
-        <li><a ng-href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
-        <li><a ng-href="#!/student/{{student.id}}/services">Services</a></li>
+        <li><a ng-href="/student/{{student.id}}">Overview</a></li>
+        <li><a ng-href="/student/{{student.id}}/tests">Test Scores</a></li>
+        <li class="active"><a ng-href="/student/{{student.id}}/grades">Grades</a></li>
+        <li><a ng-href="/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a ng-href="/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a ng-href="/student/{{student.id}}/services">Services</a></li>
     </ul>
     <ul class="nav nav-tabs hidden-xs">
-        <li><a ng-href="#!/student/{{student.id}}">Overview</a></li>
-        <li><a ng-href="#!/student/{{student.id}}/tests">Test Scores</a></li>
-        <li class="active"><a ng-href="#!/student/{{student.id}}/grades">Grades</a></li>
-        <li><a ng-href="#!/student/{{student.id}}/behaviors">Behavior</a></li>
-        <li><a ng-href="#!/student/{{student.id}}/ieps">IEP Goals</a></li>
-        <li><a ng-href="#!/student/{{student.id}}/services">Services</a></li>
+        <li><a ng-href="/student/{{student.id}}">Overview</a></li>
+        <li><a ng-href="/student/{{student.id}}/tests">Test Scores</a></li>
+        <li class="active"><a ng-href="/student/{{student.id}}/grades">Grades</a></li>
+        <li><a ng-href="/student/{{student.id}}/behaviors">Behavior</a></li>
+        <li><a ng-href="/student/{{student.id}}/ieps">IEP Goals</a></li>
+        <li><a ng-href="/student/{{student.id}}/services">Services</a></li>
     </ul>
     <div class="tab-content">
-        <div id="grades" class="tab-pane fade in active voffset3">
+        <div ng-if="sections.length === 0">
+            <div class="row voffset4">
+                <div class="col-xs-12">
+                    <div class="alert alert-danger no-bottom-margin" role="alert">
+                        <span><b>Error:</b> This student isn't enrolled in any classes.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-if="sections.length > 0" id="grades" class="tab-pane fade in active voffset3">
             <div class="row voffset4" ng-repeat="error in errorMessages">
                 <div class="col-xs-12">
                     <div class="alert alert-danger no-bottom-margin" role="alert">
@@ -126,21 +135,56 @@
                 </div>
             </div>
             <div class="row voffset2">
-                <div class="col-xs-12">
+                <div class="col-xs-12 col-sm-6">
+                    <div class="panel-wrapper">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Upcoming Assignments</h3>
+                                <!--todo: get the upcoming assignments instead of the missing ones.-->
+                            </div>
+                            <div class="panel-body">
+                                <table ng-if="upcomingAssignments.length > 0" class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Due Date</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="assignment in upcomingAssignments">
+                                        <td>{{ assignment.assignment_name }}</td>
+                                        <td>{{ assignment.due_date.format('MM/DD').toString() }}</td>
+                                    </tr>
+                                    </tbody>
+
+                                </table>
+                                <div ng-if="upcomingAssignments.length === 0" class="panel-body">
+                                    <h4 class="centerText">No Missing Assignments</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
                     <div class="panel-wrapper">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Missing Assignments</h3>
                             </div>
-                            <table ng-if="missingAssignments.length > 0" class="table">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Due Date</th>
-                                </tr>
-                                <tr ng-repeat="assignment in missingAssignments">
-                                    <td>{{ assignment.assignment_name }}</td>
-                                    <td>{{ assignment.due_date.format('MM/DD').toString() }}</td>
-                                </tr>
+                            <div class="panel-body">
+                                <table ng-if="missingAssignments.length > 0" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Due Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="assignment in missingAssignments">
+                                            <td>{{ assignment.assignment_name }}</td>
+                                            <td>{{ assignment.due_date.format('MM/DD').toString() }}</td>
+                                        </tr>
+                                    </tbody>
 
                             </table>
                             <div ng-if="missingAssignments.length === 0 || noAssignments" class="panel-body">

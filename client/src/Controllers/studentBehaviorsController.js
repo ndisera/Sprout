@@ -1,6 +1,15 @@
 app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data, student) {
     // I know this will be here, because I filtered on the student ID, and only that student
-    $scope.student = student.student;
+    $scope.student     = student.student;
+    $scope.enrollments = [];
+    $scope.sections    = [];
+
+    if(data.enrollments !== null && data.enrollments !== undefined) {
+        $scope.enrollments = data.enrollments;
+    }
+    if(data.sections !== null && data.sections !== undefined) {
+        $scope.sections = data.sections;
+    }
 
     // for now, sort sections alphabetically
     $scope.sections       = _.sortBy(data.sections, 'title');
@@ -80,7 +89,7 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
      * updates min/max values of date range, updates graph
      *
      * @param {string} varName - name of datepicker that was change
-     * @param {datetime} newDate - new date that was selected
+     * @param {newDate} newDate - new date that was selected
      *
      * @return {void}
      */

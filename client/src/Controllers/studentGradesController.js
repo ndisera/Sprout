@@ -1,6 +1,10 @@
 app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, sectionService, studentService, studentData, enrollmentData) {
-    $scope.student = studentData.student;
-    $scope.sections = _.sortBy(enrollmentData.sections, 'title');
+    $scope.student  = studentData.student;
+    $scope.sections = [];
+
+    if(enrollmentData.sections !== null && enrollmentData.sections !== undefined) {
+        $scope.sections = _.sortBy(enrollmentData.sections, 'title');
+    }
 
     $scope.assignmentsGraph = {
         data: [],
@@ -115,6 +119,15 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                 $scope.noAssignments = false;
                 $scope.assignments = _.sortBy(data.assignments, function(elem) { return moment(elem.due_date); });
 
+                // Save off the upcoming assignments, then remove them from our current assignments list
+                $scope.upcomingAssignments = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) >= 0; });
+                $scope.assignments         = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) < 0; });
+
+                // Save the upcoming assignment due dates
+                _.each($scope.upcomingAssignments, function(assignmentElem) {
+                    assignmentElem.due_date = moment(assignmentElem.due_date);
+                });
+                
                 // get all the grades for this class
                 var gradesConfig = {
                     filter: [
@@ -195,7 +208,7 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                 //TODO: notify user
             }
         );
-    }
+    };
 
     if($scope.sections.length > 0) {
         $scope.selectSection($scope.sections[0]);
