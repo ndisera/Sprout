@@ -45,6 +45,11 @@
     font-size: 11px;
 }
 
+.glyphicon.glyphicon-plus, .glyphicon.glyphicon-remove {
+    float:right;
+    cursor:pointer
+}
+
 #roundBorder {
     border-radius:4px
 }
