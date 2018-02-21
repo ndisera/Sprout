@@ -14,7 +14,7 @@ class GradesService():
         self.headers = headers
         self.url = url
         self.port_num = port_num
-        self.uri_template_sections = "https://" + str(self.url) + ":" + str(self.port_num) + "/sections/{sections_pk}/assignments/{assignments_pk}/"
+        self.uri_template_sections = "https://" + str(self.url) + ":" + str(self.port_num) + "/sections/{sections_pk}/assignments/{assignments_pk}/grades"
         self.uri_template_students = "https://" + str(self.url) + ":" + str(self.port_num) + "/students/{students_pk}/grades/"
         self.verify = verify
 

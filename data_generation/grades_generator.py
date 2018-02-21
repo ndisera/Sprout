@@ -95,7 +95,7 @@ class GradesGenerator():
         :param num:
         :param range_start: Date to start random date generation
         :param range_end: Date to end random date generation
-        :return: Dictionary of studentID -> list[Grade]
+        :return: Dictionary of sectionID -> Dictionary of assignmentID -> list[Grade]
         """
 
         to_return = {}
@@ -104,12 +104,13 @@ class GradesGenerator():
         (students, sections) = self.parse_enrollments(enrollments)
 
         for section in sections:
+            to_return[section] = {}
             assignments = self.assignmentService.get_assignments(section=section)
             for assignment in assignments:
+                grades = []
                 section = assignment.section
 
                 for student in students:
-                    grades = []
                     # Find the original enrollment (if it exists)
                     enrollment = None
                     for e in enrollments:
@@ -151,7 +152,7 @@ class GradesGenerator():
                                       handin_datetime=str(handin),
                                       id=None)
                         grades.append(grade)
-                    to_return[student] = grades
+                to_return[section][assignment.id] = grades
         return to_return
 
 
@@ -200,5 +201,6 @@ if __name__ == "__main__":
     else:
         grades = generator.generate_grades(args.num_scores)
 
-        for student in grades.keys():
-            generator.gradeService.add_many_grades(grades[student], student=student)
+        for section in grades.keys():
+            for assignment in grades[section].keys():
+                generator.gradeService.add_many_grades(grades[section][assignment], section=section, assignment=assignment)
