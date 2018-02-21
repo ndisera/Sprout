@@ -2,12 +2,12 @@
     <div class="row">
         <div class="col-xs-12">
             <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
-                <li class="active"><a href="#!/focus">Focus</a></li>
-                <li><a href="#!/focus">All Students</a></li>
+                <li class="active"><a href="/focus">Focus</a></li>
+                <li><a href="/focus">All Students</a></li>
             </ul>
             <ul class="nav nav-tabs hidden-xs">
-                <li class="active"><a href="#!/focus">Focus</a></li>
-                <li><a href="#!/focus">All Students</a></li>
+                <li class="active"><a href="/focus">Focus</a></li>
+                <li><a href="/focus">All Students</a></li>
             </ul>
         </div>
     </div>
@@ -19,20 +19,17 @@
     </div>
     <div class="voffset3" ui-sortable="sortableOptions" ng-model="students">
         <div class="row" ng-repeat="student in students">
-            <!--<div class="col-xs-1 width-slide" ng-class="{ 'zero-width': !editing, 'col-xs-1': editing, }">-->
             <div class="col-xs-1 width-slide-padding focus-fade-in focus-cloak focus-width-none" ng-class="{ 'focus-width-none': !editing, 'focus-cloak': !editing, }">
-            <!--<div ng-if="editing" class="slide-out">-->
                 <button ng-click="test()" class="btn btn-danger focus-fade-in focus-cloak focus-width-none" ng-class="{ 'focus-width-none': !editing, 'focus-cloak': !editing, }" type="button">
                     <span class="glyphicon glyphicon-minus white"></span>
                 </button>
             </div>
             <div class="width-slide" ng-class="{ 'col-xs-12': !editing, 'col-xs-11': editing, }">
-            <!--<div class="slide-in">-->
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a href="#!/student/{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</a>
+                                <a href="/student/{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</a>
                                 <span class="glyphicon glyphicon-chevron-down blackish"
                                       data-toggle="collapse" data-target="#collapse-{{ $index }}" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')">
                             </h4>

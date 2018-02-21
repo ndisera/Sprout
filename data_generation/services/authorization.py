@@ -5,7 +5,7 @@ import requests
 
 CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/rootCA_cert.pem")
 
-class AuthorizationHandler():
+class AuthorizationService():
     """
     Helper class for containing all things to do with authorization
     """
@@ -13,7 +13,6 @@ class AuthorizationHandler():
     def __init__(self, url="https://localhost", port_num=8000, verify=False):
         self.url = url
         self.port_num = port_num
-        self.complete_uri = str(self.url) + ":" + str(self.port_num) + "/students/"
         self.verify = verify
 
     def send_login_request(self, username, password):
@@ -32,7 +31,7 @@ class AuthorizationHandler():
         """
         login_url = str(self.url) + ":" + str(self.port_num) + "/login/"
 
-        json = {"username" : username,
+        json = {"email" : username,
                 "password" :  password,}
         response = requests.post(login_url, json=json, verify=self.verify)
 
@@ -56,7 +55,7 @@ class AuthorizationHandler():
         """
 
         if not username:
-            username = raw_input("Sprout Username: ")
+            username = raw_input("Sprout Login Email: ")
         if not password:
             password = getpass.getpass("Sprout Password for {}: ".format(username))
 

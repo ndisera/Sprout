@@ -1,4 +1,4 @@
-app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, assignmentService, gradeService, studentData, enrollmentData) {
+app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, sectionService, studentService, studentData, enrollmentData) {
     $scope.student  = studentData.student;
     $scope.sections = [];
 
@@ -107,22 +107,35 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
             ],
         };
 
-        assignmentService.getAssignments(assignmentConfig).then(
+        sectionService.getAssignmentsForSection(section.id).then(
             function success(data) {
-                console.log(data);
 
                 $scope.selectedSection = section;
+
+                if(data.assignments.length === 0) {
+                    $scope.noAssignments = true;
+                    return;
+                }
+                $scope.noAssignments = false;
                 $scope.assignments = _.sortBy(data.assignments, function(elem) { return moment(elem.due_date); });
 
+                // Save off the upcoming assignments, then remove them from our current assignments list
+                $scope.upcomingAssignments = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) >= 0; });
+                $scope.assignments         = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) < 0; });
+
+                // Save the upcoming assignment due dates
+                _.each($scope.upcomingAssignments, function(assignmentElem) {
+                    assignmentElem.due_date = moment(assignmentElem.due_date);
+                });
+                
                 // get all the grades for this class
                 var gradesConfig = {
                     filter: [
                         { name: 'assignment.section', val: section.id, },
-                        { name: 'student', val: $scope.student.id, },
                     ],
                 };
 
-                gradeService.getGrades(gradesConfig).then(
+                studentService.getGradesForStudent($scope.student.id, gradesConfig).then(
                     function success(data) {
                         console.log(data);
 
@@ -195,7 +208,7 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                 //TODO: notify user
             }
         );
-    }
+    };
 
     if($scope.sections.length > 0) {
         $scope.selectSection($scope.sections[0]);

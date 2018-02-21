@@ -1,7 +1,7 @@
 
 import requests
 
-from authorization_service import CERT_PATH
+from authorization import CERT_PATH
 from collections import namedtuple
 import json
 
@@ -35,11 +35,7 @@ class StandardizedTestScoreService():
         toReturn = []
 
         for standardized_test_score in standardized_test_scores:
-            toReturn.append(StandardizedTestScore(date=standardized_test_score['date'],
-                                                  standardized_test=standardized_test_score['standardized_test'],
-                                                  score=standardized_test_score['score'],
-                                                  student=standardized_test_score['student'],
-                                                  id=standardized_test_score['id']))
+            toReturn.append(StandardizedTestScore(**standardized_test_score))
 
         return toReturn
 
@@ -54,8 +50,9 @@ class StandardizedTestScoreService():
         del(data['id'])
         response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
+        response.raise_for_status()
+
+        return response
 
     def add_many_standardized_test_scores(self, standardized_test_scores):
         """
@@ -79,5 +76,6 @@ class StandardizedTestScoreService():
 
         response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
 
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
+        response.raise_for_status()
+
+        return response

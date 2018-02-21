@@ -1,7 +1,8 @@
 
+import json
 import requests
 
-from authorization_service import CERT_PATH
+from authorization import CERT_PATH
 from collections import namedtuple
 
 Enrollment = namedtuple("Enrollment", ['section', 'student', 'id'])
@@ -34,9 +35,7 @@ class EnrollmentService():
         toReturn = []
 
         for enrollment in enrollments:
-            toReturn.append(Enrollment(section=enrollment['section'],
-                                       student=enrollment['student'],
-                                       id=enrollment['id']))
+            toReturn.append(Enrollment(**enrollment))
 
         return toReturn
 
@@ -51,5 +50,32 @@ class EnrollmentService():
         del(data['id'])
         response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
 
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
+        response.raise_for_status()
+
+        return response
+
+    def add_many_enrollments(self, enrollments):
+        """
+        Upload a list of enrollment objects to the server
+
+        :param enrollments: List of enrollment objects
+        :return:
+        """
+
+        data = []
+
+        for enrollment in enrollments:
+            enrollment = enrollment._asdict()
+            del(enrollment['id'])
+            data.append(enrollment)
+
+        data = json.dumps(data)
+
+        headers = self.headers
+        headers['content-type'] = 'application/json'
+
+        response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
+
+        response.raise_for_status()
+
+        return response

@@ -6,14 +6,13 @@ import random
 import requests
 import sys
 
-from authorization_service import AuthorizationService
-from authorization_service import CERT_PATH
+from services.authorization import AuthorizationService
 
-from assignment_service import Assignment, AssignmentService
+from services.assignment import Assignment, AssignmentService
 
-from enrollment_service import Enrollment, EnrollmentService
+from services.enrollment import EnrollmentService
 
-from grades_service import GradesService, Grade
+from services.grades import GradesService, Grade
 
 ASSIGNMENT_NAMES = ['Homework',  'Quiz', 'Worksheet']
 
@@ -43,9 +42,10 @@ class GradesGenerator():
         :param num:
         :param range_start: Date to start random date generation
         :param range_end: Date to end random date generation
-        :return:
+        :return: Dictionary of num -> list[Assignment] where the key is the ID of the section to upload the corresponding list of assignments to
         """
 
+        to_return = {}
         assignments = []
         enrollments = self.enrollmentService.get_enrollments()
         students, sections = self.parse_enrollments(enrollments)
@@ -80,7 +80,10 @@ class GradesGenerator():
                                         id=None)
                 assignments.append(assignment)
 
-        return assignments
+            to_return[sectionID] = assignments
+            assignments = []
+
+        return to_return
 
 
     def generate_grades(self, num,
@@ -92,63 +95,65 @@ class GradesGenerator():
         :param num:
         :param range_start: Date to start random date generation
         :param range_end: Date to end random date generation
-        :return:
+        :return: Dictionary of sectionID -> Dictionary of assignmentID -> list[Grade]
         """
 
-        toPost = []
-
-        assignments = self.assignmentService.get_assignments()
+        to_return = {}
 
         enrollments = self.enrollmentService.get_enrollments()
         (students, sections) = self.parse_enrollments(enrollments)
 
-        for assignment in assignments:
-            section = assignment.section
+        for section in sections:
+            to_return[section] = {}
+            assignments = self.assignmentService.get_assignments(section=section)
+            for assignment in assignments:
+                grades = []
+                section = assignment.section
 
-            for student in students:
-                # Find the original enrollment (if it exists)
-                enrollment = None
-                for e in enrollments:
-                    if e.student is student and e.section is section:
-                        enrollment = e
-                        break
-                if enrollment is None:
-                    # If the student was not in this class, move along
-                    continue
+                for student in students:
+                    # Find the original enrollment (if it exists)
+                    enrollment = None
+                    for e in enrollments:
+                        if e.student is student and e.section is section:
+                            enrollment = e
+                            break
+                    if enrollment is None:
+                        # If the student was not in this class, move along
+                        continue
 
-                # For each student and section, randomly decide a grade range
-                grade_average = random.randint(assignment.score_min, assignment.score_max)
-                assignment_score_range = assignment.score_max - assignment.score_min
-                grade_spread = random.randint(0, assignment_score_range / 6)
+                    # For each student and section, randomly decide a grade range
+                    grade_average = random.randint(assignment.score_min, assignment.score_max)
+                    assignment_score_range = assignment.score_max - assignment.score_min
+                    grade_spread = random.randint(0, assignment_score_range / 6)
 
-                grade_max = grade_average + grade_spread
-                grade_min = grade_average - grade_spread
-                # Avoid overflowing the min/max grade
-                grade_max = min(grade_max, assignment.score_max)
-                grade_min = max(grade_min, assignment.score_min)
+                    grade_max = grade_average + grade_spread
+                    grade_min = grade_average - grade_spread
+                    # Avoid overflowing the min/max grade
+                    grade_max = min(grade_max, assignment.score_max)
+                    grade_min = max(grade_min, assignment.score_min)
 
-                # calculate when the assignment was turned in
-                duedate = datetime.datetime.strptime(assignment.due_date, '%Y-%m-%d')
+                    # calculate when the assignment was turned in
+                    duedate = datetime.datetime.strptime(assignment.due_date, '%Y-%m-%d')
 
-                # Now generate the number of grades we were supposed to generate
-                for unused in range(num):
-                    late_modifier = random.randint(0, 9)
-                    handin = datetime.datetime.now();
-                    if late_modifier > 8:
-                        print 'assignment was late!'
-                        handin = datetime.datetime(duedate.year, duedate.month, duedate.day + 1, handin.hour, handin.minute, handin.second, handin.microsecond)
-                    else:
-                        handin = datetime.datetime(duedate.year, duedate.month, duedate.day - 1, handin.hour, handin.minute, handin.second, handin.microsecond)
+                    # Now generate the number of grades we were supposed to generate
+                    for unused in range(num):
+                        late_modifier = random.randint(0, 9)
+                        handin = datetime.datetime.now()
+                        if late_modifier > 8:
+                            print 'assignment was late!'
+                            handin = handin + datetime.timedelta(days=1)
+                        else:
+                            handin = handin - datetime.timedelta(days=1)
 
-                    score = random.randint(grade_min, grade_max)
-                    grade = Grade(assignment=assignment.id,
-                                  score=score,
-                                  student=student,
-                                  handin_datetime=str(handin),
-                                  id=None)
-                    toPost.append(grade)
-
-        return toPost
+                        score = random.randint(grade_min, grade_max)
+                        grade = Grade(assignment=assignment.id,
+                                      score=score,
+                                      student=student,
+                                      handin_datetime=str(handin),
+                                      id=None)
+                        grades.append(grade)
+                to_return[section][assignment.id] = grades
+        return to_return
 
 
 if __name__ == "__main__":
@@ -190,7 +195,12 @@ if __name__ == "__main__":
 
     if args.setup_num_assign is not None:
         assignments = generator.generate_assignments(args.setup_num_assign)
-        generator.assignmentService.add_many_assignments(assignments)
+
+        for sectionID in assignments.keys():
+            generator.assignmentService.add_many_assignments(assignments[sectionID], section=sectionID)
     else:
         grades = generator.generate_grades(args.num_scores)
-        generator.gradeService.add_many_grades(grades)
+
+        for section in grades.keys():
+            for assignment in grades[section].keys():
+                generator.gradeService.add_many_grades(grades[section][assignment], section=section, assignment=assignment)

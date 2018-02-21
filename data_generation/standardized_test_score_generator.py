@@ -6,13 +6,12 @@ import random
 import requests
 import sys
 
-from authorization_service import AuthorizationService
-from authorization_service import CERT_PATH
+from services.authorization import AuthorizationService
 
-from student_service import Student, StudentService
+from services.student import StudentService
 
-from stdtest_score_service import StandardizedTestScore, StandardizedTestScoreService
-from stdtest_service import StandardizedTest, StandardizedTestService
+from services.stdtest_score import StandardizedTestScore, StandardizedTestScoreService
+from services.stdtest import StandardizedTest, StandardizedTestService
 
 # https://www.schools.utah.gov/specialeducation/resources/assessment
 STD_TESTS_NAMES = ["SAGE", "WIDA", "DLM", "ELAA", "UAA"]

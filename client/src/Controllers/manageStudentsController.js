@@ -1,4 +1,3 @@
-﻿
 app.controller("manageStudentsController", function($scope, $rootScope, $location, students, studentService) {
 
     var studentTask = "view/edit";
@@ -86,9 +85,49 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
         $scope.studentDeleteSearch = student.first_name + ' ' + student.last_name;
     };
 
+    /**
+     * Sets studentD
+     * @param {student} student - student used to set.
+     */
     $scope.setStudentD = function(student) {
         $scope.studentD = student;
     };
+
+    /**
+     * Filter used for viewing students
+     * @param {student} student - student to be filtered.
+     */
+    $scope.viewStudentFilter = function(student) {
+        if ($scope.studentViewSearch == null) {
+            return true;
+        }
+        var input = $scope.studentViewSearch.toUpperCase();
+        var fullname = student.first_name + " " + student.last_name;
+        if (student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
+            student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
+            fullname.toUpperCase().includes(input)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Filter used for deleting students
+     * @param {student} student - student to be filtered.
+     */
+    $scope.deleteStudentFilter = function(student) {
+        if ($scope.studentDeleteSearch == null) {
+            return true;
+        }
+        var input = $scope.studentDeleteSearch.toUpperCase();
+        var fullname = student.first_name + " " + student.last_name;
+        if (student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
+            student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
+            fullname.toUpperCase().includes(input)) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Deletes the selected student from the database.
@@ -110,13 +149,6 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
                 $("#deleteStudentFailure").slideUp(500);
             });
         });
-    };
-
-    /**
-     * Clears the view student search bar.
-     */
-    $scope.clearStudentViewSearch = function() {
-        $scope.studentViewSearch = "";
     };
 
     /**

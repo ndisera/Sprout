@@ -10,11 +10,13 @@ var app = angular.module(
 );
 
 // configure our routes
-app.config(function ($routeProvider, $httpProvider) {
+app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     /**
      * Set our interceptor to add auth token to all requests
      */
     $httpProvider.interceptors.push('interceptorService');
+
+    $locationProvider.html5Mode(true);
 
     $routeProvider
 
@@ -46,8 +48,8 @@ app.config(function ($routeProvider, $httpProvider) {
             templateUrl: 'html/manageTeachers.html',
             controller: 'manageTeachersController',
             resolve: {
-                teachers: function (teacherService) {
-                    return teacherService.getTeachers();
+                userData: function(userService) {
+                    return userService.getUsers();
                 },
                 auth: function (userService) {
                     return userService.authVerify();
@@ -63,8 +65,8 @@ app.config(function ($routeProvider, $httpProvider) {
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
-                teachers: function (teacherService) {
-                    return teacherService.getTeachers();
+                userData: function(userService) {
+                    return userService.getUsers();
                 },
                 auth: function (userService) {
                     return userService.authVerify();
@@ -80,8 +82,8 @@ app.config(function ($routeProvider, $httpProvider) {
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
-                teachers: function (teacherService) {
-                    return teacherService.getTeachers();
+                userData: function(userService) {
+                    return userService.getUsers();
                 },
                 sections: function (sectionService) {
                     return sectionService.getSections();
@@ -141,15 +143,8 @@ app.config(function ($routeProvider, $httpProvider) {
                         }
                     );
                 },
-                caseManagerData: function(caseManagerService, $route) {
-                    return caseManagerService.getCaseManager(
-                        {
-                            filter: [{ name: 'student', val: $route.current.params.id },],
-                        }
-                    );
-                },
-                teacherData: function(teacherService, $route) {
-                    return teacherService.getTeachers();
+                userData: function(userService) {
+                    return userService.getUsers();
                 },
                 studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
