@@ -83,6 +83,7 @@ class StudentViewSet(DynamicModelViewSet):
     """ ensure variables show as correct types for docs """
     name_case_manager = 'case_manager'
     desc_case_manager = "ID of the User who oversees this student"
+
     create_fields = (
         coreapi.Field(
             name=name_case_manager,
@@ -129,6 +130,49 @@ class TermViewSet(DynamicModelViewSet):
     """ define custom schema for documentation """
     schema = TermViewSetSchema()
 
+
+class HolidayViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    HolidayViewSetSchema class in the coreapi documentation.
+    """
+
+    def get_link(self, path, method, base_url):
+        link = super(HolidayViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(HolidayViewSet, path, method, link)
+
+
+class HolidayViewSet(DynamicModelViewSet):
+    """
+    allows interaction with the set of "Student" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = HolidaySerializer
+    queryset = Holiday.objects.all()
+
+    """ define custom schema for documentation """
+    schema = HolidayViewSetSchema()
+
+    """ ensure variables show as correct types for docs """
+    term_name = 'term'
+    term_desc = 'Term this holiday starts in'
+
+    term_field = coreapi.Field(
+        name=term_name,
+        required=True,
+        location="form",
+        description=term_desc,
+        schema=coreschema.Integer(title=term_name))
+
+    create_fields = (
+        term_field,
+    )
+    update_fields = (
+        term_field,
+    )
+    partial_update_fields = (
+        term_field,
+    )
 
 class SectionViewSetSchema(AutoSchema):
     """

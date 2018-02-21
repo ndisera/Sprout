@@ -26,6 +26,7 @@ from api.views import *
 router = DynamicRouter()
 router.register('behaviors', viewset=BehaviorViewSet, base_name='Behaviors')
 router.register('enrollments', viewset=EnrollmentViewSet, base_name='Enrollments')
+router.register('holidays', viewset=HolidayViewSet, base_name='holidays')
 router.register('sections', viewset=SectionViewSet, base_name='Sections')
 router.register('tests/standardized', viewset=StandardizedTestViewSet, base_name='StandardizedTests')
 router.register('standardized_test_scores', viewset=StandardizedTestScoreViewSet, base_name='StandardizedTestScores')
