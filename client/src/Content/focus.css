@@ -20,12 +20,21 @@
     height: 200px;
 }
 
+.focus-remove-button {
+    width: 50px;
+    float: left;
+}
+
+.focus-student-panel-editing {
+    margin-left: 50px;
+}
+
 .focus-fade-in {
-    -webkit-transition: opacity ease-in-out 0.3s;
-    -moz-transition: opacity ease-in-out 0.3s;
-    -ms-transition: opacity ease-in-out 0.3s;
-    -o-transition: opacity ease-in-out 0.3s;
-    transition: opacity ease-in-out 0.3s;
+    -webkit-transition: opacity ease-in-out 0.6s;
+    -moz-transition: opacity ease-in-out 0.6s;
+    -ms-transition: opacity ease-in-out 0.6s;
+    -o-transition: opacity ease-in-out 0.6s;
+    transition: opacity ease-in-out 0.6s;
 }
 
 .focus-cloak {
