@@ -9,12 +9,20 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     $scope.allManagersArray = userData.sprout_users;
     $scope.allManagers = _.indexBy($scope.allManagersArray, "pk");
 
+    /**
+     * If a panel body hasn't been opened before in unassigned managers, load its content.
+     * @param {number} index - index of panel to be opened (from ng-repeat).
+     */
     $scope.togglePanelBodies = function(index) {
         if (!_.has($scope.toggleStudents, index) || $scope.toggleStudents[index] == null) {
             $scope.toggleStudents[index] = true;
         }
     }
 
+    /**
+     * If a reassign dropdown hasn't been opened before, load it's content.
+     * @param {number} index - index of dropdown to be opened (from ng-repeat).
+     */
     $scope.toggleDropdowns = function(index) {
         if (!_.has($scope.toggleManagers, index) || $scope.toggleManagers[index] == null) {
             $scope.toggleManagers[index] = true;
@@ -124,7 +132,11 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         $scope.otherStudentsArray = _.values($scope.otherStudents);
     }
 
-    // remove student (update student object case manager field)
+    /**
+     * Unassigns a case manager, student pair.
+     * @param {number} managerPK - student's previous case manager.
+     * @param {student} student - student to be edited.
+     */
     $scope.unassign = function(managerPK, student) {
         student.case_manager = null;
         var studentPromise = studentService.updateStudent(student.id, student);
@@ -140,7 +152,12 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         });
     };
 
-    // reassign student
+    /**
+     * Assigns a student to a different case manager.
+     * @param {number} oldManagerPK - student's previous case manager.
+     * @param {number} newManagerPK - student's new case manager.
+     * @param {student} student - student to be edited.
+     */
     $scope.reassign = function(oldManagerPK, newManagerPK, student) {
         student.case_manager = newManagerPK;
         var studentPromise = studentService.updateStudent(student.id, student);
@@ -159,7 +176,10 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         });
     };
 
-    // remove case manager - or kind of like a cancel all (update all student objects case manager fields (for that case manager))
+    /**
+     * Unassigns all students from a case manager.
+     * @param {number} managerPK - case manager to be cleared.
+     */
     $scope.clearManagerStudents = function(managerPK) {
         var studentChanges = [];
         for (var i = 0; i < $scope.caseStudents[managerPK].length; i++) {
@@ -183,7 +203,12 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         });
     };
 
-    // assign student
+    /**
+     * Assigns a student with no case manager to a case manager.
+     * @param {number} managerPK - case manager being assigned.
+     * @param {student} student - student being assigned.
+     * @param {string} assigned - "assigned" if manager has students, "unassigned" if not.
+     */
     $scope.assignManagerAndStudent = function(managerPK, student, assigned) {
         student.case_manager = managerPK;
         var studentPromise = studentService.updateStudent(student.id, student);
@@ -207,7 +232,10 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         });
     }
 
-    // helper for unassigning a manager
+    /**
+     * Helper funciton that unassigns a manager.
+     * @param {number} managerPK - manager being unassigned.
+     */
     function unassignManager(managerPK) {
         delete $scope.caseStudents[managerPK];
         delete $scope.caseManagers[managerPK];
@@ -216,7 +244,11 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         refreshManagerArrays();
     }
 
-    // helper for unassigning a student
+    /**
+     * Helper funciton that unassigns a student.
+     * @param {number} managerPK - previous manager.
+     * @param {reponse.data} data - data from student update promise.
+     */
     function unassignStudent(managerPK, data) {
         // Think this is by reference here which is what I want
         var managerArray = $scope.caseStudents[managerPK];
@@ -232,7 +264,9 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         }
     }
 
-    // cancels edit if nothing left
+    /**
+     * Switches stop button to edit if there's nothing left to edit.
+     */
     function checkEdit() {
         // stop editing if there's nothing left to edit
         if ($scope.nonManagersArray.length === $scope.allManagersArray.length) {
@@ -241,6 +275,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     }
 })
 
+// filter used for unassigned students
 app.filter('otherStudentFilter', [function() {
     return function(students, index, studentSearch) {
         if (!_.has(studentSearch, index) || studentSearch[index] == null) {
