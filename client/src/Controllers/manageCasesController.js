@@ -1,12 +1,23 @@
 app.controller("manageCasesController", function($scope, $rootScope, $location, students, userData, studentService, userService) {
 
     getCaseManagers();
-    $scope.test = {};
-    $scope.toggle = {};
+    $scope.studentSearch = {};
+    $scope.caseStudentSearch = {};
+    $scope.toggleStudents = {};
+    $scope.toggleManagers = {};
+    $scope.editCaseManagers = false;
+    $scope.allManagersArray = userData.sprout_users;
+    $scope.allManagers = _.indexBy($scope.allManagersArray, "pk");
 
     $scope.togglePanelBodies = function(index) {
-        if (!_.has($scope.toggle, index || $scope.toggle[index] == null)) {
-            $scope.toggle[index] = true;
+        if (!_.has($scope.toggleStudents, index) || $scope.toggleStudents[index] == null) {
+            $scope.toggleStudents[index] = true;
+        }
+    }
+
+    $scope.toggleDropdowns = function(index) {
+        if (!_.has($scope.toggleManagers, index) || $scope.toggleManagers[index] == null) {
+            $scope.toggleManagers[index] = true;
         }
     }
 
@@ -35,7 +46,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
             $scope.caseManagers = _.indexBy(data.sprout_users, 'pk');
 
             // setNonManagers to all other managers
-            $scope.nonManagers = _.indexBy(userData.sprout_users, 'pk');
+            $scope.nonManagers = _.indexBy($scope.allManagersArray, 'pk');
             for (var teacher in $scope.caseManagers) {
                 delete $scope.nonManagers[teacher];
             }
@@ -86,10 +97,10 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
      * @param {student} student - student to be filtered.
      */
     $scope.otherStudentFilter = function(student) {
-        if ($scope.test == null) {
+        if ($scope.studentSearch == null) {
             return true;
         }
-        var input = $scope.test.toUpperCase();
+        var input = $scope.studentSearch.toUpperCase();
         var fullname = student.first_name + " " + student.last_name;
         if (student.first_name.toUpperCase().includes(input) || student.last_name.toUpperCase().includes(input) ||
             student.student_id.toUpperCase().includes(input) || fullname.toUpperCase().includes(input)) {
@@ -114,18 +125,129 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     }
 
     // remove student (update student object case manager field)
-    // update student (update student object case manager field)
+    $scope.unassign = function(managerPK, student) {
+        student.case_manager = null;
+        var studentPromise = studentService.updateStudent(student.id, student);
+        studentPromise.then(function success(data) {
+            $scope.otherStudents[student.id] = data.student;
+            refreshStudentArray();
+            // Think this is by reference here which is what I want
+            unassignStudent(managerPK, data);
+            // stop editing if there's nothing left to edit
+            checkEdit();
+        }, function error(response) {
+            setErrorMessage(response);
+        });
+    };
+
+    // reassign student
+    $scope.reassign = function(oldManagerPK, newManagerPK, student) {
+        student.case_manager = newManagerPK;
+        var studentPromise = studentService.updateStudent(student.id, student);
+        studentPromise.then(function success(data) {
+            unassignStudent(oldManagerPK, data);
+            // new manager stuff
+            if (!_.has($scope.caseManagers, newManagerPK)) {
+                delete $scope.nonManagers[newManagerPK];
+                $scope.caseManagers[newManagerPK] = $scope.allManagers[newManagerPK];
+            }
+            $scope.caseStudents[newManagerPK] = [];
+            $scope.caseStudents[newManagerPK].push(data.student);
+            refreshManagerArrays();
+        }, function error(response) {
+            setErrorMessage(response);
+        });
+    };
+
     // remove case manager - or kind of like a cancel all (update all student objects case manager fields (for that case manager))
-    // delete case manager (delete user)
+    $scope.clearManagerStudents = function(managerPK) {
+        var studentChanges = [];
+        for (var i = 0; i < $scope.caseStudents[managerPK].length; i++) {
+            studentChanges.push({
+                'id': $scope.caseStudents[managerPK][i].id,
+                'case_manager': null
+            });
+        }
+        var studentPromise = studentService.updateStudents(studentChanges);
+        studentPromise.then(function success(data) {
+            var students = data.students;
+            for (var i = 0; i < students.length; i++) {
+                $scope.otherStudents[students[i].id] = students[i];
+            }
+            refreshStudentArray();
+            unassignManager(managerPK);
+            // stop editing if there's nothing left to edit
+            checkEdit();
+        }, function error(response) {
+            setErrorMessage(response);
+        });
+    };
+
+    // assign student
+    $scope.assignManagerAndStudent = function(managerPK, student, assigned) {
+        student.case_manager = managerPK;
+        var studentPromise = studentService.updateStudent(student.id, student);
+        studentPromise.then(function success(data) {
+            // already assigned vs not assigned
+            delete $scope.otherStudents[data.student.id];
+            if (assigned === "assigned") {
+                $scope.caseStudents[managerPK].push(data.student);
+            } else if (assigned === "unassigned") {
+                // move manager
+                delete $scope.nonManagers[managerPK];
+                $scope.caseManagers[managerPK] = $scope.allManagers[managerPK];
+                refreshManagerArrays();
+                // move student and assign to him
+                $scope.caseStudents[managerPK] = [];
+                $scope.caseStudents[managerPK].push(data.student);
+            }
+            refreshStudentArray();
+        }, function error(response) {
+            setErrorMessage(response);
+        });
+    }
+
+    // helper for unassigning a manager
+    function unassignManager(managerPK) {
+        delete $scope.caseStudents[managerPK];
+        delete $scope.caseManagers[managerPK];
+        // and now add this manager to othermanagers
+        $scope.nonManagers[managerPK] = $scope.allManagers[managerPK];
+        refreshManagerArrays();
+    }
+
+    // helper for unassigning a student
+    function unassignStudent(managerPK, data) {
+        // Think this is by reference here which is what I want
+        var managerArray = $scope.caseStudents[managerPK];
+        if (managerArray.length > 1) {
+            for (var i = 0; i < managerArray.length; i++) {
+                if (managerArray[i].id === data.student.id) {
+                    managerArray.splice(i, i + 1);
+                    return;
+                }
+            }
+        } else {
+            unassignManager(managerPK);
+        }
+    }
+
+    // cancels edit if nothing left
+    function checkEdit() {
+        // stop editing if there's nothing left to edit
+        if ($scope.nonManagersArray.length === $scope.allManagersArray.length) {
+            $scope.editCaseManagers = false;
+        }
+    }
 })
 
 app.filter('otherStudentFilter', [function() {
-    return function(students, index, test) {
-        if (!_.has(test, index) || test[index] == null) {
+    return function(students, index, studentSearch) {
+        if (!_.has(studentSearch, index) || studentSearch[index] == null) {
             return students;
         }
         var filtered = [];
-        var input = test[index].toUpperCase();
+        var input = studentSearch[index].toUpperCase();
         for (var i = 0; i < students.length; i++) {
             var student = students[i];
             var fullname = student.first_name + " " + student.last_name;

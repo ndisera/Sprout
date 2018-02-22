@@ -45,7 +45,13 @@
     font-size: 11px;
 }
 
-.glyphicon.glyphicon-plus, .glyphicon.glyphicon-remove {
+.left-heading-btn {
+    float: left;
+    margin-top: -5px;
+    font-size: 11px;
+}
+
+.heading-glyphicon {
     float:right;
     cursor:pointer
 }
