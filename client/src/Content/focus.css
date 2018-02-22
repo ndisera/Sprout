@@ -19,3 +19,22 @@
 .focusProgress, .focusCaution, .focusGraph {
     height: 200px;
 }
+
+.focus-remove-button {
+    width: 50px;
+    float: left;
+}
+
+.focus-remove-button > button {
+    height: 40px;
+}
+
+.focus-student-panel-editing {
+    margin-left: 50px;
+}
+
+.focus-width-none {
+    width: 0px;
+    padding: 0px;
+    border: none;
+}

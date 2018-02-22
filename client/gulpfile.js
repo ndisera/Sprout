@@ -51,6 +51,11 @@ const include_paths = [
     bower_path + 'angular-datepicker/dist/angular-datepicker.css',
     bower_path + 'angular-datepicker/dist/angular-datepicker.js',
 
+    // sortable
+    bower_path + 'angular-ui-sortable/sortable.min.js',
+
+    bower_path + 'angular-ui-sortable/sortable.js',
+
 
     // helpers
     bower_path + 'moment/min/moment-with-locales.min.js',

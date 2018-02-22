@@ -9,6 +9,12 @@
 .voffset8 { margin-top: 100px; }
 .voffset9 { margin-top: 150px; }
 
+@media screen and (max-width: 767px) {
+    .table-responsive {
+        margin-bottom: 0px;
+    }
+}
+
 @media (max-width: 768px) {
     .navbar-form {
         margin-top: 0px;
@@ -80,6 +86,10 @@
     margin-bottom: 0px;
 }
 
+.no-bottom-border {
+    border-bottom: none;
+}
+
 .panel-wrapper {
     border-left: 5px solid #45B9BD;
     border-radius: 4px 0px 0px 4px;
@@ -99,10 +109,40 @@
     display: inline-block;
 }
 
+.panel-add {
+    border: 3px dashed #CCC;
+}
+
+.panel-add > .panel-heading {
+    border-bottom: none;
+}
+
+.zero-width {
+    width: 0px;
+}
+
 [date-picker] {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .pointer {
     cursor: pointer;
+}
+
+.panel-header-btn {
+    margin-top: -23px;
+    margin-right: -10px;
+    font-size: 11px;
+}
+
+.table-responsive {
+    border: 1px solid #DDD;
+}
+
+.table {
+    margin-bottom: 0px;
+}
+
+.alert-glyphicon-icon {
+    padding: 0px 10px 0px 5px;
 }
