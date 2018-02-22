@@ -9,6 +9,12 @@
 .voffset8 { margin-top: 100px; }
 .voffset9 { margin-top: 150px; }
 
+@media screen and (max-width: 767px) {
+    .table-responsive {
+        margin-bottom: 0px;
+    }
+}
+
 @media (max-width: 768px) {
     .navbar-form {
         margin-top: 0px;
@@ -121,4 +127,18 @@
 
 .pointer {
     cursor: pointer;
+}
+
+.panel-header-btn {
+    margin-top: -23px;
+    margin-right: -10px;
+    font-size: 11px;
+}
+
+.table-responsive {
+    border: 1px solid #DDD;
+}
+
+.table {
+    margin-bottom: 0px;
 }

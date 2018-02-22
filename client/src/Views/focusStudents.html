@@ -20,12 +20,12 @@
     <div class="sortable voffset3" ui-sortable="sortableOptions" ng-model="focusStudents">
         <div class="row" ng-repeat="focusStudent in focusStudents">
             <div class="col-xs-12">
-                <div class="focus-remove-button width-slide-padding focus-fade-in focus-cloak focus-width-none" ng-class="{ 'focus-width-none': !editing, 'focus-cloak': !editing, }">
-                    <button ng-click="removeFocusStudent(focusStudent)" class="btn btn-danger focus-fade-in focus-cloak focus-width-none" ng-class="{ 'focus-width-none': !editing, 'focus-cloak': !editing, }" type="button">
+                <div class="focus-remove-button" ng-if="editing">
+                    <button ng-click="removeFocusStudent(focusStudent)" class="btn btn-danger" type="button">
                         <span class="glyphicon glyphicon-minus white"></span>
                     </button>
                 </div>
-                <div ng-cloak class="width-slide" ng-class="{ 'focus-student-panel-editing': editing, }">
+                <div ng-class="{ 'focus-student-panel-editing': editing, }">
                     <div class="panel-wrapper">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -33,6 +33,7 @@
                                     <a href="/student/{{ focusStudent.student }}">{{ studentsLookup[focusStudent.student].first_name }} {{ studentsLookup[focusStudent.student].last_name }}</a>
                                     <span class="glyphicon glyphicon-chevron-down blackish"
                                           data-toggle="collapse" data-target="#collapse-{{ $index }}" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')">
+                                    </span>
                                 </h4>
                             </div>
                             <div id="collapse-{{ $index }}" class="panel-collapse collapse">
@@ -68,13 +69,53 @@
             </div>
         </div>
     </div>
-    <div class="row focus-fade-in focus-cloak" ng-class="{ 'focus-cloak': !editing, }">
+    <div class="row" ng-if="editing && focusStudents.length < 5">
         <div class="col-xs-12">
-            <div class="panel panel-default panel-add">
+            <div class="panel panel-default panel-add pointer" ng-show="!adding" ng-click="toggleAdd(true)">
                 <div class="panel-heading">
                     <h4 class="panel-title centerText">
                         <span class="glyphicon glyphicon-plus blackish"></span>
                     </h4>
+                </div>
+            </div>
+            <div class="panel-wrapper" ng-show="adding">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Add Student</h4>
+                        <button type="button" class="btn btn-danger panel-header-btn pull-right" ng-click="toggleAdd(false)">Cancel</button>
+                    </div>
+                    <div class="panel-body">
+                        <h4 class="centerText" ng-show="filterResults.length === 0">No Other Students</h4>
+                        <div ng-show="filterResults.length !== 0">
+                            <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" name="studentSearch" list="studentSearch" ng-model="studentSearch">
+                            <div class="table-responsive scrollableTableDiv voffset3">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Student ID</th>
+                                            <th>Birthday</th>
+                                            <th class="buttonColumn"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="student in students | filter:studentFilter as filterResults">
+                                            <td>{{ student.first_name }}</td>
+                                            <td>{{ student.last_name }}</td>
+                                            <td>{{ student.student_id }}</td>
+                                            <td>{{ student.birthdate }}</td>
+                                            <td>
+                                                <button class="btn btn-success btn-xs" type="button" ng-click="addStudent(student)">
+                                                    <span class="glyphicon glyphicon-plus"></span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

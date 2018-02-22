@@ -1,5 +1,15 @@
 app.controller("focusStudentsController", function ($scope, $q, studentData, focusData, userService) {
 
+    //$scope.deleteButtonClasses = {
+        //'focus-width-none': true,
+        //'focus-cloak': true,
+    //};
+
+    //$scope.panelClasses = {
+        //'focus-student-panel-editing': false,
+    //};
+
+
     // set students if there are any
     $scope.students       = [];
     $scope.studentsLookup = {};
@@ -17,7 +27,45 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
     $scope.editing = false;
     $scope.toggleEdit = function() {
         $scope.editing = !$scope.editing;
+        if($scope.editing === true) {
+            $scope.adding = false;
+            //$scope.deleteButtonClasses['focus-width-none']     = false;
+            //$scope.deleteButtonClasses['focus-cloak']          = false;
+            //$scope.panelClasses['focus-student-panel-editing'] = false;
+        }
     };
+
+    $scope.adding = false;
+    $scope.toggleAdd = function(val) {
+        if(val === null || val === undefined) {
+            $scope.adding = !$scope.adding;
+        }
+        else {
+            $scope.adding = val;
+        }
+    };
+
+    /**
+     * Filter used for students
+     * @param {student} student - student to be filtered.
+     */
+    $scope.studentFilter = function(student) {
+        if(_.find($scope.focusStudents, function(elem) { return elem.student === student.id; })) {
+            return false;
+        }
+        if($scope.studentSearch === null || $scope.studentSearch === undefined) {
+            return true;
+        }
+        var input = $scope.studentSearch.toUpperCase();
+        var fullname = student.first_name + " " + student.last_name;
+        if(student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
+            student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
+            fullname.toUpperCase().includes(input)) {
+            return true;
+        }
+        return false;
+    }
+
 
     // set up for sotrable drag/drop
     var tempOrder = [];
@@ -98,6 +146,43 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
             },
         );
     };
+
+    /***
+     * adds a student to this user's focuses
+     * also updates the ordering on all focuses (post-add)
+     *
+     * @param {student} student - student to add
+     *
+     * @return {void}
+     */
+    $scope.addStudent = function(student) {
+        var newFocus = {
+            ordering: $scope.focusStudents.length,
+            user: userService.user.id,
+            student: student.id,
+            focus_category: "none",
+        };
+
+        userService.createFocusForUser(userService.user.id, newFocus).then(
+            function success(data) {
+                $scope.focusStudents.push(data['focus_student']);
+
+                var promises = saveOrder();
+                $q.all(promises).then(function(data) {
+                    var tempLookup = _.indexBy(_.pluck(data, 'focus_student'), 'id');
+                    _.each($scope.focusStudents, function(elem) {
+                        elem.ordering = tempLookup[elem.id].ordering;
+                    });
+                });
+
+                $scope.adding = false;
+            },
+            function error(response) {
+                //TODO(gzuber): notify the user
+            },
+        );
+    };
+
 
 
     //TODO(gzuber): add in check to not allow them to add more than 5 focus students
