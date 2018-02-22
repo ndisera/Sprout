@@ -142,3 +142,7 @@
 .table {
     margin-bottom: 0px;
 }
+
+.alert-glyphicon-icon {
+    padding: 0px 10px 0px 5px;
+}

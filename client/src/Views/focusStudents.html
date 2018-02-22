@@ -17,6 +17,14 @@
             <button ng-if="editing" ng-click="toggleEdit()" class="btn btn-danger pull-right" type="button">Stop Editing</button>
         </div>
     </div>
+    <div class="row voffset3" ng-if="focusStudents.length === 0 && !editing">
+        <div class="col-xs-12">
+            <div class="alert alert-info no-bottom-margin" role="alert">
+                <span class="glyphicon glyphicon-info-sign alert-glyphicon-icon"></span>
+                <span>It looks like you don't have any Focus Students. Click the "Edit" button to add one.</span>
+            </div>
+        </div>
+    </div>
     <div class="sortable voffset3" ui-sortable="sortableOptions" ng-model="focusStudents">
         <div class="row" ng-repeat="focusStudent in focusStudents">
             <div class="col-xs-12">
