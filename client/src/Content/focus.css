@@ -33,34 +33,6 @@
     margin-left: 50px;
 }
 
-.focus-fade-in {
-    -webkit-transition: opacity ease-in-out 0.6s;
-    -moz-transition: opacity ease-in-out 0.6s;
-    -ms-transition: opacity ease-in-out 0.6s;
-    -o-transition: opacity ease-in-out 0.6s;
-    transition: opacity ease-in-out 0.6s;
-}
-
-.focus-cloak {
-    opacity: 0;
-}
-
-.width-slide-padding {
-    -webkit-transition: width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
-    -moz-transition: width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
-    -ms-transition: width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
-    -o-transition: width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
-    transition: width 0.3s ease, margin 0.3s ease, padding 0.3s ease;
-}
-
-.width-slide {
-    -webkit-transition: width 0.3s ease, margin 0.3s ease;
-    -moz-transition: width 0.3s ease, margin 0.3s ease;
-    -ms-transition: width 0.3s ease, margin 0.3s ease;
-    -o-transition: width 0.3s ease, margin 0.3s ease;
-    transition: width 0.3s ease, margin 0.3s ease;
-}
-
 .focus-width-none {
     width: 0px;
     padding: 0px;
