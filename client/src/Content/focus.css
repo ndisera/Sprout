@@ -25,6 +25,10 @@
     float: left;
 }
 
+.focus-remove-button > button {
+    height: 40px;
+}
+
 .focus-student-panel-editing {
     margin-left: 50px;
 }

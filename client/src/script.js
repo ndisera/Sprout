@@ -110,11 +110,29 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/focusStudents.html',
             controller: 'focusStudentsController',
             resolve: {
-                students: function (studentService) {
+                studentData: function(studentService) {
                     return studentService.getStudents();
                 },
-                auth: function(userService) {
-                    return userService.authVerify();
+                // need to make sure user in userService is set before calling
+                focusData: function (userService, $q) {
+                    //TODO(gzuber): I don't like this in script.js...
+                    var deferred = $q.defer();
+                    userService.authVerify().then(
+                        function success() {
+                            userService.getAllFocusForUser(userService.user.id).then(
+                                function success(data) {
+                                    deferred.resolve(data);
+                                },
+                                function error(response) {
+                                    deferred.reject(response);
+                                },
+                            );
+                        },
+                        function error(response) {
+                            deferred.reject(response);
+                        },
+                    );
+                    return deferred.promise;
                 },
             }
         })
@@ -280,6 +298,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
      * Set listener for route change errors (user is not auth-ed)
      */
     $rootScope.$on('$routeChangeError', function(event, next, current) {
+        console.log(userService.user);
         // log out the user
         userService.logout();
 
@@ -293,5 +312,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
      * Load the user's previous authentication token
      */
     userService.loadToken();
-
+    if(userService.user.token !== null && userService.user.token !== undefined) {
+        userService.authVerify();
+    }
 });

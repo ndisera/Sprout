@@ -146,11 +146,8 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
      *
      * @return {promise} promise that will resolve to the response
      */
-    userService.authVerify = function(includeUser) {
-        var query = '';
-        if(includeUser) {
-            query = '?user=true';
-        }
+    userService.authVerify = function() {
+        var query = '?user=true';
 
         var deferred = $q.defer();
         $http({
@@ -363,6 +360,29 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         });
         return deferred.promise;
     };
+
+    /**
+     * Patch a focus for a user
+     * @param {number} userId - the user's id.
+     * @param {number} focusId - the focus's id.
+     * @param {focus} focusObj - the focus object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    //TODO(gzuber): implement/finish when fixed on backend
+    //userService.patchFocusForUser = function (userId, focusId, focusObj) {
+        //var deferred = $q.defer();
+        //$http({
+            //method: 'PUT',
+            //url: 'https://' + $rootScope.backend + '/users/' + userId +
+                //'/focus/' + focusId,
+            //data: focusObj,
+        //}).then(function success(response) {
+            //deferred.resolve(response.data);
+        //}, function error(response) {
+            //deferred.reject(response);
+        //});
+        //return deferred.promise;
+    //};
 
     /*** NOTIFICATION RECORDS ***/
 

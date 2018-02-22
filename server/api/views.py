@@ -730,16 +730,14 @@ class AuthVerifyView(generics.RetrieveAPIView):
         }
 
         include_user = request.query_params.get('user', None)
-        print include_user
         if include_user == 'true':
             response['user'] = {
-                'username': request._user.username,
                 'email': request._user.email,
-                'first_name': request._user.first_name,
-                'last_name': request._user.last_name,
-                'id': request._user.id,
+                'first_name': request._user.sproutuserprofile.first_name,
+                'last_name': request._user.sproutuserprofile.last_name,
+                'pk': request._user.id,
             }
-            
+
         return Response(data=response)
 
 
