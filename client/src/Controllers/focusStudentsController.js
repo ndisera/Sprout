@@ -1,15 +1,5 @@
 app.controller("focusStudentsController", function ($scope, $q, studentData, focusData, userService) {
 
-    //$scope.deleteButtonClasses = {
-        //'focus-width-none': true,
-        //'focus-cloak': true,
-    //};
-
-    //$scope.panelClasses = {
-        //'focus-student-panel-editing': false,
-    //};
-
-
     // set students if there are any
     $scope.students       = [];
     $scope.studentsLookup = {};
@@ -29,9 +19,6 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
         $scope.editing = !$scope.editing;
         if($scope.editing === true) {
             $scope.adding = false;
-            //$scope.deleteButtonClasses['focus-width-none']     = false;
-            //$scope.deleteButtonClasses['focus-cloak']          = false;
-            //$scope.panelClasses['focus-student-panel-editing'] = false;
         }
     };
 
@@ -182,14 +169,6 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
             },
         );
     };
-
-
-
-    //TODO(gzuber): add in check to not allow them to add more than 5 focus students
-
-
-
-
 
 
 
