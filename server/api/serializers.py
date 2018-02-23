@@ -4,6 +4,7 @@ from api.models import *
 from rest_framework import serializers
 from rest_auth.serializers import LoginSerializer, UserDetailsSerializer
 from rest_auth.registration.serializers import RegisterSerializer
+from focus_category.category_calculator import CategoryCalculator
 
 
 class StudentSerializer(DynamicModelSerializer):
@@ -192,3 +193,19 @@ class FocusStudentSerializer(DynamicModelSerializer):
         fields = ('id', 'student', 'user', 'ordering', 'focus_category', 'progress_category', 'caution_category', )
     user = DynamicRelationField('SproutUserSerializer')
     student = DynamicRelationField('StudentSerializer')
+
+    def to_representation(self, instance):
+        representation = super(FocusStudentSerializer, self).to_representation(instance)
+
+        # Get the Sprout-generated categories
+        grades = [grade for grade in Grade.objects.filter(student=representation['student'])]
+        attendances = [] # Attendances not currently tracked by Sprout
+        behavior_efforts = [record for record in Behavior.objects.filter(enrollment__student=representation['student'])]
+        test_scores = [score for score in StandardizedTestScore.objects.filter(student=representation['student'])]
+        calculator = CategoryCalculator(grades=grades, attendances=attendances, behavior_efforts=behavior_efforts,
+                                        test_scores=test_scores)
+        progress = calculator.get_progress_category()
+        caution = calculator.get_caution_category()
+        representation['progress_category'] = progress
+        representation['caution_category'] = caution
+        return representation
