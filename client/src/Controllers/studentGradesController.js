@@ -16,7 +16,11 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                 yAxes: [{
                     ticks: {
                         max: 100,
+                        min: 0,
                     },
+                }],
+                xAxes: [{
+                    maxBarThickness: 70,
                 }],
             },
         },
@@ -101,7 +105,7 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
 
     $scope.selectSection = function(section) {
 
-        var assignmentConfig = {
+        var assignmentConfig = { //todo: not used
             filter: [
                 { name: 'section', val: section.id, },
             ],
