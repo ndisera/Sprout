@@ -206,3 +206,10 @@ class IEPGoalNoteSerializer(DynamicModelSerializer):
         model = IEPGoalNote
         fields = '__all__'
     goal = DynamicRelationField('IEPGoalSerializer')
+
+
+class ServiceRequirementSerializer(DynamicModelSerializer):
+    class Meta:
+        model = ServiceRequirement
+        fields = '__all__'
+    student = DynamicRelationField('StudentSerializer')

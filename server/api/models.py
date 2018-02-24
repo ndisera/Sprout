@@ -214,5 +214,13 @@ class IEPGoalNote(models.Model):
     goal = models.ForeignKey(IEPGoal, blank=False)
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Name of this note")
-    body = models.CharField(null=False, blank=False, max_length=settings.IEP_GOAL_NOTE_MAX_CHARS,
-                             help_text="Body of this note (max length {})".format(settings.IEP_GOAL_NOTE_MAX_CHARS))
+    body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                             help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+
+class ServiceRequirement(models.Model):
+    student = models.ForeignKey(Student, blank=False)
+    title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this service requirement")
+    description = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                                   help_text="Description of this service requirement (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
