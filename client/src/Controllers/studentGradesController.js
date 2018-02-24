@@ -19,6 +19,9 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                         min: 0,
                     },
                 }],
+                xAxes: [{
+                    maxBarThickness: 70,
+                }],
             },
         },
         colors: [],
