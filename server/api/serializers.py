@@ -6,6 +6,14 @@ from rest_auth.serializers import LoginSerializer, UserDetailsSerializer
 from rest_auth.registration.serializers import RegisterSerializer
 
 
+class ProfilePictureSerializer(DynamicModelSerializer):
+    file = serializers.ImageField(max_length=None)
+
+    class Meta:
+        fields = '__all__'
+        model = ProfilePicture
+
+
 class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student

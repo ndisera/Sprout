@@ -3,7 +3,23 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 
-from sprout_user import SproutUser, SproutUserProfile
+from sprout_user import SproutUser
+
+
+class ProfilePicture(models.Model):
+    file = models.ImageField(upload_to='profile_pictures/', null=True, default='profile_pictures/default.png')
+    upload_time = models.DateTimeField(auto_now=True)
+
+
+class SproutUserProfile(models.Model):
+    user = models.OneToOneField(SproutUser, on_delete=models.CASCADE,
+                                help_text="User to which this profile information belongs")
+    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="User first name")
+    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                 help_text="User last name")
+    picture = models.OneToOneField(ProfilePicture, on_delete=models.CASCADE,
+                                   blank=True, null=True)
 
 from school_settings.models import *
 

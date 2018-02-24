@@ -2,12 +2,14 @@
 from __future__ import unicode_literals
 import coreapi
 import coreschema
+from django.http.response import HttpResponseNotFound, HttpResponse
 from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
 from rest_framework import mixins, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from api.models import *
@@ -62,6 +64,66 @@ def set_link(class_id, path, method, link):
 
 class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
+
+class ProfilePictureViewSet(mixins.CreateModelMixin,
+                            mixins.RetrieveModelMixin,
+                            mixins.ListModelMixin,
+                            mixins.DestroyModelMixin,
+                            NestedViewSetMixin,
+                            WithDynamicViewSetMixin,
+                            GenericViewSet):
+    """
+    allows access to the profile pictures stored in the database
+
+    create:
+    upload a new profile picture
+
+    retrieve:
+    get a specific profile picture
+
+    delete:
+    remove a specified profile picture
+    """
+    # Relevant tutorial: http://blog.josephmisiti.com/how-to-upload-a-photo-to-django-using-ios
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProfilePictureSerializer
+    parser_classes = (MultiPartParser, FormParser, )
+    queryset = ProfilePicture.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        response = super(ProfilePictureViewSet, self).create(request, *args, **kwargs)
+        parents_query_dict = self.get_parents_query_dict()
+        if 'sproutuserprofile' in parents_query_dict:
+            user_profile_id = parents_query_dict['sproutuserprofile']
+            user_profile = SproutUserProfile.objects.filter(id=user_profile_id)
+            # Double check: This should always be true because we are looking at the PK of SproutUserProfile
+            if not len(user_profile) == 1:
+                raise AssertionError("Found multiple user profiles with the ID {id}".format(id=user_profile_id))
+            user_profile = user_profile[0]
+            user_profile.picture = self.instance
+            user_profile.save()
+        return response
+
+    def perform_create(self, serializer):
+        serializer.save()
+        self.instance = serializer.instance
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        get the actual profile image data
+        """
+        queryset = self.get_queryset()
+        if len(queryset) == 0:
+            return HttpResponseNotFound()
+        if not len(queryset) == 1:
+            raise AssertionError('More than one profile picture found for ID')
+
+        picture = queryset[0]
+        file = picture.file.file
+
+        response = HttpResponse(file, content_type="image/jpeg")
+
+        return response
 
 
 class StudentViewSetSchema(AutoSchema):
