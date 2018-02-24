@@ -12,8 +12,8 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $route
         $scope.sections = enrollmentData.sections;
     }
 
-    // create class schedule
-    $scope.teachers = _.indexBy(enrollmentData.teachers, 'pk');
+    // create teacher lookup
+    $scope.teachers = _.indexBy(userData.sprout_users, 'pk');
 
     // define structure for editing student fields
     $scope.editingAll = false;
@@ -180,9 +180,6 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $route
     };
 
 });
-
-
-
 
 
 

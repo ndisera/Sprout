@@ -1,4 +1,4 @@
-﻿<div class="container">
+<div class="container">
     <div class="row">
         <div class="col-xs-12">
             <h2 class="student-name-title">{{ student.first_name }} {{ student.last_name }}</h2>
@@ -35,10 +35,14 @@
                     <div id="student-overview-assign-dropdown" class="input-group pull-right">
                         <span class="input-group-addon">Assigned To</span>
                         <div class="input-group-btn">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span></button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span>
+                            </button>
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)">
-                                    <a class="student-overview-assign-link">{{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.pk === caseManager.pk" class="glyphicon glyphicon-ok"></span></a>
+                                    <a class="student-overview-assign-link">
+                                        {{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.pk === caseManager.pk" class="glyphicon glyphicon-ok"></span>
+                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -56,7 +60,7 @@
                                     Edit All
                                 </button>
                                 <button id="student-overview-edit-all-btn" class="btn btn-danger pull-right" type="button" ng-click="endEditStudent('all')" ng-show="editingAll">
-                                    Cancel All
+                                    Stop Editing All
                                 </button>
                             </div>
                             <div class="panel-body">
@@ -69,7 +73,7 @@
                                             <span ng-click="beginEditStudent(property)" class="glyphicon glyphicon-pencil pencilEdit"></span>
                                             </p>
                                             <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9" ng-show="property.editable">
-                                                <input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                                <input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required auto-focus>
                                                 <input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
                                                 <div class="input-group-btn">
                                                     <button class="btn btn-default" type="submit" ng-disabled="editStudentForm{{$index}}.editStudentFormInput{{$index}}.$invalid">
@@ -94,22 +98,24 @@
                                 <h3 class="panel-title">Class Schedule</h3>
                             </div>
                             <div class="panel-body">
-                                <table ng-if="sections.length > 0" class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Period</th>
-                                            <th>Class Name</th>
-                                            <th>Teacher</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr ng-repeat="section in sections">
-                                            <td>{{ section.id }}</td>
-                                            <td>{{ section.title }}</td>
-                                            <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <div class="table-responsive">
+                                    <table ng-if="sections.length > 0" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Period</th>
+                                                <th>Class Name</th>
+                                                <th>Teacher</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="section in sections">
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>{{ section.title }}</td>
+                                                <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                                 <div ng-if="sections.length === 0">
                                     <h4 class="centerText">No Classes</h4>
                                 </div>

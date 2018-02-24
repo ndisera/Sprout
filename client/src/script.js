@@ -156,7 +156,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 enrollmentData: function(enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
                         {
-                            include: ['section.*', 'section.teacher.*'],
+                            include: ['section.*', ],
                             filter: [{ name: 'student', val: $route.current.params.id },],
                         }
                     );
