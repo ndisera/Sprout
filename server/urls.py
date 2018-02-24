@@ -40,10 +40,13 @@ assignments_router = sections_router.register('assignments', viewset=AssignmentV
 assignments_router.register('grades', viewset=GradeViewSet, base_name='assignment-grades', parents_query_lookups=['assignment__section', 'assignment'])
 
 # Add nested routes under students
-# Student's grades
+# Add nested route for grades as /student/{pk}/grades
 students_router.register('grades', viewset=GradeViewSet, base_name='student-grades', parents_query_lookups=['student'])
-# Student's IEP goals
-students_router.register('ieps', viewset=IEPGoalViewSet, base_name='student-ieps', parents_query_lookups=['student'])
+# Add nested route for IEPs as /student/{pk}/ieps
+iep_router = students_router.register('ieps', viewset=IEPGoalViewSet, base_name='student-ieps', parents_query_lookups=['student'])
+
+# Add nested routes for iep notes as /student/{pk}/ieps/{pk}/notes
+iep_router.register('notes', viewset=IEPGoalNoteViewSet, base_name='iep-notes', parents_query_lookups=['goal__student', 'goal'])
 
 # Add nested route for notifications as /users/{pk}/notifications
 users_router.register('notifications', viewset=NotificationViewSet, base_name='users-notifications', parents_query_lookups=['user'])

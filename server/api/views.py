@@ -948,7 +948,7 @@ class IEPGoalViewSetSchema(AutoSchema):
         return set_link(IEPGoalViewSet, path, method, link)
 
 
-class IEPGoalViewSet(NestedDynamicViewSet, ):
+class IEPGoalViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
     """
@@ -978,4 +978,48 @@ class IEPGoalViewSet(NestedDynamicViewSet, ):
     )
     partial_update_fields = (
         student_field,
+    )
+
+
+class IEPGoalNoteViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    HolidayViewSetSchema class in the coreapi documentation.
+    """
+
+    def get_link(self, path, method, base_url):
+        link = super(IEPGoalNoteViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(IEPGoalNoteViewSet, path, method, link)
+
+
+class IEPGoalNoteViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "Student" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = IEPGoalNoteSerializer
+    queryset = IEPGoalNote.objects.all()
+
+    # define custom schema for documentation
+    schema = IEPGoalNoteViewSetSchema()
+
+    # ensure variables show as correct types for docs
+    iep_name = 'goal'
+    iep_desc = 'IEPGoal to which this note belongs'
+
+    iep_field = coreapi.Field(
+        name=iep_name,
+        required=True,
+        location="form",
+        description=iep_desc,
+        schema=coreschema.Integer(title=iep_name))
+
+    create_fields = (
+        iep_field,
+    )
+    update_fields = (
+        iep_field,
+    )
+    partial_update_fields = (
+        iep_field,
     )
