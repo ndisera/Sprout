@@ -192,3 +192,17 @@ class FocusStudentSerializer(DynamicModelSerializer):
         fields = ('id', 'student', 'user', 'ordering', 'focus_category', 'progress_category', 'caution_category', )
     user = DynamicRelationField('SproutUserSerializer')
     student = DynamicRelationField('StudentSerializer')
+
+
+class IEPGoalSerializer(DynamicModelSerializer):
+    class Meta:
+        model = IEPGoal
+        fields = '__all__'
+    student = DynamicRelationField('StudentSerializer')
+
+
+class IEPGoalNoteSerializer(DynamicModelSerializer):
+    class Meta:
+        model = IEPGoalNote
+        fields = '__all__'
+    goal = DynamicRelationField('IEPGoalSerializer')

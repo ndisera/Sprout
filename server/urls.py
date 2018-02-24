@@ -47,9 +47,12 @@ assignments_router = NestedDynamicRouter(sections_router, 'assignments', lookup=
 assignments_router.register('grades', viewset=GradeViewSet, base_name='assignment-grades')
 urlpatterns.append(url(r'^', include(assignments_router.urls)))
 
-# Add nested route for grades as /students/{pk}/grades
+# Add nested routes under students
 students_router = NestedDynamicRouter(router, 'students', lookup='students')
+# Student's grades
 students_router.register('grades', viewset=GradeViewSet, base_name='student-grades')
+# Student's IEP goals
+students_router.register('ieps', viewset=IEPGoalViewSet, base_name='student-ieps')
 urlpatterns.append(url(r'^', include(students_router.urls)))
 
 # Add nested route for notifications as /users/{pk}/notifications

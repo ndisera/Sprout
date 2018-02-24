@@ -198,3 +198,21 @@ class FocusStudent(models.Model):
     class Meta:
         ordering = ('user', 'ordering', )
         unique_together = (('user', 'student'), )
+
+
+class IEPGoal(models.Model):
+    student = models.ForeignKey(Student, blank=False)
+    title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this IEP Goal")
+    quantitative = models.BooleanField(blank=True,
+                                       help_text="Optionally, whether this IEP goal tracks quantitative information")
+    quantitative_category = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                             help_text="Optional quantitative category associated with this goal")
+
+
+class IEPGoalNote(models.Model):
+    goal = models.ForeignKey(IEPGoal, blank=False)
+    title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Name of this note")
+    body = models.CharField(null=False, blank=False, max_length=settings.IEP_GOAL_NOTE_MAX_CHARS,
+                             help_text="Body of this note (max length {})".format(settings.IEP_GOAL_NOTE_MAX_CHARS))

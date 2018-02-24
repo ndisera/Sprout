@@ -956,3 +956,61 @@ class FocusStudentViewSet(DynamicModelViewSet):
             description=desc_student,
             schema=coreschema.Integer(title=name_student)),
     )
+
+
+class IEPGoalViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    HolidayViewSetSchema class in the coreapi documentation.
+    """
+
+    def get_link(self, path, method, base_url):
+        link = super(IEPGoalViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(IEPGoalViewSet, path, method, link)
+
+
+class IEPGoalViewSet(DynamicModelViewSet,):
+    """
+    allows interaction with the set of "Student" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = IEPGoalSerializer
+
+    def get_queryset(self, queryset=None):
+        """
+        Get the queryset, possibly for parent IDs
+
+        :param queryset: Simon has no idea. Hopefully something useful.
+        :return:
+        """
+        if queryset is None:
+            queryset = IEPGoal.objects.all()
+
+        if 'students_pk' in self.kwargs:
+            queryset = queryset.filter(student_id=self.kwargs['students_pk'])
+
+        return queryset
+
+    # define custom schema for documentation
+    schema = IEPGoalViewSetSchema()
+
+    # ensure variables show as correct types for docs
+    student_name = 'student'
+    student_desc = 'Student whose goal this is'
+
+    student_field = coreapi.Field(
+        name=student_name,
+        required=True,
+        location="form",
+        description=student_desc,
+        schema=coreschema.Integer(title=student_name))
+
+    create_fields = (
+        student_field,
+    )
+    update_fields = (
+        student_field,
+    )
+    partial_update_fields = (
+        student_field,
+    )
