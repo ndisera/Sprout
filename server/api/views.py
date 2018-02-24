@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from api.models import *
 from api.serializers import *
