@@ -60,6 +60,10 @@ def set_link(class_id, path, method, link):
         return link
 
 
+class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
+    pass
+
+
 class StudentViewSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the
@@ -70,7 +74,7 @@ class StudentViewSetSchema(AutoSchema):
         return set_link(StudentViewSet, path, method, link)
 
 
-class StudentViewSet(DynamicModelViewSet):
+class StudentViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
     """
@@ -120,7 +124,7 @@ class TermViewSetSchema(AutoSchema):
         return set_link(TermViewSet, path, method, link)
 
 
-class TermViewSet(DynamicModelViewSet):
+class TermViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
     """
@@ -143,7 +147,7 @@ class HolidayViewSetSchema(AutoSchema):
         return set_link(HolidayViewSet, path, method, link)
 
 
-class HolidayViewSet(DynamicModelViewSet):
+class HolidayViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
     """
@@ -184,7 +188,7 @@ class SectionViewSetSchema(AutoSchema):
         link = super(SectionViewSetSchema, self).get_link(path, method, base_url)
         return set_link(SectionViewSet, path, method, link)
 
-class SectionViewSet(DynamicModelViewSet):
+class SectionViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Section" instances
 
@@ -253,7 +257,7 @@ class EnrollmentViewSetSchema(AutoSchema):
         link = super(EnrollmentViewSetSchema, self).get_link(path, method, base_url)
         return set_link(EnrollmentViewSet, path, method, link)
 
-class EnrollmentViewSet(DynamicModelViewSet):
+class EnrollmentViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Enrollment" instances
 
@@ -340,7 +344,7 @@ class BehaviorViewSetSchema(AutoSchema):
         link = super(BehaviorViewSetSchema, self).get_link(path, method, base_url)
         return set_link(BehaviorViewSet, path, method, link)
 
-class BehaviorViewSet(DynamicModelViewSet):
+class BehaviorViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Behavior" instances
 
@@ -410,7 +414,7 @@ class StandardizedTestViewSetSchema(AutoSchema):
         return set_link(StandardizedTestViewSet, path, method, link)
 
 
-class StandardizedTestViewSet(DynamicModelViewSet):
+class StandardizedTestViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "StandardizedTests" instances
 
@@ -451,7 +455,7 @@ class StandardizedTestScoreViewSetSchema(AutoSchema):
         return set_link(StandardizedTestScoreViewSet, path, method, link)
 
 
-class StandardizedTestScoreViewSet(DynamicModelViewSet):
+class StandardizedTestScoreViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "StandardizedTestScore" instances
 
@@ -543,7 +547,7 @@ class AssignmentViewSetSchema(AutoSchema):
         return set_link(AssignmentViewSet, path, method, link)
 
 
-class AssignmentViewSet(DynamicModelViewSet):
+class AssignmentViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Assignment" instances
 
@@ -570,9 +574,6 @@ class AssignmentViewSet(DynamicModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
-
-    def get_queryset(self, queryset=None):
-        return Assignment.objects.filter(section=self.kwargs['sections_pk'])
 
     """ define custom schema for documentation """
     schema = AssignmentViewSetSchema()
@@ -615,7 +616,7 @@ class GradeViewSetSchema(AutoSchema):
         return set_link(GradeViewSet, path, method, link)
 
 
-class GradeViewSet(DynamicModelViewSet):
+class GradeViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Grade" instances
 
@@ -641,24 +642,7 @@ class GradeViewSet(DynamicModelViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = GradeSerializer
-
-    def get_queryset(self, queryset=None):
-        """
-        Get a queryset for grades, possibly by filtering for grades for a particular student or assignment
-
-        :param queryset: Simon has no idea. Hopefully something useful.
-        :return:
-        """
-        if queryset is None:
-            queryset = Grade.objects.all()
-
-        if 'assignments_pk' in self.kwargs:
-            queryset = queryset.filter(assignment=self.kwargs['assignments_pk'])
-
-        if 'students_pk' in self.kwargs:
-            queryset = queryset.filter(student_id=self.kwargs['students_pk'])
-
-        return queryset
+    queryset = Grade.objects.all()
 
     """ define custom schema for documentation """
     schema = GradeViewSetSchema()
@@ -781,7 +765,7 @@ class NotificationViewSetSchema(AutoSchema):
         return set_link(NotificationViewSet, path, method, link)
 
 
-class NotificationViewSet(DynamicModelViewSet):
+class NotificationViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Notification" instances
 
@@ -808,9 +792,6 @@ class NotificationViewSet(DynamicModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
-
-    def get_queryset(self, queryset=None):
-        return Notification.objects.filter(user=self.kwargs['users_pk'])
 
     """ define custom schema for documentation """
     schema = NotificationViewSetSchema()
@@ -875,7 +856,7 @@ class FocusStudentViewSetSchema(AutoSchema):
         return set_link(FocusStudentViewSet, path, method, link)
 
 
-class FocusStudentViewSet(DynamicModelViewSet):
+class FocusStudentViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "FocusStudent" instances
 
@@ -901,9 +882,7 @@ class FocusStudentViewSet(DynamicModelViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = FocusStudentSerializer
-
-    def get_queryset(self, queryset=None):
-        return FocusStudent.objects.filter(user=self.kwargs['users_pk'])
+    queryset = FocusStudent.objects.all()
 
     """ define custom schema for documentation """
     schema = FocusStudentViewSetSchema()
@@ -969,27 +948,13 @@ class IEPGoalViewSetSchema(AutoSchema):
         return set_link(IEPGoalViewSet, path, method, link)
 
 
-class IEPGoalViewSet(DynamicModelViewSet,):
+class IEPGoalViewSet(NestedDynamicViewSet, ):
     """
     allows interaction with the set of "Student" instances
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = IEPGoalSerializer
-
-    def get_queryset(self, queryset=None):
-        """
-        Get the queryset, possibly for parent IDs
-
-        :param queryset: Simon has no idea. Hopefully something useful.
-        :return:
-        """
-        if queryset is None:
-            queryset = IEPGoal.objects.all()
-
-        if 'students_pk' in self.kwargs:
-            queryset = queryset.filter(student_id=self.kwargs['students_pk'])
-
-        return queryset
+    queryset = IEPGoal.objects.all()
 
     # define custom schema for documentation
     schema = IEPGoalViewSetSchema()
