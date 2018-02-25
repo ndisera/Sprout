@@ -60,5 +60,5 @@ class FileUploadTestCase(TestCase):
         response = self.client.get(get_url)
         self.assertEqual(response.status_code, 200, msg="Unable to GET profile picture")
         new_file = response.content
-        # TODO: Actually compare content
-        pass
+        self.assertEqual(new_file, original_file.read(), msg="Downloaded file not the same as uploaded file!")
+    
