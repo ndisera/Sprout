@@ -13,6 +13,11 @@ class ProfilePictureSerializer(DynamicModelSerializer):
         fields = '__all__'
         model = ProfilePicture
 
+    def to_representation(self, instance):
+        representation = super(ProfilePictureSerializer, self).to_representation(instance)
+        del (representation['file']) # Hide the file path from the response
+        return representation
+
 
 class StudentSerializer(DynamicModelSerializer):
     class Meta:
