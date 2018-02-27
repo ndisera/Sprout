@@ -66,7 +66,8 @@ app.controller('loginController', function ($scope, $rootScope, $location, userS
         event.preventDefault();
 
         if(!validateInput($scope.email) || !validateInput($scope.password)) {
-            displayErrors("email and password must not be blank.");
+            displayErrors("Email and password must not be blank.");
+            return;
         }
 
         userService.login($scope.email, $scope.password).then(

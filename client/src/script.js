@@ -318,5 +318,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
 
     toastr.options = {
         closeButton: true,
+        timeOut: 500000,
     };
 });
