@@ -1,7 +1,7 @@
 
-from base_service import BaseService
-
 from collections import namedtuple
+
+from base_service import BaseService
 
 Grade = namedtuple("Grade", ['assignment', 'student', 'score', 'handin_datetime', 'id'])
 
