@@ -1,93 +1,91 @@
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12">
-            <h2 class="student-name-title">{{ student.first_name }} {{ student.last_name }}</h2>
+<div class="row">
+    <div class="col-xs-12">
+        <h2 class="student-name-title">{{ student.first_name }} {{ student.last_name }}</h2>
+    </div>
+</div>
+<ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
+    <li><a ng-href="/student/{{student.id}}">Overview</a></li>
+    <li><a ng-href="/student/{{student.id}}/tests">Test Scores</a></li>
+    <li><a ng-href="/student/{{student.id}}/grades">Grades</a></li>
+    <li class="active"><a ng-href="/student/{{student.id}}/behaviors">Behavior</a></li>
+    <li><a ng-href="/student/{{student.id}}/ieps">IEP Goals</a></li>
+    <li><a ng-href="/student/{{student.id}}/services">Services</a></li>
+</ul>
+<ul class="nav nav-tabs hidden-xs">
+    <li><a ng-href="/student/{{student.id}}">Overview</a></li>
+    <li><a ng-href="/student/{{student.id}}/tests">Test Scores</a></li>
+    <li><a ng-href="/student/{{student.id}}/grades">Grades</a></li>
+    <li class="active"><a ng-href="/student/{{student.id}}/behaviors">Behavior</a></li>
+    <li><a ng-href="/student/{{student.id}}/ieps">IEP Goals</a></li>
+    <li><a ng-href="/student/{{student.id}}/services">Services</a></li>
+</ul>
+<div class="tab-content">
+    <div ng-if="sections.length === 0">
+        <div class="row voffset4">
+            <div class="col-xs-12">
+                <div class="alert alert-danger no-bottom-margin" role="alert">
+                    <span><b>Error:</b> This student isn't enrolled in any classes.</span>
+                </div>
+            </div>
         </div>
     </div>
-    <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
-        <li><a ng-href="/student/{{student.id}}">Overview</a></li>
-        <li><a ng-href="/student/{{student.id}}/tests">Test Scores</a></li>
-        <li><a ng-href="/student/{{student.id}}/grades">Grades</a></li>
-        <li class="active"><a ng-href="/student/{{student.id}}/behaviors">Behavior</a></li>
-        <li><a ng-href="/student/{{student.id}}/ieps">IEP Goals</a></li>
-        <li><a ng-href="/student/{{student.id}}/services">Services</a></li>
-    </ul>
-    <ul class="nav nav-tabs hidden-xs">
-        <li><a ng-href="/student/{{student.id}}">Overview</a></li>
-        <li><a ng-href="/student/{{student.id}}/tests">Test Scores</a></li>
-        <li><a ng-href="/student/{{student.id}}/grades">Grades</a></li>
-        <li class="active"><a ng-href="/student/{{student.id}}/behaviors">Behavior</a></li>
-        <li><a ng-href="/student/{{student.id}}/ieps">IEP Goals</a></li>
-        <li><a ng-href="/student/{{student.id}}/services">Services</a></li>
-    </ul>
-    <div class="tab-content">
-        <div ng-if="sections.length === 0">
-            <div class="row voffset4">
-                <div class="col-xs-12">
-                    <div class="alert alert-danger no-bottom-margin" role="alert">
-                        <span><b>Error:</b> This student isn't enrolled in any classes.</span>
-                    </div>
+    <div ng-if="sections.length > 0" id="behavior" class="tab-pane fade in active voffset3">
+        <div class="row voffset4" ng-repeat="error in errorMessages">
+            <div class="col-xs-12">
+                <div class="alert alert-danger no-bottom-margin" role="alert">
+                    <span><b>Error:</b> {{ error }}</span>
                 </div>
             </div>
         </div>
-        <div ng-if="sections.length > 0" id="behavior" class="tab-pane fade in active voffset3">
-            <div class="row voffset4" ng-repeat="error in errorMessages">
-                <div class="col-xs-12">
-                    <div class="alert alert-danger no-bottom-margin" role="alert">
-                        <span><b>Error:</b> {{ error }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="row voffset4">
-                <div class="col-xs-12">
-                    <div class="panel-wrapper">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Performance</h3>
-                            </div>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-xs-12 col-sm-6 voffset2">
-                                        <div class="input-group">
-                                            <span class="input-group-addon">From</span>
-                                            <input type="text" id="graphStartDate" class="form-control" date-time ng-model="graphStartDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="graphDateRangeChange" max-date="graphEndDate" watch-direct-changes="true">
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-12 col-sm-6 voffset2">
-                                        <div class="input-group">
-                                            <span class="input-group-addon">To</span>
-                                            <input type="text" id="graphEndDate" class="form-control" date-time ng-model="graphEndDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="graphDateRangeChange" min-date="graphStartDate" watch-direct-changes="true">
-                                        </div>
+        <div class="row voffset4">
+            <div class="col-xs-12">
+                <div class="panel-wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Performance</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6 voffset2">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">From</span>
+                                        <input type="text" id="graphStartDate" class="form-control" date-time ng-model="graphStartDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="graphDateRangeChange" max-date="graphEndDate" watch-direct-changes="true">
                                     </div>
                                 </div>
-                                <div class="row voffset3">
-                                    <div class="col-sm-6 centerText focusGraph">
-                                        <label>Behavior</label>
-                                        <div class="col-sm-12">
-                                            <canvas id="student_behavior"
-                                                    class="chart chart-line"
-                                                    chart-data="behaviorGraph.data"
-                                                    chart-labels="sharedGraph.labels"
-                                                    chart-series="sharedGraph.series"
-                                                    chart-options="sharedGraph.options"
-                                                    chart-colors="sharedGraph.colors"
-                                                    chart-click="onClick">
-                                            </canvas>
-                                        </div>
+                                <div class="col-xs-12 col-sm-6 voffset2">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">To</span>
+                                        <input type="text" id="graphEndDate" class="form-control" date-time ng-model="graphEndDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="graphDateRangeChange" min-date="graphStartDate" watch-direct-changes="true">
                                     </div>
-                                    <div class="col-sm-6 centerText focusGraph">
-                                        <label>Effort</label>
-                                        <div class="col-sm-12">
-                                            <canvas id="student_effort"
-                                                    class="chart chart-line"
-                                                    chart-data="effortGraph.data"
-                                                    chart-labels="sharedGraph.labels"
-                                                    chart-series="sharedGraph.series"
-                                                    chart-options="sharedGraph.options"
-                                                    chart-colors="sharedGraph.colors"
-                                                    chart-click="onClick">
-                                            </canvas>
-                                        </div>
+                                </div>
+                            </div>
+                            <div class="row voffset3">
+                                <div class="col-sm-6 centerText focusGraph">
+                                    <label>Behavior</label>
+                                    <div class="col-sm-12">
+                                        <canvas id="student_behavior"
+                                                class="chart chart-line"
+                                                chart-data="behaviorGraph.data"
+                                                chart-labels="sharedGraph.labels"
+                                                chart-series="sharedGraph.series"
+                                                chart-options="sharedGraph.options"
+                                                chart-colors="sharedGraph.colors"
+                                                chart-click="onClick">
+                                        </canvas>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 centerText focusGraph">
+                                    <label>Effort</label>
+                                    <div class="col-sm-12">
+                                        <canvas id="student_effort"
+                                                class="chart chart-line"
+                                                chart-data="effortGraph.data"
+                                                chart-labels="sharedGraph.labels"
+                                                chart-series="sharedGraph.series"
+                                                chart-options="sharedGraph.options"
+                                                chart-colors="sharedGraph.colors"
+                                                chart-click="onClick">
+                                        </canvas>
                                     </div>
                                 </div>
                             </div>
@@ -95,41 +93,41 @@
                     </div>
                 </div>
             </div>
-            <div class="row voffset3">
-                <div class="col-xs-12">
-                    <div class="panel-wrapper">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Input Behavior Scores</h3>
+        </div>
+        <div class="row voffset3">
+            <div class="col-xs-12">
+                <div class="panel-wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Input Behavior Scores</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="input-group">
+                                <span class="input-group-addon">For Date</span>
+                                <input type="text" id="inputDate" class="form-control" date-time ng-model="inputDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="inputDateChange" watch-direct-changes="true">
                             </div>
-                            <div class="panel-body">
-                                <div class="input-group">
-                                    <span class="input-group-addon">For Date</span>
-                                    <input type="text" id="inputDate" class="form-control" date-time ng-model="inputDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="inputDateChange" watch-direct-changes="true">
-                                </div>
-                                <div class="voffset3">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Class</th>
-                                                <th>Behavior</th>
-                                                <th>Effort</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr ng-repeat="entry in scoresInput">
-                                                <td>{{ entry.title }}</td>
-                                                <td>
-                                                    <select ng-model="entry.curBehavior" ng-options="x for x in inputOptions" ng-change="saveScore(entry, 'behavior')"></select>
-                                                </td>
-                                                <td>
-                                                    <select ng-model="entry.curEffort" ng-options="x for x in inputOptions" ng-change="saveScore(entry, 'effort')"></select>
-                                                </td>
-                                            </tr>
+                            <div class="voffset3">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Class</th>
+                                            <th>Behavior</th>
+                                            <th>Effort</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="entry in scoresInput">
+                                            <td>{{ entry.title }}</td>
+                                            <td>
+                                                <select ng-model="entry.curBehavior" ng-options="x for x in inputOptions" ng-change="saveScore(entry, 'behavior')"></select>
+                                            </td>
+                                            <td>
+                                                <select ng-model="entry.curEffort" ng-options="x for x in inputOptions" ng-change="saveScore(entry, 'effort')"></select>
+                                            </td>
+                                        </tr>
 
-                                        </tbody>
-                                    </table>
-                                </div>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

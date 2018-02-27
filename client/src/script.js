@@ -10,7 +10,7 @@ var app = angular.module(
 );
 
 // configure our routes
-app.config(function ($httpProvider, $locationProvider, $routeProvider) {
+app.config(function ($httpProvider, $locationProvider, $routeProvider, ChartJsProvider) {
     /**
      * Set our interceptor to add auth token to all requests
      */
@@ -269,6 +269,23 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         })
 
         .otherwise({ redirectTo: '/focus' });
+
+
+    ChartJsProvider.setOptions(
+        {
+            global: {
+                colors: [
+                    '#8860d0',
+                    '#5ab9ea',
+                    '#963484',
+                    '#edb5bf',
+                    '#57bc90',
+                    '#5680E9',
+                    '#3066be',
+                ],
+            },
+        }
+    );
 })
 
 .run(function($rootScope, $location, userService) {
