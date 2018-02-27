@@ -45,7 +45,7 @@ class SettingsService(BaseService):
         return self._add_many_models(schedules, self.complete_uri_schedules)
 
     def add_term_settings(self, term_settings):
-        return self.add_many_schedules([term_settings])
+        return self.add_many_term_settings([term_settings])
 
     def add_many_term_settings(self, term_settings):
-        return self._add_many_models(term_settings, self.complete_uri_schedules)
+        return self._add_many_models(term_settings, self.complete_uri_term_settings)
