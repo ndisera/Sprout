@@ -1,4 +1,4 @@
-app.controller("focusStudentsController", function ($scope, $q, studentData, focusData, userService) {
+app.controller("focusStudentsController", function ($scope, $q, toastService, userService, studentData, focusData) {
 
     // set students if there are any
     $scope.students       = [];
@@ -83,7 +83,8 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
                     });
                     $scope.focusStudents = tempFocusStudents;
 
-                    //TODO(gzuber): nofity user
+                    // notify the user
+                    toastService.error('The server wasn\'t able to save your reordering.');
                 });
         },
     };
@@ -129,7 +130,8 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
                 });
             },
             function error(response) {
-                //TODO(gzuber): notify the user
+                // notify the user
+                toastService.error('The server wasn\'t able to save your removal.');
             },
         );
     };
@@ -165,7 +167,8 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
                 $scope.adding = false;
             },
             function error(response) {
-                //TODO(gzuber): notify the user
+                // notify the user
+                toastService.error('The server wasn\'t able to save your addition.');
             },
         );
     };
