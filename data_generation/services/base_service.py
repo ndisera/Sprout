@@ -7,7 +7,7 @@ import requests
 class BaseService():
     __metaclass__ = ABCMeta # Mark this class as abstract, since it does nothing useful by itself
 
-    complete_uri_template = "{protocol}://{hostname}:{port_num}/{endpoint}"
+    complete_uri_template = "{protocol}://{hostname}:{port_num}{endpoint}"
 
     def __init__(self, headers=None, hostname="localhost", protocol="https", port_num=8000, verify=False):
         self.headers = headers
