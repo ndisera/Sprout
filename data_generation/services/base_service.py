@@ -20,6 +20,8 @@ class BaseService():
         :param verify: HTTPS certificate or False to disable certificate verification
         """
         self.headers = headers
+        if headers is None:
+            self.headers = {}
         self.hostname = hostname
         self.protocol = protocol
         self.port_num = port_num
