@@ -20,7 +20,7 @@ class BaseService():
                                                                        port_num=port_num,
                                                                        endpoint='{endpoint}')
 
-    def _get_model(self, model_type, uri):
+    def _get_models(self, model_type, uri):
         """
         Get all of some kind of model
 
