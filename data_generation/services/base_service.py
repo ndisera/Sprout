@@ -9,7 +9,16 @@ class BaseService():
 
     complete_uri_template = "{protocol}://{hostname}:{port_num}{endpoint}"
 
-    def __init__(self, headers=None, hostname="localhost", protocol="https", port_num=8000, verify=False):
+    def __init__(self, headers=None, protocol="https", hostname="localhost", port_num=8000, verify=False):
+        """
+        Default Service constructor
+
+        :param headers: HTTP headers to send on every request
+        :param protocol: protocol (http or https) to use
+        :param hostname: host to connect to
+        :param port_num: port number to connect on
+        :param verify: HTTPS certificate or False to disable certificate verification
+        """
         self.headers = headers
         self.hostname = hostname
         self.protocol = protocol
