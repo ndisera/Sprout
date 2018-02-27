@@ -37,7 +37,8 @@ if __name__ == "__main__":
     if not args.token:
         args.username, args.password = AuthorizationService.display_login_prompt(args.username, args.password)
 
-        authorizationHandler = AuthorizationService(url="https://{}".format(args.host),
+        authorizationHandler = AuthorizationService(protocol=args.protocol,
+                                                    hostname=format(args.host),
                                                     port_num=args.port,
                                                     verify=False)
 
