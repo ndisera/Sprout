@@ -1,5 +1,6 @@
 
 from abc import ABCMeta
+import requests
 
 
 class BaseService():
@@ -17,3 +18,26 @@ class BaseService():
                                                                        hostname=hostname,
                                                                        port_num=port_num,
                                                                        endpoint='{endpoint}')
+
+    def get_model(self, model_type, uri):
+        """
+        Get all of some kind of model
+
+        :param model_type: Type of model to GET
+        :return: list[model]
+        """
+        response = requests.get(uri, verify=self.verify, headers=self.headers)
+
+        response.raise_for_status()
+
+        body = response.json()
+        assert len(body.keys()) == 1, "Cannot handle GET-ing more than one kind of thing"
+        key = [key for key in body.keys()][0]
+        models = body[key]
+
+        toReturn = []
+
+        for model in models:
+            toReturn.append(model_type(**model))
+
+        return toReturn
