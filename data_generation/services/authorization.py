@@ -3,35 +3,34 @@ import os
 import getpass
 import requests
 
+from base_service import BaseService
+
 CERT_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../pki/rootCA_cert.pem")
 
-class AuthorizationService():
+class AuthorizationService(BaseService):
     """
     Helper class for containing all things to do with authorization
     """
 
-    def __init__(self, url="https://localhost", port_num=8000, verify=False):
-        self.url = url
-        self.port_num = port_num
-        self.verify = verify
+    def __init__(self, **kwargs):
+        super(AuthorizationService, self).__init__(**kwargs)
 
-    def send_login_request(self, username, password):
-        # type: (str, str, bool) -> str
+    def send_login_request(self, email, password):
+        # type: (AuthorizationService, str, bool) -> str
         """
         Send a login request using the given username and password, return the auth token as a string
 
-        :param username: login username
-        :type username: str
+        :param user
+        name: login email
+        :type email: str
         :param password: login password
         :type password: str
-        :param verify: whether the server's https certificate should be checked for authenticity
-        :type verify: bool
         :return: Authorization token string
         :rtype: str
         """
-        login_url = str(self.url) + ":" + str(self.port_num) + "/login/"
+        login_url = self.complete_uri_template.format(endpoint="/login/")
 
-        json = {"email" : username,
+        json = {"email" : email,
                 "password" :  password,}
         response = requests.post(login_url, json=json, verify=self.verify)
 

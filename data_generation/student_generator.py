@@ -21,14 +21,8 @@ class StudentGenerator(object):
     RANDOM_STUDENT_ID_PREFIX = "gen"
     CERT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=False):
-        self.headers = headers
-        self.url = url
-        self.port_num = port_num
-        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/students/"
-        self.verify = verify
-
-        self.studentService = StudentService(headers=headers, url=url, port_num=port_num, verify=verify)
+    def __init__(self, headers=None, protocol='https', hostname="localhost", port_num=8000, verify=False):
+        self.studentService = StudentService(headers=headers, protocol=protocol, hostname=hostname, port_num=port_num, verify=verify)
 
     def generate_many_random_students(self,
                                       num_students,

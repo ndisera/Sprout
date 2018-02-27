@@ -18,10 +18,10 @@ ASSIGNMENT_NAMES = ['Homework',  'Quiz', 'Worksheet']
 
 class GradesGenerator():
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=False):
-        self.gradeService = GradesService(headers=headers, url=url, port_num=port_num, verify=verify)
-        self.assignmentService = AssignmentService(headers=headers, url=url, port_num=port_num, verify=verify)
-        self.enrollmentService = EnrollmentService(headers=headers, url=url, port_num=port_num, verify=verify)
+    def __init__(self, headers=None, protocol='https', hostname="localhost", port_num=8000, verify=False):
+        self.gradeService = GradesService(headers=headers, protocol=protocol, hostname=hostname, port_num=port_num, verify=verify)
+        self.assignmentService = AssignmentService(headers=headers, protocol=protocol, hostname=hostname, verify=verify)
+        self.enrollmentService = EnrollmentService(headers=headers, protocol=protocol, hostname=hostname, verify=verify)
 
     def parse_enrollments(self, enrollments):
         students = set()
