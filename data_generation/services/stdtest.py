@@ -1,21 +1,16 @@
 
-import requests
-
-from authorization import CERT_PATH
 from collections import namedtuple
-import json
+
+from base_service import BaseService
 
 StandardizedTest = namedtuple("StandardizedTest", ['test_name', 'min_score', 'max_score', 'id'])
 
 
-class StandardizedTestService():
+class StandardizedTestService(BaseService):
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=CERT_PATH):
-        self.headers = headers
-        self.url = url
-        self.port_num = port_num
-        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/tests/standardized"
-        self.verify = verify
+    def __init__(self, **kwargs):
+        super(StandardizedTestService, self).__init__(**kwargs)
+        self.complete_uri = self.complete_uri_template.format(endpoint="/tests/standardized")
 
     def get_standardized_tests(self):
         """
@@ -24,20 +19,7 @@ class StandardizedTestService():
         :return: list of standardized_test objects
         :rtype: list[Student]
         """
-        response = requests.get(self.complete_uri, verify=self.verify, headers=self.headers)
-
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
-
-        body = response.json()
-        standardized_tests = body['standardized_tests']
-
-        toReturn = []
-
-        for standardized_test in standardized_tests:
-            toReturn.append(StandardizedTest(**standardized_test))
-
-        return toReturn
+        return self._get_models(StandardizedTest, self.complete_uri)
 
     def add_standardized_test(self, standardized_test):
         """
@@ -46,13 +28,7 @@ class StandardizedTestService():
         :param standardized_test: StandardizedTest object to upload
         :type standardized_test: StandardizedTest
         """
-        data = standardized_test._asdict()
-        del(data['id'])
-        response = requests.post(self.complete_uri, verify=self.verify, headers=self.headers, data=data)
-
-        response.raise_for_status()
-
-        return response
+        return self.add_many_standardized_tests([standardized_test])
 
     def add_many_standardized_tests(self, standardized_tests):
         """
@@ -61,21 +37,4 @@ class StandardizedTestService():
         :param standardized_tests: List of standardized_test objects
         :return:
         """
-
-        data = []
-
-        for standardized_test in standardized_tests:
-            standardized_test = standardized_test._asdict()
-            del(standardized_test['id'])
-            data.append(standardized_test)
-
-        data = json.dumps(data)
-
-        headers = self.headers
-        headers['content-type'] = 'application/json'
-
-        response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
-
-        response.raise_for_status()
-
-        return response
+        return self._add_many_models(standardized_tests, self.complete_uri)
