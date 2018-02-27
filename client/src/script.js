@@ -315,4 +315,8 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     if(userService.user.token !== null && userService.user.token !== undefined) {
         userService.authVerify();
     }
+
+    toastr.options = {
+        closeButton: true,
+    };
 });
