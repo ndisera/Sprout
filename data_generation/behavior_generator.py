@@ -6,8 +6,8 @@ from services.behavior import Behavior, BehaviorService
 
 class BehaviorGenerator:
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=False,):
-        self.behaviorService = BehaviorService(headers=headers, url=url, port_num=port_num, verify=verify)
+    def __init__(self, headers=None, protocol='https', hostname="localhost", port_num=8000, verify=False,):
+        self.behaviorService = BehaviorService(headers=headers, protocol=protocol, hostname=hostname, port_num=port_num, verify=verify)
 
     def generate_random_behavior(self,
                                  enrollment,
