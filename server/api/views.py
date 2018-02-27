@@ -67,7 +67,7 @@ class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
 class StudentViewSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the
-    BehaviorViewSet class in the coreapi documentation.
+    StudentViewSet class in the coreapi documentation.
     """
     def get_link(self, path, method, base_url):
         link = super(StudentViewSetSchema, self).get_link(path, method, base_url)
@@ -89,28 +89,20 @@ class StudentViewSet(NestedDynamicViewSet):
     name_case_manager = 'case_manager'
     desc_case_manager = "ID of the User who oversees this student"
 
+    case_manager_field = coreapi.Field(name=name_case_manager,
+                                       required=True,
+                                       location="form",
+                                       description=desc_case_manager,
+                                       schema=coreschema.Integer(title=name_case_manager)),
+
     create_fields = (
-        coreapi.Field(
-            name=name_case_manager,
-            required=True,
-            location="form",
-            description=desc_case_manager,
-            schema=coreschema.Integer(title=name_case_manager)),
+        case_manager_field
     )
     update_fields = (
-        coreapi.Field(
-            name=name_case_manager,
-            required=True,
-            location="form",
-            description=desc_case_manager,
-            schema=coreschema.Integer(title=name_case_manager)),
+        case_manager_field
     )
     partial_update_fields = (
-        coreapi.Field(
-            name=name_case_manager,
-            location="form",
-            description=desc_case_manager,
-            schema=coreschema.Integer(title=name_case_manager)),
+        case_manager_field
     )
 
 
