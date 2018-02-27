@@ -39,6 +39,11 @@ assignments_router = sections_router.register('assignments', viewset=AssignmentV
 # Add nested route for grades as /sections/{pk}/assignments/{pk}/grades
 assignments_router.register('grades', viewset=GradeViewSet, base_name='assignment-grades', parents_query_lookups=['assignment__section', 'assignment'])
 
+# Add 'nested' settings routes
+router.register('settings/school', viewset=SchoolSettingsViewSet, base_name='settings-school')
+router.register('settings/schedules', viewset=DailyScheduleViewSet, base_name='settings-schedules')
+router.register('settings/terms', viewset=TermSettingsViewSet, base_name='settings-terms')
+
 # Add nested routes under students
 # Add nested route for grades as /student/{pk}/grades
 students_router.register('grades', viewset=GradeViewSet, base_name='student-grades', parents_query_lookups=['student'])

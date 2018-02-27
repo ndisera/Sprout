@@ -106,6 +106,92 @@ class StudentViewSet(NestedDynamicViewSet):
     )
 
 
+class SchoolSettingsSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    SchoolSettingsViewSet class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(SchoolSettingsSetSchema, self).get_link(path, method, base_url)
+        return set_link(SchoolSettingsViewSet, path, method, link)
+
+
+class SchoolSettingsViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the "SchoolSettings" instance
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SchoolSettingsSerializer
+    queryset = SchoolSettings.objects.all()
+
+    """ define custom schema for documentation """
+    schema = SchoolSettingsSetSchema()
+
+
+class DailyScheduleSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    DailyScheduleViewSet class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(DailyScheduleSetSchema, self).get_link(path, method, base_url)
+        return set_link(DailyScheduleViewSet, path, method, link)
+
+
+class DailyScheduleViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the "DailySchedule" instance
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = DailyScheduleSerializer
+    queryset = DailySchedule.objects.all()
+
+    """ define custom schema for documentation """
+    schema = DailyScheduleSetSchema()
+
+
+class TermSettingsViewSetSchema(AutoSchema):
+    """
+    class that allows specification of more detailed schema for the
+    TermSettingsViewSet class in the coreapi documentation.
+    """
+    def get_link(self, path, method, base_url):
+        link = super(TermSettingsViewSetSchema, self).get_link(path, method, base_url)
+        return set_link(TermSettingsViewSet, path, method, link)
+
+
+class TermSettingsViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "Term" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TermSettingsSerializer
+    queryset = TermSettings.objects.all()
+
+    """ define custom schema for documentation """
+    schema = TermSettingsViewSetSchema()
+
+    """ ensure variables show as correct types for docs """
+    name_schedule = 'schedule'
+    desc_schedule = "ID of the TermSettings object controlling this term"
+
+    schedule_field = coreapi.Field(name=name_schedule,
+                                   required=True,
+                                   location="form",
+                                   description=desc_schedule,
+                                   schema=coreschema.Integer(title=name_schedule)),
+
+    create_fields = (
+        schedule_field
+    )
+    update_fields = (
+        schedule_field
+    )
+    partial_update_fields = (
+        schedule_field
+    )
+
+
 class TermViewSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the
@@ -118,7 +204,7 @@ class TermViewSetSchema(AutoSchema):
 
 class TermViewSet(NestedDynamicViewSet):
     """
-    allows interaction with the set of "Student" instances
+    allows interaction with the set of "Term" instances
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = TermSerializer
@@ -126,6 +212,26 @@ class TermViewSet(NestedDynamicViewSet):
 
     """ define custom schema for documentation """
     schema = TermViewSetSchema()
+
+    """ ensure variables show as correct types for docs """
+    name_term_settings = 'term_settings'
+    desc_term_settings = "ID of the TermSettings object controlling this term"
+
+    term_settings_field = coreapi.Field(name=name_term_settings,
+                                        required=True,
+                                        location="form",
+                                        description=desc_term_settings,
+                                        schema=coreschema.Integer(title=name_term_settings)),
+
+    create_fields = (
+        term_settings_field
+    )
+    update_fields = (
+        term_settings_field
+    )
+    partial_update_fields = (
+        term_settings_field
+    )
 
 
 class HolidayViewSetSchema(AutoSchema):
