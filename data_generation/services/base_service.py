@@ -1,5 +1,6 @@
 
 from abc import ABCMeta
+import json
 import requests
 
 
@@ -19,7 +20,7 @@ class BaseService():
                                                                        port_num=port_num,
                                                                        endpoint='{endpoint}')
 
-    def get_model(self, model_type, uri):
+    def _get_model(self, model_type, uri):
         """
         Get all of some kind of model
 
@@ -41,3 +42,22 @@ class BaseService():
             toReturn.append(model_type(**model))
 
         return toReturn
+
+    def _add_many_models(self, models, uri):
+        data = []
+
+        for model in models:
+            model = model._asdict()
+            del(model['id'])
+            data.append(model)
+
+        data = json.dumps(data)
+
+        headers = self.headers
+        headers['content-type'] = 'application/json'
+
+        response = requests.post(uri, verify=self.verify, headers=headers, data=data)
+
+        response.raise_for_status()
+
+        return response
