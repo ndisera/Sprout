@@ -9,6 +9,14 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     $scope.allManagersArray = userData.sprout_users;
     $scope.allManagers = _.indexBy($scope.allManagersArray, "pk");
 
+    $scope.toggleManagerAssign = function(index) {
+        if ($("#assignManagerButton" + index).text().trim() === "Assign") {
+            $("#assignManagerButton" + index).html('Cancel');
+        } else {
+            $("#assignManagerButton" + index).html('Assign')
+        }
+    };
+
     /**
      * If a panel body hasn't been opened before in unassigned managers, load its content.
      * @param {number} index - index of panel to be opened (from ng-repeat).
@@ -17,7 +25,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         if (!_.has($scope.toggleStudents, index) || $scope.toggleStudents[index] == null) {
             $scope.toggleStudents[index] = true;
         }
-    }
+    };
 
     /**
      * If a reassign dropdown hasn't been opened before, load it's content.
@@ -27,7 +35,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         if (!_.has($scope.toggleManagers, index) || $scope.toggleManagers[index] == null) {
             $scope.toggleManagers[index] = true;
         }
-    }
+    };
 
     /**
      * Grabs all case managers with students.
@@ -81,7 +89,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
             return true;
         }
         return false;
-    }
+    };
 
     /**
      * Filter used for viewing unassigned managers
@@ -98,7 +106,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
             return true;
         }
         return false;
-    }
+    };
 
     /**
      * Filter used for viewing unassigned students
@@ -115,7 +123,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
             return true;
         }
         return false;
-    }
+    };
 
     /**
      * Sets manager arrays equal to their lookup values.

@@ -56,6 +56,17 @@
     cursor:pointer
 }
 
+@media (max-width: 500px) {
+    .table-responsive .dropdown-menu {
+        position: relative !important;
+    }
+}
+@media (min-width: 501px) {
+    #specialTable {
+        overflow: visible;
+    }
+}
+
 #roundBorder {
     border-radius:4px
 }
