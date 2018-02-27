@@ -198,3 +198,29 @@ class FocusStudent(models.Model):
     class Meta:
         ordering = ('user', 'ordering', )
         unique_together = (('user', 'student'), )
+
+
+class IEPGoal(models.Model):
+    student = models.ForeignKey(Student, blank=False)
+    title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this IEP Goal")
+    quantitative = models.BooleanField(blank=True,
+                                       help_text="Optionally, whether this IEP goal tracks quantitative information")
+    quantitative_category = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                             help_text="Optional quantitative category associated with this goal")
+
+
+class IEPGoalNote(models.Model):
+    goal = models.ForeignKey(IEPGoal, blank=False)
+    title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Name of this note")
+    body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                             help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+
+class ServiceRequirement(models.Model):
+    student = models.ForeignKey(Student, blank=False)
+    title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this service requirement")
+    description = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                                   help_text="Description of this service requirement (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
