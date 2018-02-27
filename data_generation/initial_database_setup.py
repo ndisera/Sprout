@@ -103,7 +103,7 @@ if __name__ == "__main__":
         behaviors.extend(behavior)
     behavior_generator.behaviorService.add_many_behaviors(behaviors)
 
-    std_test_score_generator = StandardizedTestScoreGenerator(url=args.host, verify=False, headers=headers)
+    std_test_score_generator = StandardizedTestScoreGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
     std_test_score_generator.setup_tests()
     toPost = std_test_score_generator.generate(10,
                                                range_start=datetime.date(year=2018, month=01, day=01),

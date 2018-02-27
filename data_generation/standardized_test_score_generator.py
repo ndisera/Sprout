@@ -21,10 +21,10 @@ STD_TESTS = [ StandardizedTest("SAGE", 100, 1000, None),
 
 class StandardizedTestScoreGenerator():
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=False):
-        self.stdtest_score_service = StandardizedTestScoreService(headers=headers, url=url, port_num=port_num, verify=verify)
-        self.stdtest_service = StandardizedTestService(headers=headers, url=url, port_num=port_num, verify=verify)
-        self.student_service = StudentService(headers=headers, url=url, port_num=port_num, verify=verify)
+    def __init__(self, headers=None, protocol='https', hostname="localhost", port_num=8000, verify=False):
+        self.stdtest_score_service = StandardizedTestScoreService(headers=headers, protocol=protocol, hostname=hostname, port_num=port_num, verify=verify)
+        self.stdtest_service = StandardizedTestService(headers=headers, protocol=protocol, hostname=hostname, port_num=port_num, verify=verify)
+        self.student_service = StudentService(headers=headers, protocol=protocol, hostname=hostname, port_num=port_num, verify=verify)
 
     def generate(self, num,
                  range_start=datetime.date(year=2018, month=01, day=12),
