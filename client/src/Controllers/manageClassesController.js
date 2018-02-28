@@ -1,4 +1,4 @@
-app.controller("manageClassesController", function($scope, $rootScope, $location, students, userData, sections, studentService, sectionService, enrollmentService) {
+app.controller("manageClassesController", function($scope, $rootScope, $location, toastService, students, userData, sections, studentService, sectionService, enrollmentService) {
 
     // anywhere 's' or 't' was previously used for 'students' and 'teachers', 'c' will be used for 'classes'
     // another 's' for 'sections' would be confusing with 'students', which will probably use an 's' again
@@ -29,6 +29,17 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.addValidTeacher = false;
     $scope.editValidTeacher = false;
     $scope.editingAll = true;
+
+    /**
+     * Extra part of error message
+     */
+    function errorResponse() {
+        var message = "";
+        if ($scope.errorMessage != null && $scope.errorMessage !== "") {
+            message = " Error message: " + $scope.errorMessage;
+        }
+        return message;
+    }
 
     // create fast lookup sections dictionary
     for (var i = 0; i < $scope.sections.length; ++i) {
@@ -67,7 +78,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         switch (sectionTask) {
             case "view/edit":
                 $scope.displaySectionViewSearch = false;
-                $scope.displayCEditInfo = false;
                 break;
             case "delete":
                 $scope.displaySectionInfo = false;
@@ -85,9 +95,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         switch (task) {
             case "view/edit":
                 $scope.displaySectionViewSearch = true;
-                if ($scope.sectionV.title === $scope.sectionViewSearch) {
-                    $scope.displayCEditInfo = true;
-                }
                 break;
             case "delete":
                 $scope.displaySectionDeleteSearch = true;
@@ -256,6 +263,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             }
         }, function error(response) {
             setErrorMessage(response);
+            toastService.error("The server was unable to save your edit." + errorResponse());
         });
     };
 
@@ -268,19 +276,13 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         sectionPromise.then(function success(data) {
             $scope.addTeacher = "";
             $scope.newSection = {};
-            $scope.addSectionSuccess = true;
-            $("#addSectionSuccess").fadeTo(2000, 500).slideUp(500, function() {
-                $("#addSectionSuccess").slideUp(500);
-            });
+            toastService.success("New section has been added.");
             $scope.sections.push(data.section);
             var lookupName = data.section.title;
             $scope.sectionsLookup[lookupName.toUpperCase()] = data.section;
         }, function error(response) {
             setErrorMessage(response);
-            $scope.addSectionFailure = true;
-            $("#addSectionFailure").fadeTo(5000, 500).slideUp(500, function() {
-                $("#addSectionFailure").slideUp(500);
-            });
+            toastService.error("The server was unable to add the class." + errorResponse());
         });
     };
 
@@ -314,9 +316,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             $scope.sectionD = {};
             $scope.sectionDeleteSearch = "";
             $scope.deleteSectionSuccess = true;
-            $("#deleteSectionSuccess").fadeTo(2000, 500).slideUp(500, function() {
-                $("#deleteSectionSuccess").slideUp(500);
-            });
             $scope.displaySectionDeleteSearch = true;
             $scope.displaySectionInfo = false;
             // check to see if sectionV/E is this deleted section and change view accordingly
@@ -329,10 +328,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             }
         }, function error(response) {
             setErrorMessage(response);
-            $scope.deleteSectionFailure = true;
-            $("#deleteSectionFailure").fadeTo(5000, 500).slideUp(500, function() {
-                $("#deleteSectionFailure").slideUp(500);
-            });
+            toastService.error("The server was unable to delete the class" + errorResponse());
         });
     };
 
@@ -366,7 +362,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             }
             refreshStudentArrays();
         }, function error(response) {
-            $scope.errorMessage = response;
+            setErrorMessage(response);
+            toastService.error("The server was unable to get the enrolled students." + errorResponse());
         });
     };
 
@@ -391,7 +388,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             $scope.enrolledStudents[tempStudent.id] = tempStudent;
             refreshStudentArrays();
         }, function error(response) {
-            $scope.errorMessage = response;
+            setErrorMessage(response);
+            toastService.error("The server was unable to enroll the student." + errorResponse());
         })
     }
 

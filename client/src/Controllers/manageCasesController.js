@@ -1,4 +1,4 @@
-app.controller("manageCasesController", function($scope, $rootScope, $location, students, userData, studentService, userService) {
+app.controller("manageCasesController", function($scope, $rootScope, $location, toastService, students, userData, studentService, userService) {
 
     getCaseManagers();
     $scope.studentSearch = {};
@@ -8,6 +8,17 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     $scope.editCaseManagers = false;
     $scope.allManagersArray = userData.sprout_users;
     $scope.allManagers = _.indexBy($scope.allManagersArray, "pk");
+
+    /**
+     * Extra part of error message
+     */
+    function errorResponse() {
+        var message = "";
+        if ($scope.errorMessage != null && $scope.errorMessage !== "") {
+            message = " Error message: " + $scope.errorMessage;
+        }
+        return message;
+    }
 
     $scope.toggleManagerAssign = function(index) {
         if ($("#assignManagerButton" + index).text().trim() === "Assign") {
@@ -70,7 +81,8 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
             refreshManagerArrays();
             refreshStudentArray();
         }, function error(response) {
-            $scope.errorMessage = response;
+            setErrorMessage(response);
+            toastService.error("The server was unable to get assigned case managers." + errorResponse());
         });
     };
 
@@ -157,6 +169,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
             checkEdit();
         }, function error(response) {
             setErrorMessage(response);
+            toastService.error("The server was unable to unassign the student from their case manager." + errorResponse());
         });
     };
 
@@ -181,33 +194,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
             refreshManagerArrays();
         }, function error(response) {
             setErrorMessage(response);
-        });
-    };
-
-    /**
-     * Unassigns all students from a case manager.
-     * @param {number} managerPK - case manager to be cleared.
-     */
-    $scope.clearManagerStudents = function(managerPK) {
-        var studentChanges = [];
-        for (var i = 0; i < $scope.caseStudents[managerPK].length; i++) {
-            studentChanges.push({
-                'id': $scope.caseStudents[managerPK][i].id,
-                'case_manager': null
-            });
-        }
-        var studentPromise = studentService.updateStudents(studentChanges);
-        studentPromise.then(function success(data) {
-            var students = data.students;
-            for (var i = 0; i < students.length; i++) {
-                $scope.otherStudents[students[i].id] = students[i];
-            }
-            refreshStudentArray();
-            unassignManager(managerPK);
-            // stop editing if there's nothing left to edit
-            checkEdit();
-        }, function error(response) {
-            setErrorMessage(response);
+            toastService.error("The server was unable to reassign the student to a different case manager." + errorResponse());
         });
     };
 
@@ -237,6 +224,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
             refreshStudentArray();
         }, function error(response) {
             setErrorMessage(response);
+            toastService.error("The server was unable to assign the student to the case manager." + errorResponse());
         });
     }
 
@@ -280,6 +268,22 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         if ($scope.nonManagersArray.length === $scope.allManagersArray.length) {
             $scope.editCaseManagers = false;
         }
+    }
+
+    /**
+     * Updates the displayed error message.
+     * @param {response} response - response containing data and error message.
+     */
+    function setErrorMessage(response) {
+        $scope.errorMessage = [];
+        for (var property in response.data) {
+            if (response.data.hasOwnProperty(property)) {
+                for (var i = 0; i < response.data[property].length; i++) {
+                    $scope.errorMessage.push(response.data[property][i]);
+                }
+            }
+        }
+        $scope.errorMessage = $scope.errorMessage.join(" ");
     }
 })
 

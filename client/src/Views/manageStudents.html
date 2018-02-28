@@ -32,27 +32,30 @@
                         <h3 class="panel-title">All Students</h3>
                     </div>
                     <div class="panel-body">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="studentsv" name="studentsv" ng-model="studentViewSearch">
-                        </br>
-                        <div class="table-responsive scrollableTableDiv">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Student ID</th>
-                                        <th>Birthday</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="student in studentInfo.students | filter:viewStudentFilter" ng-click="viewStudent(student.id)" class="pointer">
-                                        <td>{{ student.first_name }}</td>
-                                        <td>{{ student.last_name }}</td>
-                                        <td>{{ student.student_id }}</td>
-                                        <td>{{ student.birthdate }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <h4 class="centerText" ng-show="viewStudentResults.length === 0">No Students</h4>
+                        <div ng-hide="viewStudentResults.length === 0">
+                            <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="studentsv" name="studentsv" ng-model="studentViewSearch">
+                            </br>
+                            <div class="table-responsive scrollableTableDiv">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Student ID</th>
+                                            <th>Birthday</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="student in studentInfo.students | filter:viewStudentFilter as viewStudentResults" ng-click="viewStudent(student.id)" class="pointer">
+                                            <td>{{ student.first_name }}</td>
+                                            <td>{{ student.last_name }}</td>
+                                            <td>{{ student.student_id }}</td>
+                                            <td>{{ student.birthdate }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -94,12 +97,6 @@
                                 </div>
                             </div>
                         </form>
-                        <div class="alert alert-success fade in col-sm-offset-1" id="addStudentSuccess" ng-show="addStudentSuccess">
-                            <strong>Success!</strong> New student has been added.
-                        </div>
-                        <div class="alert alert-danger fade in col-sm-offset-1" id="addStudentFailure" ng-show="addStudentFailure">
-                            <strong>Failure!</strong> {{errorMessage}}
-                        </div>
                     </div>
                 </div>
             </div>
@@ -109,37 +106,34 @@
                         <h3 class="panel-title">All Students</h3>
                     </div>
                     <div class="panel-body">
-                        <input type="text" class="form-control" placeholder="Filter Students" list="studentsd" name="studentsd" autocomplete="off" ng-model="studentDeleteSearch">
-                        <br />
-                        <div class="table-responsive scrollableTableDiv">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Student ID</th>
-                                        <th>Birthday</th>
-                                        <th class="buttonColumn"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="student in studentInfo.students | filter:deleteStudentFilter">
-                                        <td>{{ student.first_name }}</td>
-                                        <td>{{ student.last_name }}</td>
-                                        <td>{{ student.student_id }}</td>
-                                        <td>{{ student.birthdate }}</td>
-                                        <td>
-                                            <button class="btn btn-danger btn-xs" type="button" data-toggle="modal" data-target="#deleteStudentModal" ng-click="setStudentD(student)">Delete</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="alert alert-success fade in deleteAlert" id="deleteStudentSuccess" ng-show="deleteStudentSuccess">
-                            <strong>Success!</strong> Student has been deleted.
-                        </div>
-                        <div class="alert alert-danger fade in deleteAlert" id="deleteStudentFailure" ng-show="deleteStudentFailure">
-                            <strong>Failure!</strong> {{errorMessage}}
+                        <h4 class="centerText" ng-show="deleteStudentResults.length === 0">No Students</h4>
+                        <div ng-hide="deleteStudentResults.length === 0">
+                            <input type="text" class="form-control" placeholder="Filter Students" list="studentsd" name="studentsd" autocomplete="off" ng-model="studentDeleteSearch">
+                            <br />
+                            <div class="table-responsive scrollableTableDiv">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Student ID</th>
+                                            <th>Birthday</th>
+                                            <th class="buttonColumn"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="student in studentInfo.students | filter:deleteStudentFilter as deleteStudentResults">
+                                            <td>{{ student.first_name }}</td>
+                                            <td>{{ student.last_name }}</td>
+                                            <td>{{ student.student_id }}</td>
+                                            <td>{{ student.birthdate }}</td>
+                                            <td>
+                                                <button class="btn btn-danger btn-xs" type="button" data-toggle="modal" data-target="#deleteStudentModal" ng-click="setStudentD(student)">Delete</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
