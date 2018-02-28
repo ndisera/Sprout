@@ -189,6 +189,10 @@ class FocusStudent(models.Model):
 
 
 class IEPGoal(models.Model):
+    """
+    IEPGoal
+    Represent a student's Individualized Education Plan goal
+    """
     student = models.ForeignKey(Student, blank=False)
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Short name of this IEP Goal")
@@ -196,10 +200,30 @@ class IEPGoal(models.Model):
                                        help_text="Optionally, whether this IEP goal tracks quantitative information")
     quantitative_category = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                              help_text="Optional quantitative category associated with this goal")
+    quantitative_range_low = models.IntegerField(null=True,
+                                                 help_text="If defined, lower bound of the quantitative category value")
+    quantitative_range_upper = models.IntegerField(null=True,
+                                                   help_text="If defined, upper bound of the quantitative category value")
+
+
+class IEPGoalDatapoint(models.Model):
+    """
+    IEPGoalDatapoint
+    Represent one custom quantitative datapoint associated with an IEPGoal
+    """
+    goal = models.OneToOneField(IEPGoal, blank=False, on_delete=models.CASCADE,
+                                help_text="IEPGoal this datapoint belongs to")
+    value = models.IntegerField(null=True,
+                                help_text="Data value of this datapoint")
 
 
 class IEPGoalNote(models.Model):
-    goal = models.ForeignKey(IEPGoal, blank=False)
+    """
+    IEPGoalNote
+    Represent a note associated with an IEPGoal
+    """
+    goal = models.OneToOneField(IEPGoal, blank=False, on_delete=models.CASCADE,
+                                help_text="IEPGoal this note belongs to")
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Name of this note")
     body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,

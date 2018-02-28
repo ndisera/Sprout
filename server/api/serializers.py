@@ -225,6 +225,13 @@ class IEPGoalSerializer(DynamicModelSerializer):
     student = DynamicRelationField('StudentSerializer')
 
 
+class IEPGoalDatapointSerializer(DynamicModelSerializer):
+    class Meta:
+        model = IEPGoalDatapoint
+        fields = '__all__'
+    goal = DynamicRelationField('IEPGoalSerializer')
+
+
 class IEPGoalNoteSerializer(DynamicModelSerializer):
     class Meta:
         model = IEPGoalNote
