@@ -1,4 +1,4 @@
-app.controller("manageStudentsController", function($scope, $rootScope, $location, students, studentService) {
+app.controller("manageStudentsController", function($scope, $rootScope, $location, toastService, students, studentService) {
 
     var studentTask = "view/edit";
     $scope.displayStudentViewSearch = true;
@@ -9,6 +9,17 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
     $scope.studentD = {};
     $scope.newStudent = {};
     $scope.studentInfo = studentService.studentInfo;
+
+    /**
+     * Extra part of error message
+     */
+    function errorResponse() {
+        var message = "";
+        if ($scope.errorMessage != null && $scope.errorMessage !== "") {
+            message = " Error message: " + $scope.errorMessage;
+        }
+        return message;
+    }
 
     /**
      * Display search or form depending on the student task selected and set the active button
@@ -64,16 +75,10 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
         var studentPromise = studentService.addStudent($scope.newStudent);
         studentPromise.then(function success(data) {
             $scope.newStudent = {};
-            $scope.addStudentSuccess = true;
-            $("#addStudentSuccess").fadeTo(2000, 500).slideUp(500, function() {
-                $("#addStudentSuccess").slideUp(500);
-            });
+            toastService.success("New student has been added.")
         }, function error(response) {
             setErrorMessage(response);
-            $scope.addStudentFailure = true;
-            $("#addStudentFailure").fadeTo(5000, 500).slideUp(500, function() {
-                $("#addStudentFailure").slideUp(500);
-            });
+            toastService.error("The server was unable to add the student." + errorResponse());
         });
     };
 
@@ -136,18 +141,12 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
         var studentPromise = studentService.deleteStudent($scope.studentD.id);
         studentPromise.then(function success(data) {
             $scope.studentD = {};
-            $scope.deleteStudentSuccess = true;
-            $("#deleteStudentSuccess").fadeTo(2000, 500).slideUp(500, function() {
-                $("#deleteStudentSuccess").slideUp(500);
-            });
+            //$scope.deleteStudentSuccess = true; assuming this is unnecessary
             $scope.displayStudentDeleteSearch = true;
             $scope.studentDeleteSearch = "";
         }, function error(response) {
             setErrorMessage(response);
-            $scope.deleteStudentFailure = true;
-            $("#deleteStudentFailure").fadeTo(5000, 500).slideUp(500, function() {
-                $("#deleteStudentFailure").slideUp(500);
-            });
+            toastService.error("The server was unable to delete the student." + errorResponse());
         });
     };
 
