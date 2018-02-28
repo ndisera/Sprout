@@ -54,6 +54,7 @@ students_router.register('services', viewset=ServiceRequirementViewSet, base_nam
 
 # Add nested routes for iep notes as /student/{pk}/ieps/{pk}/notes
 iep_router.register('notes', viewset=IEPGoalNoteViewSet, base_name='iep-notes', parents_query_lookups=['goal__student', 'goal'])
+iep_router.register('data', viewset=IEPGoalDatapointViewSet, base_name='iep-data', parents_query_lookups=['goal__student', 'goal'])
 
 # Add nested route for notifications as /users/{pk}/notifications
 users_router.register('notifications', viewset=NotificationViewSet, base_name='users-notifications', parents_query_lookups=['user'])
