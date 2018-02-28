@@ -21,8 +21,8 @@
 }
 
 .focus-remove-button {
-    width: 50px;
-    float: left;
+    width: 40px;
+    float: right;
 }
 
 .focus-remove-button > button {
@@ -30,7 +30,8 @@
 }
 
 .focus-student-panel-editing {
-    margin-left: 50px;
+    display: inline-block;
+    width: calc(100% - 50px);
 }
 
 .focus-width-none {
