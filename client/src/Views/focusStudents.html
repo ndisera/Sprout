@@ -24,12 +24,6 @@
         </div>
     </div>
 </div>
-<div class="panel-wrapper voffset3">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">Something</h4>
-        </div>
-        <div class="panel-body">
 <div class="sortable voffset3" ui-sortable="sortableOptions" ng-model="focusStudents">
     <div class="row" ng-repeat="focusStudent in focusStudents">
         <div class="col-xs-12">
@@ -82,7 +76,6 @@
         </div>
     </div>
 </div>
-        </div>
 <div class="row" ng-if="editing && focusStudents.length < 5">
     <div class="col-xs-12">
         <div class="panel panel-default panel-add pointer" ng-show="!adding" ng-click="toggleAdd(true)">
