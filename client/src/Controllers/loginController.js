@@ -77,6 +77,10 @@ app.controller('loginController', function ($scope, $rootScope, $location, userS
                 if (response.data && response.data["non_field_errors"]) {
                     displayErrors(response.data["non_field_errors"]);
                 }
+
+                if (response.data && response.data["email"]) {
+                    displayErrors(response.data["email"]);
+                }
             }
         );
     };
