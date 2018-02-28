@@ -1,21 +1,16 @@
 
-import json
-import requests
-
-from authorization import CERT_PATH
 from collections import namedtuple
 
-Term = namedtuple("Term", ['name', 'start_date', 'end_date', 'id'])
+from base_service import BaseService
+
+Term = namedtuple("Term", ['name', 'start_date', 'end_date', 'settings', 'id'])
 
 
-class TermService():
+class TermService(BaseService):
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=CERT_PATH):
-        self.headers = headers
-        self.url = url
-        self.port_num = port_num
-        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/terms/"
-        self.verify = verify
+    def __init__(self, **kwargs):
+        super(TermService, self).__init__(**kwargs)
+        self.complete_uri = self.complete_uri_template.format(endpoint="/terms/")
 
     def get_terms(self):
         """
@@ -24,19 +19,7 @@ class TermService():
         :return: list of term objects
         :rtype: list[Terms]
         """
-        response = requests.get(self.complete_uri, verify=self.verify, headers=self.headers)
-
-        response.raise_for_status()
-
-        body = response.json()
-        terms = body['terms']
-
-        toReturn = []
-
-        for term in terms:
-            toReturn.append(Term(**term))
-
-        return toReturn
+        return self._get_models(Term, self.complete_uri)
 
     def add_term(self, term):
         """
@@ -54,21 +37,4 @@ class TermService():
         :param terms: List of term objects
         :return:
         """
-
-        data = []
-
-        for term in terms:
-            term = term._asdict()
-            del(term['id'])
-            data.append(term)
-
-        data = json.dumps(data)
-
-        headers = self.headers
-        headers['content-type'] = 'application/json'
-
-        response = requests.post(self.complete_uri, verify=self.verify, headers=headers, data=data)
-
-        response.raise_for_status()
-
-        return response
+        return self._add_many_models(terms, self.complete_uri)

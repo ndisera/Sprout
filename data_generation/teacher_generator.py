@@ -5,13 +5,13 @@ from services.users import User, UsersService
 
 class TeacherGenerator:
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=False,
+    def __init__(self, headers=None, protocol='https', hostname="localhost", port_num=8000, verify=False,
                  first_names_file="./first_names.txt",
                  last_names_file="./last_names.txt",):
         self.first_names_file=first_names_file
         self.last_names_file=last_names_file
 
-        self.usersService = UsersService(headers=headers, url=url, port_num=port_num, verify=verify)
+        self.usersService = UsersService(headers=headers, protocol=protocol, hostname=hostname, verify=verify)
 
     def generate_random_teachers(self, num_teachers):
         """

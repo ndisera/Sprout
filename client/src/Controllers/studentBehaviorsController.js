@@ -1,4 +1,4 @@
-app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data, student) {
+app.controller("studentBehaviorsController", function ($scope, $routeParams, toastService, behaviorService, data, student) {
     // I know this will be here, because I filtered on the student ID, and only that student
     $scope.student     = student.student;
     $scope.enrollments = [];
@@ -163,13 +163,10 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
 
                     iterDate.add(1, 'd');
                 }
-                //debugging help:
-                // console.log("Behavior and effort graphs:");
-                // console.log($scope.behaviorGraph);
-                // console.log($scope.effortGraph);
             },
             function error(response) {
-                //TODO: notify the user
+                // notify the user
+                toastService.error('The server wasn\'t able to get student behaviors.');
             }
         );
 
@@ -253,7 +250,8 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                 });
             },
             function error(response) {
-                //TODO: notify user
+                // notify user
+                toastService.error('The server wasn\'t able to get student behaviors.');
             }
         );
     }
@@ -310,7 +308,8 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                     }
                 },
                 function error(response) {
-                    //TODO: notify the user
+                    // notify the user
+                    toastService.error('The server wasn\'t able to save the behavior score.');
                 }
             );
         }
@@ -342,7 +341,8 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                     }
                 },
                 function error(response) {
-                    //TODO: notify the user
+                    // notify the user
+                    toastService.error('The server wasn\'t able to save the behavior score.');
                 }
             );
         }

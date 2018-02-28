@@ -22,6 +22,10 @@
     }
 }
 
+#toast-container > div {
+    opacity: 1;
+}
+
 .centerText {
     text-align: center;
 }

@@ -1,21 +1,16 @@
 
-import json
-import requests
-
-from authorization import CERT_PATH
 from collections import namedtuple
+
+from base_service import BaseService
 
 Assignment = namedtuple("Assignment", ['section', 'assignment_name', 'score_min', 'score_max', 'due_date', 'id'])
 
 
-class AssignmentService():
+class AssignmentService(BaseService):
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=CERT_PATH):
-        self.headers = headers
-        self.url = url
-        self.port_num = port_num
-        self.uri_template = "https://" + str(self.url) + ":" + str(self.port_num) + "/sections/{sections_pk}/assignments/"
-        self.verify = verify
+    def __init__(self, **kwargs):
+        super(AssignmentService, self).__init__(**kwargs)
+        self.uri_template = self.complete_uri_template.format(endpoint="/sections/{sections_pk}/assignments/")
 
     def get_assignments(self, section):
         """
@@ -26,21 +21,8 @@ class AssignmentService():
         :return: list of assignment objects
         :rtype: list[Assignment]
         """
-        complete_uri = self.uri_template.format(sections_pk=section)
-        response = requests.get(complete_uri, verify=self.verify, headers=self.headers)
-
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
-
-        body = response.json()
-        assignments = body['assignments']
-
-        toReturn = []
-
-        for assignment in assignments:
-            toReturn.append(Assignment(**assignment))
-
-        return toReturn
+        uri = self.uri_template.format(sections_pk=section)
+        return self._get_models(Assignment, uri)
 
     def add_assignment(self, assignment, section):
         """
@@ -63,23 +45,5 @@ class AssignmentService():
         :type section: num
         :return:
         """
-
-        data = []
-
-        for assignment in assignments:
-            assignment = assignment._asdict()
-            del(assignment['id'])
-            data.append(assignment)
-
-        data = json.dumps(data)
-
-        headers = self.headers
-        headers['content-type'] = 'application/json'
-
-        complete_uri = self.uri_template.format(sections_pk=section)
-
-        response = requests.post(complete_uri, verify=self.verify, headers=headers, data=data)
-
-        response.raise_for_status()
-
-        return response
+        uri = self.uri_template.format(sections_pk=section)
+        return self._add_many_models(assignments, uri)

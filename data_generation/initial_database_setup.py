@@ -13,15 +13,18 @@ from teacher_generator import TeacherGenerator
 from services.authorization import AuthorizationService
 from services.enrollment import Enrollment, EnrollmentService
 from services.section import Section, SectionService
+from services.settings import SchoolSettings, DailySchedule, TermSettings, SettingsService
 from services.term import Term, TermService
 from services.users import User, UsersService
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
-    parser.add_argument("--url", "-u", action='store', default="localhost", type=str,
+    parser.add_argument("--host", "-u", action='store', default="localhost", type=str,
                         help="hostname or IP address to connect to (default: localhost)")
     parser.add_argument("--port", "-p", action='store', default=8000, type=int,
                         help="port to connect on (default: 8000)")
+    parser.add_argument("--protocol", action='store', default='https', type=str,
+                        help="protocol to use (default: https)")
     parser.add_argument("--username", "-l", action="store", type=str,
                         help="login username")
     parser.add_argument("--password", "-s", action="store", type=str,
@@ -35,7 +38,8 @@ if __name__ == "__main__":
     if not args.token:
         args.username, args.password = AuthorizationService.display_login_prompt(args.username, args.password)
 
-        authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
+        authorizationHandler = AuthorizationService(protocol=args.protocol,
+                                                    hostname=format(args.host),
                                                     port_num=args.port,
                                                     verify=False)
 
@@ -45,7 +49,7 @@ if __name__ == "__main__":
             # Attempt to add an account with the given credentials
             try:
                 print "Unable to send login request, attempting to register user"
-                user_service = UsersService(headers={}, url=args.url, verify=False, port_num=args.port)
+                user_service = UsersService(protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
                 user = User(id=None, email=args.username, first_name='Admin', last_name='Admin')
                 response = user_service.register_user(user, args.password)
                 args.token = response.json()['token']
@@ -57,8 +61,28 @@ if __name__ == "__main__":
     headers = {}
     headers['Authorization'] = 'JWT ' + args.token
 
-    student_generator = StudentGenerator(url=args.url, verify=False, headers=headers)
-    teacher_generator = TeacherGenerator(url=args.url, verify=False, headers=headers)
+    settings_service = SettingsService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
+    term_service = TermService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
+    sections_service = SectionService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
+    enrollments_service = EnrollmentService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
+
+    student_generator = StudentGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
+    teacher_generator = TeacherGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
+    behavior_generator = BehaviorGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
+    std_test_score_generator = StandardizedTestScoreGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
+
+    # Setup the school
+    school_settings = SchoolSettings(school_name="Mavis Middle School", school_location="123 Victory Road", id=None)
+    settings_service.add_school(school_settings)
+
+    ab_schedule = DailySchedule(name="A/B Periods", total_periods=8, periods_per_day=4, id=None)
+    block_schedule = DailySchedule(name="Block Periods", total_periods=8, periods_per_day=8, id=None)
+    response = settings_service.add_many_schedules([ab_schedule, block_schedule, ])
+    schedule_ids = [schedule['id'] for schedule in response.json()['daily_schedules']]
+
+    term_settings = TermSettings(id=None, schedule=schedule_ids[0])
+    response = settings_service.add_term_settings(term_settings)
+    term_settings_id = response.json()['term_settings'][0]['id']
 
     teachers = TeacherGenerator.generate_default_teacher_users()
     teacher_ids = []
@@ -70,21 +94,18 @@ if __name__ == "__main__":
     response = student_generator.studentService.add_many_students(students)
     students = [Student(**data) for data in response.json()['students']]
 
-    term_service = TermService(headers=headers, url=args.url, verify=False, port_num=args.port)
-    term = Term(name="Spring", start_date="2018-01-06", end_date="2018-04-24", id=None)
+    term = Term(name="Spring", start_date="2018-01-06", end_date="2018-04-24", settings=term_settings_id, id=None)
     response = term_service.add_term(term)
     terms = [term['id'] for term in response.json()['terms']]
 
     sections = []
-    cs5510_section = Section(teacher=teacher_ids[0], title="CS 5510", term=terms[0], id=None)
-    cs4400_section = Section(teacher=teacher_ids[1], title="CS 4400", term=terms[0], id=None)
+    cs5510_section = Section(teacher=teacher_ids[0], title="CS 5510", term=terms[0], schedule_position=1, id=None)
+    cs4400_section = Section(teacher=teacher_ids[1], title="CS 4400", term=terms[0], schedule_position=6, id=None)
     sections.extend((cs5510_section, cs4400_section,))
 
-    sections_service = SectionService(headers=headers, url=args.url, verify=False, port_num=args.port)
     response = sections_service.add_many_sections(sections)
     section_ids = [section['id'] for section in response.json()['sections']]
 
-    enrollments_service = EnrollmentService(headers=headers, url=args.url, verify=False, port_num=args.port)
     enrollments = []
     for student in students:
         for section_id in section_ids:
@@ -95,13 +116,11 @@ if __name__ == "__main__":
     enrollments = [Enrollment(**enrollment) for enrollment in response.json()['enrollments']]
 
     behaviors = []
-    behavior_generator = BehaviorGenerator(url=args.url, verify=False, headers=headers)
     for enrollment in enrollments:
         behavior = behavior_generator.generate_random_behavior(enrollment)
         behaviors.extend(behavior)
     behavior_generator.behaviorService.add_many_behaviors(behaviors)
 
-    std_test_score_generator = StandardizedTestScoreGenerator(url=args.url, verify=False, headers=headers)
     std_test_score_generator.setup_tests()
     toPost = std_test_score_generator.generate(10,
                                                range_start=datetime.date(year=2018, month=01, day=01),
