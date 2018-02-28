@@ -5,6 +5,8 @@ from django.conf import settings
 
 from sprout_user import SproutUser, SproutUserProfile
 
+from school_settings.models import *
+
 
 class Student(models.Model):
     """
@@ -21,20 +23,6 @@ class Student(models.Model):
 
     class Meta:
         ordering = ('id',)
-
-
-class Term(models.Model):
-    """
-    Term
-    Represent a school term, such as a particular semester, quarter, etc.
-    """
-    name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                            help_text="Term name, such as \"Fall\" or \"First Quarter\"")
-    start_date = models.DateField(blank=False,
-                                  help_text="Term start date, such as 2018-01-18 for the 18th of January, 2018")
-    end_date = models.DateField(blank=False,
-                                help_text="Term end date")
-    # TODO: Some 'versioning' on a School Schedule object
 
 
 class Holiday(models.Model):
@@ -65,9 +53,9 @@ class Section(models.Model):
     teacher = models.ForeignKey(SproutUser)
     term = models.ForeignKey(Term, on_delete=models.CASCADE,
                              help_text="Term this section takes place in")
-    # TODO: Uncomment when Schedule model exists
-    # schedule = models.ForeignKey(Schedule,
-    #                              help_text="Class start/end schedule used in this semester")
+    # Lookup the class schedule via term's TermSettings
+    schedule_position = models.IntegerField(blank=False,
+                                            help_text="Relative position in the schedule this class takes place")
 
     class Meta:
         ordering = ('id',)
