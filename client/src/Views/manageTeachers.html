@@ -32,30 +32,33 @@
                         <h3 class="panel-title">All Teachers</h3>
                     </div>
                     <div class="panel-body">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch" ng-focus="clearTeacherViewSearch()">
-                        <br />
-                        <div class="table-responsive scrollableTableDiv">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter" ng-click="viewTeacher(teacher)" class="pointer">
-                                        <td>{{ teacher.first_name }}</td>
-                                        <td>{{ teacher.last_name }}</td>
-                                        <td>{{ teacher.email }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <h4 class="centerText" ng-show="viewTeacherResults.length === 0">No Teachers</h4>
+                        <div ng-hide="viewTeacherResults.length === 0">
+                            <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch" ng-focus="clearTeacherViewSearch()">
+                            <br />
+                            <div class="table-responsive scrollableTableDiv">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter as viewTeacherResults" ng-click="viewTeacher(teacher)" class="pointer">
+                                            <td>{{ teacher.first_name }}</td>
+                                            <td>{{ teacher.last_name }}</td>
+                                            <td>{{ teacher.email }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" ng-show="displayTeacherViewSearch">
                 <div class="col-xs-12 col-sm-8" ng-show="displayTEditInfo">
                     <div class="panel-wrapper">
                         <div class="panel panel-default">
@@ -142,7 +145,10 @@
                             <div class="panel-heading">
                                 <h3 class="panel-title">Classes Taught</h3>
                             </div>
-                            <table class="table">
+                            <div class="panel-body" ng-show="sections.length === 0">
+                                <h4 class="centerText">No Classes</h4>
+                            </div>
+                            <table class="table" ng-hide="sections.length === 0">
                                 <tr ng-repeat="section in sections">
                                     <td>&nbsp;&nbsp;{{ section.title }}</td>
                                 </tr>
@@ -197,35 +203,38 @@
                         <h3 class="panel-title">All Teachers</h3>
                     </div>
                     <div class="panel-body">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
-                        <br />
-                        <div class="table-responsive scrollableTableDiv">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Email</th>
-                                        <th class="buttonColumn"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter" class="pointer">
-                                        <td>{{ teacher.first_name }}</td>
-                                        <td>{{ teacher.last_name }}</td>
-                                        <td>{{ teacher.email }}</td>
-                                        <td>
-                                            <button class="btn btn-danger btn-xs" type="button" data-toggle="modal" data-target="#deleteTeacherModal" ng-click="setTeacherD(teacher)">Delete</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="alert alert-success fade in deleteAlert" id="deleteTeacherSuccess" ng-show="deleteTeacherSuccess">
-                            <strong>Success!</strong> Teacher has been deleted.
-                        </div>
-                        <div class="alert alert-danger fade in deleteAlert" id="deleteTeacherFailure" ng-show="deleteTeacherFailure">
-                            <strong>Failure!</strong> {{errorMessage}}
+                        <h4 class="centerText" ng-show="deleteTeacherResults.length === 0">No Teachers</h4>
+                        <div ng-hide="deleteTeacherResults.length === 0">
+                            <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
+                            <br />
+                            <div class="table-responsive scrollableTableDiv">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Email</th>
+                                            <th class="buttonColumn"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter as deleteTeacherResults" class="pointer">
+                                            <td>{{ teacher.first_name }}</td>
+                                            <td>{{ teacher.last_name }}</td>
+                                            <td>{{ teacher.email }}</td>
+                                            <td>
+                                                <button class="btn btn-danger btn-xs" type="button" data-toggle="modal" data-target="#deleteTeacherModal" ng-click="setTeacherD(teacher)">Delete</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="alert alert-success fade in deleteAlert" id="deleteTeacherSuccess" ng-show="deleteTeacherSuccess">
+                                <strong>Success!</strong> Teacher has been deleted.
+                            </div>
+                            <div class="alert alert-danger fade in deleteAlert" id="deleteTeacherFailure" ng-show="deleteTeacherFailure">
+                                <strong>Failure!</strong> {{errorMessage}}
+                            </div>
                         </div>
                     </div>
                 </div>

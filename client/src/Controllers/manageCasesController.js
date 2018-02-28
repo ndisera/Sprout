@@ -185,33 +185,6 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     };
 
     /**
-     * Unassigns all students from a case manager.
-     * @param {number} managerPK - case manager to be cleared.
-     */
-    $scope.clearManagerStudents = function(managerPK) {
-        var studentChanges = [];
-        for (var i = 0; i < $scope.caseStudents[managerPK].length; i++) {
-            studentChanges.push({
-                'id': $scope.caseStudents[managerPK][i].id,
-                'case_manager': null
-            });
-        }
-        var studentPromise = studentService.updateStudents(studentChanges);
-        studentPromise.then(function success(data) {
-            var students = data.students;
-            for (var i = 0; i < students.length; i++) {
-                $scope.otherStudents[students[i].id] = students[i];
-            }
-            refreshStudentArray();
-            unassignManager(managerPK);
-            // stop editing if there's nothing left to edit
-            checkEdit();
-        }, function error(response) {
-            setErrorMessage(response);
-        });
-    };
-
-    /**
      * Assigns a student with no case manager to a case manager.
      * @param {number} managerPK - case manager being assigned.
      * @param {student} student - student being assigned.

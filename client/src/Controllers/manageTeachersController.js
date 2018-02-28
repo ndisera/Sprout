@@ -57,7 +57,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         switch (teacherTask) {
             case "view/edit":
                 $scope.displayTeacherViewSearch = false;
-                $scope.displayTEditInfo = false;
                 break;
             case "delete":
                 $scope.displayTeacherDeleteSearch = false;
@@ -75,8 +74,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         switch (task) {
             case "view/edit":
                 $scope.displayTeacherViewSearch = true;
-                // probably have to make some change here
-                $scope.displayTEditInfo = true;
                 break;
             case "delete":
                 $scope.displayTeacherDeleteSearch = true;

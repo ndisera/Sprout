@@ -67,7 +67,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         switch (sectionTask) {
             case "view/edit":
                 $scope.displaySectionViewSearch = false;
-                $scope.displayCEditInfo = false;
                 break;
             case "delete":
                 $scope.displaySectionInfo = false;
@@ -85,9 +84,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         switch (task) {
             case "view/edit":
                 $scope.displaySectionViewSearch = true;
-                if ($scope.sectionV.title === $scope.sectionViewSearch) {
-                    $scope.displayCEditInfo = true;
-                }
                 break;
             case "delete":
                 $scope.displaySectionDeleteSearch = true;
