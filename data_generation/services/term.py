@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-Term = namedtuple("Term", ['name', 'start_date', 'end_date', 'id'])
+Term = namedtuple("Term", ['name', 'start_date', 'end_date', 'settings', 'id'])
 
 
 class TermService(BaseService):
