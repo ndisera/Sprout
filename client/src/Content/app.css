@@ -117,6 +117,10 @@
     border-bottom: none;
 }
 
+.panel-add > .panel-heading:hover {
+    background-color: #f0f0f0;
+}
+
 .zero-width {
     width: 0px;
 }
