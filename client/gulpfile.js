@@ -68,6 +68,8 @@ const include_paths = [
     bower_path + 'moment/min/moment-with-locales.js',
     bower_path + 'underscore/underscore-min.js',
     bower_path + 'underscore/underscore.js',
+    bower_path + 'tinycolor/dist/tinycolor-min.js',
+    bower_path + 'tinycolor/tinycolor.js',
 ];
 
 const paths = {

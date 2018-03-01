@@ -10,7 +10,7 @@ var app = angular.module(
 );
 
 // configure our routes
-app.config(function ($httpProvider, $locationProvider, $routeProvider, ChartJsProvider) {
+app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     /**
      * Set our interceptor to add auth token to all requests
      */
@@ -296,26 +296,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider, ChartJsPr
         })
 
         .otherwise({ redirectTo: '/focus' });
-
-
-    ChartJsProvider.setOptions(
-        {
-            global: {
-                colors: [
-                    '#8860d0',
-                    '#5ab9ea',
-                    '#963484',
-                    '#edb5bf',
-                    '#57bc90',
-                    '#5680E9',
-                    '#3066be',
-                ],
-            },
-        }
-    );
 })
 
-.run(function($rootScope, $location, userService) {
+.run(function($rootScope, $location, toastService, userService) {
 
     /**
      *  Used to determine where to make calls to the backend
@@ -349,7 +332,8 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider, ChartJsPr
         // redirect the user
         $location.path('/login').replace();
 
-        //TODO(gzuber): notify user
+        // notify user
+        toastService.error('There was a fatal error with the server. Please log back in.');
     });
 
     /**
@@ -363,4 +347,17 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider, ChartJsPr
     toastr.options = {
         closeButton: true,
     };
+
+    $rootScope.colors = [
+        tinycolor('#57bc90'), // green
+        tinycolor('#5ab9ea'), // light blue
+        tinycolor('#0b3c5d'), // prussian blue
+        tinycolor('#8860d0'), // purple
+        tinycolor('#963484'), // purple red
+        tinycolor('#d9b310'), // gold leaf
+        tinycolor('#ff3b3f'), // watermelon
+        tinycolor('#333333'), // grey
+    ];
+
+    Chart.defaults.global.colors = _.map($rootScope.colors, function(elem) { return elem.toHexString(); });
 });
