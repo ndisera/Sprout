@@ -31,8 +31,8 @@
                     <h3 class="panel-title">All Classes</h3>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="viewSectionResults.length === 0">No Classes</h4>
-                    <div ng-hide="viewSectionResults.length === 0">
+                    <h4 class="centerText" ng-show="sections.length === 0">No Classes</h4>
+                    <div ng-hide="sections.length === 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Classes" list="sectionv" name="sectionv" ng-model="sectionViewSearch" ng-focus="clearSectionViewSearch()">
                         </br>
                         <div class="table-responsive scrollableTableDiv">
@@ -44,7 +44,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="section in sections | filter:viewSectionFilter as viewSectionsResults" ng-click="viewSection(section)" class="pointer">
+                                    <tr ng-repeat="section in sections | filter:viewSectionFilter" ng-click="viewSection(section)" class="pointer">
                                         <td>{{ section.title }}</td>
                                         <td>{{ teacherIdLookup[section.teacher] }}</td>
                                     </tr>
@@ -123,8 +123,8 @@
                     <h3 class="panel-title">Class Roster</h3>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="enrolledStudentResults.length === 0">No Enrolled Students</h4>
-                    <div ng-hide="enrolledStudentResults.length === 0">
+                    <h4 class="centerText" ng-show="enrollmentsArray.length === 0">No Enrolled Students</h4>
+                    <div ng-hide="enrollmentsArray.length === 0">
                         <input autocomplete="off" autocapitalize="off" class="form-control" id="enrolledInput" type="text" placeholder="Filter Students" ng-model="enrolledInput">
                         <br>
                         <div class="table-responsive scrollableTableDiv">
@@ -138,7 +138,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="enrolledStudents">
-                                    <tr ng-repeat="enrollment in enrollmentsArray | filter:enrolledStudentFilter as enrolledStudentResults">
+                                    <tr ng-repeat="enrollment in enrollmentsArray | filter:enrolledStudentFilter">
                                         <td>{{ enrolledStudents[enrollment.student].first_name }}</td>
                                         <td>{{ enrolledStudents[enrollment.student].last_name }}</td>
                                         <td>{{ enrolledStudents[enrollment.student].student_id }}</td>
@@ -166,8 +166,8 @@
                 </div>
                 <div id="collapse-{{$index}}" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <h4 class="centerText" ng-show="unenrolledStudentResults.length === 0">No Unenrolled Students</h4>
-                        <div ng-hide="unenrolledStudentResults.length === 0">
+                        <h4 class="centerText" ng-show="unenrolledStudentsArray.length === 0">No Unenrolled Students</h4>
+                        <div ng-hide="unenrolledStudentsArray.length === 0">
                             <input autocomplete="off" autocapitalize="off" class="form-control" id="unenrolledInput" type="text" placeholder="Filter Students" ng-model="unenrolledInput">
                             <br>
                             <div class="table-responsive scrollableTableDiv">
@@ -181,7 +181,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="unenrolledStudents">
-                                        <tr ng-repeat="student in unenrolledStudentsArray | filter:unenrolledStudentFilter as unenrolledStudentResults">
+                                        <tr ng-repeat="student in unenrolledStudentsArray | filter:unenrolledStudentFilter">
                                             <td>{{ student.first_name }}</td>
                                             <td>{{ student.last_name }}</td>
                                             <td>{{ student.student_id }}</td>
@@ -239,8 +239,8 @@
                 <h3 class="panel-title">All Classes</h3>
             </div>
             <div class="panel-body">
-                <h4 class="centerText" ng-show="deleteSectionResults.length === 0">No Classes</h4>
-                <div ng-hide="deleteSectionResults.length === 0">
+                <h4 class="centerText" ng-show="sections.length === 0">No Classes</h4>
+                <div ng-hide="sections.length === 0">
                     <input type="text" autocomplete="off" class="form-control" placeholder="Filter Classes" list="sectiond" name="sectiond" ng-model="sectionDeleteSearch">
                     <br />
                     <div class="table-responsive scrollableTableDiv">
@@ -253,7 +253,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="section in sections | filter:deleteSectionFilter as deleteSectionResults">
+                                <tr ng-repeat="section in sections | filter:deleteSectionFilter">
                                     <td>{{ section.title }}</td>
                                     <td>{{ teacherIdLookup[section.teacher] }}</td>
                                     <td>

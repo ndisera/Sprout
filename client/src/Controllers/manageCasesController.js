@@ -229,7 +229,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     }
 
     /**
-     * Helper funciton that unassigns a manager.
+     * Helper function that unassigns a manager.
      * @param {number} managerPK - manager being unassigned.
      */
     function unassignManager(managerPK) {
@@ -241,7 +241,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     }
 
     /**
-     * Helper funciton that unassigns a student.
+     * Helper function that unassigns a student.
      * @param {number} managerPK - previous manager.
      * @param {reponse.data} data - data from student update promise.
      */
