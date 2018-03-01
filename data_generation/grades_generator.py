@@ -138,7 +138,11 @@ class GradesGenerator():
                     # Now generate the number of grades we were supposed to generate
                     for unused in range(num):
                         late_modifier = random.randint(0, 9)
-                        handin = datetime.datetime.now()
+                        handin = duedate.replace(
+                                    hour=datetime.datetime.now().hour, 
+                                    minute=datetime.datetime.now().minute, 
+                                    second=datetime.datetime.now().second, 
+                                    microsecond=datetime.datetime.now().microsecond)
                         if late_modifier > 8:
                             print 'assignment was late!'
                             handin = handin + datetime.timedelta(days=1)
