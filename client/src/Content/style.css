@@ -187,7 +187,7 @@ a {
     border-color: #165a87;
 }
 
-.btn-primary.active, .btn-primary:hover, .btn-primary.active:hover {
+.btn-primary:hover, .btn-primary.active, .btn-primary.active:hover, .btn-primary.active:focus {
     background-color: #1a699e;
     border-color: #11527d;
 }
@@ -382,7 +382,7 @@ a {
     border-color: #165a87;
 }
 
-.btn-primary.active, .btn-primary:hover, .btn-primary.active:hover {
+.btn-primary:hover, .btn-primary.active, .btn-primary.active:hover, .btn-primary.active:focus {
     background-color: #1a699e;
     border-color: #11527d;
 }
