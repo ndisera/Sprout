@@ -1,5 +1,6 @@
 
 import requests
+import json
 
 from collections import namedtuple
 
@@ -37,6 +38,11 @@ class UsersService(BaseService):
         if password is not None:
             data['password1'] = password
             data['password2'] = password
+
+        data = json.dumps(data)
+
+        self.headers['content-type'] = 'application/json'
+
         response = requests.post(self.complete_register_uri, data=data, verify=self.verify, headers=self.headers)
         response.raise_for_status()
 

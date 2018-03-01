@@ -105,6 +105,33 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider, ChartJsPr
             },
         })
 
+        // route for the settings page
+        .when('/settings', {
+            redirectTo: '/settings/user',
+        })
+
+        // route for the user settings page
+        .when('/settings/user', {
+            templateUrl: 'html/userSettings.html',
+            controller: 'userSettingsController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
+        })
+
+        // route for the school settings page
+        .when('/settings/school', {
+            templateUrl: 'html/schoolSettings.html',
+            controller: 'schoolSettingsController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
+        })
+
         // route for the focus students page
         .when('/focus', {
             templateUrl: 'html/focusStudents.html',
@@ -332,4 +359,8 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider, ChartJsPr
     if(userService.user.token !== null && userService.user.token !== undefined) {
         userService.authVerify();
     }
+
+    toastr.options = {
+        closeButton: true,
+    };
 });

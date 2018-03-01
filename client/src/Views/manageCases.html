@@ -26,41 +26,34 @@
                     </button>
                 </div>
                 <div class="panel-body">
-                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Assigned Managers" ng-model="caseManagerSearch">
-                    </br>
-                    <div ng-repeat="caseManager in caseManagersArray | filter:caseManagerFilter">
-                        <div class="panel panel-default">
-                            <div class="panel-heading hidden-xs">
-                                <h4 class="panel-title">
-                                    <span ng-if="editCaseManagers">
-                                        <button class="btn btn-danger left-heading-btn" type="button" ng-click="clearManagerStudents(caseManager.pk)">Unassign
-                                        </button>&nbsp;&nbsp;
-                                    </span>
-                                    {{caseManager.first_name}} {{caseManager.last_name}} ({{caseManager.email}}) <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
-                                    <span class="glyphicon glyphicon-chevron-down blackish"
-                                          data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
-                                </h4>
-                            </div>
-                            <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl">
-                                {{caseManager.first_name}} {{caseManager.last_name}} <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
-                                <span class="glyphicon glyphicon-chevron-down blackish"
-                                      data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')"></span>
-                                <h5>
-                                    ({{caseManager.email}})
-                                </h5>
-                                <span ng-if="editCaseManagers">
-                                    <button class="btn btn-danger left-heading-btn" type="button" ng-click="clearManagerStudents(caseManager.pk)">Unassign
-                                    </button>&nbsp;&nbsp;
-                                </span>
-                            </div>
-                            <div id="collapse-assigned{{$index}}" class="panel-collapse collapse">
-                                <div class="table-responsive" id="specialTable">
-                                    <table class="table table-hover">
-                                        <tbody>
-                                            <tr ng-repeat="student in caseStudents[caseManager.pk]">
-                                                <td ng-if="editCaseManagers"><button class="btn btn-danger btn-xs" type="button" ng-click="unassign(caseManager.pk, student)">
-                                                        <i class="glyphicon glyphicon-minus white"></i>
-                                                    </button></td>
+                    <h4 class="centerText" ng-show="caseManagerResults.length === 0">No Assigned Managers</h4>
+                    <div ng-hide="caseManagerResults.length === 0">
+                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Assigned Managers" ng-model="caseManagerSearch">
+                        </br>
+                        <div ng-repeat="caseManager in caseManagersArray | filter:caseManagerFilter as caseManagerResults">
+                            <div class="panel panel-default">
+                                <div class="panel-heading hidden-xs">
+                                    <h4 class="panel-title">
+                                        {{caseManager.first_name}} {{caseManager.last_name}} ({{caseManager.email}}) <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
+                                        <span class="glyphicon glyphicon-chevron-right blackish"
+                                              data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).toggleClass('glyphicon-chevron-down glyphicon-chevron-right')"></span>
+                                    </h4>
+                                </div>
+                                <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl">
+                                    {{caseManager.first_name}} {{caseManager.last_name}} <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
+                                    <span class="glyphicon glyphicon-chevron-right blackish" data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).toggleClass('glyphicon-chevron-down glyphicon-chevron-right')"></span>
+                                    <h5 style="margin-bottom:0px;">
+                                        ({{caseManager.email}})
+                                    </h5>
+                                </div>
+                                <div id="collapse-assigned{{$index}}" class="panel-collapse collapse">
+                                    <div class="table-responsive" id="specialTable">
+                                        <table class="table table-hover">
+                                            <tbody>
+                                                <tr ng-repeat="student in caseStudents[caseManager.pk]">
+                                                    <td>{{ student.first_name }}</td>
+                                                    <td>{{ student.last_name }}</td>
+                                                    <td>{{ student.student_id }}</td>
                                                     <td ng-if="editCaseManagers">
                                                         <div class="dropdown">
                                                             <button class="btn btn-xs default dropdown-toggle" type="button" data-toggle="dropdown" ng-click="toggleDropdowns($index)">Reassign
@@ -73,41 +66,46 @@
                                                             </ul>
                                                         </div>
                                                     </td>
-                                                    <td>{{ student.first_name }}</td>
-                                                    <td>{{ student.last_name }}</td>
-                                                    <td>{{ student.student_id }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <li class="list-group-item" ng-if="editCaseManagers">
-                                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Unassigned Students" ng-model="caseStudentSearch[$index]">
-                                    </br>
-                                    <div class="table-responsive scrollableTableDiv">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>First Name</th>
-                                                    <th>Last Name</th>
-                                                    <th>Student ID</th>
-                                                    <th class="buttonColumn"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr ng-repeat="student in otherStudentsArray | otherStudentFilter:$index:caseStudentSearch">
-                                                    <td>{{ student.first_name }}</td>
-                                                    <td>{{ student.last_name }}</td>
-                                                    <td>{{ student.student_id }}</td>
-                                                    <td>
-                                                        <button class="btn btn-success btn-xs" type="button" ng-click="assignManagerAndStudent(caseManager.pk, student, 'assigned')">
-                                                            <i class="glyphicon glyphicon-plus white"></i>
-                                                        </button>
-                                                    </td>
+                                                    <td ng-if="editCaseManagers" class="buttonColumn">
+                                                        <button class="btn btn-danger btn-xs" type="button" ng-click="unassign(caseManager.pk, student)">
+                                                            <i class="glyphicon glyphicon-minus white"></i>
+                                                        </button></td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
-                                </li>
+                                    <li class="list-group-item" ng-if="editCaseManagers">
+                                        <h4 class="centerText" ng-show="aOtherStudentResults.length === 0">No Unassigned Students</h4>
+                                        <div ng-hide="aOtherStudentResults.length === 0">
+                                            <input type="text" autocomplete="off" class="form-control" placeholder="Filter Unassigned Students" ng-model="caseStudentSearch[$index]">
+                                            </br>
+                                            <div class="table-responsive scrollableTableDiv">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>First Name</th>
+                                                            <th>Last Name</th>
+                                                            <th>Student ID</th>
+                                                            <th class="buttonColumn"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="student in otherStudentsArray | otherStudentFilter:$index:caseStudentSearch as aOtherStudentResults">
+                                                            <td>{{ student.first_name }}</td>
+                                                            <td>{{ student.last_name }}</td>
+                                                            <td>{{ student.student_id }}</td>
+                                                            <td>
+                                                                <button class="btn btn-success btn-xs" type="button" ng-click="assignManagerAndStudent(caseManager.pk, student, 'assigned')">
+                                                                    <i class="glyphicon glyphicon-plus white"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -120,49 +118,54 @@
                     <h3 class="panel-title">Unassigned Managers</h3>
                 </div>
                 <div class="panel-body">
-                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Unassigned Managers" ng-model="nonManagerSearch">
-                    </br>
-                    <div ng-repeat="manager in nonManagersArray | filter:nonManagerFilter">
-                        <div class="panel panel-default">
-                            <div class="panel-heading hidden-xs">
-                                <h4 class="panel-title panel-title-with-btn">{{manager.first_name}} {{manager.last_name}} ({{manager.email}})</h4>
-                                <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn" type="button" data-toggle="collapse"
-                                                                                                                                        data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
-                                    Assign
-                                </button>
-                            </div>
-                            <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl">
-                                {{manager.first_name}} {{manager.last_name}}
-                                <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">Assign</button>
-                                <h5>({{manager.email}})</h5>
-                            </div>
-                            <div id="collapse-unassigned{{$index}}" class="panel-collapse collapse">
-                                <div class="panel-body" ng-if="toggleStudents[$index]">
-                                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Unassigned Students" ng-model="studentSearch[$index]">
-                                    </br>
-                                    <div class="table-responsive scrollableTableDiv">
-                                        <table class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>First Name</th>
-                                                    <th>Last Name</th>
-                                                    <th>Student ID</th>
-                                                    <th class="buttonColumn"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr ng-repeat="student in otherStudentsArray | otherStudentFilter:$index:studentSearch">
-                                                    <td>{{ student.first_name }}</td>
-                                                    <td>{{ student.last_name }}</td>
-                                                    <td>{{ student.student_id }}</td>
-                                                    <td>
-                                                        <button class="btn btn-success btn-xs" type="button" ng-click="assignManagerAndStudent(manager.pk, student, 'unassigned')">
-                                                            <i class="glyphicon glyphicon-plus white"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                    <h4 class="centerText" ng-show="nonManagerResults.length === 0">No Unassigned Managers</h4>
+                    <div ng-hide="nonManagerResults.length === 0">
+                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Unassigned Managers" ng-model="nonManagerSearch">
+                        </br>
+                        <div ng-repeat="manager in nonManagersArray | filter:nonManagerFilter as nonManagerResults">
+                            <div class="panel panel-default">
+                                <div class="panel-heading hidden-xs">
+                                    <h4 class="panel-title panel-title-with-btn">{{manager.first_name}} {{manager.last_name}} ({{manager.email}})</h4>
+                                    <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
+                                        Assign
+                                    </button>
+                                </div>
+                                <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl">
+                                    {{manager.first_name}} {{manager.last_name}}
+                                    <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">Assign</button>
+                                    <h5 style="margin-bottom:0px;">({{manager.email}})</h5>
+                                </div>
+                                <div id="collapse-unassigned{{$index}}" class="panel-collapse collapse">
+                                    <div class="panel-body" ng-if="toggleStudents[$index]">
+                                        <h4 class="centerText" ng-show="uOtherStudentResults.length === 0">No Unassigned Students</h4>
+                                        <div ng-hide="uOtherStudentResults.length === 0">
+                                            <input type="text" autocomplete="off" class="form-control" placeholder="Filter Unassigned Students" ng-model="studentSearch[$index]">
+                                            </br>
+                                            <div class="table-responsive scrollableTableDiv">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>First Name</th>
+                                                            <th>Last Name</th>
+                                                            <th>Student ID</th>
+                                                            <th class="buttonColumn"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="student in otherStudentsArray | otherStudentFilter:$index:studentSearch as uOtherStudentResults">
+                                                            <td>{{ student.first_name }}</td>
+                                                            <td>{{ student.last_name }}</td>
+                                                            <td>{{ student.student_id }}</td>
+                                                            <td>
+                                                                <button class="btn btn-success btn-xs" type="button" ng-click="assignManagerAndStudent(manager.pk, student, 'unassigned')">
+                                                                    <i class="glyphicon glyphicon-plus white"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

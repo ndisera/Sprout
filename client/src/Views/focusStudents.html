@@ -19,27 +19,21 @@
 <div class="row voffset3" ng-if="focusStudents.length === 0 && !editing">
     <div class="col-xs-12">
         <div class="alert alert-info no-bottom-margin" role="alert">
-            <span class="glyphicon glyphicon-info-sign alert-glyphicon-icon"></span>
-            <span>It looks like you don't have any Focus Students. Click the "Edit" button to add one.</span>
+            <span><b>Tip:</b> It looks like you don't have any Focus Students. Click the "Edit" button to add one.</span>
         </div>
     </div>
 </div>
 <div class="sortable voffset3" ui-sortable="sortableOptions" ng-model="focusStudents">
     <div class="row" ng-repeat="focusStudent in focusStudents">
         <div class="col-xs-12">
-            <div class="focus-remove-button" ng-if="editing">
-                <button ng-click="removeFocusStudent(focusStudent)" class="btn btn-danger" type="button">
-                    <span class="glyphicon glyphicon-minus white"></span>
-                </button>
-            </div>
             <div ng-class="{ 'focus-student-panel-editing': editing, }">
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a href="/student/{{ focusStudent.student }}">{{ studentsLookup[focusStudent.student].first_name }} {{ studentsLookup[focusStudent.student].last_name }}</a>
-                                <span class="glyphicon glyphicon-chevron-down blackish"
-                                      data-toggle="collapse" data-target="#collapse-{{ $index }}" onclick="$(this).toggleClass('glyphicon-chevron-up glyphicon-chevron-down')">
+                                <span class="glyphicon glyphicon-chevron-right blackish"
+                                      data-toggle="collapse" data-target="#collapse-{{ $index }}" onclick="$(this).toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
                                 </span>
                             </h4>
                         </div>
@@ -53,25 +47,30 @@
                                             <canvas id="focus_graph" class="chart chart-line" chart-data="focus_data" chart-labels="focus_labels" chart-options="options" chart-click="onClick"></canvas>
                                         </div>
                                     </div>
-                                    <div class="col-sm-4 centerText">
-                                        <label>Progress Category</label>
-                                        <span class="glyphicon glyphicon-fire"></span>
-                                        <div class="col-sm-12 focusProgress">
-                                            <canvas id="focus_progress_graph" class="chart chart-line" chart-data="progress_data" chart-labels="progress_labels" chart-colors="progress_colours" chart-options="options_behavior" chart-click="onClick"></canvas>
-                                        </div>
+                                </div>
+                                <div class="col-sm-4 centerText">
+                                    <label>Progress Category</label>
+                                    <span class="glyphicon glyphicon-fire"></span>
+                                    <div class="col-sm-12 focusProgress">
+                                        <canvas id="focus_progress_graph" class="chart chart-line" chart-data="progress_data" chart-labels="progress_labels" chart-colors="progress_colours" chart-options="options_behavior" chart-click="onClick"></canvas>
                                     </div>
-                                    <div class="col-sm-4 centerText">
-                                        <label>Caution Category</label>
-                                        <span class="glyphicon glyphicon-alert"></span>
-                                        <div class="col-sm-12 focusCaution">
-                                            <canvas id="focus_caution_graph" class="chart chart-line" chart-data="caution_data" chart-labels="caution_labels" chart-colors="caution_colours" chart-options="options" chart-click="onClick"></canvas>
-                                        </div>
+                                </div>
+                                <div class="col-sm-4 centerText">
+                                    <label>Caution Category</label>
+                                    <span class="glyphicon glyphicon-alert"></span>
+                                    <div class="col-sm-12 focusCaution">
+                                        <canvas id="focus_caution_graph" class="chart chart-line" chart-data="caution_data" chart-labels="caution_labels" chart-colors="caution_colours" chart-options="options" chart-click="onClick"></canvas>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="focus-remove-button" ng-if="editing">
+                <button ng-click="removeFocusStudent(focusStudent)" class="btn btn-danger" type="button">
+                    <span class="glyphicon glyphicon-minus white"></span>
+                </button>
             </div>
         </div>
     </div>
@@ -92,9 +91,9 @@
                     <button type="button" class="btn btn-danger panel-header-btn pull-right" ng-click="toggleAdd(false)">Cancel</button>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="filterResults.length === 0">No Other Students</h4>
-                    <div ng-show="filterResults.length !== 0">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" name="studentSearch" list="studentSearch" ng-model="studentSearch">
+                    <h4 class="centerText" ng-show="students.length === focusStudents.length">No Other Students</h4>
+                    <div ng-show="students.length !== focusStudents.length">
+                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" name="studentSearch" list="studentSearch" ng-model="studentSearch.text">
                         <div class="table-responsive scrollableTableDiv voffset3">
                             <table class="table table-hover">
                                 <thead>
@@ -124,6 +123,13 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<div class="row" ng-if="editing">
+    <div class="col-xs-12">
+        <div class="alert alert-info">
+            <span><b>Tip:</b> You can reorder your focus students by dragging and dropping.</span>
         </div>
     </div>
 </div>

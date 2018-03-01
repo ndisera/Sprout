@@ -1,4 +1,4 @@
-app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, sectionService, studentService, studentData, enrollmentData) {
+app.controller("studentGradesController", function ($scope, $routeParams, toastService, sectionService, studentService, studentData, enrollmentData) {
     $scope.student  = studentData.student;
     $scope.sections = [];
 
@@ -205,11 +205,13 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
 
                     },
                     function error(response) {
+                        toastService.error('The server wasn\'t able to get the student\'s grades for this class.');
                     }
                 );
             },
             function error(response) {
                 //TODO: notify user
+                toastService.error('The server wasn\'t able to get the assignments for this class.');
             }
         );
     };

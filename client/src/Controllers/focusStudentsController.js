@@ -1,4 +1,8 @@
-app.controller("focusStudentsController", function ($scope, $q, studentData, focusData, userService) {
+app.controller("focusStudentsController", function ($scope, $q, toastService, userService, studentData, focusData) {
+
+    $scope.studentSearch = {
+        text: "",
+    };
 
     // set students if there are any
     $scope.students       = [];
@@ -17,8 +21,9 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
     $scope.editing = false;
     $scope.toggleEdit = function() {
         $scope.editing = !$scope.editing;
-        if($scope.editing === true) {
+        if($scope.editing === false) {
             $scope.adding = false;
+            $scope.studentSearch.text = "";
         }
     };
 
@@ -30,6 +35,8 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
         else {
             $scope.adding = val;
         }
+        $scope.studentSearch.text = "";
+
     };
 
     /**
@@ -40,10 +47,10 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
         if(_.find($scope.focusStudents, function(elem) { return elem.student === student.id; })) {
             return false;
         }
-        if($scope.studentSearch === null || $scope.studentSearch === undefined) {
+        if($scope.studentSearch.text === null || $scope.studentSearch.text === undefined) {
             return true;
         }
-        var input = $scope.studentSearch.toUpperCase();
+        var input = $scope.studentSearch.text.toUpperCase();
         var fullname = student.first_name + " " + student.last_name;
         if(student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
             student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
@@ -54,7 +61,7 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
     }
 
 
-    // set up for sotrable drag/drop
+    // set up for sortable drag/drop
     var tempOrder = [];
     $scope.sortableOptions = {
         // update is called before changes to order of focusStudents are final
@@ -74,6 +81,8 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
                     _.each($scope.focusStudents, function(elem) {
                         elem.ordering = tempLookup[elem.id].ordering;
                     });
+
+                    toastService.success('The server saved your order');
                 })
                 .catch(function(data) {
                     // revert the order using tempOrder saved in "update" call
@@ -83,7 +92,8 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
                     });
                     $scope.focusStudents = tempFocusStudents;
 
-                    //TODO(gzuber): nofity user
+                    // notify the user
+                    toastService.error('The server wasn\'t able to save your reordering.');
                 });
         },
     };
@@ -129,7 +139,8 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
                 });
             },
             function error(response) {
-                //TODO(gzuber): notify the user
+                // notify the user
+                toastService.error('The server wasn\'t able to save your removal.');
             },
         );
     };
@@ -162,10 +173,11 @@ app.controller("focusStudentsController", function ($scope, $q, studentData, foc
                     });
                 });
 
-                $scope.adding = false;
+                $scope.toggleAdd(false);
             },
             function error(response) {
-                //TODO(gzuber): notify the user
+                // notify the user
+                toastService.error('The server wasn\'t able to save your addition.');
             },
         );
     };
