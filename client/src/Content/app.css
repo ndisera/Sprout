@@ -9,6 +9,16 @@
 .voffset8 { margin-top: 100px; }
 .voffset9 { margin-top: 150px; }
 
+[date-picker] .active, [date-picker] .active.active {
+    background: none;
+    background-color: #11527d;
+}
+
+[date-picker] .now, [date-picker] .now.active {
+    background: none;
+    background-color: #57bc90;
+}
+
 html, body {
     height: 100%;
     width: 100%;
