@@ -21,8 +21,8 @@
 }
 
 .focus-remove-button {
+    display: inline-block;
     width: 40px;
-    float: right;
     margin-top: -2px;
 }
 
