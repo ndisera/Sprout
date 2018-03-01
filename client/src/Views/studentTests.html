@@ -33,7 +33,7 @@
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Performance</h3>
+                            <h3 class="panel-title">Select Date Range</h3>
                         </div>
                         <div class="panel-body">
                             <div class="row">
@@ -44,12 +44,12 @@
                                                id="graphStartDate"
                                                class="form-control"
                                                date-time ng-model="graphStartDate"
-                                                         view="date"
-                                                         min-view="date"
-                                                         format="YYYY-MM-DD"
-                                                         date-change="graphDateRangeChange"
-                                                         max-date="graphEndDate"
-                                                         watch-direct-changes="true">
+                                               view="date"
+                                               min-view="date"
+                                               format="YYYY-MM-DD"
+                                               date-change="graphDateRangeChange"
+                                               max-date="graphEndDate"
+                                               watch-direct-changes="true">
                                     </div>
                                 </div>
                                 <div class="col-xs-12 col-sm-6 voffset2">
@@ -59,25 +59,35 @@
                                                id="graphEndDate"
                                                class="form-control"
                                                date-time ng-model="graphEndDate"
-                                                         view="date"
-                                                         min-view="date"
-                                                         format="YYYY-MM-DD"
-                                                         date-change="graphDateRangeChange"
-                                                         min-date="graphStartDate"
-                                                         watch-direct-changes="true">
+                                               view="date"
+                                               min-view="date"
+                                               format="YYYY-MM-DD"
+                                               date-change="graphDateRangeChange"
+                                               min-date="graphStartDate"
+                                               watch-direct-changes="true">
                                     </div>
                                 </div>
                             </div>
-                            <!--todo: prettify the frontend-->
-                            <div class="row voffset3">
-                                <div class="col-sm-12 centerText student-tests-graph" ng-repeat="graph in testGraphs">
-                                    <label>{{testGraphTitles[$index]}}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row voffset2" ng-repeat="graph in testGraphs">
+            <div class="col-xs-12">
+                <div class="panel-wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">{{testGraphTitles[$index]}}</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-xs-12 voffset2 student-tests-graph">
                                     <canvas id="testGraph-{{$index}}"
                                             class="chart chart-line"
                                             chart-data="graph.data"
                                             chart-labels="graph.labels"
-                                            chart-options="graph.options"
-                                            chart-colors="graph.colors">
+                                            chart-options="graph.options">
                                     </canvas>
                                 </div>
                             </div>
