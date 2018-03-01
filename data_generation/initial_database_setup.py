@@ -19,12 +19,12 @@ from services.users import User, UsersService
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
+    parser.add_argument("--protocol", action='store', default='https', type=str,
+                        help="protocol to use (default: https)")
     parser.add_argument("--host", "-u", action='store', default="localhost", type=str,
                         help="hostname or IP address to connect to (default: localhost)")
     parser.add_argument("--port", "-p", action='store', default=8000, type=int,
                         help="port to connect on (default: 8000)")
-    parser.add_argument("--protocol", action='store', default='https', type=str,
-                        help="protocol to use (default: https)")
     parser.add_argument("--username", "-l", action="store", type=str,
                         help="login username")
     parser.add_argument("--password", "-s", action="store", type=str,

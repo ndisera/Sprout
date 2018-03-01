@@ -158,7 +158,9 @@ class GradesGenerator():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload random grade information to Sprout")
-    parser.add_argument("--url", "-u", action='store', default="localhost", type=str,
+    parser.add_argument("--protocol", action='store', default='https', type=str,
+                        help="protocol to use (default: https)")
+    parser.add_argument("--hostname", "-u", action='store', default="localhost", type=str,
                         help="hostname or IP address to connect to (default: localhost)")
     parser.add_argument("--port", "-p", action='store', default=8000, type=int,
                         help="port to connect on (default: 8000)")
@@ -169,7 +171,7 @@ if __name__ == "__main__":
     parser.add_argument("--token", action="store", type=str,
                         help="auth token -- supersedes username and password")
     parser.add_argument("--num-scores", action="store", type=int, default=5,
-                        help="number of datapoints to generate")
+                        help="number of datapoints to generate for each assignment")
     parser.add_argument("--setup-num-assign", action="store", type=int,
                         help="generate and upload this number of assignments")
 
@@ -178,7 +180,8 @@ if __name__ == "__main__":
     if not args.token:
         args.username, args.password = AuthorizationService.display_login_prompt(args.username, args.password)
 
-        authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
+        authorizationHandler = AuthorizationService(protocol=args.protocol,
+                                                    hostname=args.hostname,
                                                     port_num=args.port,
                                                     verify=False)
 
@@ -191,7 +194,7 @@ if __name__ == "__main__":
 
     headers = { 'Authorization': 'JWT {}'.format(args.token)}
 
-    generator = GradesGenerator(url=args.url, port_num=args.port, headers=headers, verify=False)
+    generator = GradesGenerator(protocol=args.protocol, hostname=args.hostname, port_num=args.port, headers=headers, verify=False)
 
     if args.setup_num_assign is not None:
         assignments = generator.generate_assignments(args.setup_num_assign)
