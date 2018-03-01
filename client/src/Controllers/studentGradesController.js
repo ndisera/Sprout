@@ -1,4 +1,4 @@
-app.controller("studentGradesController", function ($scope, $routeParams, toastService, sectionService, studentService, studentData, enrollmentData) {
+app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, toastService, sectionService, studentService, studentData, enrollmentData) {
     $scope.student  = studentData.student;
     $scope.sections = [];
 
@@ -26,33 +26,9 @@ app.controller("studentGradesController", function ($scope, $routeParams, toastS
         },
         colors: [],
         datasetOverride: {
-            //backgroundColor: [
-                //"rgba(255,99,132,0.2)",
-                //"rgba(255,159,64,0.2)",
-                //"rgba(255,205,86,0.2)",
-                //"rgba(75,192,192,0.2)",
-                //"rgba(54,162,235,0.2)",
-                //"rgba(153,102,255,0.2)",
-                //"rgba(201,203,207,0.2)",
-            //],
-            //hoverBackgroundColor: [
-                //"rgba(255,99,132,0.4)",
-                //"rgba(255,159,64,0.4)",
-                //"rgba(255,205,86,0.4)",
-                //"rgba(75,192,192,0.4)",
-                //"rgba(54,162,235,0.4)",
-                //"rgba(153,102,255,0.4)",
-                //"rgba(201,203,207,0.4)",
-            //],
-            //borderColor: [
-                //"rgba(255,99,132,0.7)",
-                //"rgba(255,159,64,0.7)",
-                //"rgba(255,205,86,0.7)",
-                //"rgba(75,192,192,0.7)",
-                //"rgba(54,162,235,0.7)",
-                //"rgba(153,102,255,0.7)",
-                //"rgba(201,203,207,0.7)",
-            //],
+            backgroundColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.2).toRgbString(); }),
+            hoverBackgroundColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.4).toRgbString(); }),
+            borderColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.7).toRgbString(); }),
         },
     };
 
@@ -70,35 +46,10 @@ app.controller("studentGradesController", function ($scope, $routeParams, toastS
                 position: 'bottom',
             },
         },
-        colors: [],
         datasetOverride: {
-            backgroundColor: [
-                "rgba(75,192,192,0.2)",
-                "rgba(255,159,64,0.2)",
-                "rgba(255,99,132,0.2)",
-                "rgba(54,162,235,0.2)",
-                "rgba(153,102,255,0.2)",
-                "rgba(201,203,207,0.2)",
-                "rgba(255,205,86,0.2)",
-            ],
-            hoverBackgroundColor: [
-                "rgba(75,192,192,0.4)",
-                "rgba(255,159,64,0.4)",
-                "rgba(255,99,132,0.4)",
-                "rgba(54,162,235,0.4)",
-                "rgba(153,102,255,0.4)",
-                "rgba(201,203,207,0.4)",
-                "rgba(255,205,86,0.4)",
-            ],
-            borderColor: [
-                "rgba(75,192,192,0.7)",
-                "rgba(255,159,64,0.7)",
-                "rgba(255,99,132,0.7)",
-                "rgba(54,162,235,0.7)",
-                "rgba(153,102,255,0.7)",
-                "rgba(201,203,207,0.7)",
-                "rgba(255,205,86,0.7)",
-            ],
+            backgroundColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.2).toRgbString(); }),
+            hoverBackgroundColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.4).toRgbString(); }),
+            borderColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.7).toRgbString(); }),
         },
     };
 
