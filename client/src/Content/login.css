@@ -1,17 +1,42 @@
-.well.login-box {
-    margin: 0 auto;
-    max-width: 500px;
+/*.well.login-box {*/
+    /*margin: 0 auto;*/
+    /*max-width: 500px;*/
+/*}*/
+
+/*.well.login-box h1 {*/
+    /*font-size: 26px;*/
+    /*text-align: center;*/
+    /*font-weight: 300;*/
+/*}*/
+
+/*.well.login-box label {*/
+    /*font-weight: 300;*/
+    /*font-size: 16px;*/
+/*}*/
+
+#login-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    background-image: url("../img/sprout_background3.jpg");
+    background-size: cover;
 }
 
-.well.login-box h1 {
-    font-size: 26px;
-    text-align: center;
-    font-weight: 300;
+#login-background-container {
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)) 0% 0% / cover, url("../img/sprout_background") center center;
 }
 
-.well.login-box label {
-    font-weight: 300;
-    font-size: 16px;
+#login-box {
+    margin-top: 100px;
+}
+
+#login-top-label, #login-bottom-label {
+    font-weight: 200;
 }
 
 #login-logo-container {
