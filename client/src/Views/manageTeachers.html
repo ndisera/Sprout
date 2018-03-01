@@ -31,8 +31,8 @@
                     <h3 class="panel-title">All Teachers</h3>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="viewTeacherResults.length === 0">No Teachers</h4>
-                    <div ng-hide="viewTeacherResults.length === 0">
+                    <h4 class="centerText" ng-show="teachers.length === 0">No Teachers</h4>
+                    <div ng-hide="teachers.length === 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch" ng-focus="clearTeacherViewSearch()">
                         <br />
                         <div class="table-responsive scrollableTableDiv">
@@ -45,7 +45,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter as viewTeacherResults" ng-click="viewTeacher(teacher)" class="pointer">
+                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter" ng-click="viewTeacher(teacher)" class="pointer">
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
@@ -196,8 +196,8 @@
                     <h3 class="panel-title">All Teachers</h3>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="deleteTeacherResults.length === 0">No Teachers</h4>
-                    <div ng-hide="deleteTeacherResults.length === 0">
+                    <h4 class="centerText" ng-show="teachers.length === 0">No Teachers</h4>
+                    <div ng-hide="teachers.length === 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
                         <br />
                         <div class="table-responsive scrollableTableDiv">
@@ -211,7 +211,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter as deleteTeacherResults" class="pointer">
+                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter" class="pointer">
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
