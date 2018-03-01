@@ -24,11 +24,10 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                 }],
             },
         },
-        colors: [],
         datasetOverride: {
-            backgroundColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.2).toRgbString(); }),
-            hoverBackgroundColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.4).toRgbString(); }),
-            borderColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.7).toRgbString(); }),
+            backgroundColor: [],
+            hoverBackgroundColor: [],
+            borderColor: [],
         },
     };
 
@@ -77,6 +76,19 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                 // Save off the upcoming assignments, then remove them from our current assignments list
                 $scope.upcomingAssignments = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) >= 0; });
                 $scope.assignments         = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) < 0; });
+
+                // make sure there are enough colors for every assignment in assignment graph
+                var backgroundColors      = [];
+                var hoverBackgroundColors = [];
+                var borderColors          = [];
+                for(var i = 0; i < $scope.assignments.length; i += $rootScope.colors.length) {
+                    backgroundColors.push(_.map($rootScope.colors, function(elem) { return elem.setAlpha(0.2).toRgbString(); }));
+                    hoverBackgroundColors.push(_.map($rootScope.colors, function(elem) { return elem.setAlpha(0.4).toRgbString(); }));
+                    borderColors.push(_.map($rootScope.colors, function(elem) { return elem.setAlpha(0.7).toRgbString(); }));
+                }
+                $scope.assignmentsGraph.datasetOverride.backgroundColor      = _.flatten(backgroundColors);
+                $scope.assignmentsGraph.datasetOverride.hoverBackgroundColor = _.flatten(hoverBackgroundColors);
+                $scope.assignmentsGraph.datasetOverride.borderColor          = _.flatten(borderColors);
 
                 // Save the upcoming assignment due dates
                 _.each($scope.upcomingAssignments, function(assignmentElem) {
