@@ -23,6 +23,7 @@
 .focus-remove-button {
     width: 40px;
     float: right;
+    margin-top: -2px;
 }
 
 .focus-remove-button > button {
