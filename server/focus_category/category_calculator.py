@@ -1,3 +1,5 @@
+import random
+
 
 class CategoryCalculator():
     """
@@ -32,7 +34,25 @@ class CategoryCalculator():
         :return: a category to be included with the FocusStudent object
         :rtype: str
         """
-        return 'progress'
+        # The contructors for the data that I can use
+        # grades = [grade for grade in Grade.objects.filter(student=representation['student'])]
+        # attendances = []  # Attendances not currently tracked by Sprout
+        # behavior_efforts = [record for record in Behavior.objects.filter(enrollment__student=representation['student'])]
+        # test_scores = [score for score in StandardizedTestScore.objects.filter(student=representation['student'])]
+
+        # todo: remove import for random call once fleshed out
+        # todo: document string format/maybe look at json
+        # name__StartDate__EndDate__id
+        # ex) test__2018-02-21__2018-02-28__1
+        randVal = random.randint(1, 4)
+
+        # if randVal == 1:
+        #     return 'test'
+        # if randVal == 2:
+        return 'behavior'
+        # if randVal == 3:
+        #     return 'effort'
+        # return 'grades'
 
     def get_caution_category(self):
         """
@@ -41,4 +61,14 @@ class CategoryCalculator():
         :return: a category to be included with the FocusStudent object
         :rtype: str
         """
-        return 'caution'
+        randVal = random.randint(1, 4)
+
+        # if randVal == 1:
+        #     return 'test'
+        # if randVal == 2:
+        #     return 'behavior'
+        # if randVal == 3:
+        return 'effort'
+        # return 'grades'
+
+
