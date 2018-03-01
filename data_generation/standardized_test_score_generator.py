@@ -91,7 +91,9 @@ def date_arg(date_str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload random grade information to Sprout")
-    parser.add_argument("--url", "-u", action='store', default="localhost", type=str,
+    parser.add_argument("--protocol", action='store', default='https', type=str,
+                        help="protocol to use (default: https)")
+    parser.add_argument("--hostname", "-u", action='store', default="localhost", type=str,
                         help="hostname or IP address to connect to (default: localhost)")
     parser.add_argument("--port", "-p", action='store', default=8000, type=int,
                         help="port to connect on (default: 8000)")
@@ -117,7 +119,8 @@ if __name__ == "__main__":
     if not args.token:
         args.username, args.password = AuthorizationService.display_login_prompt(args.username, args.password)
 
-        authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
+        authorizationHandler = AuthorizationService(protocol=args.protocol,
+                                                    hostname=args.hostname,
                                                     port_num=args.port,
                                                     verify=False)
 
@@ -130,7 +133,7 @@ if __name__ == "__main__":
 
     headers = { 'Authorization': 'JWT {}'.format(args.token)}
 
-    generator = StandardizedTestScoreGenerator(url=args.url, port_num=args.port, headers=headers, verify=False)
+    generator = StandardizedTestScoreGenerator(protocol=args.protocol, hostname=args.hostname, port_num=args.port, headers=headers, verify=False)
 
     if args.setup:
         generator.setup_tests()
