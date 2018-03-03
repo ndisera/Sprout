@@ -1,4 +1,5 @@
 app.controller("manageCasesController", function($scope, $rootScope, $location, toastService, students, userData, studentService, userService) {
+    $scope.location = $location;
 
     getCaseManagers();
     $scope.studentSearch = {};

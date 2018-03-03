@@ -27,7 +27,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
         {
             title: "Home",
             glyph: "home",
-            href: "/focus",
+            href: "/profile",
             click: $scope.clearSearch,
         },
         {
@@ -39,7 +39,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
         {
             title: "Scores Input",
             glyph: "pencil",
-            href: "/scores",
+            href: "/input",
             click: $scope.clearSearch,
         },
         {
