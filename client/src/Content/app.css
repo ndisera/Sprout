@@ -234,6 +234,25 @@ a {
     }
 }
 
+.table-add > table.table-hover > tbody > tr:hover {
+    background-color: #dff0d8;
+    color: #3c763d;
+    cursor: pointer;
+}
+
+.table-remove > table.table-hover > tbody > tr:hover {
+    background-color: #f2dede;
+    color: #a94442;
+    cursor: pointer;
+}
+
+.table-select > table.table-hover > tbody > tr:hover {
+    background-color: #d9edf7;
+    color: #31708f;
+    cursor: pointer;
+}
+
+
 .centerText {
     text-align: center;
 }
@@ -364,15 +383,32 @@ a {
 }
 
 .panel-add {
-    border: 3px dashed #CCC;
+    /*border: 3px dashed #cae2b6;*/
+    border: 3px dashed #bcdba3;
+}
+
+.panel-add:hover {
+    /*border: 3px dashed #bcdba3;*/
+    border: 3px dashed #afd491;
 }
 
 .panel-add > .panel-heading {
     border-bottom: none;
+    /*background-color: #dff0d8;*/
+    background-color: #d1eac8;
 }
 
 .panel-add > .panel-heading:hover {
-    background-color: #e9e9e9;
+    /*background-color: #d1eac8;*/
+    background-color: #c1e3b5;
+}
+
+.panel-add > .panel-heading > .panel-title > .glyphicon {
+    color: #3c763d;
+}
+
+.panel-title.big {
+    font-size: 23px;
 }
 
 .zero-width {

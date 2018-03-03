@@ -26,18 +26,23 @@
 <div class="sortable voffset3" ui-sortable="sortableOptions" ng-model="focusStudents">
     <div class="row" ng-repeat="focusStudent in focusStudents">
         <div class="col-xs-12">
+            <div class="focus-remove-button" ng-if="editing">
+                <button ng-click="removeFocusStudent(focusStudent)" class="btn btn-danger" type="button">
+                    <span class="glyphicon glyphicon-minus white"></span>
+                </button>
+            </div>
             <div ng-class="{ 'focus-student-panel-editing': editing, }">
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title">
+                            <h4 class="panel-title big">
                                 <a href="/student/{{ focusStudent.student }}">{{ studentsLookup[focusStudent.student].first_name }} {{ studentsLookup[focusStudent.student].last_name }}</a>
-                                <span class="glyphicon glyphicon-chevron-right blackish"
-                                      data-toggle="collapse" data-target="#collapse-{{ $index }}" onclick="$(this).toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
-                                </span>
+                                <!--<span class="glyphicon glyphicon-chevron-right blackish"-->
+                                      <!--data-toggle="collapse" data-target="#collapse-{{ $index }}" onclick="$(this).toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">-->
+                                <!--</span>-->
                             </h4>
                         </div>
-                        <div id="collapse-{{ $index }}" class="panel-collapse collapse">
+                        <div id="collapse-{{ $index }}" class="panel-collapse collapse" ng-class="{ 'in': !editing, }">
                             <div class="panel-body">
                                 <div class="row">
                                     <div class="col-sm-4 centerText">
@@ -67,11 +72,6 @@
                     </div>
                 </div>
             </div>
-            <div class="focus-remove-button" ng-if="editing">
-                <button ng-click="removeFocusStudent(focusStudent)" class="btn btn-danger" type="button">
-                    <span class="glyphicon glyphicon-minus white"></span>
-                </button>
-            </div>
         </div>
     </div>
 </div>
@@ -94,7 +94,7 @@
                     <h4 class="centerText" ng-show="students.length === focusStudents.length">No Other Students</h4>
                     <div ng-show="students.length !== focusStudents.length">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" name="studentSearch" list="studentSearch" ng-model="studentSearch.text">
-                        <div class="table-responsive scrollableTableDiv voffset3">
+                        <div class="table-responsive scrollableTableDiv table-add voffset3">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -106,13 +106,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="student in students | filter:studentFilter as filterResults">
+                                    <tr ng-repeat="student in students | filter:studentFilter as filterResults" ng-click="addStudent(student)">
                                         <td>{{ student.first_name }}</td>
                                         <td>{{ student.last_name }}</td>
                                         <td>{{ student.student_id }}</td>
                                         <td>{{ student.birthdate }}</td>
                                         <td>
-                                            <button class="btn btn-success btn-xs" type="button" ng-click="addStudent(student)">
+                                            <button class="btn btn-success btn-xs" type="button">
                                                 <span class="glyphicon glyphicon-plus"></span>
                                             </button>
                                         </td>

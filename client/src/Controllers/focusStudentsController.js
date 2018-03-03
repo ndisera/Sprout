@@ -25,6 +25,7 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, us
             $scope.adding = false;
             $scope.studentSearch.text = "";
         }
+        $('.collapse').collapse("toggle");
     };
 
     $scope.adding = false;
@@ -172,8 +173,6 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, us
                         elem.ordering = tempLookup[elem.id].ordering;
                     });
                 });
-
-                $scope.toggleAdd(false);
             },
             function error(response) {
                 // notify the user

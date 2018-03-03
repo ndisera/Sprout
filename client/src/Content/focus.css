@@ -21,18 +21,18 @@
 }
 
 .focus-remove-button {
-    display: inline-block;
+    float: left;
     width: 40px;
     margin-top: -2px;
 }
 
 .focus-remove-button > button {
-    height: 40px;
+    height: 48px;
+    width: 45px;
 }
 
 .focus-student-panel-editing {
-    display: inline-block;
-    width: calc(100% - 50px);
+    margin-left: 55px;
 }
 
 .focus-width-none {
