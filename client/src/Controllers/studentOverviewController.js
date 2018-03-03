@@ -182,7 +182,3 @@ app.controller("studentOverviewController", function ($scope, $routeParams, toas
     };
 
 });
-
-
-
-

@@ -246,6 +246,9 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
             url: 'https://' + $rootScope.backend + '/users/' + userId,
             data: userObj,
         }).then(function success(response) {
+            if (user.id === response.data.sprout_user.pk) {
+                saveUser(response.data.sprout_user);
+            }
             deferred.resolve(response.data);
         }, function error(response) {
             deferred.reject(response);

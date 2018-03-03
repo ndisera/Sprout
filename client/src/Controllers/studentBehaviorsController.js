@@ -346,8 +346,3 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, toa
     updateInputScores();
 
 });
-
-
-
-
-

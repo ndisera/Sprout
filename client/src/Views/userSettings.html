@@ -8,6 +8,104 @@
 </ul>
 <div class="tab-content">
     <div class="tab-pane fade in active">
-        <h3 class="inlineHeading hidden-xs">User Settings</h3>
+        <h3>User Settings</h3>
+        <hr />
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 voffset2">
+                <div class="panel-wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title panel-title-with-btn">User Info</h3>
+                            <button class="btn btn-default pull-right heading-btn" type="button" ng-click="editUser('all')" ng-show="editingAll">
+                        Edit All
+                    </button>
+                            <button class="btn btn-default pull-right heading-btn" type="button" ng-click="editUser('none')" ng-hide="editingAll">
+                        Cancel All
+                    </button>
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" name="uEmailForm">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3" for="uemail">Email:</label>
+                                    <div class="col-sm-9">
+                                        <p class="form-control-static" ng-show="viewUEmail">{{user.email}}</p>
+                                    </div>
+                                </div>
+                            </form>
+                            <form name="editUFirstNameForm" class="form-horizontal" ng-submit="saveUEdit('firstname')">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3" for="ufirstname">First Name:</label>
+                                    <div class="col-sm-9">
+                                        <p class="form-control-static" ng-show="viewUFirstName">{{user.firstName}}&nbsp;&nbsp;&nbsp;<span ng-click="editUser('firstname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                        <div class="input-group" ng-hide="viewUFirstName">
+                                            <input required autocomplete="off" type="text" class="form-control" id="ufirstname" placeholder="{{user.firstName}}" name="ufirstname" ng-model="uFirstName">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="editUFirstNameForm.$invalid">
+                                            <i class="glyphicon glyphicon-ok green"></i>
+                                        </button>
+                                            </div>
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default" type="button" ng-click="cancelUEdit('firstname')">
+                                            <i class="glyphicon glyphicon-remove red"></i>
+                                        </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <form name="editULastNameForm" class="form-horizontal" ng-submit="saveUEdit('lastname')">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3" for="ulastname">Last Name:</label>
+                                    <div class="col-sm-9">
+                                        <p class="form-control-static" ng-show="viewULastName">{{user.lastName}}&nbsp;&nbsp;&nbsp;<span ng-click="editUser('lastname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                        <div class="input-group" ng-hide="viewULastName">
+                                            <input required autocomplete="off" type="text" class="form-control" id="ulastname" placeholder="{{user.lastName}}" name="ulastname" ng-model="uLastName">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="editULastNameForm.$invalid">
+                                            <i class="glyphicon glyphicon-ok green"></i>
+                                        </button>
+                                            </div>
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default" type="button" ng-click="cancelUEdit('lastname')">
+                                            <i class="glyphicon glyphicon-remove red"></i>
+                                        </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 voffset2">
+                <div class="panel-wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Change Password</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form name="passwordForm" action="savePassword">
+                                <div class="form-group">
+                                    <label class="control-label" for="oldpwd">Old Password:</label>
+                                    <input type="password" class="form-control" id="oldpwd" placeholder="Enter Old Password" name="oldpwd">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="newpwd">New Password:</label>
+                                    <input type="password" class="form-control" id="newpwd" placeholder="Enter New Password" name="newpwd">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="cnewpwd">Confirm New Password:</label>
+                                    <input type="password" class="form-control" id="cnewpwd" placeholder="Enter New Password" name="cnewpwd">
+                                </div>
+                                <div class="form-group">
+                                    <button ng-disabled="passwordForm.$invalid" type="submit" class="btn btn-success">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

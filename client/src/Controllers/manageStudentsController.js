@@ -193,4 +193,4 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
         }
         $scope.errorMessage = $scope.errorMessage.join(" ");
     }
-})
+});
