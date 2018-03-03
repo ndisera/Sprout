@@ -619,17 +619,27 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     }
 })
 
-// orderby used for class roster students THAT DOESN'T F^*&@#^! WORK AND GETS CALLED WAY TOO MANY TIMES IDK MAN!!!
-// app.filter('classRosterSort', function() {
-//     return function(items, enrollmentsArray, enrolledStudents) {
-//         if (items == null) {
-//             return [];
-//         }
-//         var filter = [];
-//         for (var i = 0; i < items.length; i++) {
-//             filter.push(enrolledStudents[enrollmentsArray[i].student]);
-//         }
-//         var x = _.sortBy(filter, 'last_name');
-//         return x;
-//     }
-// });
+// orderby for class roster students
+app.filter('classRosterSort', function() {
+    return function(items, enrolledStudents) {
+        if (items == null) {
+            return [];
+        }
+        var filter = [];
+        for (var i = 0; i < items.length; i++) {
+            filter.push(enrolledStudents[items[i].student]);
+        }
+        var sortedStudents = _.sortBy(filter, 'last_name');
+        // I have my student sorted by last Name
+        // now I want to translate this to enrollments
+        // an enrollment has a student id
+        // a student has a student id
+        // an enrollments lookup by student id would be nice
+        var itemsLookup = _.indexBy(items, 'student');
+        var sortedEnrollments = [];
+        for (var i = 0; i < sortedStudents.length; i++){
+            sortedEnrollments.push(itemsLookup[sortedStudents[i].id]);
+        }
+        return sortedEnrollments;
+    }
+});

@@ -45,7 +45,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter" ng-click="viewTeacher(teacher)" class="pointer">
+                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter | orderBy:'last_name'" ng-click="viewTeacher(teacher)" class="pointer">
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
@@ -137,7 +137,7 @@
                         <div class="table-responsive" ng-hide="sections.length === 0">
                             <table class="table">
                                 <tbody>
-                                    <tr ng-repeat="section in sections">
+                                    <tr ng-repeat="section in sections | orderBy:'title'">
                                         <td>&nbsp;&nbsp;{{ section.title }}</td>
                                         <td ng-if="section.schedule_position == null"></td>
                                         <td ng-if="section.schedule_position != null">&nbsp;&nbsp;{{ currentTermPeriods[section.schedule_position] }}</td>
@@ -204,7 +204,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter" class="pointer" ng-click="setTeacherD(teacher)" data-toggle="modal" data-target="#deleteTeacherModal">
+                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter | orderBy:'last_name'" class="pointer" ng-click="setTeacherD(teacher)" data-toggle="modal" data-target="#deleteTeacherModal">
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
