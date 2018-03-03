@@ -14,7 +14,7 @@
     background-color: #11527d;
 }
 
-[date-picker] .now, [date-picker] .now.active {
+[date-picker] .now, [date-picker] .now.active, [date-picker] .now.disabled {
     background: none;
     background-color: #57bc90;
 }
@@ -122,7 +122,7 @@ a {
 }
 
 #topbar .btn-group {
-    margin-top: 6px;
+    margin-top: -2px;
 }
 
 #topbar .btn-group > .btn {
@@ -133,6 +133,12 @@ a {
 
 #topbar .btn-group > .btn > span.glyphicon {
     color: #57bc90;
+}
+
+#topbar .topbar-user {
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 10px;
 }
 
 #topbar-hamburger-btn {
@@ -423,6 +429,16 @@ a {
     cursor: pointer;
 }
 
+.input-group-btn.open ul.dropdown-menu {
+    max-height: 167px;
+    overflow: auto;
+}
+
+.input-group-btn.open ul.dropdown-menu > li > a:hover {
+    background-color: #d9edf7;
+    color: #31708f;
+}
+
 .panel-header-btn {
     margin-top: -23px;
     margin-right: -10px;
@@ -577,6 +593,10 @@ a {
         margin-left: 0px;
         height: 80px;
         background-color: #0b3c5d;
+    }
+
+    #topbar .btn-group {
+        margin-top: 7px;
     }
 
     #topbar .btn-group > .btn > span.glyphicon {

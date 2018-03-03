@@ -4,7 +4,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     $scope.studentInfo = studentService.studentInfo;
 
     $scope.sidebarExtended = false;
-
     $scope.extendSidebar = function() {
         $scope.sidebarExtended = !$scope.sidebarExtended;
     };

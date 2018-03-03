@@ -152,8 +152,9 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         var deferred = $q.defer();
         $http({
             method: 'GET',
-            url: 'https://' + $rootScope.backend + '/auth-verify/' + query,
+            url: 'https://' + $rootScope.backend + '/auth-verify' + query,
         }).then(function success(response) {
+            console.log(response);
             if(_.has(response.data, 'user')) {
                 saveUser(response.data.user);
             }
