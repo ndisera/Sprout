@@ -1,9 +1,13 @@
-app.controller("manageClassesController", function($scope, $rootScope, $location, toastService, students, userData, sections, studentService, sectionService, enrollmentService) {
+app.controller("manageClassesController", function($scope, $rootScope, $location, toastService, students, userData, sections, studentService, sectionService, enrollmentService, termsInfo) {
 
     // anywhere 's' or 't' was previously used for 'students' and 'teachers', 'c' will be used for 'classes'
     // another 's' for 'sections' would be confusing with 'students', which will probably use an 's' again
 
     var sectionTask = "view/edit";
+    $scope.terms = termsInfo.terms;
+    $scope.termsLookup = _.indexBy(termsInfo.terms, "id");
+    $scope.termSettings = _.indexBy(termsInfo.term_settings, "id");
+    $scope.dailySchedules = _.indexBy(termsInfo.daily_schedules, "id");
     $scope.displaySectionViewSearch = true;
     $scope.displaySectionDeleteSearch = false;
     $scope.displaySectionForm = false;
@@ -11,6 +15,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.displayCEditInfo = false;
     $scope.viewCTitle = true;
     $scope.viewCTeacher = true;
+    $scope.viewCTerm = true;
+    $scope.viewCPeriod = true;
     $scope.addSectionSuccess = false;
     $scope.deleteSectionSuccess = false;
     $scope.sectionsLookup = {};
@@ -29,6 +35,25 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.addValidTeacher = false;
     $scope.editValidTeacher = false;
     $scope.editingAll = true;
+    $scope.viewSectionTerm = {name: "All Terms"};
+    $scope.deleteSectionTerm = {name: "All Terms"};
+
+    /**
+     * Sets cPeriod to selected period
+     * @param {string} period - the selected display period.
+     */
+    $scope.setPeriod = function(period) {
+        $scope.cPeriod = period;
+    }
+
+    /**
+     * Sets term variables to selected term
+     * @param {object} term - the term selected.
+     * @param {string} operation - the type of operation.
+     */
+    $scope.selectTerm = function(term, operation) {
+        operation === "view" ? $scope.viewSectionTerm = term : $scope.deleteSectionTerm = term;
+    }
 
     /**
      * Extra part of error message
@@ -55,16 +80,45 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     }
 
     /**
+     * Converts numbers to viewable periods
+     */
+    function getDisplayPeriods() {
+        $scope.periodArraysLookup = {};
+        for (var i = 0; i < $scope.terms.length; i++) {
+            var periodsForDisplay = [];
+            var schedule = $scope.dailySchedules[$scope.termSettings[$scope.terms[i].settings].schedule];
+            var day = 1;
+            var period = 0;
+            var noDays = schedule.total_periods === schedule.periods_per_day;
+            for (var j = 0; j < schedule.total_periods; j++) {
+                period++;
+                if (period > schedule.periods_per_day) {
+                    day++;
+                    period = 1;
+                }
+                noDays ? periodsForDisplay.push("Period " + period) : periodsForDisplay.push("Day " + day + " Period " + period);
+            }
+            $scope.periodArraysLookup[$scope.terms[i].name] = periodsForDisplay;
+        }
+    }
+
+    getDisplayPeriods();
+
+    /**
      * Make sure teacher text is an actual teacher.
      * @param {string} task - the type of task selected.
      */
     $scope.checkValidTeacher = function(task) {
         switch (task) {
             case "add":
-                $scope.addValidTeacher = _.has($scope.teachersLookup, $scope.addTeacher.toUpperCase());
+                if ($scope.addTeacher != null) {
+                    $scope.addValidTeacher = _.has($scope.teachersLookup, $scope.addTeacher.toUpperCase());
+                }
                 break;
             case "edit":
-                $scope.editValidTeacher = _.has($scope.teachersLookup, $scope.cTeacher.toUpperCase());
+                if ($scope.cTeacher != null) {
+                    $scope.editValidTeacher = _.has($scope.teachersLookup, $scope.cTeacher.toUpperCase());
+                }
                 break;
             default:
         }
@@ -137,7 +191,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     }
 
     /**
-     * Displays teacher info if name in teacher search bar is valid.
+     * Displays section info.
+     * @param {object} section - the selected section.
      */
     $scope.viewSection = function(section) {
         $scope.sectionV = section;
@@ -147,6 +202,10 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         // make sure edit is still not displayed when switching
         $scope.viewCTitle = true;
         $scope.viewCTeacher = true;
+        $scope.viewCTerm = true;
+        $scope.cTerm = $scope.termsLookup[section.term];
+        $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[section.term].name][section.schedule_position];
+        $scope.viewCPeriod = true;
         // set enrolledStudents and unenrolledStudents
         $('#enrolledInput').val('');
         $('#unenrolledInput').val('');
@@ -167,14 +226,26 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 $scope.viewCTeacher = false;
                 checkIfAllSelected()
                 break;
+            case "term":
+                $scope.viewCTerm = false;
+                checkIfAllSelected()
+                break;
+            case "period":
+                $scope.viewCPeriod = false;
+                checkIfAllSelected()
+                break;
             case "none":
                 $scope.viewCTitle = true;
                 $scope.viewCTeacher = true;
+                $scope.viewCTerm = true;
+                $scope.viewCPeriod = true;
                 $scope.editingAll = true;
                 break;
             case "all":
                 $scope.viewCTitle = false;
                 $scope.viewCTeacher = false;
+                $scope.viewCTerm = false;
+                $scope.viewCPeriod = false;
                 $scope.editingAll = false;
                 break;
             default:
@@ -185,9 +256,11 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Sets edit all button according to what edit fields are ready to edit.
      */
     function checkIfAllSelected() {
-        if ($scope.viewCTitle === true && $scope.viewCTeacher === true) {
+        if ($scope.viewCTitle === true && $scope.viewCTeacher === true &&
+            $scope.viewCTerm === true && $scope.viewCPeriod === true) {
             $scope.editingAll = true;
-        } else if ($scope.viewCTitle === false && $scope.viewCTeacher === false) {
+        } else if ($scope.viewCTitle === false && $scope.viewCTeacher === false &&
+            $scope.viewCTerm === false && $scope.viewCPeriod === false) {
             $scope.editingAll = false;
         }
     }
@@ -206,6 +279,12 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 $scope.viewCTeacher = true;
                 $scope.cTeacher = "";
                 break;
+            case "term":
+                $scope.viewCTerm = true;
+                break;
+            case "period":
+                $scope.viewCPeriod = true;
+                break;
             default:
         }
         checkIfAllSelected()
@@ -223,6 +302,12 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 break;
             case "teacher":
                 $scope.sectionE.teacher = $scope.teachersLookup[$scope.cTeacher.toUpperCase()];
+                break;
+            case "term":
+                $scope.sectionE.term = $scope.cTerm.id;
+                break;
+            case "period":
+                $scope.sectionE.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].name].indexOf($scope.cPeriod);
                 break;
             default:
         }
@@ -259,6 +344,12 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     $scope.viewCTeacher = true;
                     $scope.cTeacher = "";
                     break;
+                case "term":
+                    $scope.viewCTerm = true;
+                    break;
+                case "period":
+                    $scope.viewCPeriod = true;
+                    break;
                 default:
             }
         }, function error(response) {
@@ -272,10 +363,17 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      */
     $scope.addSection = function() {
         $scope.newSection.teacher = $scope.teachersLookup[$scope.addTeacher.toUpperCase()];
+        $scope.newSection.term = $scope.newSectionTerm.id;
+        if ($scope.newSectionPeriod != null) {
+            $scope.newSection.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.newSection.term].name].indexOf($scope.newSectionPeriod);
+        }
         var sectionPromise = sectionService.addSection($scope.newSection);
         sectionPromise.then(function success(data) {
             $scope.addTeacher = "";
             $scope.newSection = {};
+            $scope.newSectionTerm = null;
+            $scope.newSectionPeriod = null;
+            $scope.addPeriodsForDisplay = [];
             toastService.success("New section has been added.");
             $scope.sections.push(data.section);
             var lookupName = data.section.title;
@@ -464,8 +562,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * @param {section} section - section to be filtered.
      */
     $scope.viewSectionFilter = function(section) {
-        if ($scope.sectionViewSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionViewSearch.toUpperCase())
-            || section.title.toUpperCase().includes($scope.sectionViewSearch.toUpperCase())) {
+        if ($scope.sectionViewSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionViewSearch.toUpperCase()) ||
+            section.title.toUpperCase().includes($scope.sectionViewSearch.toUpperCase())) {
             return true;
         }
         return false; // otherwise it won't be within the results
@@ -476,8 +574,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * @param {section} section - section to be filtered.
      */
     $scope.deleteSectionFilter = function(section) {
-        if ($scope.sectionDeleteSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase())
-            || section.title.toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase())) {
+        if ($scope.sectionDeleteSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase()) ||
+            section.title.toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase())) {
             return true;
         }
         return false; // otherwise it won't be within the results
@@ -520,3 +618,18 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         return false;
     }
 })
+
+// orderby used for class roster students THAT DOESN'T F^*&@#^! WORK AND GETS CALLED WAY TOO MANY TIMES IDK MAN!!!
+// app.filter('classRosterSort', function() {
+//     return function(items, enrollmentsArray, enrolledStudents) {
+//         if (items == null) {
+//             return [];
+//         }
+//         var filter = [];
+//         for (var i = 0; i < items.length; i++) {
+//             filter.push(enrolledStudents[enrollmentsArray[i].student]);
+//         }
+//         var x = _.sortBy(filter, 'last_name');
+//         return x;
+//     }
+// });

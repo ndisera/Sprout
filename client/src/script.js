@@ -54,6 +54,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 auth: function (userService) {
                     return userService.authVerify();
                 },
+                termsInfo: function(termService) {
+                    return termService.getTerms({
+                        include: ['settings.schedule.*']
+                    });
+                },
             }
         })
 
@@ -90,6 +95,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 auth: function(userService) {
                     return userService.authVerify();
+                },
+                termsInfo: function(termService) {
+                    return termService.getTerms({
+                        include: ['settings.schedule.*']
+                    });
                 },
             },
         })
