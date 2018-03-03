@@ -100,6 +100,10 @@ const paths = {
         src: 'src/Views/*.html',
         dest: 'public/html',
     },
+    partials: {
+        src: 'src/Partials/*.html',
+        dest: 'public/html',
+    },
     index: {
         src: 'src/index.html',
         dest: 'public',
@@ -131,6 +135,11 @@ function copy_imgs() {
 function copy_views() {
     return gulp.src(paths.views.src)
             .pipe(gulp.dest(paths.views.dest));
+}
+
+function copy_partials() {
+    return gulp.src(paths.partials.src)
+            .pipe(gulp.dest(paths.partials.dest));
 }
 
 function copy_index() {
@@ -166,6 +175,7 @@ var build = gulp.series(
                     copy_fonts,
                     copy_imgs,
                     copy_views,
+                    copy_partials,
                     copy_index,
                     copy_includes, 
                     concat_styles, 

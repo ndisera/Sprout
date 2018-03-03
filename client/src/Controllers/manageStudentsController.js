@@ -1,4 +1,5 @@
 app.controller("manageStudentsController", function($scope, $rootScope, $location, toastService, students, studentService) {
+    $scope.location = $location;
 
     var studentTask = "view/edit";
     $scope.displayStudentViewSearch = true;

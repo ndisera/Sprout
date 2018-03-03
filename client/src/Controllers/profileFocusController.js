@@ -1,4 +1,5 @@
-app.controller("focusStudentsController", function ($scope, $q, toastService, userService, studentData, focusData) {
+app.controller("profileFocusController", function ($scope, $q, $location, toastService, userService, studentData, focusData) {
+    $scope.location = $location;
 
     $scope.studentSearch = {
         text: "",
@@ -15,7 +16,13 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, us
     // set focus students if there are any
     $scope.focusStudents = [];
     if(focusData.focus_students !== null && focusData.focus_students !== undefined) {
-        $scope.focusStudents = _.sortBy(focusData.focus_students, 'ordering');
+        $scope.focusStudents = [];
+        var orderedFocusStudents = _.sortBy(focusData.focus_students, 'ordering');
+        _.each(orderedFocusStudents, function(elem) {
+            $scope.focusStudents.push(elem);
+        });
+
+        //$scope.focusStudents = _.sortBy(focusData.focus_students, 'ordering');
     }
 
     $scope.editing = false;
