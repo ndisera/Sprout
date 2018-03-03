@@ -154,7 +154,6 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
             method: 'GET',
             url: 'https://' + $rootScope.backend + '/auth-verify/' + query,
         }).then(function success(response) {
-            console.log(response);
             if(_.has(response.data, 'user')) {
                 saveUser(response.data.user);
             }
