@@ -429,6 +429,10 @@ a {
     font-size: 11px;
 }
 
+.panel-heading.pointer:hover {
+    background-color: #e7e7e7;
+}
+
 .table-responsive {
     border: 1px solid #DDD;
 }
