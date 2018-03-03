@@ -33,16 +33,15 @@
                         <div ng-repeat="caseManager in caseManagersArray | filter:caseManagerFilter">
                             <div class="panel-wrapper">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading hidden-xs">
+                                    <div class="panel-heading hidden-xs pointer" data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
                                         <h4 class="panel-title">
                                         {{caseManager.first_name}} {{caseManager.last_name}} ({{caseManager.email}}) <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
-                                        <span class="glyphicon glyphicon-chevron-right blackish"
-                                              data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).toggleClass('glyphicon-chevron-down glyphicon-chevron-right')"></span>
+                                        <span class="glyphicon glyphicon-chevron-right blackish"></span>
                                     </h4>
                                     </div>
-                                    <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl">
+                                    <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl pointer" data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
                                         {{caseManager.first_name}} {{caseManager.last_name}} <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
-                                        <span class="glyphicon glyphicon-chevron-right blackish" data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).toggleClass('glyphicon-chevron-down glyphicon-chevron-right')"></span>
+                                        <span class="glyphicon glyphicon-chevron-right blackish"></span>
                                         <h5 class="no-bottom-margin">
                                         ({{caseManager.email}})
                                     </h5>
@@ -127,15 +126,15 @@
                         <div ng-repeat="manager in nonManagersArray | filter:nonManagerFilter">
                             <div class="panel-wrapper">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading hidden-xs">
+                                    <div class="panel-heading hidden-xs pointer" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
                                         <h4 class="panel-title panel-title-with-btn">{{manager.first_name}} {{manager.last_name}} ({{manager.email}})</h4>
-                                        <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
+                                        <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn">
                                         Assign
                                     </button>
                                     </div>
-                                    <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl">
+                                    <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl pointer" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
                                         {{manager.first_name}} {{manager.last_name}}
-                                        <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">Assign</button>
+                                        <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn">Assign</button>
                                         <h5 class="no-bottom-margin">({{manager.email}})</h5>
                                     </div>
                                     <div id="collapse-unassigned{{$index}}" class="panel-collapse collapse">

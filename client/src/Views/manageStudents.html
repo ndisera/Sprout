@@ -35,7 +35,7 @@
                     <div ng-hide="studentInfo.students.length === 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="studentsv" name="studentsv" ng-model="studentViewSearch">
                         </br>
-                        <div class="table-responsive scrollableTableDiv">
+                        <div class="table-responsive scrollableTableDiv table-select">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -109,7 +109,7 @@
                     <div ng-hide="studentInfo.students.length === 0">
                         <input type="text" class="form-control" placeholder="Filter Students" list="studentsd" name="studentsd" autocomplete="off" ng-model="studentDeleteSearch">
                         <br />
-                        <div class="table-responsive scrollableTableDiv">
+                        <div class="table-responsive scrollableTableDiv table-remove">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -121,13 +121,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="student in studentInfo.students | filter:deleteStudentFilter">
+                                    <tr ng-repeat="student in studentInfo.students | filter:deleteStudentFilter" data-toggle="modal" data-target="#deleteStudentModal" ng-click="setStudentD(student)">
                                         <td>{{ student.first_name }}</td>
                                         <td>{{ student.last_name }}</td>
                                         <td>{{ student.student_id }}</td>
                                         <td>{{ student.birthdate }}</td>
                                         <td>
-                                            <button class="btn btn-danger btn-xs" type="button" data-toggle="modal" data-target="#deleteStudentModal" ng-click="setStudentD(student)">Delete</button>
+                                            <button class="btn btn-danger btn-xs" type="button">Delete</button>
                                         </td>
                                     </tr>
                                 </tbody>

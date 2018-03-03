@@ -35,7 +35,7 @@
                     <div ng-hide="teachers.length === 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch" ng-focus="clearTeacherViewSearch()">
                         <br />
-                        <div class="table-responsive scrollableTableDiv">
+                        <div class="table-responsive scrollableTableDiv table-select">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -193,7 +193,7 @@
                     <div ng-hide="teachers.length === 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
                         <br />
-                        <div class="table-responsive scrollableTableDiv">
+                        <div class="table-responsive scrollableTableDiv table-remove">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -204,12 +204,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter" class="pointer">
+                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter" class="pointer" ng-click="setTeacherD(teacher)" data-toggle="modal" data-target="#deleteTeacherModal">
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
                                         <td>
-                                            <button class="btn btn-danger btn-xs" type="button" data-toggle="modal" data-target="#deleteTeacherModal" ng-click="setTeacherD(teacher)">Delete</button>
+                                            <button class="btn btn-danger btn-xs" type="button">Delete</button>
                                         </td>
                                     </tr>
                                 </tbody>
