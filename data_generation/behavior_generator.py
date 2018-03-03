@@ -20,15 +20,19 @@ class BehaviorGenerator:
         :return: list[Behavior]
         """
         behaviors = []
+        iter_date = date_range_start
+        end_date = date_range_start + datetime.timedelta(days=num_days)
 
-        for day in range(1, num_days):
-            date = date_range_start + datetime.timedelta(days=day)
-            behavior = Behavior(
-                date=date.strftime('%Y-%m-%d'),
-                enrollment=enrollment.id,
-                effort=random.randint(1, 5),
-                behavior=random.randint(1, 5),
-                id=None,
-            )
-            behaviors.append(behavior)
+        while iter_date < end_date:
+            if iter_date.weekday() < 5:
+                behavior = Behavior(
+                    date=iter_date.strftime('%Y-%m-%d'),
+                    enrollment=enrollment.id,
+                    effort=random.randint(1, 5),
+                    behavior=random.randint(1, 5),
+                    id=None,
+                )
+                behaviors.append(behavior)
+            iter_date = iter_date + datetime.timedelta(days=1)
+
         return behaviors
