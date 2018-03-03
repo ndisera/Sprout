@@ -1,4 +1,4 @@
-app.controller("manageTeachersController", function($scope, $rootScope, $location, userData, userService, sectionService) {
+app.controller("manageTeachersController", function($scope, $rootScope, $location, toastService, userData, userService, sectionService, termsInfo) {
 
     var teacherTask = "view/edit";
     $scope.displayTeacherViewSearch = true;
@@ -17,6 +17,20 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
     $scope.newTeacher = {};
     $scope.teachers = userData.sprout_users;
     $scope.editingAll = true;
+    var terms = termsInfo.terms;
+    var termSettings = _.indexBy(termsInfo.term_settings, "id");
+    var dailySchedules = _.indexBy(termsInfo.daily_schedules, "id");
+
+    /**
+     * Extra part of error message
+     */
+    function errorResponse() {
+        var message = "";
+        if ($scope.errorMessage != null && $scope.errorMessage !== "") {
+            message = " Error message: " + $scope.errorMessage;
+        }
+        return message;
+    }
 
     /**
      * Sets teacherD.
@@ -25,6 +39,49 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
     $scope.setTeacherD = function(teacher) {
         $scope.teacherD = teacher;
     };
+
+    /**
+     * Creates the display periods based on the current term
+     * @param {string} currentDate - today's date.
+     */
+    function getDisplayPeriods(currentDate) {
+        $scope.currentTermPeriods = [];
+        for (var i = 0; i < terms.length; i++) {
+            if (terms[i].start_date <= currentDate && terms[i].end_date >= currentDate) {
+                var schedule = dailySchedules[termSettings[terms[i].settings].schedule];
+                var day = 1;
+                var period = 0;
+                var noDays = schedule.total_periods === schedule.periods_per_day;
+                for (var j = 0; j < schedule.total_periods; j++) {
+                    period++;
+                    if (period > schedule.periods_per_day) {
+                        day++;
+                        period = 1;
+                    }
+                    noDays ? $scope.currentTermPeriods.push("Period " + period) : $scope.currentTermPeriods.push("Day " + day + " Period " + period);
+                }
+                break; // should only be one term that matches
+            }
+        }
+    }
+
+    /**
+     * Gets today's date
+     */
+    function getCurrentDate() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        today = yyyy + "-" + mm + '-' + dd;
+        return today;
+    }
 
     /**
      * Grabs all classes taught by the selected teacher.
@@ -38,8 +95,12 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         });
         sectionsPromise.then(function success(data) {
             $scope.sections = data.sections;
+            var currentDate = getCurrentDate();
+            // this fills $scope.currentTermPeriods
+            getDisplayPeriods(currentDate);
         }, function error(response) {
-            $scope.errorMessage = response;
+            setErrorMessage(response);
+            toastService.error("The server was unable to get the teacher's classes." + errorResponse());
         });
     };
 
@@ -57,7 +118,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         switch (teacherTask) {
             case "view/edit":
                 $scope.displayTeacherViewSearch = false;
-                $scope.displayTEditInfo = false;
                 break;
             case "delete":
                 $scope.displayTeacherDeleteSearch = false;
@@ -75,8 +135,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         switch (task) {
             case "view/edit":
                 $scope.displayTeacherViewSearch = true;
-                // probably have to make some change here
-                $scope.displayTEditInfo = true;
                 break;
             case "delete":
                 $scope.displayTeacherDeleteSearch = true;
@@ -112,19 +170,13 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         var teacherPromise = userService.createUser($scope.newTeacher);
         teacherPromise.then(function success(data) {
             $scope.newTeacher = {};
-            $scope.addTeacherSuccess = true;
-            $("#addTeacherSuccess").fadeTo(2000, 500).slideUp(500, function() {
-                $("#addTeacherSuccess").slideUp(500);
-            });
+            toastService.success("New teacher has been added.");
             $scope.teachers.push(data.user);
             var lookupName = data.user.first_name + " " + data.user.last_name;
             $scope.teachersLookup[lookupName.toUpperCase()] = data.user;
         }, function error(response) {
             setErrorMessage(response);
-            $scope.addTeacherFailure = true;
-            $("#addTeacherFailure").fadeTo(5000, 500).slideUp(500, function() {
-                $("#addTeacherFailure").slideUp(500);
-            });
+            toastService.error("The server was unable to add the teacher." + errorResponse());
         });
     };
 
@@ -191,10 +243,7 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             }
             var pk = $scope.teacherD.pk;
             $scope.teacherD = {};
-            $scope.deleteTeacherSuccess = true;
-            $("#deleteTeacherSuccess").fadeTo(2000, 500).slideUp(500, function() {
-                $("#deleteTeacherSuccess").slideUp(500);
-            });
+            //$scope.deleteTeacherSuccess = true; assuming this isn't necessary
             $scope.displayTeacherDeleteSearch = true;
             $scope.teacherDeleteSearch = "";
             // check to see if teacherV/E is this deleted teacher and change view accordingly
@@ -208,10 +257,7 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             }
         }, function error(response) {
             setErrorMessage(response);
-            $scope.deleteTeacherFailure = true;
-            $("#deleteTeacherFailure").fadeTo(5000, 500).slideUp(500, function() {
-                $("#deleteTeacherFailure").slideUp(500);
-            });
+            toastService.error("The server was unable to delete the teacher." + errorResponse());
         });
     };
 
@@ -229,20 +275,14 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
                 $scope.viewTLastName = false;
                 checkIfAllSelected();
                 break;
-            case "email":
-                $scope.viewTEmail = false;
-                checkIfAllSelected();
-                break;
             case "none":
                 $scope.viewTFirstName = true;
                 $scope.viewTLastName = true;
-                $scope.viewTEmail = true;
                 $scope.editingAll = true;
                 break;
             case "all":
                 $scope.viewTFirstName = false;
                 $scope.viewTLastName = false;
-                $scope.viewTEmail = false;
                 $scope.editingAll = false;
                 break;
             default:
@@ -253,9 +293,9 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      * Sets edit all button according to what edit fields are ready to edit.
      */
     function checkIfAllSelected() {
-        if ($scope.viewTFirstName === true && $scope.viewTLastName === true && $scope.viewTEmail === true) {
+        if ($scope.viewTFirstName === true && $scope.viewTLastName === true) {
             $scope.editingAll = true;
-        } else if ($scope.viewTFirstName === false && $scope.viewTLastName === false && $scope.viewTEmail === false) {
+        } else if ($scope.viewTFirstName === false && $scope.viewTLastName === false) {
             $scope.editingAll = false;
         }
     }
@@ -272,9 +312,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
                 break;
             case "lastname":
                 $scope.teacherE.last_name = $scope.tLastName;
-                break;
-            case "email":
-                $scope.teacherE.email = $scope.tEmail;
                 break;
             default:
         }
@@ -316,14 +353,11 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
                     $scope.viewTLastName = true;
                     $scope.tLastName = "";
                     break;
-                case "email":
-                    $scope.viewTEmail = true;
-                    $scope.tEmail = "";
-                    break;
                 default:
             }
         }, function error(response) {
             setErrorMessage(response);
+            toastService.error("The server was unable to save your edit." + errorResponse());
         });
     };
 
@@ -340,10 +374,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             case "lastname":
                 $scope.viewTLastName = true;
                 $scope.tLastName = "";
-                break;
-            case "email":
-                $scope.viewTEmail = true;
-                $scope.tEmail = "";
                 break;
             default:
         }

@@ -1,4 +1,4 @@
-app.controller("studentOverviewController", function ($scope, $rootScope, $routeParams, studentService, enrollmentData, userData, studentData) {
+app.controller("studentOverviewController", function ($scope, $routeParams, toastService, studentService, enrollmentData, userData, studentData) {
 
     // set important scope variables
     $scope.student     = studentData.student;
@@ -12,8 +12,8 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $route
         $scope.sections = enrollmentData.sections;
     }
 
-    // create class schedule
-    $scope.teachers = _.indexBy(enrollmentData.teachers, 'pk');
+    // create teacher lookup
+    $scope.teachers = _.indexBy(userData.sprout_users, 'pk');
 
     // define structure for editing student fields
     $scope.editingAll = false;
@@ -143,7 +143,8 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $route
                     value.editable = false;
                 });
                 $scope.editingAll = false;
-                //TODO: notify the user
+                // notify the user
+                toastService.error('The server wasn\'t able to update the student\'s information.');
             }
         );
 
@@ -174,15 +175,13 @@ app.controller("studentOverviewController", function ($scope, $rootScope, $route
                 $scope.caseManager = teacherLookup[$scope.student.case_manager];
             },
             function error(response) {
-                //TODO: notify the user
+                // notify the user
+                toastService.error('The server wasn\'t able to assign the student\'s case manager.');
             }
         );
     };
 
 });
-
-
-
 
 
 

@@ -11,6 +11,8 @@ from services.authorization import AuthorizationService
 
 from services.student import Student, StudentService
 
+from services.users import User, UsersService
+
 class StudentGenerator(object):
     """StudentGenerator contains various methods for generating student data
 
@@ -21,19 +23,15 @@ class StudentGenerator(object):
     RANDOM_STUDENT_ID_PREFIX = "gen"
     CERT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=False):
-        self.headers = headers
-        self.url = url
-        self.port_num = port_num
-        self.complete_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/students/"
-        self.verify = verify
-
-        self.studentService = StudentService(headers=headers, url=url, port_num=port_num, verify=verify)
+    def __init__(self, headers=None, protocol='https', hostname="localhost", port_num=8000, verify=False):
+        self.studentService = StudentService(headers=headers, protocol=protocol, hostname=hostname, port_num=port_num, verify=verify)
+        self.usersService = UsersService(headers=headers, protocol=protocol, hostname=hostname, verify=verify)
 
     def generate_many_random_students(self,
                                       num_students,
-                                      first_names_file="./first_names.txt",
-                                      last_names_file="./last_names.txt",
+                                      case_manager_ids,
+                                      first_names_file="services/first_names.txt",
+                                      last_names_file="services/last_names.txt",
                                       birthdate_range_start=datetime.date(2006, 9, 1),
                                       birthdate_range_end=datetime.date(2008, 9, 1)):
         """Generate a specified number of students by reading first and last names from text files
@@ -48,10 +46,13 @@ class StudentGenerator(object):
         :type birthdate_range_end: datetime.date
         :return: list[Student]
         """
+        files_path = os.path.dirname(os.path.abspath(__file__))
+        first_names_file = os.path.join(files_path, first_names_file)
+        last_names_file = os.path.join(files_path, last_names_file)
         students = []
 
         # Get the list of possible user IDs to use for case managers
-        case_managers = [user.id for user in self.usersService.get_users()]
+        # case_managers = [user.id for user in self.usersService.get_users()]
 
         with open(first_names_file, 'r') as first_names_file:
             with open(last_names_file, 'r') as last_names_file:
@@ -74,13 +75,14 @@ class StudentGenerator(object):
                     # If that number turns out to be non-unique, we will be in trouble. Cross your fingers!
                     student_id = str(StudentGenerator.RANDOM_STUDENT_ID_PREFIX + str(random_id_number))
 
-                    case_manager = random.choice(case_managers)
+                    case_manager = random.choice(case_manager_ids)
                     student = Student(
                         student_id=student_id,
                         first_name=first_name,
                         last_name=last_name,
-                        birthdate=birthdate,
+                        birthdate=str(datetime.date(year=birthdate.year, month=birthdate.month, day=birthdate.day)),
                         case_manager=case_manager,
+                        id=None,
                     )
                     students.append(student)
         return students

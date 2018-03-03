@@ -45,6 +45,28 @@
     font-size: 11px;
 }
 
+.left-heading-btn {
+    float: left;
+    margin-top: -5px;
+    font-size: 11px;
+}
+
+.heading-glyphicon {
+    float:right;
+    cursor:pointer
+}
+
+@media (max-width: 500px) {
+    .table-responsive .dropdown-menu {
+        position: relative !important;
+    }
+}
+@media (min-width: 501px) {
+    #specialTable {
+        overflow: visible;
+    }
+}
+
 #roundBorder {
     border-radius:4px
 }

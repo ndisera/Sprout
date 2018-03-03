@@ -1,22 +1,20 @@
 
-import json
 import requests
+import json
 
-from authorization import CERT_PATH
 from collections import namedtuple
+
+from base_service import BaseService
 
 User = namedtuple("User", ['id', 'email', 'first_name', 'last_name'])
 
 
-class UsersService():
+class UsersService(BaseService):
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=CERT_PATH):
-        self.headers = headers
-        self.url = url
-        self.port_num = port_num
-        self.complete_list_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/users/"
-        self.complete_register_uri = "https://" + str(self.url) + ":" + str(self.port_num) + "/registration/"
-        self.verify = verify
+    def __init__(self, **kwargs):
+        super(UsersService, self).__init__(**kwargs)
+        self.complete_list_uri = self.complete_uri_template.format(endpoint="/users/")
+        self.complete_register_uri = self.complete_uri_template.format(endpoint="/registration/")
 
     def get_users(self):
         """
@@ -25,21 +23,9 @@ class UsersService():
         :return: list of user objects
         :rtype: list[User]
         """
-        response = requests.get(self.complete_list_uri, verify=self.verify, headers=self.headers)
+        return self._get_models(User, self.complete_list_uri)
 
-        response.raise_for_status()
-
-        body = response.json()
-        users = body['sprout_users']
-
-        toReturn = []
-
-        for user in users:
-            toReturn.append(User(**user))
-
-        return toReturn
-
-    def register_user(self, user, password=None):
+    def register_user(self, user, password=None, throw_error=True):
         """
         Register a user, optionally with a password
 
@@ -52,7 +38,13 @@ class UsersService():
         if password is not None:
             data['password1'] = password
             data['password2'] = password
+
+        data = json.dumps(data)
+
+        self.headers['content-type'] = 'application/json'
+
         response = requests.post(self.complete_register_uri, data=data, verify=self.verify, headers=self.headers)
-        response.raise_for_status()
+        if throw_error:
+            response.raise_for_status()
 
         return response

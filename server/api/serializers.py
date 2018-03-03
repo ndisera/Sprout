@@ -14,12 +14,36 @@ class StudentSerializer(DynamicModelSerializer):
     case_manager = DynamicRelationField('SproutUserSerializer')
 
 
+class SchoolSettingsSerializer(DynamicModelSerializer):
+    class Meta:
+        model = SchoolSettings
+        fields = '__all__'
+
+
+class DailyScheduleSerializer(DynamicModelSerializer):
+    class Meta:
+        model = DailySchedule
+        fields = '__all__'
+
+
+class TermSettingsSerializer(DynamicModelSerializer):
+    schedule = DynamicRelationField('DailyScheduleSerializer')
+
+    class Meta:
+        model = TermSettings
+        fields = '__all__'
+
+
 class TermSerializer(DynamicModelSerializer):
+    settings = DynamicRelationField('TermSettingsSerializer')
+
     class Meta:
         model = Term
         fields = '__all__'
 
     def validate(self, data):
+        super(TermSerializer, self).validate(data)
+
         if data['end_date'] < data['start_date']:
             raise serializers.ValidationError("A semester cannot end before it starts!")
         return data
@@ -209,3 +233,31 @@ class FocusStudentSerializer(DynamicModelSerializer):
         representation['progress_category'] = progress
         representation['caution_category'] = caution
         return representation
+
+
+class IEPGoalSerializer(DynamicModelSerializer):
+    class Meta:
+        model = IEPGoal
+        fields = '__all__'
+    student = DynamicRelationField('StudentSerializer')
+
+
+class IEPGoalDatapointSerializer(DynamicModelSerializer):
+    class Meta:
+        model = IEPGoalDatapoint
+        fields = '__all__'
+    goal = DynamicRelationField('IEPGoalSerializer')
+
+
+class IEPGoalNoteSerializer(DynamicModelSerializer):
+    class Meta:
+        model = IEPGoalNote
+        fields = '__all__'
+    goal = DynamicRelationField('IEPGoalSerializer')
+
+
+class ServiceRequirementSerializer(DynamicModelSerializer):
+    class Meta:
+        model = ServiceRequirement
+        fields = '__all__'
+    student = DynamicRelationField('StudentSerializer')

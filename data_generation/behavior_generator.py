@@ -6,8 +6,8 @@ from services.behavior import Behavior, BehaviorService
 
 class BehaviorGenerator:
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=False,):
-        self.behaviorService = BehaviorService(headers=headers, url=url, port_num=port_num, verify=verify)
+    def __init__(self, headers=None, protocol='https', hostname="localhost", port_num=8000, verify=False,):
+        self.behaviorService = BehaviorService(headers=headers, protocol=protocol, hostname=hostname, port_num=port_num, verify=verify)
 
     def generate_random_behavior(self,
                                  enrollment,
@@ -20,15 +20,19 @@ class BehaviorGenerator:
         :return: list[Behavior]
         """
         behaviors = []
+        iter_date = date_range_start
+        end_date = date_range_start + datetime.timedelta(days=num_days)
 
-        for day in range(1, num_days):
-            date = date_range_start + datetime.timedelta(days=day)
-            behavior = Behavior(
-                date=date.strftime('%Y-%m-%d'),
-                enrollment=enrollment.id,
-                effort=random.randint(1, 5),
-                behavior=random.randint(1, 5),
-                id=None,
-            )
-            behaviors.append(behavior)
+        while iter_date < end_date:
+            if iter_date.weekday() < 5:
+                behavior = Behavior(
+                    date=iter_date.strftime('%Y-%m-%d'),
+                    enrollment=enrollment.id,
+                    effort=random.randint(1, 5),
+                    behavior=random.randint(1, 5),
+                    id=None,
+                )
+                behaviors.append(behavior)
+            iter_date = iter_date + datetime.timedelta(days=1)
+
         return behaviors

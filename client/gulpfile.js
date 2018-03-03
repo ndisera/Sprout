@@ -56,12 +56,20 @@ const include_paths = [
 
     bower_path + 'angular-ui-sortable/sortable.js',
 
+    // toastr
+    bower_path + 'toastr/toastr.min.css',
+    bower_path + 'toastr/toastr.min.js',
+
+    bower_path + 'toastr/toastr.css',
+    bower_path + 'toastr/toastr.js',
 
     // helpers
     bower_path + 'moment/min/moment-with-locales.min.js',
     bower_path + 'moment/min/moment-with-locales.js',
     bower_path + 'underscore/underscore-min.js',
     bower_path + 'underscore/underscore.js',
+    bower_path + 'tinycolor/dist/tinycolor-min.js',
+    bower_path + 'tinycolor/tinycolor.js',
 ];
 
 const paths = {

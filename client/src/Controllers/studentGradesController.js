@@ -1,4 +1,4 @@
-app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, sectionService, studentService, studentData, enrollmentData) {
+app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, toastService, sectionService, studentService, studentData, enrollmentData) {
     $scope.student  = studentData.student;
     $scope.sections = [];
 
@@ -16,39 +16,18 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                 yAxes: [{
                     ticks: {
                         max: 100,
+                        min: 0,
                     },
+                }],
+                xAxes: [{
+                    maxBarThickness: 70,
                 }],
             },
         },
-        colors: [],
         datasetOverride: {
-            backgroundColor: [
-                "rgba(255,99,132,0.2)",
-                "rgba(255,159,64,0.2)",
-                "rgba(255,205,86,0.2)",
-                "rgba(75,192,192,0.2)",
-                "rgba(54,162,235,0.2)",
-                "rgba(153,102,255,0.2)",
-                "rgba(201,203,207,0.2)",
-            ],
-            hoverBackgroundColor: [
-                "rgba(255,99,132,0.4)",
-                "rgba(255,159,64,0.4)",
-                "rgba(255,205,86,0.4)",
-                "rgba(75,192,192,0.4)",
-                "rgba(54,162,235,0.4)",
-                "rgba(153,102,255,0.4)",
-                "rgba(201,203,207,0.4)",
-            ],
-            borderColor: [
-                "rgba(255,99,132,0.7)",
-                "rgba(255,159,64,0.7)",
-                "rgba(255,205,86,0.7)",
-                "rgba(75,192,192,0.7)",
-                "rgba(54,162,235,0.7)",
-                "rgba(153,102,255,0.7)",
-                "rgba(201,203,207,0.7)",
-            ],
+            backgroundColor: [],
+            hoverBackgroundColor: [],
+            borderColor: [],
         },
     };
 
@@ -66,42 +45,17 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                 position: 'bottom',
             },
         },
-        colors: [],
         datasetOverride: {
-            backgroundColor: [
-                "rgba(75,192,192,0.2)",
-                "rgba(255,159,64,0.2)",
-                "rgba(255,99,132,0.2)",
-                "rgba(54,162,235,0.2)",
-                "rgba(153,102,255,0.2)",
-                "rgba(201,203,207,0.2)",
-                "rgba(255,205,86,0.2)",
-            ],
-            hoverBackgroundColor: [
-                "rgba(75,192,192,0.4)",
-                "rgba(255,159,64,0.4)",
-                "rgba(255,99,132,0.4)",
-                "rgba(54,162,235,0.4)",
-                "rgba(153,102,255,0.4)",
-                "rgba(201,203,207,0.4)",
-                "rgba(255,205,86,0.4)",
-            ],
-            borderColor: [
-                "rgba(75,192,192,0.7)",
-                "rgba(255,159,64,0.7)",
-                "rgba(255,99,132,0.7)",
-                "rgba(54,162,235,0.7)",
-                "rgba(153,102,255,0.7)",
-                "rgba(201,203,207,0.7)",
-                "rgba(255,205,86,0.7)",
-            ],
+            backgroundColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.2).toRgbString(); }),
+            hoverBackgroundColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.4).toRgbString(); }),
+            borderColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.7).toRgbString(); }),
         },
     };
 
 
     $scope.selectSection = function(section) {
 
-        var assignmentConfig = {
+        var assignmentConfig = { //todo: not used
             filter: [
                 { name: 'section', val: section.id, },
             ],
@@ -122,6 +76,19 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
                 // Save off the upcoming assignments, then remove them from our current assignments list
                 $scope.upcomingAssignments = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) >= 0; });
                 $scope.assignments         = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) < 0; });
+
+                // make sure there are enough colors for every assignment in assignment graph
+                var backgroundColors      = [];
+                var hoverBackgroundColors = [];
+                var borderColors          = [];
+                for(var i = 0; i < $scope.assignments.length; i += $rootScope.colors.length) {
+                    backgroundColors.push(_.map($rootScope.colors, function(elem) { return elem.setAlpha(0.2).toRgbString(); }));
+                    hoverBackgroundColors.push(_.map($rootScope.colors, function(elem) { return elem.setAlpha(0.4).toRgbString(); }));
+                    borderColors.push(_.map($rootScope.colors, function(elem) { return elem.setAlpha(0.7).toRgbString(); }));
+                }
+                $scope.assignmentsGraph.datasetOverride.backgroundColor      = _.flatten(backgroundColors);
+                $scope.assignmentsGraph.datasetOverride.hoverBackgroundColor = _.flatten(hoverBackgroundColors);
+                $scope.assignmentsGraph.datasetOverride.borderColor          = _.flatten(borderColors);
 
                 // Save the upcoming assignment due dates
                 _.each($scope.upcomingAssignments, function(assignmentElem) {
@@ -201,11 +168,13 @@ app.controller("studentGradesController", function ($scope, $rootScope, $routePa
 
                     },
                     function error(response) {
+                        toastService.error('The server wasn\'t able to get the student\'s grades for this class.');
                     }
                 );
             },
             function error(response) {
                 //TODO: notify user
+                toastService.error('The server wasn\'t able to get the assignments for this class.');
             }
         );
     };

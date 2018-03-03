@@ -1,22 +1,17 @@
 
-import json
-import requests
-
-from authorization import CERT_PATH
 from collections import namedtuple
+
+from base_service import BaseService
 
 Grade = namedtuple("Grade", ['assignment', 'student', 'score', 'handin_datetime', 'id'])
 
 
-class GradesService():
+class GradesService(BaseService):
 
-    def __init__(self, headers={}, url="localhost", port_num=8000, verify=CERT_PATH):
-        self.headers = headers
-        self.url = url
-        self.port_num = port_num
-        self.uri_template_sections = "https://" + str(self.url) + ":" + str(self.port_num) + "/sections/{sections_pk}/assignments/{assignments_pk}/grades"
-        self.uri_template_students = "https://" + str(self.url) + ":" + str(self.port_num) + "/students/{students_pk}/grades/"
-        self.verify = verify
+    def __init__(self, **kwargs):
+        super(GradesService, self).__init__(**kwargs)
+        self.uri_template_sections = self.complete_uri_template.format(endpoint="/sections/{sections_pk}/assignments/{assignments_pk}/grades")
+        self.uri_template_students = self.complete_uri_template.format(endpoint="/students/{students_pk}/grades/")
 
     def get_grades(self, section=None, assignment=None, student=None):
         """
@@ -51,24 +46,7 @@ class GradesService():
         :param uri: complete URI to send a get request to
         :return: list[Grade]
         """
-        response = requests.get(uri, verify=self.verify, headers=self.headers)
-
-        if not (response.status_code >= 200 and response.status_code < 299):
-            response.raise_for_status()
-
-        body = response.json()
-        grades = body['grades']
-
-        toReturn = []
-
-        for grade in grades:
-            toReturn.append(Grade(assignment=grade['assignment'],
-                                  student=grade['student'],
-                                  score=grade['score'],
-                                  handin_datetime=grade['handin_datetime'],
-                                  id=grade['id']))
-
-        return toReturn
+        return self._get_models(Grade, uri)
 
     def add_grade(self, grade, section=None, assignment=None, student=None):
         """
@@ -109,20 +87,4 @@ class GradesService():
         return self._add_many_grades(grades=grades, uri=complete_uri)
 
     def _add_many_grades(self, grades, uri):
-        data = []
-
-        for grade in grades:
-            grade = grade._asdict()
-            del(grade['id'])
-            data.append(grade)
-
-        data = json.dumps(data)
-
-        headers = self.headers
-        headers['content-type'] = 'application/json'
-
-        response = requests.post(uri, verify=self.verify, headers=headers, data=data)
-
-        response.raise_for_status()
-
-        return response
+        return self._add_many_models(grades, uri)

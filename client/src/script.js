@@ -54,6 +54,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 auth: function (userService) {
                     return userService.authVerify();
                 },
+                termsInfo: function(termService) {
+                    return termService.getTerms({
+                        include: ['settings.schedule.*']
+                    });
+                },
             }
         })
 
@@ -91,6 +96,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 auth: function(userService) {
                     return userService.authVerify();
                 },
+                termsInfo: function(termService) {
+                    return termService.getTerms({
+                        include: ['settings.schedule.*']
+                    });
+                },
             },
         })
 
@@ -98,6 +108,33 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         .when('/settings', {
             templateUrl: 'html/settings.html',
             controller: 'settingsController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
+        })
+
+        // route for the settings page
+        .when('/settings', {
+            redirectTo: '/settings/user',
+        })
+
+        // route for the user settings page
+        .when('/settings/user', {
+            templateUrl: 'html/userSettings.html',
+            controller: 'userSettingsController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
+        })
+
+        // route for the school settings page
+        .when('/settings/school', {
+            templateUrl: 'html/schoolSettings.html',
+            controller: 'schoolSettingsController',
             resolve: {
                 auth: function(userService) {
                     return userService.authVerify();
@@ -156,7 +193,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 enrollmentData: function(enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
                         {
-                            include: ['section.*', 'section.teacher.*'],
+                            include: ['section.*', ],
                             filter: [{ name: 'student', val: $route.current.params.id },],
                         }
                     );
@@ -271,7 +308,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         .otherwise({ redirectTo: '/focus' });
 })
 
-.run(function($rootScope, $location, userService) {
+.run(function($rootScope, $location, toastService, userService) {
 
     /**
      *  Used to determine where to make calls to the backend
@@ -305,7 +342,8 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         // redirect the user
         $location.path('/login').replace();
 
-        //TODO(gzuber): notify user
+        // notify user
+        toastService.error('There was a fatal error with the server. Please log back in.');
     });
 
     /**
@@ -315,4 +353,21 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     if(userService.user.token !== null && userService.user.token !== undefined) {
         userService.authVerify();
     }
+
+    toastr.options = {
+        closeButton: true,
+    };
+
+    $rootScope.colors = [
+        tinycolor('#57bc90'), // green
+        tinycolor('#5ab9ea'), // light blue
+        tinycolor('#0b3c5d'), // prussian blue
+        tinycolor('#8860d0'), // purple
+        tinycolor('#963484'), // purple red
+        tinycolor('#d9b310'), // gold leaf
+        tinycolor('#ff3b3f'), // watermelon
+        tinycolor('#333333'), // grey
+    ];
+
+    Chart.defaults.global.colors = _.map($rootScope.colors, function(elem) { return elem.toHexString(); });
 });

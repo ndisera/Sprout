@@ -6,19 +6,6 @@
         *display: inline; /* ie7 fix */
         zoom: 1; /* hasLayout ie7 trigger */
     }
-
-}
-
-.nav-tabs > li, .nav-pills > li {
-        width: 110px;
-    }
-
-.nav-tabs, .nav-pills {
-    text-align: center;
-}
-
-.nav-tabs li, .nav-pills li {
-    cursor: pointer;
 }
 
 .student-name-title {

@@ -1,43 +1,34 @@
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="well login-box">
-                <div class="well-content">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div id="login-logo-container">
-                                <img id="login-logo" src="img/logo/svg/color_logo_transparent.svg">
+<div id="login-container">
+    <div id="login-background-container">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                    <div id="login-box">
+                        <div id="login-logo-container">
+                            <img id="login-logo" src="img/logo/svg/white_logo_transparent.svg">
+                        </div>
+                        <form class="voffset4" action="" ng-submit="attemptLogin($event);">
+                            <div class="input-group">
+                                <span id="login-top-label" class="input-group-addon border-bottom-flat">email</span>
+                                <input autofocus autocapitalize="off" id="login-top-input" type="text" class="form-control border-bottom-flat" ng-model="email" />
                             </div>
-                        </div>
-                    </div>
-                    <div class="row voffset4">
-                        <div class="col-md-12">
-                            <form action="" ng-submit="attemptLogin($event);">
-                                <div class="input-group">
-                                    <span id="login-top-label" class="input-group-addon border-bottom-flat">email</span>
-                                    <input autofocus autocapitalize="off" id="login-top-input" type="text" class="form-control border-bottom-flat" ng-model="email" />
-                                </div>
-                                <div id="login-input-group-bottom" class="input-group">
-                                    <span id="login-bottom-label" class="input-group-addon border-top-flat">password</span>
-                                    <input id="login-bottom-input" type="password" class="form-control border-top-flat" ng-model="password"/>
-                                    <span class="input-group-btn">
-                                        <button id="login-form-btn" type="submit" class="btn btn-default border-top-flat">
-                                            <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
-                                        </button>
-                                    </span>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="row ng-fade voffset3" ng-repeat="message in errors">
-                        <div class="col-sm-12">
+                            <div id="login-input-group-bottom" class="input-group">
+                                <span id="login-bottom-label" class="input-group-addon border-top-flat">password</span>
+                                <input id="login-bottom-input" type="password" class="form-control border-top-flat" ng-model="password"/>
+                                <span class="input-group-btn">
+                                    <button id="login-form-btn" type="submit" class="btn btn-default border-top-flat">
+                                        <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                        <div class="ng-fade voffset3" ng-repeat="message in errors">
                             <div class="alert alert-danger no-bottom-margin" role="alert">
-                                <span><b>Error:</b> {{ message }}</span>
+                                    <span><b>Error:</b> {{ message }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="bottom-border-accent"></div>
             </div>
         </div>
     </div>

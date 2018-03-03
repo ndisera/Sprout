@@ -131,6 +131,27 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
+     * Update student record
+     * @param {student} studentCollection - the student collection.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function updateStudents (studentCollection) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PATCH',
+            url: 'https://' + $rootScope.backend + '/students/',
+            data: studentCollection,
+        }).then(function success(response) {
+            refreshStudents().then(function success(data) {
+                deferred.resolve(response.data);
+            });
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
      * Update students and studentsLookup anytime they have changed in the database
      * @return {response} response of the http request used before calling this method.
      */
@@ -178,6 +199,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         refreshStudents: refreshStudents,
         addStudent: addStudent,
         updateStudent: updateStudent,
+        updateStudents: updateStudents,
         deleteStudent: deleteStudent,
         getGradesForStudent: getGradesForStudent,
     };

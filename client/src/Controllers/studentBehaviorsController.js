@@ -1,4 +1,4 @@
-app.controller("studentBehaviorsController", function ($scope, $rootScope, $routeParams, behaviorService, data, student) {
+app.controller("studentBehaviorsController", function ($scope, $routeParams, toastService, behaviorService, data, student) {
     // I know this will be here, because I filtered on the student ID, and only that student
     $scope.student     = student.student;
     $scope.enrollments = [];
@@ -69,15 +69,6 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                 display: true
             }
         },
-        colors: [
-            "rgba(255,99,132,0.7)",
-            "rgba(255,159,64,0.7)",
-            "rgba(255,205,86,0.7)",
-            "rgba(75,192,192,0.7)",
-            "rgba(54,162,235,0.7)",
-            "rgba(153,102,255,0.7)",
-            "rgba(201,203,207,0.7)",
-        ],
     };
 
     // start off the two graphs with empty datasets
@@ -163,13 +154,10 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
 
                     iterDate.add(1, 'd');
                 }
-                //debugging help:
-                // console.log("Behavior and effort graphs:");
-                // console.log($scope.behaviorGraph);
-                // console.log($scope.effortGraph);
             },
             function error(response) {
-                //TODO: notify the user
+                // notify the user
+                toastService.error('The server wasn\'t able to get student behaviors.');
             }
         );
 
@@ -253,7 +241,8 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                 });
             },
             function error(response) {
-                //TODO: notify user
+                // notify user
+                toastService.error('The server wasn\'t able to get student behaviors.');
             }
         );
     }
@@ -310,7 +299,8 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                     }
                 },
                 function error(response) {
-                    //TODO: notify the user
+                    // notify the user
+                    toastService.error('The server wasn\'t able to save the behavior score.');
                 }
             );
         }
@@ -342,7 +332,8 @@ app.controller("studentBehaviorsController", function ($scope, $rootScope, $rout
                     }
                 },
                 function error(response) {
-                    //TODO: notify the user
+                    // notify the user
+                    toastService.error('The server wasn\'t able to save the behavior score.');
                 }
             );
         }

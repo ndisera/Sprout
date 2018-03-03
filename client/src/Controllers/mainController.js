@@ -3,6 +3,77 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     $scope.user = userService.user;
     $scope.studentInfo = studentService.studentInfo;
 
+    $scope.sidebarExtended = false;
+    $scope.extendSidebar = function() {
+        $scope.sidebarExtended = !$scope.sidebarExtended;
+    };
+
+    /**
+     * Clears the main navigation search bar.
+     */
+    $scope.clearSearch = function () {
+        $scope.studentName = "";
+    };
+
+    /**
+     * Logs user out
+     */
+    $scope.logout = function () {
+        $scope.clearSearch();
+        userService.logout();
+    };
+
+    $scope.sidebarLinks = [
+        {
+            title: "Home",
+            glyph: "home",
+            href: "/focus",
+            click: $scope.clearSearch,
+        },
+        {
+            title: "Manage",
+            glyph: "briefcase",
+            href: "/manage",
+            click: $scope.clearSearch,
+        },
+        {
+            title: "Scores Input",
+            glyph: "pencil",
+            href: "/scores",
+            click: $scope.clearSearch,
+        },
+        {
+            title: "Notifications",
+            glyph: "bell",
+            href: "/",
+            click: $scope.clearSearch,
+        },
+        {
+            title: "Settings",
+            glyph: "cog",
+            href: "/settings",
+            click: $scope.clearSearch,
+        },
+        {
+            title: "Logout",
+            glyph: "log-out",
+            href: "/login",
+            click: "logout(); $scope.clearSearch();",
+            click: $scope.logout,
+        },
+    ];
+
+    $scope.sidebarLinkActive = function(link) {
+        if($location.path().split('/')[1] === link.href.split('/')[1]) {
+            return true;
+        }
+        return false;
+    };
+
+    $scope.sidebarLinkClick = function(link) {
+       link.click();
+    };
+
     /**
      * Toggles navbar if it isn't collapsed and has a window width < 768px
      */
@@ -37,19 +108,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
         }
     };
 
-    /**
-     * Clears the main navigation search bar.
-     */
-    $scope.clearSearch = function () {
-        $scope.studentName = "";
-    };
-
-    /**
-     * Logs user out
-     */
-    $scope.logout = function () {
-        userService.logout();
-    };
 
     // enables autofocus in IE
     $(function () {

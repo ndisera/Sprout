@@ -5,6 +5,8 @@ from django.conf import settings
 
 from sprout_user import SproutUser, SproutUserProfile
 
+from school_settings.models import *
+
 
 class Student(models.Model):
     """
@@ -21,20 +23,6 @@ class Student(models.Model):
 
     class Meta:
         ordering = ('id',)
-
-
-class Term(models.Model):
-    """
-    Term
-    Represent a school term, such as a particular semester, quarter, etc.
-    """
-    name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                            help_text="Term name, such as \"Fall\" or \"First Quarter\"")
-    start_date = models.DateField(blank=False,
-                                  help_text="Term start date, such as 2018-01-18 for the 18th of January, 2018")
-    end_date = models.DateField(blank=False,
-                                help_text="Term end date")
-    # TODO: Some 'versioning' on a School Schedule object
 
 
 class Holiday(models.Model):
@@ -65,9 +53,9 @@ class Section(models.Model):
     teacher = models.ForeignKey(SproutUser)
     term = models.ForeignKey(Term, on_delete=models.CASCADE,
                              help_text="Term this section takes place in")
-    # TODO: Uncomment when Schedule model exists
-    # schedule = models.ForeignKey(Schedule,
-    #                              help_text="Class start/end schedule used in this semester")
+    # Lookup the class schedule via term's TermSettings
+    schedule_position = models.IntegerField(blank=False,
+                                            help_text="Relative position in the schedule this class takes place")
 
     class Meta:
         ordering = ('id',)
@@ -198,3 +186,53 @@ class FocusStudent(models.Model):
     class Meta:
         ordering = ('user', 'ordering', )
         unique_together = (('user', 'student'), )
+
+
+class IEPGoal(models.Model):
+    """
+    IEPGoal
+    Represent a student's Individualized Education Plan goal
+    """
+    student = models.ForeignKey(Student, blank=False)
+    title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this IEP Goal")
+    quantitative = models.BooleanField(blank=True,
+                                       help_text="Optionally, whether this IEP goal tracks quantitative information")
+    quantitative_category = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                             help_text="Optional quantitative category associated with this goal")
+    quantitative_range_low = models.IntegerField(null=True,
+                                                 help_text="If defined, lower bound of the quantitative category value")
+    quantitative_range_upper = models.IntegerField(null=True,
+                                                   help_text="If defined, upper bound of the quantitative category value")
+
+
+class IEPGoalDatapoint(models.Model):
+    """
+    IEPGoalDatapoint
+    Represent one custom quantitative datapoint associated with an IEPGoal
+    """
+    goal = models.OneToOneField(IEPGoal, blank=False, on_delete=models.CASCADE,
+                                help_text="IEPGoal this datapoint belongs to")
+    value = models.IntegerField(null=True,
+                                help_text="Data value of this datapoint")
+
+
+class IEPGoalNote(models.Model):
+    """
+    IEPGoalNote
+    Represent a note associated with an IEPGoal
+    """
+    goal = models.OneToOneField(IEPGoal, blank=False, on_delete=models.CASCADE,
+                                help_text="IEPGoal this note belongs to")
+    title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Name of this note")
+    body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                             help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+
+class ServiceRequirement(models.Model):
+    student = models.ForeignKey(Student, blank=False)
+    title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this service requirement")
+    description = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                                   help_text="Description of this service requirement (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
