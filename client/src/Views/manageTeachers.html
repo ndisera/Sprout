@@ -117,20 +117,7 @@
                                 <div class="form-group">
                                     <label class="control-label col-sm-2" for="temail">Email:</label>
                                     <div class="col-sm-10">
-                                        <p class="form-control-static" ng-show="viewTEmail">{{teacherV.email}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('email')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                                        <div class="input-group" ng-hide="viewTEmail">
-                                            <input required autocomplete="off" autocapitalize="off" type="email" class="form-control" id="temail" placeholder="{{teacherV.email}}" name="temail" ng-model="tEmail" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTEmailForm.$invalid">
-                                                    <i class="glyphicon glyphicon-ok green"></i>
-                                                </button>
-                                            </div>
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-default" type="button" ng-click="cancelTEdit('email')">
-                                                    <i class="glyphicon glyphicon-remove red"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                                        <p class="form-control-static" ng-show="viewTEmail">{{teacherV.email}}</p>
                                     </div>
                                 </div>
                             </form>
@@ -147,11 +134,17 @@
                         <div class="panel-body" ng-show="sections.length === 0">
                             <h4 class="centerText">No Classes</h4>
                         </div>
-                        <table class="table" ng-hide="sections.length === 0">
-                            <tr ng-repeat="section in sections">
-                                <td>&nbsp;&nbsp;{{ section.title }}</td>
-                            </tr>
-                        </table>
+                        <div class="table-responsive" ng-hide="sections.length === 0">
+                            <table class="table">
+                                <tbody>
+                                    <tr ng-repeat="section in sections">
+                                        <td>&nbsp;&nbsp;{{ section.title }}</td>
+                                        <td ng-if="section.schedule_position == null"></td>
+                                        <td ng-if="section.schedule_position != null">&nbsp;&nbsp;{{ currentTermPeriods[section.schedule_position] }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

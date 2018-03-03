@@ -33,20 +33,45 @@
                 <div class="panel-body">
                     <h4 class="centerText" ng-show="sections.length === 0">No Classes</h4>
                     <div ng-hide="sections.length === 0">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Classes" list="sectionv" name="sectionv" ng-model="sectionViewSearch" ng-focus="clearSectionViewSearch()">
-                        </br>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6 voffset2">
+                                <div id="student-grades-select" class="input-group">
+                                    <span class="input-group-addon">Select Term</span>
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ viewSectionTerm.name }} <span class="caret"></span></button>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li ng-repeat="term in terms" ng-click="selectTerm(term, 'view')">
+                                                <a class="student-overview-assign-link">{{ term.name }}  <span ng-if="term.name === viewSectionTerm.name" class="glyphicon glyphicon-ok"></span></a>
+                                            </li>
+                                            <li ng-click="selectTerm({name: 'All Terms'}, 'view')">
+                                                <a class="student-overview-assign-link">All Terms  <span ng-if="viewSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 voffset2">
+                                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Classes" list="sectionv" name="sectionv" ng-model="sectionViewSearch" ng-focus="clearSectionViewSearch()">
+                            </div>
+                        </div>
+                        <br />
                         <div class="table-responsive scrollableTableDiv">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th>Title</th>
                                         <th>Teacher</th>
+                                        <th>Term</th>
+                                        <th>Period</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="section in sections | filter:viewSectionFilter" ng-click="viewSection(section)" class="pointer">
+                                    <tr ng-repeat="section in sections | filter:{ term: viewSectionTerm.id } | filter:viewSectionFilter | orderBy:['schdule_position', 'title']" ng-click="viewSection(section)" class="pointer">
                                         <td>{{ section.title }}</td>
                                         <td>{{ teacherIdLookup[section.teacher] }}</td>
+                                        <td>{{ termsLookup[section.term].name }}</td>
+                                        <td ng-if="section.schedule_position == null"></td>
+                                        <td ng-if="section.schedule_position != null">{{ periodArraysLookup[termsLookup[section.term].name][section.schedule_position] }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -97,7 +122,7 @@
                                     <div class="input-group" ng-hide="viewCTeacher">
                                         <input required type="text" autocomplete="off" class="form-control" placeholder="{{teacherIdLookup[sectionV.teacher]}}" list="cteacher" name="cteacher" ng-model="cTeacher" ng-change="checkValidTeacher('edit')">
                                         <datalist id="cteacher">
-                                            <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
+                                            <option ng-repeat="t in teachers | orderBy:'last_name'" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
                                         </datalist>
                                         <div class="input-group-btn">
                                             <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTeacherForm.$invalid || !editValidTeacher">
@@ -106,6 +131,48 @@
                                         </div>
                                         <div class="input-group-btn">
                                             <button class="btn btn-default" type="button" ng-click="cancelCEdit('teacher')">
+                                                <i class="glyphicon glyphicon-remove red"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <form class="form-horizontal" name="editCTermForm" ng-submit="saveCEdit('term')">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="cterm">Term:</label>
+                                <div class="col-sm-10">
+                                    <p class="form-control-static" ng-show="viewCTerm">{{termsLookup[sectionV.term].name}}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('term')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                    <div class="input-group" ng-hide="viewCTerm">
+                                        <select required ng-model="cTerm" ng-options="x.name for x in terms" class="form-control"></select>
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTermForm.$invalid">
+                                                <i class="glyphicon glyphicon-ok green"></i>
+                                            </button>
+                                        </div>
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default" type="button" ng-click="cancelCEdit('term')">
+                                                <i class="glyphicon glyphicon-remove red"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <form class="form-horizontal" name="editCPeriodForm" ng-submit="saveCEdit('period')" ng-if="sectionV.schedule_position != null">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="cperiod">Period:</label>
+                                <div class="col-sm-10">
+                                    <p class="form-control-static" ng-show="viewCPeriod">{{ periodArraysLookup[termsLookup[sectionV.term].name][sectionV.schedule_position] }}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('period')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                    <div class="input-group" ng-hide="viewCPeriod">
+                                        <select ng-model="cPeriod" class="form-control" ng-change="setPeriod(cPeriod)" ng-options="x for x in periodArraysLookup[termsLookup[sectionV.term].name]"></select>
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCPeriodForm.$invalid">
+                                                <i class="glyphicon glyphicon-ok green"></i>
+                                            </button>
+                                        </div>
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default" type="button" ng-click="cancelCEdit('period')">
                                                 <i class="glyphicon glyphicon-remove red"></i>
                                             </button>
                                         </div>
@@ -181,7 +248,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="unenrolledStudents">
-                                        <tr ng-repeat="student in unenrolledStudentsArray | filter:unenrolledStudentFilter">
+                                        <tr ng-repeat="student in unenrolledStudentsArray | filter:unenrolledStudentFilter | orderBy:'last_name'">
                                             <td>{{ student.first_name }}</td>
                                             <td>{{ student.last_name }}</td>
                                             <td>{{ student.student_id }}</td>
@@ -219,9 +286,21 @@
                             <div class="input-group col-xs-12">
                                 <input required id="roundBorder" type="text" autocomplete="off" class="form-control" placeholder="Search Teachers" list="cteacher2" name="cteacher2" ng-model="addTeacher" ng-change="checkValidTeacher('add')">
                                 <datalist id="cteacher2">
-                                    <option ng-repeat="t in teachers" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
+                                    <option ng-repeat="t in teachers | orderBy:'last_name'" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
                                 </datalist>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="ctitle2">Term:</label>
+                        <div class="col-sm-10">
+                            <select required ng-model="newSectionTerm" ng-options="x.name for x in terms" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="cperiod2">Period:</label>
+                        <div class="col-sm-10">
+                            <select ng-model="newSectionPeriod" class="form-control" ng-options="x for x in periodArraysLookup[newSectionTerm.name]"></select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -241,7 +320,27 @@
             <div class="panel-body">
                 <h4 class="centerText" ng-show="sections.length === 0">No Classes</h4>
                 <div ng-hide="sections.length === 0">
-                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Classes" list="sectiond" name="sectiond" ng-model="sectionDeleteSearch">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6 voffset2">
+                            <div id="student-grades-select" class="input-group">
+                                <span class="input-group-addon">Select Term</span>
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ deleteSectionTerm.name }} <span class="caret"></span></button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li ng-repeat="term in terms" ng-click="selectTerm(term, 'delete')">
+                                            <a class="student-overview-assign-link">{{ term.name }}  <span ng-if="term.name === deleteSectionTerm.name" class="glyphicon glyphicon-ok"></span></a>
+                                        </li>
+                                        <li ng-click="selectTerm({name: 'All Terms'}, 'delete')">
+                                            <a class="student-overview-assign-link">All Terms  <span ng-if="deleteSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 voffset2">
+                            <input type="text" autocomplete="off" class="form-control" placeholder="Filter Classes" list="sectiond" name="sectiond" ng-model="sectionDeleteSearch">
+                        </div>
+                    </div>
                     <br />
                     <div class="table-responsive scrollableTableDiv">
                         <table class="table table-hover">
@@ -249,13 +348,18 @@
                                 <tr>
                                     <th>Title</th>
                                     <th>Teacher</th>
+                                    <th>Term</th>
+                                    <th>Period</th>
                                     <th class="buttonColumn"></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="section in sections | filter:deleteSectionFilter">
+                                <tr ng-repeat="section in sections | filter:{ term: deleteSectionTerm.id } | filter:deleteSectionFilter | orderBy:'title'">
                                     <td>{{ section.title }}</td>
                                     <td>{{ teacherIdLookup[section.teacher] }}</td>
+                                    <td>{{ termsLookup[section.term].name }}</td>
+                                    <td ng-if="section.schedule_position == null"></td>
+                                    <td ng-if="section.schedule_position != null">{{ periodArraysLookup[termsLookup[section.term].name][section.schedule_position] }}</td>
                                     <td>
                                         <button class="btn btn-danger btn-xs" type="button" data-toggle="modal" data-target="#deleteSectionModal" ng-click="setSectionD(section)">Delete</button>
                                     </td>
