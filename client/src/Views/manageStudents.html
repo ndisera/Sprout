@@ -46,7 +46,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="student in studentInfo.students | filter:viewStudentFilter" ng-click="viewStudent(student.id)" class="pointer">
+                                    <tr ng-repeat="student in studentInfo.students | filter:viewStudentFilter | orderBy:'last_name'" ng-click="viewStudent(student.id)" class="pointer">
                                         <td>{{ student.first_name }}</td>
                                         <td>{{ student.last_name }}</td>
                                         <td>{{ student.student_id }}</td>
@@ -121,7 +121,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="student in studentInfo.students | filter:deleteStudentFilter" data-toggle="modal" data-target="#deleteStudentModal" ng-click="setStudentD(student)">
+                                    <tr ng-repeat="student in studentInfo.students | filter:deleteStudentFilter | orderBy:'last_name'" data-toggle="modal" data-target="#deleteStudentModal" ng-click="setStudentD(student)">
                                         <td>{{ student.first_name }}</td>
                                         <td>{{ student.last_name }}</td>
                                         <td>{{ student.student_id }}</td>
