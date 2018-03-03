@@ -214,7 +214,7 @@ class TermViewSet(NestedDynamicViewSet):
     schema = TermViewSetSchema()
 
     """ ensure variables show as correct types for docs """
-    name_term_settings = 'term_settings'
+    name_term_settings = 'settings'
     desc_term_settings = "ID of the TermSettings object controlling this term"
 
     term_settings_field = coreapi.Field(name=name_term_settings,
@@ -800,7 +800,7 @@ class AuthVerifyView(generics.RetrieveAPIView):
     authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, format=None):
+    def get(self, request, format=None, **kwargs):
         """
         Authentication-required noop to see if authentication tokens are valid
 

@@ -25,7 +25,7 @@ class UsersService(BaseService):
         """
         return self._get_models(User, self.complete_list_uri)
 
-    def register_user(self, user, password=None):
+    def register_user(self, user, password=None, throw_error=True):
         """
         Register a user, optionally with a password
 
@@ -44,6 +44,7 @@ class UsersService(BaseService):
         self.headers['content-type'] = 'application/json'
 
         response = requests.post(self.complete_register_uri, data=data, verify=self.verify, headers=self.headers)
-        response.raise_for_status()
+        if throw_error:
+            response.raise_for_status()
 
         return response
