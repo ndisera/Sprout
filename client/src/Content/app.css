@@ -277,6 +277,11 @@ a {
     cursor: default;
 }
 
+.list-group.list-group-select > .list-group-item:hover, .list-group.list-group-select > .list-group-item:focus {
+    background-color: #d2ecf9;
+    color: #0c405a;
+}
+
 .centerText {
     text-align: center;
 }

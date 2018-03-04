@@ -145,7 +145,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                     return studentService.getStudents();
                 },
                 // need to make sure user in userService is set before calling
-                focusData: function (userService, $q) {
+                focusData: function ($q, userService) {
                     //TODO(gzuber): I don't like this in script.js...
                     var deferred = $q.defer();
                     userService.authVerify().then(
@@ -171,24 +171,33 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         .when('/profile/students', {
             templateUrl: 'html/profileStudents.html',
             controller: 'profileStudentsController',
+            controllerAs: 'control',
             resolve: {
-                studentData: function(studentService) {
-                    return studentService.getStudents();
-                },
-                // need to make sure user in userService is set before calling
-                focusData: function (userService, $q) {
+                data: function ($q, userService, enrollmentService, studentService) {
                     //TODO(gzuber): I don't like this in script.js...
                     var deferred = $q.defer();
                     userService.authVerify().then(
                         function success() {
-                            userService.getAllFocusForUser(userService.user.id).then(
-                                function success(data) {
+                            var deferreds = [];
+
+                            var enrollmentConfig = {
+                                filter: [ { name: 'section.teacher.pk', val: userService.user.id, }, ],
+                                include: ['student.*', 'section.*', ],
+                            };
+                            deferreds.push(enrollmentService.getStudentEnrollments(enrollmentConfig));
+
+                            var studentConfig = {
+                                filter: [ { name: 'case_manager', val: userService.user.id, }, ],
+                            };
+                            deferreds.push(studentService.getStudents(studentConfig));
+                            
+                            $q.all(deferreds)
+                                .then(function(data) {
                                     deferred.resolve(data);
-                                },
-                                function error(response) {
-                                    deferred.reject(response);
-                                },
-                            );
+                                })
+                                .catch(function(data) {
+                                    deferred.reject(data);
+                                });
                         },
                         function error(response) {
                             deferred.reject(response);
