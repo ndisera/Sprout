@@ -2,12 +2,14 @@
 from __future__ import unicode_literals
 import coreapi
 import coreschema
+from django.http.response import HttpResponseNotFound, HttpResponse
 from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
 from rest_framework import mixins, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from api.models import *
@@ -64,14 +66,71 @@ class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
 
 
-class StudentViewSetSchema(AutoSchema):
+class ProfilePictureViewSet(mixins.CreateModelMixin,
+                            mixins.RetrieveModelMixin,
+                            mixins.ListModelMixin,
+                            mixins.DestroyModelMixin,
+                            NestedViewSetMixin,
+                            WithDynamicViewSetMixin,
+                            GenericViewSet):
     """
-    class that allows specification of more detailed schema for the
-    StudentViewSet class in the coreapi documentation.
+    allows access to the profile pictures stored in the database
+
+    create:
+    upload a new profile picture
+
+    retrieve:
+    get a specific profile picture
+
+    delete:
+    remove a specified profile picture
     """
-    def get_link(self, path, method, base_url):
-        link = super(StudentViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(StudentViewSet, path, method, link)
+    # Relevant tutorial: http://blog.josephmisiti.com/how-to-upload-a-photo-to-django-using-ios
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProfilePictureSerializer
+    parser_classes = (MultiPartParser, FormParser, )
+    queryset = ProfilePicture.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        response = super(ProfilePictureViewSet, self).create(request, *args, **kwargs)
+        parents_query_dict = self.get_parents_query_dict()
+        if 'sproutuserprofile' in parents_query_dict:
+            user_profile_id = parents_query_dict['sproutuserprofile']
+            user_profile = SproutUserProfile.objects.filter(id=user_profile_id)
+            # Double check: This should always be true because we are looking at the PK of SproutUserProfile
+            if not len(user_profile) == 1:
+                raise AssertionError("Found multiple user profiles with the ID {id}".format(id=user_profile_id))
+            user_profile = user_profile[0]
+            user_profile.picture = self.instance
+            user_profile.save()
+        if 'student' in parents_query_dict:
+            student_id = parents_query_dict['student']
+            student = Student.objects.filter(id=student_id)
+            student = student[0] # Queryset always returns a list even though we used the primary key
+            student.picture = self.instance
+            student.save()
+        return response
+
+    def perform_create(self, serializer):
+        serializer.save()
+        self.instance = serializer.instance
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        get the actual profile image data
+        """
+        queryset = self.get_queryset()
+        if len(queryset) == 0:
+            return HttpResponseNotFound()
+        if not len(queryset) == 1:
+            raise AssertionError('More than one profile picture found for ID')
+
+        picture = queryset[0]
+        file = picture.file.file
+
+        response = HttpResponse(file, content_type="image/jpeg")
+
+        return response
 
 
 class StudentViewSet(NestedDynamicViewSet):
@@ -82,28 +141,35 @@ class StudentViewSet(NestedDynamicViewSet):
     serializer_class = StudentSerializer
     queryset = Student.objects.all()
 
-    """ define custom schema for documentation """
-    schema = StudentViewSetSchema()
-
     """ ensure variables show as correct types for docs """
     name_case_manager = 'case_manager'
     desc_case_manager = "ID of the User who oversees this student"
+
+    name_profile_picture = 'picture'
+    desc_profile_picture = "This student's profile picture"
 
     case_manager_field = coreapi.Field(name=name_case_manager,
                                        required=True,
                                        location="form",
                                        description=desc_case_manager,
-                                       schema=coreschema.Integer(title=name_case_manager)),
+                                       schema=coreschema.Integer(title=name_case_manager))
 
-    create_fields = (
-        case_manager_field
-    )
-    update_fields = (
-        case_manager_field
-    )
-    partial_update_fields = (
-        case_manager_field
-    )
+    profile_picture_field = coreapi.Field(name=name_profile_picture,
+                                       required=False,
+                                       location="form",
+                                       description=desc_profile_picture,
+                                       schema=coreschema.Integer(title=name_profile_picture))
+
+    schema = AutoSchema(manual_fields=[
+        case_manager_field,
+        profile_picture_field
+    ])
+
+    # Rebuild all existing fields with required=False for partial update
+    partial_update_fields = [field._asdict() for field in schema._manual_fields]
+    for field in partial_update_fields: field['required']=False
+    partial_update_fields = [coreapi.Field(**field) for field in partial_update_fields]
+    pass
 
 
 class SchoolSettingsSetSchema(AutoSchema):
@@ -1167,17 +1233,6 @@ class IEPGoalNoteViewSet(NestedDynamicViewSet):
     )
 
 
-class ServiceRequirementViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    HolidayViewSetSchema class in the coreapi documentation.
-    """
-
-    def get_link(self, path, method, base_url):
-        link = super(ServiceRequirementViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(ServiceRequirementViewSet, path, method, link)
-
-
 class ServiceRequirementViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
@@ -1186,12 +1241,11 @@ class ServiceRequirementViewSet(NestedDynamicViewSet):
     queryset = ServiceRequirement.objects.all()
     serializer_class = ServiceRequirementSerializer
 
-    # define custom schema for documentation
-    schema = ServiceRequirementViewSetSchema()
-
     # ensure variables show as correct types for docs
     student_name = 'student'
     student_desc = 'Student to whom this service requirement applies'
+    fulfilled_user_name = 'fulfilled_user'
+    fulfilled_user_desc = 'User who marked this service requirement fulfilled'
 
     student_field = coreapi.Field(
         name=student_name,
@@ -1200,12 +1254,15 @@ class ServiceRequirementViewSet(NestedDynamicViewSet):
         description=student_desc,
         schema=coreschema.Integer(title=student_name))
 
-    create_fields = (
-        student_field,
-    )
-    update_fields = (
-        student_field,
-    )
-    partial_update_fields = (
-        student_field,
-    )
+    fulfilled_user_field = coreapi.Field(
+        name=fulfilled_user_name,
+        required=True,
+        location="form",
+        description=fulfilled_user_desc,
+        schema=coreschema.Integer(title=fulfilled_user_name))
+
+    schema = AutoSchema(
+        manual_fields=[
+            student_field,
+            fulfilled_user_field,
+        ])

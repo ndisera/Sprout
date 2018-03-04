@@ -34,8 +34,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter | orderBy:'last_name'" ng-click="viewTeacher(teacher)" class="pointer" 
-                                        ng-class="{ 'active': teacherV.pk === teacher.pk, }">
+                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter | orderBy:'last_name'" ng-click="viewTeacher(teacher)" class="pointer">
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
@@ -103,7 +102,7 @@
                                     </div>
                                 </div>
                             </form>
-                            <form class="form-horizontal" name="editTEmailForm" ng-submit="saveTEdit('email')">
+                            <form class="form-horizontal" name="tEmailForm">
                                 <div class="form-group">
                                     <label class="control-label col-sm-2" for="temail">Email:</label>
                                     <div class="col-sm-10">
@@ -118,19 +117,19 @@
             <div class="col-xs-12 col-sm-4" ng-show="displayTEditInfo">
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
-                        <div class="panel-heading no-bottom-border">
+                        <div class="panel-heading">
                             <h3 class="panel-title">Classes Taught</h3>
                         </div>
                         <div class="panel-body" ng-show="sections.length === 0">
                             <h4 class="centerText">No Classes</h4>
                         </div>
-                        <div class="table-responsive no-border" ng-hide="sections.length === 0">
+                        <div class="table-responsive" ng-hide="sections.length === 0">
                             <table class="table">
                                 <tbody>
                                     <tr ng-repeat="section in sections | orderBy:'title'">
                                         <td>&nbsp;&nbsp;{{ section.title }}</td>
-                                        <td></td>
-                                        <td>&nbsp;&nbsp;{{ currentTermPeriods[section.schedule_position] }}</td>
+                                        <td ng-if="section.schedule_position == null"></td>
+                                        <td ng-if="section.schedule_position != null">&nbsp;&nbsp;{{ currentTermPeriods[section.schedule_position] }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -237,9 +236,6 @@
                                 </div>
                             </div>
                         </form>
-                        <div class="alert alert-warning">
-                            <span><b>Warning:</b> This can't be undone.</span>
-                        </div>
                     </div>
                     <div class="modal-footer grey">
                         <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="deleteTeacher()">Delete</button>
@@ -249,4 +245,3 @@
         </div>
     </div>
 </div>
-<div ng-include="'html/bottomSpacer.html'"></div>

@@ -353,6 +353,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     break;
                 default:
             }
+            checkIfAllSelected();
         }, function error(response) {
             setErrorMessage(response);
             toastService.error("The server was unable to save your edit." + errorResponse());
@@ -618,7 +619,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         }
         return false;
     }
-})
+});
 
 // orderby for class roster students
 app.filter('classRosterSort', function() {

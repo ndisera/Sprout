@@ -3,7 +3,24 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 
-from sprout_user import SproutUser, SproutUserProfile
+from sprout_user import SproutUser
+
+
+class ProfilePicture(models.Model):
+    file = models.ImageField(upload_to='profile_pictures/', null=True, default='profile_pictures/default.png')
+    upload_time = models.DateTimeField(auto_now=True)
+
+
+class SproutUserProfile(models.Model):
+    user = models.OneToOneField(SproutUser, on_delete=models.CASCADE,
+                                help_text="User to which this profile information belongs")
+    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="User first name")
+    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                 help_text="User last name")
+    picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
+                                   blank=True, null=True,
+                                   help_text="User's Profile Picture")
 
 from school_settings.models import *
 
@@ -20,6 +37,9 @@ class Student(models.Model):
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     case_manager = models.ForeignKey(SproutUser, blank=True, null=True)
+    picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
+                                   blank=True, null=True,
+                                   help_text="Student's Profile Picture")
 
     class Meta:
         ordering = ('id',)
@@ -204,6 +224,8 @@ class IEPGoal(models.Model):
                                                  help_text="If defined, lower bound of the quantitative category value")
     quantitative_range_upper = models.IntegerField(null=True,
                                                    help_text="If defined, upper bound of the quantitative category value")
+    due_date = models.DateField(null=False,
+                                help_text="Date when this IEP Goal should be completed")
 
 
 class IEPGoalDatapoint(models.Model):
@@ -213,8 +235,14 @@ class IEPGoalDatapoint(models.Model):
     """
     goal = models.OneToOneField(IEPGoal, blank=False, on_delete=models.CASCADE,
                                 help_text="IEPGoal this datapoint belongs to")
-    value = models.IntegerField(null=True,
-                                help_text="Data value of this datapoint")
+    value = models.IntegerField(help_text="Data value of this datapoint")
+    date = models.DateTimeField(help_text="Datetime this measurement was taken")
+    note = models.CharField(null=True, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                            help_text="Note associated with this datapoint (max length {})".format(
+                                settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+    class Meta:
+        ordering = ('goal', 'date', )
 
 
 class IEPGoalNote(models.Model):
@@ -228,6 +256,11 @@ class IEPGoalNote(models.Model):
                              help_text="Name of this note")
     body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
                              help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+    date = models.DateTimeField(auto_now=True,
+                                help_text="Datetime this note was last update")
+
+    class Meta:
+        ordering = ('goal', 'date', )
 
 
 class ServiceRequirement(models.Model):
@@ -235,4 +268,13 @@ class ServiceRequirement(models.Model):
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Short name of this service requirement")
     description = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
-                                   help_text="Description of this service requirement (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+                                   help_text="Description of this service requirement (max length {})".format(
+                                       settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+    fulfilled = models.BooleanField(help_text="Whether or not this service has been fulfilled")
+    fulfilled_date = models.DateField(null=True,
+                                      help_text="Date this service was marked fulfilled")
+    fulfilled_user = models.ForeignKey(SproutUser, null=True, on_delete=models.PROTECT,
+                                       help_text="User who marked this service fulfilled")
+    fulfilled_description = models.CharField(null=True, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                                             help_text="How this service is fulfilled (max length {})".format(
+                                                 settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))

@@ -6,11 +6,25 @@ from rest_auth.serializers import LoginSerializer, UserDetailsSerializer
 from rest_auth.registration.serializers import RegisterSerializer
 
 
+class ProfilePictureSerializer(DynamicModelSerializer):
+    file = serializers.ImageField(max_length=None)
+
+    class Meta:
+        fields = '__all__'
+        model = ProfilePicture
+
+    def to_representation(self, instance):
+        representation = super(ProfilePictureSerializer, self).to_representation(instance)
+        del (representation['file']) # Hide the file path from the response
+        return representation
+
+
 class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
-        fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate', 'case_manager')
+        fields = '__all__'
     case_manager = DynamicRelationField('SproutUserSerializer')
+    picture = DynamicRelationField('ProfilePictureSerializer')
 
 
 class SchoolSettingsSerializer(DynamicModelSerializer):
@@ -240,7 +254,29 @@ class IEPGoalNoteSerializer(DynamicModelSerializer):
 
 
 class ServiceRequirementSerializer(DynamicModelSerializer):
+    student = DynamicRelationField('StudentSerializer')
+    fulfilled_user = DynamicRelationField('SproutUserSerializer')
+
     class Meta:
         model = ServiceRequirement
         fields = '__all__'
-    student = DynamicRelationField('StudentSerializer')
+
+    def validate(self, data):
+        """
+        Ensure that if the service has been marked as fulfilled that the
+        other fulfilled fields are filled
+
+        :param fulfilled: Whether the service has been fulfilled
+        :return:
+        """
+        data = super(ServiceRequirementSerializer, self).validate(data)
+        fulfilled = data['fulfilled']
+        if fulfilled:
+            errors = {}
+            for field in 'fulfilled_date', 'fulfilled_user', 'fulfilled_description':
+                if not field in self.get_initial():
+                    errors[field] = ['Required if this service is fulfilled']
+            if len(errors) > 0:
+                raise serializers.ValidationError(errors)
+
+        return data

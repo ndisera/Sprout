@@ -347,8 +347,3 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
     updateInputScores();
 
 });
-
-
-
-
-

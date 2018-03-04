@@ -6,13 +6,21 @@
         <div class="panel-wrapper">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title panel-title-with-btn">Assigned Managers</h3>
-                    <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editCaseManagers = true" ng-hide="editCaseManagers">
-                        Manage Caseload
-                    </button>
-                    <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editCaseManagers = false" ng-show="editCaseManagers">
-                        Stop
-                    </button>
+                    <div class="row">
+                        <div class="col-xs-7">
+                            <h3 class="panel-title panel-title-with-btn ">Assigned Managers</h3>
+                        </div>
+                        <div class="col-xs-5 button-container" ng-hide="editCaseManagers">
+                            <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editCaseManagers = true">
+                                Manage Caseload
+                            </button>
+                        </div>
+                        <div class="col-xs-5 button-container" ng-show="editCaseManagers">
+                            <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editCaseManagers = false">
+                                Stop
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="panel-body">
                     <h4 class="centerText" ng-show="caseManagersArray.length === 0">No Assigned Managers</h4>
@@ -22,18 +30,17 @@
                         <div ng-repeat="caseManager in caseManagersArray | filter:caseManagerFilter | orderBy:'last_name'">
                             <div class="panel-wrapper">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading hidden-xs pointer no-bottom-border" data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
-                                        <h4 class="panel-title">
+                                    <div class="panel-heading pointer no-bottom-border" data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
+                                        <h4 class="panel-title panel-title-with-btn hidden-xs">
                                         {{caseManager.first_name}} {{caseManager.last_name}} ({{caseManager.email}}) <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
+                                        </h4>
+                                        <span class="hidden-sm hidden-md hidden-lg hidden-xl">
+                                            {{caseManager.first_name}} {{caseManager.last_name}} <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
+                                        </span>
                                         <span class="glyphicon glyphicon-chevron-right blackish"></span>
-                                    </h4>
-                                    </div>
-                                    <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl pointer no-bottom-border" data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
-                                        {{caseManager.first_name}} {{caseManager.last_name}} <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
-                                        <span class="glyphicon glyphicon-chevron-right blackish"></span>
-                                        <h5 class="no-bottom-margin">
-                                        ({{caseManager.email}})
-                                    </h5>
+                                        <h5 class="no-bottom-margin hidden-sm hidden-md hidden-lg hidden-xl">
+                                            ({{caseManager.email}})
+                                        </h5>
                                     </div>
                                     <div id="collapse-assigned{{$index}}" class="panel-collapse collapse">
                                         <div class="table-responsive no-border" id="specialTable">

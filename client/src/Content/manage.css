@@ -57,6 +57,10 @@
     cursor:pointer
 }
 
+.button-container {
+    height: 15px;
+}
+
 @media (max-width: 500px) {
     .table-responsive .dropdown-menu {
         position: relative !important;
