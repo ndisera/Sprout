@@ -1,13 +1,8 @@
 #!/usr/bin/env python2
 
-import argparse
 import datetime
 import os
 import random
-import requests
-import sys
-
-from services.authorization import AuthorizationService
 
 from services.student import Student, StudentService
 

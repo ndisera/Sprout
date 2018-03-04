@@ -1233,17 +1233,6 @@ class IEPGoalNoteViewSet(NestedDynamicViewSet):
     )
 
 
-class ServiceRequirementViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    HolidayViewSetSchema class in the coreapi documentation.
-    """
-
-    def get_link(self, path, method, base_url):
-        link = super(ServiceRequirementViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(ServiceRequirementViewSet, path, method, link)
-
-
 class ServiceRequirementViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
@@ -1252,12 +1241,11 @@ class ServiceRequirementViewSet(NestedDynamicViewSet):
     queryset = ServiceRequirement.objects.all()
     serializer_class = ServiceRequirementSerializer
 
-    # define custom schema for documentation
-    schema = ServiceRequirementViewSetSchema()
-
     # ensure variables show as correct types for docs
     student_name = 'student'
     student_desc = 'Student to whom this service requirement applies'
+    fulfilled_user_name = 'fulfilled_user'
+    fulfilled_user_desc = 'User who marked this service requirement fulfilled'
 
     student_field = coreapi.Field(
         name=student_name,
@@ -1266,12 +1254,15 @@ class ServiceRequirementViewSet(NestedDynamicViewSet):
         description=student_desc,
         schema=coreschema.Integer(title=student_name))
 
-    create_fields = (
-        student_field,
-    )
-    update_fields = (
-        student_field,
-    )
-    partial_update_fields = (
-        student_field,
-    )
+    fulfilled_user_field = coreapi.Field(
+        name=fulfilled_user_name,
+        required=True,
+        location="form",
+        description=fulfilled_user_desc,
+        schema=coreschema.Integer(title=fulfilled_user_name))
+
+    schema = AutoSchema(
+        manual_fields=[
+            student_field,
+            fulfilled_user_field,
+        ])
