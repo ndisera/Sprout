@@ -23,6 +23,17 @@ class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
         fields = '__all__'
+
+    def update(self, instance, validated_data):
+        if 'case_manager' in validated_data:
+            # If the case_manager is being updated, wipe all notifications
+            # between the student and the old case manager
+            old_case_manager = instance.case_manager
+            old_notifications = Notification.objects.filter(student=instance, user=old_case_manager)
+            for notification in old_notifications:
+                notification.delete()
+        super(StudentSerializer, self).update(instance, validated_data)
+
     case_manager = DynamicRelationField('SproutUserSerializer')
     picture = DynamicRelationField('ProfilePictureSerializer')
 
