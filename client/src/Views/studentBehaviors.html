@@ -22,7 +22,7 @@
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Performance</h3>
+                            <h3 class="panel-title">Score History</h3>
                         </div>
                         <div class="panel-body">
                             <div class="row">
@@ -40,7 +40,7 @@
                                 </div>
                             </div>
                             <div class="row voffset3">
-                                <div class="col-sm-6 centerText focusGraph">
+                                <div class="col-lg-6 centerText focusGraph">
                                     <label>Behavior</label>
                                     <div class="col-sm-12">
                                         <canvas id="student_behavior"
@@ -53,7 +53,7 @@
                                         </canvas>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 centerText focusGraph">
+                                <div class="col-lg-6 centerText focusGraph">
                                     <label>Effort</label>
                                     <div class="col-sm-12">
                                         <canvas id="student_effort"
@@ -97,10 +97,10 @@
                                         <tr ng-repeat="entry in scoresInput">
                                             <td>{{ entry.title }}</td>
                                             <td>
-                                                <select ng-model="entry.curBehavior" ng-options="x for x in inputOptions" ng-change="saveScore(entry, 'behavior')"></select>
+                                                <select ng-model="entry.curBehavior" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'behavior')"></select>
                                             </td>
                                             <td>
-                                                <select ng-model="entry.curEffort" ng-options="x for x in inputOptions" ng-change="saveScore(entry, 'effort')"></select>
+                                                <select ng-model="entry.curEffort" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'effort')"></select>
                                             </td>
                                         </tr>
 

@@ -1,5 +1,6 @@
 app.controller("studentBehaviorsController", function ($scope, $routeParams, $location, toastService, behaviorService, data, student) {
     $scope.location = $location;
+
     // I know this will be here, because I filtered on the student ID, and only that student
     $scope.student     = student.student;
     $scope.enrollments = [];
@@ -21,11 +22,14 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
     $scope.enrollmentsLookup     = _.indexBy(data.enrollments, 'id');
     $scope.sectionsToEnrollments = _.indexBy(data.enrollments, 'section');
 
-    // create enrollment-to-index lookup, where order is index into graph data array
-    $scope.enrollmentToIndex = {};
-    _.each($scope.enrollments, function(enrollmentElem) {
-        $scope.enrollmentToIndex[enrollmentElem.id] = _.findIndex($scope.sections, function(sectionElem) { return enrollmentElem.section === sectionElem.id });
-    });
+    //// create enrollment-to-index lookup, where order is index into graph data array
+    //$scope.enrollmentToIndex = {};
+    //_.each($scope.enrollments, function(enrollmentElem) {
+        //$scope.enrollmentToIndex[enrollmentElem.id] = _.findIndex($scope.sections, function(sectionElem) { return enrollmentElem.section === sectionElem.id });
+    //});
+    
+    //$scope.orderedCurSeries   = [];
+    $scope.sectionToDataIndex = {};
 
     $scope.errorMessages = [];
     if($scope.enrollments.length === 0) {
@@ -46,7 +50,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
     // all common behavior/effort graph settings
     $scope.sharedGraph = {
         labels: [],
-        series: _.pluck($scope.sections, 'title'),
+        series: [],
         options: {
             elements: {
                 line: {
@@ -124,14 +128,89 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
 
                 // clear labels and data
                 $scope.sharedGraph.labels = [];
+                $scope.sharedGraph.series = [];
                 $scope.behaviorGraph.data = [];
                 $scope.effortGraph.data   = [];
 
-                // make sure there are enough arrays for each class, for each day
-                _.each($scope.sections, function() {
-                    $scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
-                    $scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
-                });
+                //if(data.sections.length >= $scope.sharedGraph.series) {
+                    //// we can preserve colors
+                    //var removedSections = [];
+                    //_.each($scope.orderedCurSeries, function(elem) {
+                        //if(!_.find(data.sections, function(secElem) { return secElem.id === elem.id; })) {
+                            //removedSections.push(elem);
+                        //}
+                    //});
+
+                    //var addedSections = [];
+                    //_.each(data.sections, function(elem) {
+                        //if(!_.has($scope.sectionToDataIndex, elem.id)) {
+                            //addedSections.push(elem);
+                        //}
+                    //});
+
+                    //// replace any removed old sections
+                    //if(removedSections.length > 0) {
+                        //for(var i = 0; i < $scope.orderedCurSeries.length; ++i) {
+                            //var cur = $scope.orderedCurSeries[i];
+                            //if(_.find(removedSections, function(elem) { return elem.id === cur.id; })) {
+                                //// elem is will be removed
+                                //delete $scope.sectionToDataIndex[elem.id];
+
+                                //// something must be added because there are equal or more sections, and something was removed
+                                //var newSection = addedSections[0];
+                                //$scope.sectionToDataIndex[newSection.id] = i;
+                                //$scope.sharedGraph.series[i] = newSection.title;
+                                //$scope.orderedCurSeries[i] = newSection;
+                                //addedSections.splice(0, 1);
+                            //}
+                        //}
+                    //}
+
+                    //// add on the rest of the new sections
+                    //_.each(addedSections, function(elem) {
+                        //$scope.orderedCurSeries.push(elem);
+                        //$scope.sharedGraph.series.push(elem.title);
+                        //$scope.sectionToDataIndex[elem.id] = $scope.orderedCurSeries.length - 1;
+                    //});
+
+                    //// always needs to be done
+                    //for(var i = 0; i < data.sections.length; ++i) {
+                        //$scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                        //$scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                    //}
+                //}
+                //else {
+                    // then just restart ordering
+                    //$scope.orderedCurSeries   = [];
+                    $scope.sectionToDataIndex = {};
+                    //var sections = _.sortBy(data.sections, 'title');
+                    for(var i = 0; i < data.sections.length; ++i) {
+                        $scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                        $scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                        //$scope.orderedCurSeries.push(data.sections[i]);
+                        $scope.sharedGraph.series.push(data.sections[i].title);
+                        $scope.sectionToDataIndex[data.sections[i].id] = $scope.sharedGraph.series.length - 1;
+                    }
+                //}
+
+
+                //$scope.sectionToDataIndex = {};
+                //var sections = _.sortBy(data.sections, 'title');
+                //for(var i = 0; i < data.sections.length; ++i) {
+                    //// these are null no matter what, so just need to be added
+                    //$scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                    //$scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                    //if(!_.has($scope.sectionToDataIndex, data.sections[i].id)) {
+                        //$scope.sharedGraph.series.push(data.sections[i].title);
+                        //$scope.sectionToDataIndex[data.sections[i].id] = $scope.sharedGraph.series.length - 1;
+                    //}
+                //}
+
+                //// make sure there are enough arrays for each class, for each day
+                //_.each($scope.sections, function() {
+                    //$scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                    //$scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                //});
 
                 // iterate through each date, setting data as necessary
                 var iterDate = $scope.graphStartDate.clone();
@@ -142,9 +221,12 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                     if(data.behaviors[j]) {
                         var behaviorDate = moment(data.behaviors[j].date);
                         while(behaviorDate.diff(iterDate, 'd') === 0) {
-                            if(_.has($scope.enrollmentToIndex, data.behaviors[j].enrollment)) {
-                                $scope.behaviorGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].behavior;
-                                $scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
+                            var enrollment = $scope.enrollmentsLookup[data.behaviors[j].enrollment];
+                            if(_.has($scope.sectionToDataIndex, enrollment.section)) {
+                                $scope.behaviorGraph.data[$scope.sectionToDataIndex[enrollment.section]][i] = data.behaviors[j].behavior;
+                                $scope.effortGraph.data[$scope.sectionToDataIndex[enrollment.section]][i] = data.behaviors[j].effort;
+                                //$scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
+                                //$scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
                             }
 
                             j++;
@@ -185,7 +267,32 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
 
     // get today for input box, set input options
     $scope.inputDate = moment();
-    $scope.inputOptions = [1, 2, 3, 4, 5];
+    $scope.inputOptions = [
+        {
+            display: "",
+            value: null, 
+        },
+        {
+            display: "1",
+            value: 1, 
+        },
+        {
+            display: "2",
+            value: 2, 
+        },
+        {
+            display: "3",
+            value: 3, 
+        },
+        {
+            display: "4",
+            value: 4, 
+        },
+        {
+            display: "5",
+            value: 5, 
+        },
+    ];
 
     /**
      * called when input datepicker is changed
@@ -218,6 +325,19 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
 
         behaviorService.getStudentBehavior(config).then(
             function success(data) {
+    //$scope.scoresInput = [];
+    //_.each($scope.sections, function(elem, index) {
+        //$scope.scoresInput.push({
+            //title: elem.title,
+            //enrollment: $scope.sectionsToEnrollments[elem.id].id,
+            //id: null,
+            //behavior: null,
+            //curBehavior: null,
+            //effort: null,
+            //curEffort: null,
+            //date: null,
+        //});
+    //});
                 // if there's already a record for the day, set it
                 var newBehaviorsMap = _.indexBy(data.behaviors, 'enrollment');
                 _.each($scope.scoresInput, function(elem) {
