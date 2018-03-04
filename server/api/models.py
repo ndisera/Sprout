@@ -18,8 +18,9 @@ class SproutUserProfile(models.Model):
                                   help_text="User first name")
     last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                  help_text="User last name")
-    picture = models.OneToOneField(ProfilePicture, on_delete=models.CASCADE,
-                                   blank=True, null=True)
+    picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
+                                   blank=True, null=True,
+                                   help_text="User's Profile Picture")
 
 from school_settings.models import *
 
