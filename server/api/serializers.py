@@ -47,6 +47,19 @@ class SchoolSettingsSerializer(DynamicModelSerializer):
         fields = '__all__'
 
 
+class SchoolYearSerializer(DynamicModelSerializer):
+    class Meta:
+        model = SchoolYear
+        fields = '__all__'
+
+    def validate(self, data):
+        super(SchoolYearSerializer, self).validate(data)
+
+        if data['end_date'] < data['start_date']:
+            raise serializers.ValidationError("A school year cannot end before it starts!")
+        return data
+
+
 class DailyScheduleSerializer(DynamicModelSerializer):
     class Meta:
         model = DailySchedule
@@ -63,6 +76,7 @@ class TermSettingsSerializer(DynamicModelSerializer):
 
 class TermSerializer(DynamicModelSerializer):
     settings = DynamicRelationField('TermSettingsSerializer')
+    school_year = DynamicRelationField('SchoolYearSerializer')
 
     class Meta:
         model = Term

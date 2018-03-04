@@ -197,6 +197,18 @@ class SchoolSettingsViewSet(NestedDynamicViewSet):
     schema = SchoolSettingsSetSchema()
 
 
+class SchoolYearViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "SchoolYear" instance
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SchoolYearSerializer
+    queryset = SchoolYear.objects.all()
+
+    """ define custom schema for documentation """
+    schema = AutoSchema()
+
+
 class DailyScheduleSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the
@@ -219,16 +231,6 @@ class DailyScheduleViewSet(NestedDynamicViewSet):
     schema = DailyScheduleSetSchema()
 
 
-class TermSettingsViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    TermSettingsViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(TermSettingsViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(TermSettingsViewSet, path, method, link)
-
-
 class TermSettingsViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Term" instances
@@ -237,28 +239,28 @@ class TermSettingsViewSet(NestedDynamicViewSet):
     serializer_class = TermSettingsSerializer
     queryset = TermSettings.objects.all()
 
-    """ define custom schema for documentation """
-    schema = TermSettingsViewSetSchema()
-
     """ ensure variables show as correct types for docs """
     name_schedule = 'schedule'
     desc_schedule = "ID of the TermSettings object controlling this term"
+    name_school_year = 'school_year'
+    desc_school_year = "ID of the SchoolSettings object this term takes place in"
 
     schedule_field = coreapi.Field(name=name_schedule,
                                    required=True,
                                    location="form",
                                    description=desc_schedule,
-                                   schema=coreschema.Integer(title=name_schedule)),
+                                   schema=coreschema.Integer(title=name_schedule))
+    school_year_field = coreapi.Field(name=name_school_year,
+                                      required=True,
+                                      location="form",
+                                      description=desc_school_year,
+                                      schema=coreschema.Integer(title=name_school_year))
 
-    create_fields = (
-        schedule_field
-    )
-    update_fields = (
-        schedule_field
-    )
-    partial_update_fields = (
-        schedule_field
-    )
+    schema = AutoSchema(
+        manual_fields=[
+            schedule_field,
+            school_year_field,
+        ])
 
 
 class TermViewSetSchema(AutoSchema):

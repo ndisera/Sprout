@@ -5,6 +5,8 @@ from collections import namedtuple
 SchoolSettings = namedtuple("SchoolSettings", ['id', 'school_name', 'school_location', 'grade_range_lower', 'grade_range_upper', ])
 DailySchedule = namedtuple("DailySchedule", ['id', 'name', 'total_periods', 'periods_per_day', ])
 TermSettings  = namedtuple("TermSettings", ['id', 'schedule', ])
+SchoolYear = namedtuple("SchoolYear", ['start_date', 'end_date', 'num_terms', 'title', 'id'])
+SchoolYear.__new__.__defaults__= (None, None, ) # title and id optional
 
 
 class SettingsService(BaseService):
@@ -14,6 +16,7 @@ class SettingsService(BaseService):
         self.complete_uri_school = self.complete_uri_template.format(endpoint="/settings/school")
         self.complete_uri_schedules = self.complete_uri_template.format(endpoint="/settings/schedules")
         self.complete_uri_term_settings = self.complete_uri_template.format(endpoint="/settings/terms")
+        self.complete_uri_school_years = self.complete_uri_template.format(endpoint="/settings/years")
 
     def get_school(self):
         """
@@ -35,11 +38,20 @@ class SettingsService(BaseService):
         """
         return self._get_models(TermSettings, self.complete_uri_term_settings)
 
+    def get_school_years(self):
+        """
+        Get all the SchoolYear objects for the school
+        """
+        return self._get_models(SchoolYear, self.complete_uri_school_years)
+
     def add_school(self, school):
         return self._add_many_models([school], self.complete_uri_school)
 
     def add_schedule(self, schedule):
         return self.add_many_schedules([schedule])
+
+    def add_school_year(self, school_year):
+        return self.add_many_school_years([school_year])
 
     def add_many_schedules(self, schedules):
         return self._add_many_models(schedules, self.complete_uri_schedules)
@@ -49,3 +61,6 @@ class SettingsService(BaseService):
 
     def add_many_term_settings(self, term_settings):
         return self._add_many_models(term_settings, self.complete_uri_term_settings)
+
+    def add_many_school_years(self, school_years):
+        return self._add_many_models(school_years, self.complete_uri_school_years)

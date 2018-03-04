@@ -18,7 +18,7 @@ from service_generator import ServiceGenerator
 from services.authorization import AuthorizationService
 from services.enrollment import Enrollment, EnrollmentService
 from services.section import Section, SectionService
-from services.settings import SchoolSettings, DailySchedule, TermSettings, SettingsService
+from services.settings import SchoolSettings, DailySchedule, TermSettings, SchoolYear, SettingsService
 from services.term import Term, TermService
 from services.users import User, UsersService
 
@@ -110,6 +110,14 @@ if __name__ == "__main__":
     school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", grade_range_lower=6, grade_range_upper=8, id=None)
     settings_service.add_school(school_settings)
 
+    school_year = SchoolYear(
+        start_date=str(datetime.date(year=2017, month=9, day=5)),
+        end_date=str(datetime.date(year=2018, month=6, day=6)),
+        num_terms=4,
+        title="2017/18 School Year")
+    response = settings_service.add_school_year(school_year)
+    school_year_id = response.json()['school_years'][0]['id']
+
     ab_schedule = DailySchedule(name="A/B Periods", total_periods=8, periods_per_day=4, id=None)
     block_schedule = DailySchedule(name="Block Periods", total_periods=8, periods_per_day=8, id=None)
     response = settings_service.add_many_schedules([ab_schedule, block_schedule, ])
@@ -142,10 +150,10 @@ if __name__ == "__main__":
     students = [Student(**data) for data in response.json()['students']]
 
     terms = []
-    term = Term(name="Fall", start_date="2017-08-21", end_date="2017-12-07", settings=term_settings_id, id=None)
+    term = Term(name="Fall", start_date="2017-08-21", end_date="2017-12-07", settings=term_settings_id, school_year=school_year_id, id=None)
     response = term_service.add_term(term)
     terms.extend([Term(**data) for data in response.json()['terms']])
-    term = Term(name="Spring", start_date="2018-01-06", end_date="2018-04-24", settings=term_settings_id, id=None)
+    term = Term(name="Spring", start_date="2018-01-06", end_date="2018-04-24", settings=term_settings_id, school_year=school_year_id, id=None)
     response = term_service.add_term(term)
     terms.extend([Term(**data) for data in response.json()['terms']])
 
