@@ -1,6 +1,9 @@
 app.controller("focusStudentsController", function ($scope, $q, toastService, studentData, focusData,
                                                     userService, testService, behaviorService,
                                                     sectionService, studentService) {
+
+
+    var finishedParsing = false;
     $scope.studentSearch = {
         text: "",
     };
@@ -198,7 +201,6 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
      * Get all of the data needed for the focus student graphs
      * Insert that data into the $scope.focusStudentsGraph dictionary at ['studentID']['category']
      */
-
     function updateFocusGraphs() {
 
 
@@ -207,38 +209,12 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
             //create the structure for the graphs array
             $scope.focusGraphs[elem.student] = {};
             $scope.focusGraphs[elem.student]['focus'] = {
-                data: [],
-                labels: [],
-                series: [],
-                category: 'derp', //todo: remove. This is mainly for testing to make sure that it got generated
-                options: {
-                    elements: {
-                        line: {
-                            fill: false,
-                        },
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        yAxes: [{
-                            display: true,
-                            ticks: {
-                                min: 1,
-                                stepSize: 1,
-                                max: 5
-                                //todo: change these to be set later
-                            }
-                        }]
-                    },
-                    legend: {
-                        display: true
-                    }
-                },
+                test: 'derpdaderp'
             };
 
             $scope.focusGraphs[elem.student]['progress'] = {
-                data: [1, 2, 3, 4],
-                labels: [1, 2, 3, 4],
+                data: [],
+                labels: [],
                 series: [],
                 options: {
                     elements: {
@@ -265,9 +241,10 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
             };
 
             $scope.focusGraphs[elem.student]['caution'] = {
-                data: [1, 2, 3, 4],
-                labels: [1, 2, 3, 4],
+                data: [],
+                labels: [],
                 series: [],
+                category: 'derp',
                 options: {
                     elements: {
                         line: {
@@ -299,6 +276,8 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
             //temporarily getting a month of behavior
             serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 2, "extra shit");
 
+
+            console.log(finishedParsing)
             console.log("focus graph:");
             console.log($scope.focusGraphs[elem.student]['focus']);
             console.log("progress graph:");
@@ -324,26 +303,19 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
         // todo: possible feature: pass along the days that were troublesome so we can highlight them in the graph
         //  the caution graph is already red though...
 
-
-        //Let's figure out the format for the string I get back from the backend
-        // category_start-date_end-date_...(stuff)
-        // ...
-        //  behavior
-        //      class id
-        //  effort
-        //      class id
-        //  Test Scores
-        //      test id
-        //      maybe a surrounding date range to narrow it down?
-        //  grades
-        //      assignment id
-        // I think the general point is that I need an ID pointing to the specific item that's being flagged
         //todo: add an options string parameter to pass in specific stuff like which class for a behavior score/maybe even highlighting
 
-        //software engineering: we have the graph. we know how to build the graph based off of this and a bit more info that we can pass in
         //todo: set chartjs type of graph depending on the type of graph displayed
         //if
-        //behaviorService
+
+        var graphStart = moment(beginDate);
+        var graphEnd = moment(endDate);
+
+
+        /**
+         * Behavior
+         * todo: switch on category type
+         */
         var behaviorConfig = {
             include: ['enrollment.section.*',],
             exclude: ['id',],
@@ -354,27 +326,8 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
             ],
             sort: ['date',],
         };
-
-        var graphStart = moment(beginDate);
-        var graphEnd = moment(endDate);
-
-        /**
-         * Behavior
-         * todo: switch on category type
-         */
         behaviorService.getStudentBehavior(behaviorConfig).then(
           function success(data) {
-              // clear labels and data
-              currentGraph.labels = [];
-              currentGraph.data = [];
-
-              // calculate how many entries of data our graph will have
-              var dateDiff = graphEnd.diff(graphStart, 'd');
-
-              // there's only one class to worry about for behavior, which we have the ID for
-              // initialize the arrays with null for chartjs
-              currentGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
-              currentGraph.labels.push(_.times(dateDiff + 1, _.constant(null)));
 
               // This is the data we have
               //     {enrollments: Array(1), behaviors: Array(19), sections: Array(1)}
@@ -395,34 +348,103 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
               //     0:
               //        {id: 10, schedule_position: 1, teacher: 3, term: 2, title: "English 4945"}
 
-
-              var i;
-              //Set the data points
-              for (i = 0; i < data.behaviors.length; i++) {
-                  //iterate through each datapoint, calculate the date difference, and place data at that index
-                  var pointDate = moment(data.behaviors[i].date);
-                  var pointIndex = pointDate.diff(graphStart, 'd');
-                  currentGraph.data[0][pointIndex] = data.behaviors[i].behavior;
-                  //todo: set title of graph to the class name
-              }
-              //Set the labels
-              var iterDate = graphStart.clone();
-              for (i = 0; i < dateDiff + 1; i++) {
-                  currentGraph.labels[i] = iterDate.format('MM/DD').toString();
-                  iterDate.add(1, 'd');
-
-              }
-              //Set the line label
-              currentGraph.series[0] = data.sections[0].title;
-
-              //Set the category label (capitalized)
-              currentGraph.category = category[0].toUpperCase() + category.slice(1);
+              extractBehaviorData(currentGraph, data, graphStart, graphEnd, category);
           },
           function error(response) {
               //TODO: notify user hopefully only once
               toastService.error('The server wasn\'t able to get the behavior for focus students.');
           }
         );
+    }
+
+    function extractBehaviorData(graph, data, graphStart, graphEnd, category) {
+        var dateDiff = graphEnd.diff(graphStart, 'd');
+        var dataValues = [];
+        var dataLabels = [];
+        var series;
+        var title;
+
+        for (var fillCounter = 0; fillCounter <= dateDiff; fillCounter++) {
+            dataValues.push(null);
+            dataLabels.push(null);
+
+        }
+
+        var i;
+        //Set the data points
+        for (i = 0; i < data.behaviors.length; i++) {
+            //iterate through each datapoint, calculate the date difference, and place data at that index
+            var pointDate = moment(data.behaviors[i].date);
+            var pointIndex = pointDate.diff(graphStart, 'd');
+            dataValues[pointIndex] = data.behaviors[i].behavior;
+            //todo: set title of graph to the class name
+        }
+        //Set the labels
+        var iterDate = graphStart.clone();
+        for (i = 0; i < dateDiff + 1; i++) {
+            dataLabels[i] = iterDate.format('MM/DD').toString();
+            iterDate.add(1, 'd');
+        }
+        //Get the series and title strings
+        series = data.sections[0].title;
+        title = category[0].toUpperCase() + category.slice(1);
+
+        buildLineGraph(graph, dataValues, dataLabels, series, title)
+    }
+
+    function buildLineGraph(graph, data, labels, series, title) {
+        //initialize the graph
+        graph = {
+            data: [],
+            labels: [],
+            series: [],
+            category: 'derp', //todo: remove. This is mainly for testing to make sure that it got generated
+            options: { //todo: connect the behavior lines
+                elements: {
+                    line: {
+                        fill: false,
+                    },
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            min: 1,
+                            stepSize: 1,
+                            max: 5
+                            //todo: change these to be set later
+                        }
+                    }]
+                },
+                legend: {
+                    display: true
+                }
+            },
+        };
+
+        //if the data and labels lengths aren't the same, complain to the console
+        if(data.length !== labels.length) {
+            console.error("data and labels lengths weren't the same when trying to build a line graph for a focus student");
+        }
+
+        graph.data.push(_.times(data.length, _.constant(null)));
+        // graph.labels.push(_.times(data.length, _.constant(null)));
+
+        var i;
+        //Set the data points
+        for (i = 0; i < data.length; i++) {
+            graph.data[0][i] = data[i];
+            graph.labels[i] = labels[i];
+        }
+        //Set the line label
+        graph.series[0] = series;
+
+        //Set the category label (capitalized)
+        graph.category = title;
+
+        finishedParsing = true;
     }
 
 
@@ -438,7 +460,6 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
     console.log("The graph data:");
     console.log($scope.focusGraphs);
 
-    //todo: is setting up all the graphs at the very get go a good idea?
 });
 
 
