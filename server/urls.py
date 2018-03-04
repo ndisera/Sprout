@@ -43,6 +43,7 @@ assignments_router.register('grades', viewset=GradeViewSet, base_name='assignmen
 router.register('settings/school', viewset=SchoolSettingsViewSet, base_name='settings-school')
 router.register('settings/schedules', viewset=DailyScheduleViewSet, base_name='settings-schedules')
 router.register('settings/terms', viewset=TermSettingsViewSet, base_name='settings-terms')
+router.register('settings/years', viewset=SchoolYearViewSet, base_name='settings-years')
 
 # Add nested routes under students
 # Add nested route for grades as /student/{pk}/grades

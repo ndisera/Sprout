@@ -20,6 +20,16 @@ class SchoolSettings(models.Model):
     grade_range_upper = models.IntegerField(blank=False,
                                             help_text='Maximum school year (grade) this school supports')
 
+class SchoolYear(models.Model):
+    title = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                       help_text="Human-readable name of the school year")
+    start_date = models.DateField(blank=False, null=False,
+                                  help_text="When this school year begins")
+    end_date = models.DateField(blank=False, null=False,
+                                help_text="When this school year ends")
+    num_terms = models.IntegerField(blank=False,
+                                    help_text="Number of terms in a school year")
+
 
 class DailySchedule(models.Model):
     """
@@ -58,3 +68,5 @@ class Term(models.Model):
                                 help_text="Term end date")
     settings = models.ForeignKey(TermSettings, blank=False, on_delete=models.PROTECT,
                                  help_text="Settings controlling this Term")
+    school_year = models.ForeignKey(SchoolYear, blank=False, on_delete=models.PROTECT,
+                                    help_text="School year associated with this term")
