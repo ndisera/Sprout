@@ -2,5 +2,42 @@
 <div class="tab-content">
     <div id="school" class="tab-pane fade in active">
         <h3 class="inlineHeading hidden-xs">School Settings</h3>
+        <hr />
+        <div class="panel-wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">School Terms</h3>
+                </div>
+                <div class="panel-body">
+                    <h4 class="centerText" ng-show="terms.length === 0">No Terms</h4>
+                    <div ng-hide="terms.length === 0">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Holidays and Breaks</h3>
+                </div>
+                <div class="panel-body">
+                    <h4 class="centerText" ng-show="holidays.length === 0">No Holidays</h4>
+                    <div ng-hide="holidays.length === 0">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">School Standardized Tests</h3>
+                </div>
+                <div class="panel-body">
+                    <h4 class="centerText" ng-show="tests.length === 0">No Tests</h4>
+                    <div ng-hide="tests.length === 0">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
