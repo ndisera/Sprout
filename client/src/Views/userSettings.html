@@ -1,13 +1,6 @@
-<ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
-    <li class="active"><a href="/settings/user">User</a></li>
-    <li><a href="/settings/school">School</a></li>
-</ul>
-<ul class="nav nav-tabs hidden-xs">
-    <li class="active"><a href="/settings/user">User</a></li>
-    <li><a href="/settings/school">School</a></li>
-</ul>
+<div ng-include="'html/settingsTabs.html'"></div>
 <div class="tab-content">
-    <div class="tab-pane fade in active">
+    <div id="user" class="tab-pane fade in active">
         <h3>User Settings</h3>
         <hr />
         <div class="row">
@@ -16,11 +9,11 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title panel-title-with-btn">User Info</h3>
-                            <button class="btn btn-default pull-right heading-btn" type="button" ng-click="editUser('all')" ng-show="editingAll">
+                            <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editUser('all')" ng-show="editingAll">
                         Edit All
                     </button>
-                            <button class="btn btn-default pull-right heading-btn" type="button" ng-click="editUser('none')" ng-hide="editingAll">
-                        Cancel All
+                            <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editUser('none')" ng-hide="editingAll">
+                        Stop Editing
                     </button>
                         </div>
                         <div class="panel-body">

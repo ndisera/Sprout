@@ -1,4 +1,5 @@
 app.controller("userSettingsController", function($scope, $rootScope, $location, toastService, userService) {
+    $scope.location = $location;
 
     $scope.user = userService.user;
     $scope.viewUFirstName = true;
