@@ -85,21 +85,21 @@
                             <h3 class="panel-title">Change Password</h3>
                         </div>
                         <div class="panel-body">
-                            <form name="passwordForm" action="savePassword">
+                            <form name="passwordForm" ng-submit="savePassword()">
                                 <div class="form-group">
                                     <label class="control-label" for="oldpwd">Old Password:</label>
-                                    <input type="password" class="form-control" id="oldpwd" placeholder="Enter Old Password" name="oldpwd">
+                                    <input required min-length="8" type="password" class="form-control" id="oldpwd" placeholder="Enter Old Password" name="oldpwd" ng-model="oldPassword">
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label" for="newpwd">New Password:</label>
-                                    <input type="password" class="form-control" id="newpwd" placeholder="Enter New Password" name="newpwd">
+                                    <input required min-length="8" type="password" class="form-control" id="newpwd" placeholder="Enter New Password" name="newpwd" ng-model="newPassword">
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label" for="cnewpwd">Confirm New Password:</label>
-                                    <input type="password" class="form-control" id="cnewpwd" placeholder="Enter New Password" name="cnewpwd">
+                                    <input required min-length="8" type="password" class="form-control" id="cnewpwd" placeholder="Enter New Password" name="cnewpwd" ng-model="confirmPassword">
                                 </div>
                                 <div class="form-group">
-                                    <button ng-disabled="passwordForm.$invalid" type="submit" class="btn btn-success">Submit</button>
+                                    <button ng-disabled="passwordForm.$invalid" type="submit" class="btn btn-success">Update</button>
                                 </div>
                             </form>
                         </div>

@@ -76,7 +76,7 @@ app.controller("userSettingsController", function($scope, $rootScope, $location,
                 $scope.userE.firstName = $scope.uFirstName;
                 break;
             case "lastname":
-                $scope.userE.lastName = $scope.tLastName;
+                $scope.userE.lastName = $scope.uLastName;
                 break;
             default:
         }
@@ -138,4 +138,39 @@ app.controller("userSettingsController", function($scope, $rootScope, $location,
         }
         return message;
     }
+
+    /**
+     * Updates the user's password
+     */
+    $scope.savePassword = function() {
+        userService.loggedInLogin($scope.user.email, $scope.oldPassword).then(
+            function success(response) {
+                var passwordObj = {
+                    new_password1: $scope.newPassword,
+                    new_password2: $scope.confirmPassword
+                }
+                userService.changePassword(passwordObj).then(
+                    function pSuccess(pResponse) {
+                        toastService.success("New password has been saved.");
+                        $scope.oldPassword = "";
+                        $scope.newPassword = "";
+                        $scope.confirmPassword = "";
+                    },
+                    function error(pResponse) {
+                        // fatal error occurs here, do I need to save token or something?
+                        setErrorMessage(pResponse);
+                        toastService.error("New password could not be saved." + errorResponse());
+                    }
+                );
+            },
+            function error(response) {
+                setErrorMessage(response);
+                var extraMessage = "";
+                if ($scope.errorMessage != null && $scope.errorMessage !== "") {
+                    extraMessage = " Old password was incorrect.";
+                }
+                toastService.error("New password could not be saved." + extraMessage);
+            }
+        );
+    };
 });
