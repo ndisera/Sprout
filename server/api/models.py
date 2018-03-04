@@ -101,6 +101,19 @@ class Enrollment(models.Model):
         unique_together = (('section', 'student'),)
         ordering = ('section',)
 
+    def delete(self, using=None, keep_parents=False):
+        """
+        Cleanup notifications between this enrollment's section's teacher
+        and the student if the enrollment is deleted
+        :return: 
+        """
+        old_student = self.student
+        old_teacher = self.section.teacher
+        old_notifications = Notification.objects.filter(student=old_student, user=old_teacher)
+        for notification in old_notifications:
+            notification.delete()
+        return super(Enrollment, self).delete(using, keep_parents)
+
 
 class Behavior(models.Model):
     """
