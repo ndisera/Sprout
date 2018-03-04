@@ -58,12 +58,3 @@ class SproutUser(AbstractBaseUser):
 
     def __str__(self):
         return self.__getattribute__(AbstractBaseUser.get_email_field_name())
-
-
-class SproutUserProfile(models.Model):
-    user = models.OneToOneField(SproutUser, on_delete=models.CASCADE,
-                                help_text="User to which this profile information belongs")
-    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                                  help_text="User first name")
-    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                                 help_text="User last name")

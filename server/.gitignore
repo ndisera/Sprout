@@ -7,6 +7,7 @@ env/
 
 # database stuffs
 *.sqlite3
+profile_pictures/
 
 # compiled stuffs
 *.pyc

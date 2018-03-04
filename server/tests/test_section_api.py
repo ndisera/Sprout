@@ -1,15 +1,13 @@
 from django.test import TestCase
-from api.models import Teacher
-from api.models import Section
+from api.models import *
 
 import datetime
 
 class SectionTestCase(TestCase):
     def setUp(self):
-        self.teacher = Teacher.objects.create(username="sredman",
-                                         email="sredman@example.com",
-                                         first_name="Simon",
-                                         last_name="Redman")
+        self.teacher = SproutUser.objects.create(email="sredman@example.com",
+                                                 first_name="Simon",
+                                                 last_name="Redman")
 
         Section.objects.create(title="Computer Science",
                                teacher=self.teacher)
