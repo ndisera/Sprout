@@ -12,6 +12,7 @@ from standardized_test_score_generator import StandardizedTestScoreGenerator
 from student_generator import Student, StudentGenerator
 from teacher_generator import TeacherGenerator
 from grades_generator import GradesGenerator
+from iep_generator import IEPGenerator
 
 from services.authorization import AuthorizationService
 from services.enrollment import Enrollment, EnrollmentService
@@ -37,7 +38,9 @@ if __name__ == "__main__":
     parser.add_argument("--boring", "-b", action="store_true",
                         help="setup with old, non randomized data")
     parser.add_argument("--num-students", "-n", action='store', default=20, type=int,
-                        help="number of students to generate. will scale everything based on num-students")
+                        help="number of students to generate. Will scale everything based on num-students")
+    parser.add_argument("--num-iep-goals", action='store', default=2, type=int,
+                        help="number of IEP Goals to generate per student")
 
     args = parser.parse_args()
 
@@ -97,6 +100,7 @@ if __name__ == "__main__":
     behavior_generator = BehaviorGenerator(**generator_args)
     grades_generator = GradesGenerator(**generator_args)
     std_test_score_generator = StandardizedTestScoreGenerator(**generator_args)
+    iep_generator = IEPGenerator(**generator_args)
 
     # Setup the school
     school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", id=None)
@@ -219,7 +223,11 @@ if __name__ == "__main__":
                 grades_generator.gradeService.add_many_grades(grades[enrollment][section][assignment],
                                                               section=section,
                                                               assignment=assignment)
-    
+
+    # generate IEPs
+    iep_goals = iep_generator.generate_many_random_iep_goals(num=args.num_iep_goals)
+    for student_id in iep_goals:
+        iep_generator.iepService.add_many_iep_goals(iep_goals[student_id], student_id)
 
     std_test_score_generator.setup_tests()
     toPost = std_test_score_generator.generate(10,
