@@ -254,7 +254,29 @@ class IEPGoalNoteSerializer(DynamicModelSerializer):
 
 
 class ServiceRequirementSerializer(DynamicModelSerializer):
+    student = DynamicRelationField('StudentSerializer')
+    fulfilled_user = DynamicRelationField('SproutUserSerializer')
+
     class Meta:
         model = ServiceRequirement
         fields = '__all__'
-    student = DynamicRelationField('StudentSerializer')
+
+    def validate(self, data):
+        """
+        Ensure that if the service has been marked as fulfilled that the
+        other fulfilled fields are filled
+
+        :param fulfilled: Whether the service has been fulfilled
+        :return:
+        """
+        data = super(ServiceRequirementSerializer, self).validate(data)
+        fulfilled = data['fulfilled']
+        if fulfilled:
+            errors = {}
+            for field in 'fulfilled_date', 'fulfilled_user', 'fulfilled_description':
+                if not field in self.get_initial():
+                    errors[field] = ['Required if this service is fulfilled']
+            if len(errors) > 0:
+                raise serializers.ValidationError(errors)
+
+        return data

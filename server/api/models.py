@@ -268,4 +268,13 @@ class ServiceRequirement(models.Model):
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Short name of this service requirement")
     description = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
-                                   help_text="Description of this service requirement (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+                                   help_text="Description of this service requirement (max length {})".format(
+                                       settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+    fulfilled = models.BooleanField(help_text="Whether or not this service has been fulfilled")
+    fulfilled_date = models.DateField(null=True,
+                                      help_text="Date this service was marked fulfilled")
+    fulfilled_user = models.ForeignKey(SproutUser, null=True, on_delete=models.PROTECT,
+                                       help_text="User who marked this service fulfilled")
+    fulfilled_description = models.CharField(null=True, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                                             help_text="How this service is fulfilled (max length {})".format(
+                                                 settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
