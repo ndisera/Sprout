@@ -64,10 +64,10 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
 
     // set up for sortable drag/drop
+    //var origOrder = [];
     var tempOrder = [];
     $scope.sortableOptions = {
-        // update is called before changes to order of focusStudents are final
-        update: function(e, ui) {
+        start: function(e, ui) {
             // save the order we had
             tempOrder = [];
             _.each($scope.focusStudents, function(elem) {
@@ -75,6 +75,20 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
             });
         },
         stop: function(e, ui) {
+            // don't bother the server if nothing actually changed
+            if($scope.focusStudents.length === tempOrder.length) {
+                var changed = false;
+                for(var i = 0; i < $scope.focusStudents.length; ++i) {
+                    if($scope.focusStudents[i].id !== tempOrder[i]) {
+                        changed = true;
+                    }
+                }
+                if(changed === false) {
+                    return;
+                }
+            }
+
+            // otherwise bother the server
             var promises = saveOrder();
             $q.all(promises)
                 .then(function(data) {

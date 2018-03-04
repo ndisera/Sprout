@@ -69,6 +69,9 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
 
                 if(data.assignments.length === 0) {
                     $scope.noAssignments = true;
+                    $scope.assignments = [];
+                    $scope.upcomingAssignments = [];
+                    $scope.missingAssignments = [];
                     return;
                 }
                 $scope.noAssignments = false;
