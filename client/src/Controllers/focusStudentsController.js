@@ -298,6 +298,7 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
             //Focus Graph
             //temporarily getting a month of behavior
             serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 2, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 2, "extra shit");
 
             console.log("focus graph:");
             console.log($scope.focusGraphs[elem.student]['focus']);
@@ -325,7 +326,6 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
         //  the caution graph is already red though...
 
 
-        //Let's figure out the format for the string I get back from the backend
         // category_start-date_end-date_...(stuff)
         // ...
         //  behavior
@@ -337,14 +337,8 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
         //      maybe a surrounding date range to narrow it down?
         //  grades
         //      assignment id
-        // I think the general point is that I need an ID pointing to the specific item that's being flagged
-        //todo: add an options string parameter to pass in specific stuff like which class for a behavior score/maybe even highlighting
 
-        //software engineering: we have the graph. we know how to build the graph based off of this and a bit more info that we can pass in
-        //todo: set chartjs type of graph depending on the type of graph displayed
-        //if
-        //behaviorService
-        var behaviorConfig = {
+        var behaviorAndEffortConfig = {
             include: ['enrollment.section.*',],
             exclude: ['id',],
             filter: [
@@ -357,72 +351,76 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
 
         var graphStart = moment(beginDate);
         var graphEnd = moment(endDate);
+        //todo: set chartjs type of graph depending on the type of graph displayed
+        if (category === "behavior" || category === "effort") {
+            /**
+             * Behavior/Effort
+             */
+            behaviorService.getStudentBehavior(behaviorAndEffortConfig).then(
+              function success(data) {
+                  // clear labels and data
+                  currentGraph.labels = [];
+                  currentGraph.data = [];
 
-        /**
-         * Behavior
-         * todo: switch on category type
-         */
-        behaviorService.getStudentBehavior(behaviorConfig).then(
-          function success(data) {
-              // clear labels and data
-              currentGraph.labels = [];
-              currentGraph.data = [];
+                  // calculate how many entries of data our graph will have
+                  var dateDiff = graphEnd.diff(graphStart, 'd');
 
-              // calculate how many entries of data our graph will have
-              var dateDiff = graphEnd.diff(graphStart, 'd');
+                  // there's only one class to worry about for behavior, which we have the ID for
+                  // initialize the arrays with null for chartjs
+                  currentGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                  currentGraph.labels.push(_.times(dateDiff + 1, _.constant(null)));
 
-              // there's only one class to worry about for behavior, which we have the ID for
-              // initialize the arrays with null for chartjs
-              currentGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
-              currentGraph.labels.push(_.times(dateDiff + 1, _.constant(null)));
+                  // This is the data we have
+                  //     {enrollments: Array(1), behaviors: Array(19), sections: Array(1)}
+                  //     behaviors: Array(19)
+                  //     0:
+                  //        {date: "2018-01-08", enrollment: 24, effort: 4, behavior: 4}
+                  //     1:
+                  //        {date: "2018-01-09", enrollment: 24, effort: 2, behavior: 1}
+                  //     2:
+                  //        {date: "2018-01-10", enrollment: 24, effort: 1, behavior: 3}
+                  //     ...(19 of them for this example student)
+                  //
+                  //     enrollments: Array(1)
+                  //     0:
+                  //        {section: 10, id: 24, student: 12}
+                  //
+                  //     sections: Array(1)
+                  //     0:
+                  //        {id: 10, schedule_position: 1, teacher: 3, term: 2, title: "English 4945"}
 
-              // This is the data we have
-              //     {enrollments: Array(1), behaviors: Array(19), sections: Array(1)}
-              //     behaviors: Array(19)
-              //     0:
-              //        {date: "2018-01-08", enrollment: 24, effort: 4, behavior: 4}
-              //     1:
-              //        {date: "2018-01-09", enrollment: 24, effort: 2, behavior: 1}
-              //     2:
-              //        {date: "2018-01-10", enrollment: 24, effort: 1, behavior: 3}
-              //     ...(19 of them for this example student)
-              //
-              //     enrollments: Array(1)
-              //     0:
-              //        {section: 10, id: 24, student: 12}
-              //
-              //     sections: Array(1)
-              //     0:
-              //        {id: 10, schedule_position: 1, teacher: 3, term: 2, title: "English 4945"}
+                  var i;
+                  //Set the data points
+                  for (i = 0; i < data.behaviors.length; i++) {
+                      //iterate through each datapoint, calculate the date difference, and place data at that index
+                      var pointDate = moment(data.behaviors[i].date);
+                      var pointIndex = pointDate.diff(graphStart, 'd');
+                      if (category === "behavior") {
+                          currentGraph.data[0][pointIndex] = data.behaviors[i].behavior;
+                      } else { //category === "effort"
+                          currentGraph.data[0][pointIndex] = data.behaviors[i].effort;
+                      }
+                  }
 
+                  //Set the labels
+                  var iterDate = graphStart.clone();
+                  for (i = 0; i < dateDiff + 1; i++) {
+                      currentGraph.labels[i] = iterDate.format('MM/DD').toString();
+                      iterDate.add(1, 'd');
 
-              var i;
-              //Set the data points
-              for (i = 0; i < data.behaviors.length; i++) {
-                  //iterate through each datapoint, calculate the date difference, and place data at that index
-                  var pointDate = moment(data.behaviors[i].date);
-                  var pointIndex = pointDate.diff(graphStart, 'd');
-                  currentGraph.data[0][pointIndex] = data.behaviors[i].behavior;
-                  //todo: set title of graph to the class name
+                  }
+                  //Set the line label
+                  currentGraph.series[0] = data.sections[0].title;
+
+                  //Set the category label (capitalized)
+                  currentGraph.category = category[0].toUpperCase() + category.slice(1);
+              },
+              function error(response) {
+                  //TODO: notify user hopefully only once
+                  toastService.error('The server wasn\'t able to get the behavior for focus students.');
               }
-              //Set the labels
-              var iterDate = graphStart.clone();
-              for (i = 0; i < dateDiff + 1; i++) {
-                  currentGraph.labels[i] = iterDate.format('MM/DD').toString();
-                  iterDate.add(1, 'd');
-
-              }
-              //Set the line label
-              currentGraph.series[0] = data.sections[0].title;
-
-              //Set the category label (capitalized)
-              currentGraph.category = category[0].toUpperCase() + category.slice(1);
-          },
-          function error(response) {
-              //TODO: notify user hopefully only once
-              toastService.error('The server wasn\'t able to get the behavior for focus students.');
-          }
-        );
+            );
+        } //else if...
     }
 
 
