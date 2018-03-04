@@ -185,8 +185,8 @@ class Notification(models.Model):
     title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     date = models.DateTimeField(blank=False)
-    student = models.ForeignKey(Student, blank=False)
-    user = models.ForeignKey(SproutUser, blank=False)
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE)
     category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                 help_text="Partial string of an API call, combined with student to create a URL from this notification")
     unread = models.BooleanField(blank=False, default=False)
