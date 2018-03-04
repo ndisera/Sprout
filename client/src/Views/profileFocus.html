@@ -1,19 +1,19 @@
 <div ng-include="'html/profileTabs.html'"></div>
 <div class="row voffset3">
     <div class="col-xs-12">
-        <button ng-if="!editing" ng-click="toggleEdit()" class="btn btn-default pull-right" type="button">Edit</button>
-        <button ng-if="editing" ng-click="toggleEdit()" class="btn btn-danger pull-right" type="button">Stop Editing</button>
+        <button ng-if="!editing" ng-click="toggleEdit()" class="btn btn-primary pull-right" type="button">Choose Students</button>
+        <button ng-if="editing" ng-click="toggleEdit()" class="btn btn-danger pull-right" type="button">Stop</button>
     </div>
 </div>
 <div class="row voffset3" ng-if="focusStudents.length === 0 && !editing">
     <div class="col-xs-12">
         <div class="alert alert-info no-bottom-margin" role="alert">
-            <span><b>Tip:</b> It looks like you don't have any Focus Students. Click the "Edit" button to add one.</span>
+            <span><b>Tip:</b> It looks like you don't have any Focus Students. Click the "Choose Students" button to select one.</span>
         </div>
     </div>
 </div>
 <div class="sortable voffset3" ui-sortable="sortableOptions" ng-model="focusStudents">
-    <div class="row" ng-repeat="focusStudent in focusStudents">
+    <div class="row focus-student-row" ng-repeat="focusStudent in focusStudents" ng-class="{ 'not-sortable': !editing, }">
         <div class="col-xs-12">
             <div class="focus-remove-button" ng-if="editing">
                 <button ng-click="removeFocusStudent(focusStudent)" class="btn btn-danger" type="button">
@@ -23,13 +23,11 @@
             <div ng-class="{ 'focus-student-panel-editing': editing, }">
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
-                        <a class="panel-heading-link" href="/student/{{ focusStudent.student }}">
-                            <div class="panel-heading">
-                                <h4 class="panel-title big">
-                                    {{ studentsLookup[focusStudent.student].first_name }} {{ studentsLookup[focusStudent.student].last_name }}
-                                </h4>
-                            </div>
-                        </a>
+                        <div class="panel-heading panel-heading-link" ng-click="editing ? noop() : location.path('/student/' + focusStudent.student)">
+                            <h4 class="panel-title big">
+                                {{ studentsLookup[focusStudent.student].first_name }} {{ studentsLookup[focusStudent.student].last_name }}
+                            </h4>
+                        </div>
                         <div id="collapse-{{ $index }}" class="panel-collapse collapse" ng-class="{ 'in': !editing, }">
                             <div class="panel-body">
                                 <div class="row">

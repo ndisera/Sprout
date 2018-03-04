@@ -1,4 +1,4 @@
-﻿.panel-placeholder {
+.panel-placeholder {
     border: 1px dotted black;
     border-radius: 4px;
     margin: 0 15px 20px 15px;
@@ -40,3 +40,18 @@
     padding: 0px;
     border: none;
 }
+
+.focus-student-row.not-sortable .panel > .panel-heading.panel-heading-link:hover {
+    cursor: pointer;
+    background-color: #e7e7e7;
+    color: #11527d;
+}
+
+.focus-student-row .panel > .panel-heading.panel-heading-link:hover {
+    cursor: move;
+    background-color: #e7e7e7;
+    /*color: #11527d;*/
+}
+
+
+

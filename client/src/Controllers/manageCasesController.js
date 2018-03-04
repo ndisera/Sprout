@@ -22,10 +22,14 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     }
 
     $scope.toggleManagerAssign = function(index) {
-        if ($("#assignManagerButton" + index).text().trim() === "Assign") {
-            $("#assignManagerButton" + index).html('Cancel');
+        if ($("#assignManagerButton" + index).text().trim() === "Assign Students") {
+            $("#assignManagerButton" + index).html('Stop');
+            $("#assignManagerButton" + index).removeClass('btn-success');
+            $("#assignManagerButton" + index).addClass('btn-danger');
         } else {
-            $("#assignManagerButton" + index).html('Assign')
+            $("#assignManagerButton" + index).html('Assign Students')
+            $("#assignManagerButton" + index).removeClass('btn-danger');
+            $("#assignManagerButton" + index).addClass('btn-success');
         }
     };
 

@@ -14,6 +14,7 @@
 
 .pencilEdit {
     cursor: pointer;
+    color: #0b3c5d;
 }
 
 .pencilEdit:hover {
