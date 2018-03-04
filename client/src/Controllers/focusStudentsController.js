@@ -207,9 +207,10 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
             //create the structure for the graphs array
             $scope.focusGraphs[elem.student] = {};
             $scope.focusGraphs[elem.student]['focus'] = {
-                data: [[1, 2, 3, 4],], //todo: real data
-                labels: [1, 2, 3, 4], //todo: apply the same fix as the test data for gray lines, by making sure the data is wrapped inside its own array
+                data: [],
+                labels: [],
                 series: [],
+                category: 'derp', //todo: remove. This is mainly for testing to make sure that it got generated
                 options: {
                     elements: {
                         line: {
@@ -411,6 +412,11 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                   iterDate.add(1, 'd');
 
               }
+              //Set the line label
+              currentGraph.series[0] = data.sections[0].title;
+
+              //Set the category label (capitalized)
+              currentGraph.category = category[0].toUpperCase() + category.slice(1);
           },
           function error(response) {
               //TODO: notify user hopefully only once
