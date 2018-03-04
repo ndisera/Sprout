@@ -233,8 +233,14 @@ class IEPGoalDatapoint(models.Model):
     """
     goal = models.OneToOneField(IEPGoal, blank=False, on_delete=models.CASCADE,
                                 help_text="IEPGoal this datapoint belongs to")
-    value = models.IntegerField(null=True,
-                                help_text="Data value of this datapoint")
+    value = models.IntegerField(help_text="Data value of this datapoint")
+    date = models.DateTimeField(help_text="Datetime this measurement was taken")
+    note = models.CharField(null=True, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                            help_text="Note associated with this datapoint (max length {})".format(
+                                settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+    class Meta:
+        ordering = ('goal', 'date', )
 
 
 class IEPGoalNote(models.Model):
@@ -248,6 +254,11 @@ class IEPGoalNote(models.Model):
                              help_text="Name of this note")
     body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
                              help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+    date = models.DateTimeField(auto_now=True,
+                                help_text="Datetime this note was last update")
+
+    class Meta:
+        ordering = ('goal', 'date', )
 
 
 class ServiceRequirement(models.Model):
