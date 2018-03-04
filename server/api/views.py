@@ -2,6 +2,9 @@
 from __future__ import unicode_literals
 import coreapi
 import coreschema
+import datetime
+from django.db.models import Q
+from django.utils import timezone
 from django.http.response import HttpResponseNotFound, HttpResponse
 from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
 from rest_framework import mixins, generics
@@ -919,16 +922,6 @@ class SproutUserViewSet(WithDynamicViewSetMixin,
         return queryset
 
 
-class NotificationViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    NotificationViewSetSchema class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(NotificationViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(NotificationViewSet, path, method, link)
-
-
 class NotificationViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Notification" instances
@@ -957,57 +950,89 @@ class NotificationViewSet(NestedDynamicViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
 
-    """ define custom schema for documentation """
-    schema = NotificationViewSetSchema()
-
     """ ensure variables show as correct type for docs """
     name_user = 'user'
     name_student = 'student'
     desc_user = 'ID of the user to whom this notification should be displayed'
     desc_student = 'ID of the student to whom this notification refers'
-    create_fields = (
-        coreapi.Field(
-            name=name_user,
-            required=True,
-            location="form",
-            description=desc_user,
-            schema=coreschema.Integer(title=name_user)),
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_user,
-            required=True,
-            location="form",
-            description=desc_user,
-            schema=coreschema.Integer(title=name_user)),
+    user_field = coreapi.Field(
+        name=name_user,
+        required=True,
+        location="form",
+        description=desc_user,
+        schema=coreschema.Integer(title=name_user))
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_user,
-            location="form",
-            description=desc_user,
-            schema=coreschema.Integer(title=name_user)),
+    student_field = coreapi.Field(
+        name=name_student,
+        required=True,
+        location="form",
+        description=desc_student,
+        schema=coreschema.Integer(title=name_student))
 
-        coreapi.Field(
-            name=name_student,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
+    schema = AutoSchema(
+        manual_fields=[
+            user_field,
+            student_field
+        ])
+
+    def list(self, request, *args, **kwargs):
+        """
+        Generate some notifications for the requester's enjoyment
+
+        :param request:
+        :return:
+        """
+        queryset = self.get_queryset()
+        stored_notifications = self.get_serializer(queryset, many=True).data
+
+        # Generate student birthday notifications for all students this user
+        # should see
+        birthday_title_template = "{first_name} {last_name}'s Birthday"
+        birthday_body_template = "{first_name} {last_name} has a birthday coming up on {date}"
+        # Get notifications for this user
+        user = SproutUser.objects.get(id=kwargs['parent_lookup_user'])
+
+        # Query for all students: Students for whom this user is a case manager and students for whom this users is a section teacher
+        all_students_query = Q(case_manager=user.id) | Q(enrollment__section__teacher=user.id)
+
+        all_students = Student.objects.filter(all_students_query).distinct()
+        birthday_notifications = []
+        for student in all_students:
+            now = datetime.datetime.now()
+            year = now.year
+            # If the birthday has already passed, notify for next year
+            if now.month > student.birthdate.month or\
+                (now.month == student.birthdate.month and now.day > student.birthdate.day):
+                year += 1
+            birthdate = datetime.datetime(year=year,
+                                          month=student.birthdate.month,
+                                          day=student.birthdate.day,
+                                          hour=00,
+                                          )
+            # I am not sure I actually want this, but Django whines if I don't
+            birthdate = timezone.make_aware(birthdate, timezone.utc)
+            title = birthday_title_template.format(first_name=student.first_name,
+                                                   last_name=student.last_name)
+            body = birthday_body_template.format(first_name=student.first_name,
+                                                 last_name=student.last_name,
+                                                 date=str(birthdate.date()))
+            # See if the notification already exists
+            try:
+                queryset.get(title=title, student=student, user=user, date=birthdate)
+            except Notification.DoesNotExist:
+                # The notification did not exist. Make one!
+                Notification.objects.create(title=title,
+                                            body=body,
+                                            date=birthdate,
+                                            student=student,
+                                            user=user,
+                                            category="/",
+                                            unread=True,
+                                            )
+
+        # Now make the normal call to list to let Dynamic REST do its magic
+        return super(NotificationViewSet, self).list(request, *args, **kwargs)
 
 
 class FocusStudentViewSetSchema(AutoSchema):
