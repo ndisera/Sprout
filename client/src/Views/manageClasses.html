@@ -55,7 +55,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="section in sections | filter:{ term: viewSectionTerm.id } | filter:viewSectionFilter | orderBy:['schdule_position', 'title']" ng-click="viewSection(section)" class="pointer">
+                                    <tr ng-repeat="section in sections | filter:{ term: viewSectionTerm.id } | filter:viewSectionFilter | orderBy:['schdule_position', 'title']" ng-click="viewSection(section)" class="pointer" ng-class="{ 'active': sectionV.id === section.id, }">
                                         <td>{{ section.title }}</td>
                                         <td>{{ teacherIdLookup[section.teacher] }}</td>
                                         <td>{{ termsLookup[section.term].name }}</td>
@@ -74,11 +74,11 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title panel-title-with-btn">Class Info</h3>
-                        <button class="btn btn-default pull-right heading-btn" type="button" ng-click="editSection('all')" ng-show="editingAll">
+                        <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editSection('all')" ng-show="editingAll">
                             Edit All
                         </button>
-                        <button class="btn btn-default pull-right heading-btn" type="button" ng-click="editSection('none')" ng-hide="editingAll">
-                            Cancel All
+                        <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editSection('none')" ng-hide="editingAll">
+                            Stop Editing
                         </button>
                     </div>
                     <div class="panel-body">
@@ -381,6 +381,9 @@
                             </div>
                         </div>
                     </form>
+                    <div class="alert alert-warning">
+                        <span><b>Warning:</b> This can't be undone.</span>
+                    </div>
                 </div>
                 <div class="modal-footer grey">
                     <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="deleteSection()">Delete</button>

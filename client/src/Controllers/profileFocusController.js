@@ -16,13 +16,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
     // set focus students if there are any
     $scope.focusStudents = [];
     if(focusData.focus_students !== null && focusData.focus_students !== undefined) {
-        $scope.focusStudents = [];
-        var orderedFocusStudents = _.sortBy(focusData.focus_students, 'ordering');
-        _.each(orderedFocusStudents, function(elem) {
-            $scope.focusStudents.push(elem);
-        });
-
-        //$scope.focusStudents = _.sortBy(focusData.focus_students, 'ordering');
+        $scope.focusStudents = _.sortBy(focusData.focus_students, 'ordering');
     }
 
     $scope.editing = false;
@@ -104,6 +98,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                     toastService.error('The server wasn\'t able to save your reordering.');
                 });
         },
+        cancel: '.not-sortable',
     };
 
     /***
@@ -180,6 +175,10 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                         elem.ordering = tempLookup[elem.id].ordering;
                     });
                 });
+
+                if($scope.focusStudents.length >= 5) {
+                    $scope.toggleAdd(false);
+                }
             },
             function error(response) {
                 // notify the user
@@ -229,14 +228,4 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
     };
 
 
-
-
-
-
-
-    $('.sortable').on('mousedown', function () {
-        $(this).css('cursor', 'move');
-    }).on('mouseup', function () {
-        $(this).css('cursor', 'auto');
-    });
 });
