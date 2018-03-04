@@ -7,8 +7,8 @@
                     <h4 class="panel-title">All My Students</h4>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="studentsLookup === {}">No Other Students</h4>
-                    <div ng-show="studentsLookup !== {}">
+                    <h4 class="centerText" ng-show="students.length === 0">No Students</h4>
+                    <div ng-show="students.length !== 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" name="studentSearch" list="studentSearch" ng-model="studentSearch.text">
                         <div class="table-responsive scrollableTableDiv table-select voffset3">
                             <table class="table table-hover">
