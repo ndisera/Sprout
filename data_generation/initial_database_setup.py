@@ -19,8 +19,6 @@ from services.section import Section, SectionService
 from services.settings import SchoolSettings, DailySchedule, TermSettings, SettingsService
 from services.term import Term, TermService
 from services.users import User, UsersService
-from services.assignment import Assignment, AssignmentService
-from services.grades import Grade, GradesService
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
@@ -77,16 +75,28 @@ if __name__ == "__main__":
     num_assignments_per_section = 5
     num_grades_per_assignment = 1
 
-    settings_service = SettingsService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
-    term_service = TermService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
-    sections_service = SectionService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
-    enrollments_service = EnrollmentService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
+    service_args = {'protocol': args.protocol,
+                    'hostname': args.host,
+                    'verify': False,
+                    'headers': headers,
+                    'port_num': args.port,
+                    }
+    settings_service = SettingsService(**service_args)
+    term_service = TermService(**service_args)
+    sections_service = SectionService(**service_args)
+    enrollments_service = EnrollmentService(**service_args)
 
-    student_generator = StudentGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
-    teacher_generator = TeacherGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
-    behavior_generator = BehaviorGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
-    grades_generator = GradesGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
-    std_test_score_generator = StandardizedTestScoreGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
+    generator_args = {'protocol': args.protocol,
+                      'hostname': args.host,
+                      'verify': False,
+                      'headers': headers,
+                      'port_num': args.port,
+                      }
+    student_generator = StudentGenerator(**generator_args)
+    teacher_generator = TeacherGenerator(**generator_args)
+    behavior_generator = BehaviorGenerator(**generator_args)
+    grades_generator = GradesGenerator(**generator_args)
+    std_test_score_generator = StandardizedTestScoreGenerator(**generator_args)
 
     # Setup the school
     school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", id=None)
