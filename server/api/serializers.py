@@ -23,6 +23,20 @@ class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
         fields = '__all__'
+
+    def update(self, instance, validated_data):
+        """
+        Clean up notifications for a case manager when a student is reassigned
+        """
+        if 'case_manager' in validated_data:
+            # If the case_manager is being updated, wipe all notifications
+            # between the student and the old case manager
+            old_case_manager = instance.case_manager
+            old_notifications = Notification.objects.filter(student=instance, user=old_case_manager)
+            for notification in old_notifications:
+                notification.delete()
+        return super(StudentSerializer, self).update(instance, validated_data)
+
     case_manager = DynamicRelationField('SproutUserSerializer')
     picture = DynamicRelationField('ProfilePictureSerializer')
 
@@ -84,6 +98,18 @@ class EnrollmentSerializer(DynamicModelSerializer):
     class Meta:
         model = Enrollment
         fields = ('id', 'section', 'student')
+
+    def update(self, instance, validated_data):
+        """
+        Clean up notifications for a teacher when a student's enrollment changes
+        """
+        old_student = instance.student
+        old_teacher = instance.section.teacher
+        old_notifications = Notification.objects.filter(student=old_student, user=old_teacher)
+        for notification in old_notifications:
+            notification.delete()
+        return super(EnrollmentSerializer, self).update(instance, validated_data)
+
     section = DynamicRelationField('SectionSerializer')
     student = DynamicRelationField('StudentSerializer')
 
