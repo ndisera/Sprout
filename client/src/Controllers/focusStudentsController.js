@@ -240,6 +240,7 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                 data: [1, 2, 3, 4],
                 labels: [1, 2, 3, 4],
                 series: [],
+                category: 'derp', //todo: remove. This is mainly for testing to make sure that it got generated
                 options: {
                     elements: {
                         line: {
@@ -268,6 +269,7 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                 data: [1, 2, 3, 4],
                 labels: [1, 2, 3, 4],
                 series: [],
+                category: 'derp', //todo: remove. This is mainly for testing to make sure that it got generated
                 options: {
                     elements: {
                         line: {
@@ -297,8 +299,8 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
 
             //Focus Graph
             //temporarily getting a month of behavior
-            serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 2, "extra shit");
-            serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 2, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 23, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 24, "extra shit");
 
             console.log("focus graph:");
             console.log($scope.focusGraphs[elem.student]['focus']);
@@ -370,6 +372,10 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                   currentGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
                   currentGraph.labels.push(_.times(dateDiff + 1, _.constant(null)));
 
+
+                  // console log to get the data we're working with
+                  console.log("service call data");
+                  console.log(data);
                   // This is the data we have
                   //     {enrollments: Array(1), behaviors: Array(19), sections: Array(1)}
                   //     behaviors: Array(19)
@@ -393,12 +399,16 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                   //Set the data points
                   for (i = 0; i < data.behaviors.length; i++) {
                       //iterate through each datapoint, calculate the date difference, and place data at that index
-                      var pointDate = moment(data.behaviors[i].date);
-                      var pointIndex = pointDate.diff(graphStart, 'd');
-                      if (category === "behavior") {
-                          currentGraph.data[0][pointIndex] = data.behaviors[i].behavior;
-                      } else { //category === "effort"
-                          currentGraph.data[0][pointIndex] = data.behaviors[i].effort;
+
+                      //filter on the specificID. In this case, the enrollment ID
+                      if (data.behaviors[i].enrollment === specificID) {
+                          var pointDate = moment(data.behaviors[i].date);
+                          var pointIndex = pointDate.diff(graphStart, 'd');
+                          if (category === "behavior") {
+                              currentGraph.data[0][pointIndex] = data.behaviors[i].behavior;
+                          } else { //category === "effort"
+                              currentGraph.data[0][pointIndex] = data.behaviors[i].effort;
+                          }
                       }
                   }
 
@@ -407,10 +417,24 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                   for (i = 0; i < dateDiff + 1; i++) {
                       currentGraph.labels[i] = iterDate.format('MM/DD').toString();
                       iterDate.add(1, 'd');
-
                   }
                   //Set the line label
-                  currentGraph.series[0] = data.sections[0].title;
+                  //Grab the section id from the enrollments array
+                  var sectionID;
+                  for (i = 0; i < data.enrollments.length; i++) {
+                      if(data.enrollments[i].id === specificID) {
+                          sectionID = data.enrollments[i].section;
+                          break;
+                      }
+                  }
+                  var sectionTitle;
+                  for (i = 0; i < data.sections.length; i++) {
+                      if(data.sections[i].id === sectionID) {
+                          sectionTitle = data.sections[i].title;
+                          break;
+                      }
+                  }
+                  currentGraph.series[0] = sectionTitle;
 
                   //Set the category label (capitalized)
                   currentGraph.category = category[0].toUpperCase() + category.slice(1);
