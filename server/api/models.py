@@ -44,6 +44,12 @@ class Student(models.Model):
     class Meta:
         ordering = ('id',)
 
+    def __repr__(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    def __str__(self):
+        return self.__repr__();
+
 
 class Holiday(models.Model):
     """
