@@ -356,6 +356,7 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
                     break;
                 default:
             }
+            checkIfAllSelected();
         }, function error(response) {
             setErrorMessage(response);
             toastService.error("The server was unable to save your edit." + errorResponse());
@@ -440,4 +441,4 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         }
         $scope.errorMessage = $scope.errorMessage.join(" ");
     }
-})
+});

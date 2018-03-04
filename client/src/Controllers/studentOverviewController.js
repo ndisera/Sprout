@@ -183,7 +183,3 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
     };
 
 });
-
-
-
-

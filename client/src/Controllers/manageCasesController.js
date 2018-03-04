@@ -290,7 +290,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         }
         $scope.errorMessage = $scope.errorMessage.join(" ");
     }
-})
+});
 
 // filter used for unassigned students
 app.filter('otherStudentFilter', [function() {
