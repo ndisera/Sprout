@@ -22,8 +22,9 @@ class ProfilePictureSerializer(DynamicModelSerializer):
 class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
-        fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate', 'case_manager')
+        fields = '__all__'
     case_manager = DynamicRelationField('SproutUserSerializer')
+    picture = DynamicRelationField('ProfilePictureSerializer')
 
 
 class SchoolSettingsSerializer(DynamicModelSerializer):

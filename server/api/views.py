@@ -65,6 +65,7 @@ def set_link(class_id, path, method, link):
 class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
 
+
 class ProfilePictureViewSet(mixins.CreateModelMixin,
                             mixins.RetrieveModelMixin,
                             mixins.ListModelMixin,
@@ -102,6 +103,12 @@ class ProfilePictureViewSet(mixins.CreateModelMixin,
             user_profile = user_profile[0]
             user_profile.picture = self.instance
             user_profile.save()
+        if 'student' in parents_query_dict:
+            student_id = parents_query_dict['student']
+            student = Student.objects.filter(id=student_id)
+            student = student[0] # Queryset always returns a list even though we used the primary key
+            student.picture = self.instance
+            student.save()
         return response
 
     def perform_create(self, serializer):
@@ -126,16 +133,6 @@ class ProfilePictureViewSet(mixins.CreateModelMixin,
         return response
 
 
-class StudentViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    StudentViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(StudentViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(StudentViewSet, path, method, link)
-
-
 class StudentViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
@@ -144,28 +141,35 @@ class StudentViewSet(NestedDynamicViewSet):
     serializer_class = StudentSerializer
     queryset = Student.objects.all()
 
-    """ define custom schema for documentation """
-    schema = StudentViewSetSchema()
-
     """ ensure variables show as correct types for docs """
     name_case_manager = 'case_manager'
     desc_case_manager = "ID of the User who oversees this student"
+
+    name_profile_picture = 'picture'
+    desc_profile_picture = "This student's profile picture"
 
     case_manager_field = coreapi.Field(name=name_case_manager,
                                        required=True,
                                        location="form",
                                        description=desc_case_manager,
-                                       schema=coreschema.Integer(title=name_case_manager)),
+                                       schema=coreschema.Integer(title=name_case_manager))
 
-    create_fields = (
-        case_manager_field
-    )
-    update_fields = (
-        case_manager_field
-    )
-    partial_update_fields = (
-        case_manager_field
-    )
+    profile_picture_field = coreapi.Field(name=name_profile_picture,
+                                       required=False,
+                                       location="form",
+                                       description=desc_profile_picture,
+                                       schema=coreschema.Integer(title=name_profile_picture))
+
+    schema = AutoSchema(manual_fields=[
+        case_manager_field,
+        profile_picture_field
+    ])
+
+    # Rebuild all existing fields with required=False for partial update
+    partial_update_fields = [field._asdict() for field in schema._manual_fields]
+    for field in partial_update_fields: field['required']=False
+    partial_update_fields = [coreapi.Field(**field) for field in partial_update_fields]
+    pass
 
 
 class SchoolSettingsSetSchema(AutoSchema):

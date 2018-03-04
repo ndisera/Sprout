@@ -37,6 +37,9 @@ class Student(models.Model):
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     case_manager = models.ForeignKey(SproutUser, blank=True, null=True)
+    picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
+                                   blank=True, null=True,
+                                   help_text="Student's Profile Picture")
 
     class Meta:
         ordering = ('id',)
