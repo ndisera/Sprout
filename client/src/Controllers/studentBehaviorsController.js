@@ -1,4 +1,5 @@
-app.controller("studentBehaviorsController", function ($scope, $routeParams, toastService, behaviorService, data, student) {
+app.controller("studentBehaviorsController", function ($scope, $routeParams, $location, toastService, behaviorService, data, student) {
+    $scope.location = $location;
     // I know this will be here, because I filtered on the student ID, and only that student
     $scope.student     = student.student;
     $scope.enrollments = [];

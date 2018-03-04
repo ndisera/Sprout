@@ -106,17 +106,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
 
         // route for the settings page
         .when('/settings', {
-            templateUrl: 'html/settings.html',
-            controller: 'settingsController',
-            resolve: {
-                auth: function(userService) {
-                    return userService.authVerify();
-                },
-            },
-        })
-
-        // route for the settings page
-        .when('/settings', {
             redirectTo: '/settings/user',
         })
 
@@ -142,10 +131,46 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             },
         })
 
+        // route for the profile page
+        .when('/profile', {
+            redirectTo: '/profile/focus',
+        })
+
         // route for the focus students page
-        .when('/focus', {
-            templateUrl: 'html/focusStudents.html',
-            controller: 'focusStudentsController',
+        .when('/profile/focus', {
+            templateUrl: 'html/profileFocus.html',
+            controller: 'profileFocusController',
+            resolve: {
+                studentData: function(studentService) {
+                    return studentService.getStudents();
+                },
+                // need to make sure user in userService is set before calling
+                focusData: function (userService, $q) {
+                    //TODO(gzuber): I don't like this in script.js...
+                    var deferred = $q.defer();
+                    userService.authVerify().then(
+                        function success() {
+                            userService.getAllFocusForUser(userService.user.id).then(
+                                function success(data) {
+                                    deferred.resolve(data);
+                                },
+                                function error(response) {
+                                    deferred.reject(response);
+                                },
+                            );
+                        },
+                        function error(response) {
+                            deferred.reject(response);
+                        },
+                    );
+                    return deferred.promise;
+                },
+            }
+        })
+
+        .when('/profile/students', {
+            templateUrl: 'html/profileStudents.html',
+            controller: 'profileStudentsController',
             resolve: {
                 studentData: function(studentService) {
                     return studentService.getStudents();
@@ -175,7 +200,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         })
 
         // route for the input scores page
-        .when('/scores', {
+        .when('/input', {
             templateUrl: 'html/scoresInput.html',
             controller: 'scoresInputController',
             resolve: {
@@ -305,7 +330,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             }
         })
 
-        .otherwise({ redirectTo: '/focus' });
+        .otherwise({ redirectTo: '/profile/focus' });
 })
 
 .run(function($rootScope, $location, toastService, userService) {

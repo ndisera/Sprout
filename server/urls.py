@@ -51,6 +51,8 @@ students_router.register('grades', viewset=GradeViewSet, base_name='student-grad
 iep_router = students_router.register('ieps', viewset=IEPGoalViewSet, base_name='student-ieps', parents_query_lookups=['student'])
 # Add nested route for services as /student/{pk}/services
 students_router.register('services', viewset=ServiceRequirementViewSet, base_name='student-services', parents_query_lookups=['student'])
+# Add nested route for student profile pictures as /student/{pk}/picture
+students_router.register('picture', viewset=ProfilePictureViewSet, base_name='student-pictures', parents_query_lookups=['student'])
 
 # Add nested routes for iep notes as /student/{pk}/ieps/{pk}/notes
 iep_router.register('notes', viewset=IEPGoalNoteViewSet, base_name='iep-notes', parents_query_lookups=['goal__student', 'goal'])
@@ -58,7 +60,10 @@ iep_router.register('data', viewset=IEPGoalDatapointViewSet, base_name='iep-data
 
 # Add nested route for notifications as /users/{pk}/notifications
 users_router.register('notifications', viewset=NotificationViewSet, base_name='users-notifications', parents_query_lookups=['user'])
+# Add nested route for notifications as /users/{pk}/focus
 users_router.register('focus', viewset=FocusStudentViewSet, base_name='users-focus', parents_query_lookups=['user'])
+# Add nested route for notifications as /users/{pk}/picture
+users_router.register('picture', viewset=ProfilePictureViewSet, base_name='users-picture', parents_query_lookups=['sproutuserprofile'])
 
 urlpatterns = router.urls
 

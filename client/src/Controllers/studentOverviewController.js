@@ -1,4 +1,5 @@
-app.controller("studentOverviewController", function ($scope, $routeParams, toastService, studentService, enrollmentData, userData, studentData) {
+app.controller("studentOverviewController", function ($scope, $location, $routeParams, toastService, studentService, enrollmentData, userData, studentData) {
+    $scope.location = $location;
 
     // set important scope variables
     $scope.student     = studentData.student;

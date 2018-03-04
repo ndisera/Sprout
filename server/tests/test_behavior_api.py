@@ -1,19 +1,14 @@
 from django.test import TestCase
 from django.db import IntegrityError
-from api.models import Behavior
-from api.models import Enrollment
-from api.models import Section
-from api.models import Student
-from api.models import Teacher
+from api.models import *
 
 import datetime
 
 class BehaviorTestCase(TestCase):
     def setUp(self):
-        self.teacher = Teacher.objects.create(username="sredman",
-                                              email="sredman@example.com",
-                                              first_name="Simon",
-                                              last_name="Redman")
+        self.teacher = SproutUser.objects.create(email="sredman@example.com",
+                                                 first_name="Simon",
+                                                 last_name="Redman")
 
         self.student = Student.objects.create(student_id="dev890918",
                                               first_name="Graham",

@@ -6,11 +6,25 @@ from rest_auth.serializers import LoginSerializer, UserDetailsSerializer
 from rest_auth.registration.serializers import RegisterSerializer
 
 
+class ProfilePictureSerializer(DynamicModelSerializer):
+    file = serializers.ImageField(max_length=None)
+
+    class Meta:
+        fields = '__all__'
+        model = ProfilePicture
+
+    def to_representation(self, instance):
+        representation = super(ProfilePictureSerializer, self).to_representation(instance)
+        del (representation['file']) # Hide the file path from the response
+        return representation
+
+
 class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
-        fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate', 'case_manager')
+        fields = '__all__'
     case_manager = DynamicRelationField('SproutUserSerializer')
+    picture = DynamicRelationField('ProfilePictureSerializer')
 
 
 class SchoolSettingsSerializer(DynamicModelSerializer):

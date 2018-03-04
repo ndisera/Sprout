@@ -1,4 +1,5 @@
 app.controller("manageTeachersController", function($scope, $rootScope, $location, toastService, userData, userService, sectionService, termsInfo) {
+    $scope.location = $location;
 
     var teacherTask = "view/edit";
     $scope.displayTeacherViewSearch = true;

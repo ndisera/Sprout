@@ -1,4 +1,5 @@
-app.controller("studentGradesController", function ($scope, $rootScope, $routeParams, toastService, sectionService, studentService, studentData, enrollmentData) {
+app.controller("studentGradesController", function ($scope, $rootScope, $location, $routeParams, toastService, sectionService, studentService, studentData, enrollmentData) {
+    $scope.location = $location;
     $scope.student  = studentData.student;
     $scope.sections = [];
 
