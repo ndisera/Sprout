@@ -107,7 +107,7 @@ if __name__ == "__main__":
     service_generator = ServiceGenerator(**generator_args)
 
     # Setup the school
-    school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", id=None)
+    school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", grade_range_lower=6, grade_range_upper=8, id=None)
     settings_service.add_school(school_settings)
 
     ab_schedule = DailySchedule(name="A/B Periods", total_periods=8, periods_per_day=4, id=None)

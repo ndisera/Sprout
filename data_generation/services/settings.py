@@ -2,7 +2,7 @@ from base_service import BaseService
 
 from collections import namedtuple
 
-SchoolSettings = namedtuple("SchoolSettings", ['id', 'school_name', 'school_location', ])
+SchoolSettings = namedtuple("SchoolSettings", ['id', 'school_name', 'school_location', 'grade_range_lower', 'grade_range_upper', ])
 DailySchedule = namedtuple("DailySchedule", ['id', 'name', 'total_periods', 'periods_per_day', ])
 TermSettings  = namedtuple("TermSettings", ['id', 'schedule', ])
 

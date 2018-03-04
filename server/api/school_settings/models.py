@@ -15,6 +15,10 @@ class SchoolSettings(models.Model):
     school_location = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                        default="101 Eazy Street",
                                        help_text="Real-world location of the school")
+    grade_range_lower = models.IntegerField(blank=False,
+                                            help_text='Minimum school year (grade) this school supports')
+    grade_range_upper = models.IntegerField(blank=False,
+                                            help_text='Maximum school year (grade) this school supports')
 
 
 class DailySchedule(models.Model):
