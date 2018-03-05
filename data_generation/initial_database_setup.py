@@ -7,14 +7,14 @@ import sys
 import random
 import math
 
-from lib.generators.behavior_generator import BehaviorGenerator
-from lib.generators.standardized_test_score_generator import StandardizedTestScoreGenerator
-from lib.generators.student_generator import Student, StudentGenerator
-from lib.generators.teacher_generator import TeacherGenerator
-from lib.generators.grades_generator import GradesGenerator
-from lib.generators.iep_generator import IEPGenerator
-from lib.generators.service_generator import ServiceGenerator
-from lib.generators.attendance_generator import AttendanceGenerator
+from lib.generators.behavior import BehaviorGenerator
+from lib.generators.standardized_test_score import StandardizedTestScoreGenerator
+from lib.generators.student import Student, StudentGenerator
+from lib.generators.teacher import TeacherGenerator
+from lib.generators.grades import GradesGenerator
+from lib.generators.iep import IEPGenerator
+from lib.generators.service import ServiceGenerator
+from lib.generators.attendance import AttendanceGenerator
 
 from lib.services.authorization import AuthorizationService
 from lib.services.enrollment import Enrollment, EnrollmentService
