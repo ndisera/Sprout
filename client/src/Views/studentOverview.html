@@ -18,7 +18,7 @@
                             {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-right">
-                            <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)">
+                            <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)" ng-class="{ 'active': entry.pk === caseManager.pk, }">
                                 <a class="student-overview-assign-link">
                                     {{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.pk === caseManager.pk" class="glyphicon glyphicon-ok"></span>
                                 </a>
