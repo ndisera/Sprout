@@ -47,7 +47,7 @@ app.factory("holidayService", function ($rootScope, $http, $q, queryService) {
         updateHoliday: function (holidayId, holidayObj) {
             var deferred = $q.defer();
             $http({
-                method: 'UPDATE',
+                method: 'PUT',
                 url: 'https://' + $rootScope.backend + '/holidays/' + holidayId,
                 data: holidayObj,
             }).then(function success(response) {
