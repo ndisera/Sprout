@@ -147,7 +147,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
 
                 studentService.getGradesForStudent($scope.student.id, gradesConfig).then(
                     function success(data) {
-                        console.log(data);
 
                         // reset relevant data
                         $scope.classGrade              = 0;

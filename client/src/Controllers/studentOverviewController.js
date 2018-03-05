@@ -1,8 +1,6 @@
 app.controller("studentOverviewController", function ($scope, $location, $routeParams, toastService, studentService, termData, enrollmentData, userData, studentData) {
     $scope.location = $location;
 
-    console.log(termData);
-
     // set important scope variables
     $scope.student         = studentData.student;
     $scope.enrollments     = [];
@@ -68,14 +66,6 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
     $scope.selectTerm = function(term) {
         $scope.selectedTerm = term;
         $scope.termSections = _.filter($scope.sections, function(elem) { return elem.term === term.id; });
-        console.log($scope.termSections);
-        //var sectionsInTerm = _.filter($scope.sections, function(elem) { return elem.term === term.id; });
-        //if(sectionsInTerm.length === 0) {
-            //$scope.selectedSection = null;
-        //}
-        //else {
-            //$scope.selectSection(sectionsInTerm[0]);
-        //}
     };
 
     $scope.selectTerm($scope.selectedTerm);

@@ -17,56 +17,59 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 voffset3">
+                <div class="input-group">
+                    <span class="input-group-addon">From</span>
+                    <input type="text" id="graphStartDate" class="form-control" date-time ng-model="graphStartDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="graphDateRangeChange" max-date="graphEndDate" watch-direct-changes="true">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 voffset3">
+                <div class="input-group">
+                    <span class="input-group-addon">To</span>
+                    <input type="text" id="graphEndDate" class="form-control" date-time ng-model="graphEndDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="graphDateRangeChange" min-date="graphStartDate" watch-direct-changes="true">
+                </div>
+            </div>
+        </div>
         <div class="row voffset4">
-            <div class="col-xs-12">
+            <div class="col-lg-6">
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Score History</h3>
+                            <h3 class="panel-title">Behavior</h3>
                         </div>
                         <div class="panel-body">
-                            <div class="row">
-                                <div class="col-xs-12 col-sm-6 voffset2">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">From</span>
-                                        <input type="text" id="graphStartDate" class="form-control" date-time ng-model="graphStartDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="graphDateRangeChange" max-date="graphEndDate" watch-direct-changes="true">
-                                    </div>
-                                </div>
-                                <div class="col-xs-12 col-sm-6 voffset2">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">To</span>
-                                        <input type="text" id="graphEndDate" class="form-control" date-time ng-model="graphEndDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="graphDateRangeChange" min-date="graphStartDate" watch-direct-changes="true">
-                                    </div>
-                                </div>
+                            <div class="focusGraph">
+                                <canvas id="student_behavior"
+                                        class="chart chart-line"
+                                        chart-data="behaviorGraph.data"
+                                        chart-labels="sharedGraph.labels"
+                                        chart-series="sharedGraph.series"
+                                        chart-options="sharedGraph.options"
+                                        chart-dataset-override="sharedGraph.datasetOverride"
+                                        chart-click="onClick">
+                                </canvas>
                             </div>
-                            <div class="row voffset3">
-                                <div class="col-lg-6 centerText focusGraph">
-                                    <label>Behavior</label>
-                                    <div class="col-sm-12">
-                                        <canvas id="student_behavior"
-                                                class="chart chart-line"
-                                                chart-data="behaviorGraph.data"
-                                                chart-labels="sharedGraph.labels"
-                                                chart-series="sharedGraph.series"
-                                                chart-options="sharedGraph.options"
-                                                chart-dataset-override="sharedGraph.datasetOverride"
-                                                chart-click="onClick">
-                                        </canvas>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 centerText focusGraph">
-                                    <label>Effort</label>
-                                    <div class="col-sm-12">
-                                        <canvas id="student_effort"
-                                                class="chart chart-line"
-                                                chart-data="effortGraph.data"
-                                                chart-labels="sharedGraph.labels"
-                                                chart-series="sharedGraph.series"
-                                                chart-options="sharedGraph.options"
-                                                chart-click="onClick">
-                                        </canvas>
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="panel-wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Effort</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="focusGraph">
+                                <canvas id="student_effort"
+                                        class="chart chart-line"
+                                        chart-data="effortGraph.data"
+                                        chart-labels="sharedGraph.labels"
+                                        chart-series="sharedGraph.series"
+                                        chart-options="sharedGraph.options"
+                                        chart-click="onClick">
+                                </canvas>
                             </div>
                         </div>
                     </div>
