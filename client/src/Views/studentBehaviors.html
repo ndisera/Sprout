@@ -49,6 +49,7 @@
                                                 chart-labels="sharedGraph.labels"
                                                 chart-series="sharedGraph.series"
                                                 chart-options="sharedGraph.options"
+                                                chart-dataset-override="sharedGraph.datasetOverride"
                                                 chart-click="onClick">
                                         </canvas>
                                     </div>
@@ -85,7 +86,10 @@
                                 <input type="text" id="inputDate" class="form-control" date-time ng-model="inputDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="inputDateChange" watch-direct-changes="true">
                             </div>
                             <div class="voffset3">
-                                <table class="table table-responsive">
+                                <div class="student-behaviors-no-input-classes" ng-show="scoresInput.length === 0">
+                                    <h4 class="centerText">No Enrolled Classes</h4>
+                                </div>
+                                <table class="table table-responsive" ng-show="scoresInput.length !== 0">
                                     <thead>
                                         <tr>
                                             <th>Class</th>
