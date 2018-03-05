@@ -5,13 +5,11 @@
         <div class="taskSelection btn-group hidden-xs">
             <button id="tViewButton" type="button" class="btn btn-primary active" ng-click="changeTeacherTask('view/edit')">View/Edit</button>
             <button id="tAddButton" type="button" class="btn btn-primary" ng-click="changeTeacherTask('add')">Add</button>
-            <button id="tDeleteButton" type="button" class="btn btn-primary" ng-click="changeTeacherTask('delete')">Delete</button>
         </div>
         <h3 class="hidden-sm hidden-md hidden-lg hidden-xl centerText">Teachers</h3>
         <div class="btn-group hidden-sm hidden-md hidden-lg hidden-xl smBtnGroup">
             <button id="tViewButton2" type="button" class="btn btn-primary active" ng-click="changeTeacherTask('view/edit')">View/Edit</button>
             <button id="tAddButton2" type="button" class="btn btn-primary" ng-click="changeTeacherTask('add')">Add</button>
-            <button id="tDeleteButton2" type="button" class="btn btn-primary" ng-click="changeTeacherTask('delete')">Delete</button>
         </div>
         <hr />
         <div class="panel-wrapper" ng-show="displayTeacherViewSearch">
@@ -31,6 +29,7 @@
                                         <th>First Name</th>
                                         <th>Last Name</th>
                                         <th>Email</th>
+                                        <th class="buttonColumn"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,6 +37,9 @@
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
+                                        <td>
+                                            <button class="btn btn-danger btn-xs" type="button" ng-click="setTeacherD(teacher); $event.stopPropagation();">Delete</button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -193,7 +195,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter | orderBy:'last_name'" class="pointer" ng-click="setTeacherD(teacher)" data-toggle="modal" data-target="#deleteTeacherModal">
+                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter | orderBy:'last_name'" class="pointer" data-toggle="modal" data-target="#deleteTeacherModal">
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
@@ -236,6 +238,9 @@
                                 </div>
                             </div>
                         </form>
+                        <div class="alert alert-warning">
+                            <span><b>Warning:</b> This can't be undone.</span>
+                        </div>
                     </div>
                     <div class="modal-footer grey">
                         <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="deleteTeacher()">Delete</button>
