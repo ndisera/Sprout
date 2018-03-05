@@ -23,6 +23,7 @@ from api.routers import NestedDynamicRouter
 from api.views import *
 
 router = NestedDynamicRouter()
+router.register('attendances', viewset=AttendanceRecordViewSet, base_name='attendances')
 router.register('behaviors', viewset=BehaviorViewSet, base_name='Behaviors')
 router.register('enrollments', viewset=EnrollmentViewSet, base_name='Enrollments')
 router.register('holidays', viewset=HolidayViewSet, base_name='holidays')
