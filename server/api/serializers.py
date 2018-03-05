@@ -268,7 +268,7 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
 class NotificationSerializer(DynamicModelSerializer):
     class Meta:
         model = Notification
-        fields = ('id', 'title', 'body', 'date', 'student', 'user', 'category', 'unread', )
+        fields = '__all__'
     user = DynamicRelationField('SproutUserSerializer')
     student = DynamicRelationField('StudentSerializer')
 
