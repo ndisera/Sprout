@@ -70,3 +70,21 @@ class Term(models.Model):
                                  help_text="Settings controlling this Term")
     school_year = models.ForeignKey(SchoolYear, blank=False, on_delete=models.PROTECT,
                                     help_text="School year associated with this term")
+
+
+class Holiday(models.Model):
+    """
+    Holiday
+    Represent a time period when school is not in session but normally would be
+    """
+    name = models.CharField(unique=True, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                            help_text="Human-readable name of the holiday")
+    start_date = models.DateField(blank=False,
+                                  help_text="Holiday start date")
+    end_date = models.DateField(blank=False,
+                                help_text="Holiday end date. May be outside the Term the holiday starts in")
+    school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE,
+                                    help_text="School year this holiday starts in")
+
+    class Meta:
+        unique_together = (('school_year', 'name', 'start_date', ),)
