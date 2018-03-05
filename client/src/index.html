@@ -10,12 +10,14 @@
         <link rel="stylesheet" href="includes/bootstrap.min.css" />
         <link rel="stylesheet" href="includes/jquery-ui.min.css" />
         <link rel="stylesheet" href="includes/toastr.min.css" />
+        <link rel="stylesheet" href="includes/fa-svg-with-js.css" />
         <link rel="stylesheet" href="includes/angular-datepicker.min.css" />
         <!-- @endif -->
         <!-- @ifdef DEBUG -->
         <link rel="stylesheet" href="includes/bootstrap.css" />
         <link rel="stylesheet" href="includes/jquery-ui.css" />
         <link rel="stylesheet" href="includes/toastr.css" />
+        <link rel="stylesheet" href="includes/fa-svg-with-js.css" />
         <link rel="stylesheet" href="includes/angular-datepicker.css" />
         <!-- @endif -->
         <link rel="stylesheet" href="css/styles.css" />
@@ -33,6 +35,7 @@
         <script src="includes/angular-datepicker.min.js"></script>
         <script src="includes/sortable.min.js"></script>
         <script src="includes/toastr.min.js"></script>
+        <script src="includes/fontawesome-all.min.js"></script>
         <script src="includes/moment-with-locales.min.js"></script>
         <script src="includes/underscore-min.js"></script>
         <script src="includes/tinycolor-min.js"></script>
@@ -51,6 +54,7 @@
         <script src="includes/angular-datepicker.js"></script>
         <script src="includes/sortable.js"></script>
         <script src="includes/toastr.js"></script>
+        <script src="includes/fontawesome-all.js"></script>
         <script src="includes/moment-with-locales.js"></script>
         <script src="includes/underscore.js"></script>
         <script src="includes/tinycolor.js"></script>
@@ -78,7 +82,11 @@
                         <div class="col-xs-12 no-padding">
                             <ul class="list-group" ng-cloak>
                                 <li ng-repeat="link in sidebarLinks" ng-click="sidebarLinkClick(link)" class="list-group-item" ng-class="{ 'active': sidebarLinkActive(link), }">
-                                    <a ng-href="{{ link.href }}"><span class="glyphicon glyphicon-{{ link.glyph }}"></span>{{ link.title }}</a>
+                                    <a ng-href="{{ link.href }}">
+                                        <span class="glyphicon glyphicon-{{ link.glyph }}"></span>
+                                        {{ link.title }}
+                                        <span class="badge" ng-if="link.badgeList.length > 0">{{ link.badgeList.length }}</span>
+                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -97,8 +105,8 @@
                         </a>
                         <div class="pull-right">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span></button>
-                                <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-bell"></span></button>
+                                <button type="button" class="btn btn-default" ng-click="location.path('/settings')"><span class="glyphicon glyphicon-cog"></span></button>
+                                <button type="button" class="btn btn-default" ng-click="location.path('/notifications')"><span class="glyphicon glyphicon-bell"></span></button>
                             </div>
                         </div>
                     </div>
@@ -124,8 +132,8 @@
                                     <span>{{ user.firstName }} {{ user.lastName }}</span>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span></button>
-                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-bell"></span></button>
+                                    <button type="button" class="btn btn-default" ng-click="location.path('/settings')"><span class="glyphicon glyphicon-cog"></span></button>
+                                    <button type="button" class="btn btn-default" ng-click="location.path('/notifications')"><span class="glyphicon glyphicon-bell"></span></button>
                                 </div>
                             </div>
                         </div>
