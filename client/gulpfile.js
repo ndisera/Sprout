@@ -63,6 +63,12 @@ const include_paths = [
     bower_path + 'toastr/toastr.css',
     bower_path + 'toastr/toastr.js',
 
+    // material icons
+    bower_path + 'fontawesome/svg-with-js/js/fontawesome-all.min.js',
+
+    bower_path + 'fontawesome/svg-with-js/css/fa-svg-with-js.css',
+    bower_path + 'fontawesome/svg-with-js/js/fontawesome-all.js',
+
     // helpers
     bower_path + 'moment/min/moment-with-locales.min.js',
     bower_path + 'moment/min/moment-with-locales.js',

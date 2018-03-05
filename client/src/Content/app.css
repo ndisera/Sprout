@@ -46,7 +46,7 @@ a {
 #sidebar {
     position: fixed;
     height: 100vh;
-    width: 150px;
+    width: 160px;
     top: 0px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.3);
     background-color: #0b3c5d;
@@ -87,7 +87,7 @@ a {
 }
 
 #sidebar .list-group-item > a > span.glyphicon {
-    margin-right: 10px;
+    margin-right: 7px;
 }
 
 #sidebar-hamburger-btn {
@@ -101,12 +101,17 @@ a {
     font-size: 20px;
 }
 
+#sidebar .badge {
+    margin-left: 5px;
+    background-color: #c9302c;
+}
+
 
 #topbar {
     position: fixed;
     height: 40px;
     top: 0px;
-    margin-left: 150px;
+    margin-left: 160px;
     z-index: 100;
     box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     background-color: #EEE;
@@ -178,7 +183,7 @@ a {
 
 #main {
     margin-top: 55px;
-    margin-left: 150px;
+    margin-left: 160px;
 }
 
 .bottom-spacer {
@@ -742,6 +747,13 @@ ul.dropdown-menu > li > a:hover {
     border-color: #33805e;
 }
 
+.btn-glyphicon > span.glyphicon {
+    margin-right: 5px;
+}
+
+.btn-glyphicon > span.btn-text {
+    margin-top: -5px;
+}
 
 
 
