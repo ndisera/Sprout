@@ -44,23 +44,11 @@ class Student(models.Model):
     class Meta:
         ordering = ('id',)
 
+    def __repr__(self):
+        return "{} {}".format(self.first_name, self.last_name)
 
-class Holiday(models.Model):
-    """
-    Holiday
-    Represent a time period when school is not in session but normally would be
-    """
-    name = models.CharField(unique=True, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                            help_text="Human-readable name of the holiday")
-    start_date = models.DateField(blank=False,
-                                  help_text="Holiday start date")
-    end_date = models.DateField(blank=False,
-                                help_text="Holiday end date. May be outside the Term the holiday starts in")
-    term = models.ForeignKey(Term, on_delete=models.CASCADE,
-                             help_text="Term this holiday starts in")
-
-    class Meta:
-        unique_together = (('term', 'name', 'start_date', ),)
+    def __str__(self):
+        return self.__repr__();
 
 
 class Section(models.Model):
@@ -95,6 +83,19 @@ class Enrollment(models.Model):
         unique_together = (('section', 'student'),)
         ordering = ('section',)
 
+    def delete(self, using=None, keep_parents=False):
+        """
+        Cleanup notifications between this enrollment's section's teacher
+        and the student if the enrollment is deleted
+        :return: 
+        """
+        old_student = self.student
+        old_teacher = self.section.teacher
+        old_notifications = Notification.objects.filter(student=old_student, user=old_teacher)
+        for notification in old_notifications:
+            notification.delete()
+        return super(Enrollment, self).delete(using, keep_parents)
+
 
 class Behavior(models.Model):
     """
@@ -110,6 +111,24 @@ class Behavior(models.Model):
     class Meta:
         unique_together = (('enrollment', 'date'),)
         ordering = ('date',)
+
+
+class AttendanceRecord(models.Model):
+    """
+    AttendanceRecord
+    Keep track of whether a student did not attend a particular class or was late, etc.
+    """
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE,
+                                   help_text="Enrollment associated with this attendance report")
+    date = models.DateTimeField(null=False, blank=False,
+                                help_text="Date this attendace record was recorded")
+    short_code = models.CharField(blank=False, max_length=3,
+                                  help_text="Short code of this attendance record, for digest viewing")
+    description = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="Human-readable description of this attendance record")
+
+    class Meta:
+        unique_together = [('enrollment', 'date'),]
 
 class StandardizedTest(models.Model):
     """
@@ -179,8 +198,8 @@ class Notification(models.Model):
     title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     date = models.DateTimeField(blank=False)
-    student = models.ForeignKey(Student, blank=False)
-    user = models.ForeignKey(SproutUser, blank=False)
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE)
     category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                 help_text="Partial string of an API call, combined with student to create a URL from this notification")
     unread = models.BooleanField(blank=False, default=False)

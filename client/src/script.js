@@ -278,10 +278,13 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 data: function(enrollmentService, $route) {
                     return enrollmentService.getStudentEnrollments(
                         {
-                            include: ['section.*',],
+                            include: ['section.*', ],
                             filter: [{ name: 'student', val: $route.current.params.id, },],
                         }
                     );
+                },
+                terms: function(termService) {
+                    return termService.getTerms();
                 },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);

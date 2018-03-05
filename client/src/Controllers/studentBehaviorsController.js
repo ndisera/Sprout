@@ -1,32 +1,83 @@
-app.controller("studentBehaviorsController", function ($scope, $routeParams, $location, toastService, behaviorService, data, student) {
+app.controller("studentBehaviorsController", function ($scope, $routeParams, $location, toastService, behaviorService, data, terms, student) {
     $scope.location = $location;
+
     // I know this will be here, because I filtered on the student ID, and only that student
-    $scope.student     = student.student;
-    $scope.enrollments = [];
-    $scope.sections    = [];
+    $scope.student               = student.student;
+    $scope.enrollments           = [];
+    $scope.enrollmentsLookup     = {};
+    $scope.sectionsToEnrollments = {};
 
-    if(data.enrollments !== null && data.enrollments !== undefined) {
-        $scope.enrollments = data.enrollments;
+    $scope.sections              = [];
+    $scope.sectionsLookup        = {};
+
+    $scope.terms                 = [];
+    // each subarray represents term and has all sections in that term (array to preserve order, and term id not sequential)
+    $scope.sectionsByTerm        = [];
+    // will give index into sectionsByTerm if given a term id
+    $scope.termToSectionsByTerm  = {};
+    // will give index into graph's data array if given section id
+    $scope.sectionToDataIndex    = {};
+
+    if(data !== null && data !== undefined) {
+        if(data.enrollments !== null && data.enrollments !== undefined) {
+            $scope.enrollments = data.enrollments;
+            // set up lookup for enrollments
+            $scope.enrollmentsLookup     = _.indexBy(data.enrollments, 'id');
+            $scope.sectionsToEnrollments = _.indexBy(data.enrollments, 'section');
+        }
+        if(data.sections !== null && data.sections !== undefined) {
+            $scope.sections = data.sections;
+            // for now, sort sections alphabetically
+            $scope.sections       = _.sortBy(data.sections, 'title');
+            $scope.sectionsLookup = _.indexBy(data.sections, 'id');
+        }
     }
-    if(data.sections !== null && data.sections !== undefined) {
-        $scope.sections = data.sections;
+    if(terms !== null && terms !== undefined && terms.terms !== null && terms.terms !== undefined) {
+        $scope.terms = terms.terms;
+        _.each($scope.terms, function(elem) {
+            elem.start_date = moment(elem.start_date);
+            elem.end_date   = moment(elem.end_date);
+        });
+        $scope.terms = _.sortBy($scope.terms, function(elem) { return -elem.start_date; });
     }
 
-    // for now, sort sections alphabetically
-    $scope.sections       = _.sortBy(data.sections, 'title');
-    $scope.sectionsLookup = _.indexBy(data.sections, 'id');
-
-    // set up lookup for enrollments
-    $scope.enrollments           = data.enrollments;
-    $scope.enrollmentsLookup     = _.indexBy(data.enrollments, 'id');
-    $scope.sectionsToEnrollments = _.indexBy(data.enrollments, 'section');
-
-    // create enrollment-to-index lookup, where order is index into graph data array
-    $scope.enrollmentToIndex = {};
-    _.each($scope.enrollments, function(enrollmentElem) {
-        $scope.enrollmentToIndex[enrollmentElem.id] = _.findIndex($scope.sections, function(sectionElem) { return enrollmentElem.section === sectionElem.id });
+    // set up term-lookup variables
+    _.each($scope.terms, function(elem) {
+        $scope.sectionsByTerm.push([]);
+        $scope.termToSectionsByTerm[elem.id] = $scope.sectionsByTerm.length - 1;
     });
 
+    _.each($scope.sections, function(elem) {
+        $scope.sectionsByTerm[$scope.termToSectionsByTerm[elem.term]].push(elem);
+    });
+
+    function termsByDateRange(terms, startDate, endDate) {
+        var includedTerms = [];
+        _.each(terms, function(elem) {
+            // startDate in the middle of the term
+            // endDate in the middle of the term
+            // startDate and endDate between term dates taken care of by above
+            // term dates between startDate and endDate
+            if(startDate >= elem.start_date && startDate <= elem.end_date
+                || endDate >= elem.start_date && endDate <= elem.end_date
+                || startDate <= elem.start_date && endDate >= elem.end_date) {
+                includedTerms.push(elem.id);
+            }
+        });
+        return includedTerms;
+    }
+
+    function termsByDate(terms, date) {
+        var includedTerms = [];
+        _.each(terms, function(elem) {
+            // is the date between term start/end
+            if(date >= elem.start_date && date <= elem.end_date) {
+                includedTerms.push(elem.id);
+            }
+        });
+        return includedTerms;
+    }
+    
     $scope.errorMessages = [];
     if($scope.enrollments.length === 0) {
         $scope.errorMessages.push("It looks like this student isn't registered for any classes.");
@@ -46,7 +97,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
     // all common behavior/effort graph settings
     $scope.sharedGraph = {
         labels: [],
-        series: _.pluck($scope.sections, 'title'),
+        series: [],
         options: {
             elements: {
                 line: {
@@ -124,13 +175,30 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
 
                 // clear labels and data
                 $scope.sharedGraph.labels = [];
+                $scope.sharedGraph.series = [];
                 $scope.behaviorGraph.data = [];
                 $scope.effortGraph.data   = [];
+                $scope.sharedGraph.datasetOverride = [];
 
-                // make sure there are enough arrays for each class, for each day
-                _.each($scope.sections, function() {
+                var termsToInclude = termsByDateRange($scope.terms, $scope.graphStartDate, $scope.graphEndDate);
+                if(termsToInclude.length === 0) {
+                    $scope.sharedGraph.series = ["", ];
+                    $scope.sectionToDataIndex = {};
                     $scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
                     $scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                    $scope.sharedGraph.options.legend.display = false;
+                }
+                else {
+                    $scope.sharedGraph.options.legend.display = true;
+                }
+
+                _.each(termsToInclude, function(termId) {
+                    _.each($scope.sectionsByTerm[$scope.termToSectionsByTerm[termId]], function(section) {
+                        $scope.sharedGraph.series.push(section.title);
+                        $scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                        $scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                        $scope.sectionToDataIndex[section.id] = $scope.behaviorGraph.data.length - 1;
+                    });
                 });
 
                 // iterate through each date, setting data as necessary
@@ -142,9 +210,10 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                     if(data.behaviors[j]) {
                         var behaviorDate = moment(data.behaviors[j].date);
                         while(behaviorDate.diff(iterDate, 'd') === 0) {
-                            if(_.has($scope.enrollmentToIndex, data.behaviors[j].enrollment)) {
-                                $scope.behaviorGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].behavior;
-                                $scope.effortGraph.data[$scope.enrollmentToIndex[data.behaviors[j].enrollment]][i] = data.behaviors[j].effort;
+                            var enrollment = $scope.enrollmentsLookup[data.behaviors[j].enrollment];
+                            if(_.has($scope.sectionToDataIndex, enrollment.section)) {
+                                $scope.behaviorGraph.data[$scope.sectionToDataIndex[enrollment.section]][i] = data.behaviors[j].behavior;
+                                $scope.effortGraph.data[$scope.sectionToDataIndex[enrollment.section]][i] = data.behaviors[j].effort;
                             }
 
                             j++;
@@ -168,24 +237,35 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
     /**
      * input-scores related code
      */
-    // update input sections object
-    $scope.scoresInput = [];
-    _.each($scope.sections, function(elem, index) {
-        $scope.scoresInput.push({
-            title: elem.title,
-            enrollment: $scope.sectionsToEnrollments[elem.id].id,
-            id: null,
-            behavior: null,
-            curBehavior: null,
-            effort: null,
-            curEffort: null,
-            date: null,
-        });
-    });
 
     // get today for input box, set input options
     $scope.inputDate = moment();
-    $scope.inputOptions = [1, 2, 3, 4, 5];
+    $scope.inputOptions = [
+        {
+            display: "",
+            value: null, 
+        },
+        {
+            display: "1",
+            value: 1, 
+        },
+        {
+            display: "2",
+            value: 2, 
+        },
+        {
+            display: "3",
+            value: 3, 
+        },
+        {
+            display: "4",
+            value: 4, 
+        },
+        {
+            display: "5",
+            value: 5, 
+        },
+    ];
 
     /**
      * called when input datepicker is changed
@@ -218,27 +298,26 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
 
         behaviorService.getStudentBehavior(config).then(
             function success(data) {
-                // if there's already a record for the day, set it
+                $scope.scoresInput = [];
                 var newBehaviorsMap = _.indexBy(data.behaviors, 'enrollment');
-                _.each($scope.scoresInput, function(elem) {
-                    if(_.has(newBehaviorsMap, elem.enrollment)) {
-                        var behaviorElem = newBehaviorsMap[elem.enrollment];
-                        elem.id          = behaviorElem.id;
-                        elem.behavior    = behaviorElem.behavior;
-                        elem.curBehavior = behaviorElem.behavior;
-                        elem.effort      = behaviorElem.effort;
-                        elem.curEffort   = behaviorElem.effort;
-                        elem.date        = behaviorElem.date;
-                    }
-                    else {
-                        // otherwise, clear it out
-                        elem.id          = null;
-                        elem.behavior    = null;
-                        elem.curBehavior = null;
-                        elem.effort      = null;
-                        elem.curEffort   = null;
-                        elem.date        = $scope.inputDate.format('YYYY-MM-DD').toString();
-                    }
+
+                var termsToInclude = termsByDate($scope.terms, $scope.inputDate);
+                _.each(termsToInclude, function(termId) {
+                    _.each($scope.sectionsByTerm[$scope.termToSectionsByTerm[termId]], function(section) {
+                        var enrollmentRecord = $scope.sectionsToEnrollments[section.id];
+                        var record           = newBehaviorsMap[enrollmentRecord.id];
+                        $scope.scoresInput.push({
+                            title: section.title,
+                            enrollment: enrollmentRecord.id,
+                            section: section.id,
+                            id: record ? record.id : null,
+                            behavior: record ? record.behavior : null,
+                            curBehavior: record ? record.behavior : null,
+                            effort: record ? record.effort : null,
+                            curEffort: record ? record.effort : null,
+                            date: $scope.inputDate.format('YYYY-MM-DD').toString(),
+                        });
+                    });
                 });
             },
             function error(response) {
@@ -277,7 +356,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
         if(entry.id !== null) {
             behaviorService.updateBehavior(entry.id, newObj).then(
                 function success(data) {
-                    updatedEntry = data.behavior;
+                    var updatedEntry = data.behavior;
 
                     entry.behavior    = updatedEntry.behavior;
                     entry.curBehavior = updatedEntry.behavior;
@@ -286,23 +365,21 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
 
                     // update the graph
                     var entryDate = moment(updatedEntry.date);
-                    var startDateDiff = $scope.graphStartDate.diff(entryDate, 'd');
-                    var endDateDiff = $scope.graphEndDate.diff(entryDate, 'd');
-                    if(startDateDiff <= 0 && endDateDiff >= 0) {
-                        var sectionIndex = $scope.enrollmentToIndex[updatedEntry.enrollment];
-                        var dateIndex    = Math.abs(startDateDiff);
+                    if(entryDate >= $scope.graphStartDate && entryDate <= $scope.graphEndDate) {
+                        var index     = $scope.sectionToDataIndex[entry.section];
+                        var dateIndex = Math.abs($scope.graphStartDate.diff(entryDate, 'd'));
                         if(type === 'behavior') {
-                            $scope.behaviorGraph.data[sectionIndex][dateIndex] = updatedEntry.behavior;
+                            $scope.behaviorGraph.data[index][dateIndex] = updatedEntry.behavior;
                         }
                         if(type === 'effort') {
-                            $scope.effortGraph.data[sectionIndex][dateIndex] = updatedEntry.effort;
+                            $scope.effortGraph.data[index][dateIndex] = updatedEntry.effort;
                         }
                     }
                 },
                 function error(response) {
                     // notify the user
                     toastService.error('The server wasn\'t able to save the behavior score.');
-                }
+               }
             );
         }
         else {
@@ -319,16 +396,14 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
 
                     // update the graph
                     var entryDate = moment(updatedEntry.date);
-                    var startDateDiff = $scope.graphStartDate.diff(entryDate, 'd');
-                    var endDateDiff = $scope.graphEndDate.diff(entryDate, 'd');
-                    if(startDateDiff <= 0 && endDateDiff >= 0) {
-                        var sectionIndex = $scope.enrollmentToIndex[updatedEntry.enrollment];
-                        var dateIndex    = Math.abs(startDateDiff);
+                    if(entryDate >= $scope.graphStartDate && entryDate <= $scope.graphEndDate) {
+                        var index     = $scope.sectionToDataIndex[entry.section];
+                        var dateIndex = Math.abs($scope.graphStartDate.diff(entryDate, 'd'));
                         if(type === 'behavior') {
-                            $scope.behaviorGraph.data[sectionIndex][dateIndex] = updatedEntry.behavior;
+                            $scope.behaviorGraph.data[index][dateIndex] = updatedEntry.behavior;
                         }
                         if(type === 'effort') {
-                            $scope.effortGraph.data[sectionIndex][dateIndex] = updatedEntry.effort;
+                            $scope.effortGraph.data[index][dateIndex] = updatedEntry.effort;
                         }
                     }
                 },
