@@ -1,6 +1,10 @@
 app.controller("notificationsController", function ($scope, $location, $q, userService, data) {
     $scope.location = $location;
 
+    $scope.categories = {
+        '1': 'birthday',
+    }
+
     $scope.notifications = userService.notificationData.relevantItems;
 
     $scope.singleColumn = $scope.notifications;
@@ -34,7 +38,7 @@ app.controller("notificationsController", function ($scope, $location, $q, userS
     }
 
     $scope.navigate = function(notification) {
-        $location.path('/student/' + notification.student + notification.category);
+        $location.path('/student/' + notification.student + notification.partial_link);
     };
 
     $scope.markAsRead = function(notification, command) {
