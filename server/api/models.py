@@ -73,6 +73,12 @@ class Section(models.Model):
     class Meta:
         ordering = ('id',)
 
+    def __repr__(self):
+        return str(self.teacher) + ' ' + str(self.title)
+
+    def __str__(self):
+        return self.__repr__()
+
 
 class Enrollment(models.Model):
     """
@@ -184,6 +190,12 @@ class Assignment(models.Model):
     class Meta:
         unique_together = (('section', 'assignment_name', 'due_date'),)
         ordering = ('due_date',)
+
+    def __repr__(self):
+        return str(self.section) + ' ' + str(self.assignment_name)
+
+    def __str__(self):
+        return self.__repr__()
 
 
 class Grade(models.Model):
