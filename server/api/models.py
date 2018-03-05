@@ -8,9 +8,7 @@ from sprout_user import SproutUser
 
 
 def get_sentinel_user():
-    return get_user_model().objects.get_or_create(email='deleted_user',
-                                                  first_name='deleted_user',
-                                                  last_name='deleted_user',)[0]
+    return get_user_model().objects.get_or_create(email='deleted_user',)[0]
 
 
 class ProfilePicture(models.Model):

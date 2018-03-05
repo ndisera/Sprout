@@ -926,7 +926,21 @@ class SproutUserViewSet(WithDynamicViewSetMixin,
     serializer_class = SproutUserSerializer
     def get_queryset(self, queryset=None):
         queryset = SproutUser.objects.all()
+        # Get rid of the "deleted_user" user
+        queryset = queryset.exclude(email='deleted_user')
         return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        If the user is specifically requested, allow access to 'deleted_user'
+        """
+        user = SproutUser.objects.get(id=kwargs['pk'])
+        if user.email == 'deleted_user':
+            serializer = self.get_serializer(user)
+            return Response(serializer.data)
+            pass
+        else:
+            return super(SproutUserViewSet, self).retrieve(request, *args, **kwargs)
 
 
 class NotificationViewSet(NestedDynamicViewSet):
