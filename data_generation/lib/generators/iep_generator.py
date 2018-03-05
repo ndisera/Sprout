@@ -4,9 +4,9 @@ import datetime
 import os
 import random
 
-from services.student import Student, StudentService
+from lib.services.student import Student, StudentService
+from lib.services.ieps import IEPGoal, IEPService
 
-from services.ieps import IEPGoal, IEPService
 
 class IEPGenerator(object):
     """IEPGenerator contains various methods for generating IEP data

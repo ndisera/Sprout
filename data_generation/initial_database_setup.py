@@ -7,21 +7,21 @@ import sys
 import random
 import math
 
-from behavior_generator import BehaviorGenerator
-from standardized_test_score_generator import StandardizedTestScoreGenerator
-from student_generator import Student, StudentGenerator
-from teacher_generator import TeacherGenerator
-from grades_generator import GradesGenerator
-from iep_generator import IEPGenerator
-from service_generator import ServiceGenerator
-from attendance_generator import AttendanceGenerator
+from lib.generators.behavior_generator import BehaviorGenerator
+from lib.generators.standardized_test_score_generator import StandardizedTestScoreGenerator
+from lib.generators.student_generator import Student, StudentGenerator
+from lib.generators.teacher_generator import TeacherGenerator
+from lib.generators.grades_generator import GradesGenerator
+from lib.generators.iep_generator import IEPGenerator
+from lib.generators.service_generator import ServiceGenerator
+from lib.generators.attendance_generator import AttendanceGenerator
 
-from services.authorization import AuthorizationService
-from services.enrollment import Enrollment, EnrollmentService
-from services.section import Section, SectionService
-from services.settings import SchoolSettings, DailySchedule, TermSettings, SchoolYear, SettingsService
-from services.term import Term, TermService
-from services.users import User, UsersService
+from lib.services.authorization import AuthorizationService
+from lib.services.enrollment import Enrollment, EnrollmentService
+from lib.services.section import Section, SectionService
+from lib.services.settings import SchoolSettings, DailySchedule, TermSettings, SchoolYear, SettingsService
+from lib.services.term import Term, TermService
+from lib.services.users import User, UsersService
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
