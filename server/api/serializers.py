@@ -100,6 +100,8 @@ class HolidaySerializer(DynamicModelSerializer):
             raise serializers.ValidationError("A semester cannot end before it starts!")
         return data
 
+    school_year = DynamicRelationField('SchoolYearSerializer')
+
 
 class SectionSerializer(DynamicModelSerializer):
     class Meta:

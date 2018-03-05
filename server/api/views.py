@@ -305,17 +305,6 @@ class TermViewSet(NestedDynamicViewSet):
     )
 
 
-class HolidayViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    HolidayViewSetSchema class in the coreapi documentation.
-    """
-
-    def get_link(self, path, method, base_url):
-        link = super(HolidayViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(HolidayViewSet, path, method, link)
-
-
 class HolidayViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
@@ -324,29 +313,21 @@ class HolidayViewSet(NestedDynamicViewSet):
     serializer_class = HolidaySerializer
     queryset = Holiday.objects.all()
 
-    """ define custom schema for documentation """
-    schema = HolidayViewSetSchema()
-
     """ ensure variables show as correct types for docs """
-    term_name = 'term'
-    term_desc = 'Term this holiday starts in'
+    school_year_name = 'school_year'
+    school_year_desc = 'School year this holiday starts in'
 
-    term_field = coreapi.Field(
-        name=term_name,
+    school_year_field = coreapi.Field(
+        name=school_year_name,
         required=True,
         location="form",
-        description=term_desc,
-        schema=coreschema.Integer(title=term_name))
+        description=school_year_desc,
+        schema=coreschema.Integer(title=school_year_name))
 
-    create_fields = (
-        term_field,
-    )
-    update_fields = (
-        term_field,
-    )
-    partial_update_fields = (
-        term_field,
-    )
+    schema = AutoSchema(manual_fields=[
+        school_year_field,
+    ])
+
 
 class SectionViewSetSchema(AutoSchema):
     """
