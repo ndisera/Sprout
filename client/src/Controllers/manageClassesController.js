@@ -1,4 +1,5 @@
 app.controller("manageClassesController", function($scope, $rootScope, $location, toastService, students, userData, sections, studentService, sectionService, enrollmentService, termsInfo) {
+    $scope.location = $location;
 
     // anywhere 's' or 't' was previously used for 'students' and 'teachers', 'c' will be used for 'classes'
     // another 's' for 'sections' would be confusing with 'students', which will probably use an 's' again
@@ -352,6 +353,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     break;
                 default:
             }
+            checkIfAllSelected();
         }, function error(response) {
             setErrorMessage(response);
             toastService.error("The server was unable to save your edit." + errorResponse());
@@ -617,7 +619,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         }
         return false;
     }
-})
+});
 
 // orderby for class roster students
 app.filter('classRosterSort', function() {

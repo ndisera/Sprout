@@ -2,16 +2,22 @@
 from __future__ import unicode_literals
 import coreapi
 import coreschema
+import datetime
+from django.db.models import Q
+from django.utils import timezone
+from django.http.response import HttpResponseNotFound, HttpResponse
 from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
 from rest_framework import mixins, generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from api.models import *
 from api.serializers import *
+from api.constants import NotificationCategories
 
 def union_fields(fields, new_fields):
     """
@@ -64,14 +70,71 @@ class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
 
 
-class StudentViewSetSchema(AutoSchema):
+class ProfilePictureViewSet(mixins.CreateModelMixin,
+                            mixins.RetrieveModelMixin,
+                            mixins.ListModelMixin,
+                            mixins.DestroyModelMixin,
+                            NestedViewSetMixin,
+                            WithDynamicViewSetMixin,
+                            GenericViewSet):
     """
-    class that allows specification of more detailed schema for the
-    StudentViewSet class in the coreapi documentation.
+    allows access to the profile pictures stored in the database
+
+    create:
+    upload a new profile picture
+
+    retrieve:
+    get a specific profile picture
+
+    delete:
+    remove a specified profile picture
     """
-    def get_link(self, path, method, base_url):
-        link = super(StudentViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(StudentViewSet, path, method, link)
+    # Relevant tutorial: http://blog.josephmisiti.com/how-to-upload-a-photo-to-django-using-ios
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ProfilePictureSerializer
+    parser_classes = (MultiPartParser, FormParser, )
+    queryset = ProfilePicture.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        response = super(ProfilePictureViewSet, self).create(request, *args, **kwargs)
+        parents_query_dict = self.get_parents_query_dict()
+        if 'sproutuserprofile' in parents_query_dict:
+            user_profile_id = parents_query_dict['sproutuserprofile']
+            user_profile = SproutUserProfile.objects.filter(id=user_profile_id)
+            # Double check: This should always be true because we are looking at the PK of SproutUserProfile
+            if not len(user_profile) == 1:
+                raise AssertionError("Found multiple user profiles with the ID {id}".format(id=user_profile_id))
+            user_profile = user_profile[0]
+            user_profile.picture = self.instance
+            user_profile.save()
+        if 'student' in parents_query_dict:
+            student_id = parents_query_dict['student']
+            student = Student.objects.filter(id=student_id)
+            student = student[0] # Queryset always returns a list even though we used the primary key
+            student.picture = self.instance
+            student.save()
+        return response
+
+    def perform_create(self, serializer):
+        serializer.save()
+        self.instance = serializer.instance
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        get the actual profile image data
+        """
+        queryset = self.get_queryset()
+        if len(queryset) == 0:
+            return HttpResponseNotFound()
+        if not len(queryset) == 1:
+            raise AssertionError('More than one profile picture found for ID')
+
+        picture = queryset[0]
+        file = picture.file.file
+
+        response = HttpResponse(file, content_type="image/jpeg")
+
+        return response
 
 
 class StudentViewSet(NestedDynamicViewSet):
@@ -82,28 +145,35 @@ class StudentViewSet(NestedDynamicViewSet):
     serializer_class = StudentSerializer
     queryset = Student.objects.all()
 
-    """ define custom schema for documentation """
-    schema = StudentViewSetSchema()
-
     """ ensure variables show as correct types for docs """
     name_case_manager = 'case_manager'
     desc_case_manager = "ID of the User who oversees this student"
+
+    name_profile_picture = 'picture'
+    desc_profile_picture = "This student's profile picture"
 
     case_manager_field = coreapi.Field(name=name_case_manager,
                                        required=True,
                                        location="form",
                                        description=desc_case_manager,
-                                       schema=coreschema.Integer(title=name_case_manager)),
+                                       schema=coreschema.Integer(title=name_case_manager))
 
-    create_fields = (
-        case_manager_field
-    )
-    update_fields = (
-        case_manager_field
-    )
-    partial_update_fields = (
-        case_manager_field
-    )
+    profile_picture_field = coreapi.Field(name=name_profile_picture,
+                                       required=False,
+                                       location="form",
+                                       description=desc_profile_picture,
+                                       schema=coreschema.Integer(title=name_profile_picture))
+
+    schema = AutoSchema(manual_fields=[
+        case_manager_field,
+        profile_picture_field
+    ])
+
+    # Rebuild all existing fields with required=False for partial update
+    partial_update_fields = [field._asdict() for field in schema._manual_fields]
+    for field in partial_update_fields: field['required']=False
+    partial_update_fields = [coreapi.Field(**field) for field in partial_update_fields]
+    pass
 
 
 class SchoolSettingsSetSchema(AutoSchema):
@@ -128,6 +198,18 @@ class SchoolSettingsViewSet(NestedDynamicViewSet):
     schema = SchoolSettingsSetSchema()
 
 
+class SchoolYearViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "SchoolYear" instance
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SchoolYearSerializer
+    queryset = SchoolYear.objects.all()
+
+    """ define custom schema for documentation """
+    schema = AutoSchema()
+
+
 class DailyScheduleSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the
@@ -150,16 +232,6 @@ class DailyScheduleViewSet(NestedDynamicViewSet):
     schema = DailyScheduleSetSchema()
 
 
-class TermSettingsViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    TermSettingsViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(TermSettingsViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(TermSettingsViewSet, path, method, link)
-
-
 class TermSettingsViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Term" instances
@@ -168,28 +240,28 @@ class TermSettingsViewSet(NestedDynamicViewSet):
     serializer_class = TermSettingsSerializer
     queryset = TermSettings.objects.all()
 
-    """ define custom schema for documentation """
-    schema = TermSettingsViewSetSchema()
-
     """ ensure variables show as correct types for docs """
     name_schedule = 'schedule'
     desc_schedule = "ID of the TermSettings object controlling this term"
+    name_school_year = 'school_year'
+    desc_school_year = "ID of the SchoolSettings object this term takes place in"
 
     schedule_field = coreapi.Field(name=name_schedule,
                                    required=True,
                                    location="form",
                                    description=desc_schedule,
-                                   schema=coreschema.Integer(title=name_schedule)),
+                                   schema=coreschema.Integer(title=name_schedule))
+    school_year_field = coreapi.Field(name=name_school_year,
+                                      required=True,
+                                      location="form",
+                                      description=desc_school_year,
+                                      schema=coreschema.Integer(title=name_school_year))
 
-    create_fields = (
-        schedule_field
-    )
-    update_fields = (
-        schedule_field
-    )
-    partial_update_fields = (
-        schedule_field
-    )
+    schema = AutoSchema(
+        manual_fields=[
+            schedule_field,
+            school_year_field,
+        ])
 
 
 class TermViewSetSchema(AutoSchema):
@@ -234,17 +306,6 @@ class TermViewSet(NestedDynamicViewSet):
     )
 
 
-class HolidayViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    HolidayViewSetSchema class in the coreapi documentation.
-    """
-
-    def get_link(self, path, method, base_url):
-        link = super(HolidayViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(HolidayViewSet, path, method, link)
-
-
 class HolidayViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
@@ -253,29 +314,21 @@ class HolidayViewSet(NestedDynamicViewSet):
     serializer_class = HolidaySerializer
     queryset = Holiday.objects.all()
 
-    """ define custom schema for documentation """
-    schema = HolidayViewSetSchema()
-
     """ ensure variables show as correct types for docs """
-    term_name = 'term'
-    term_desc = 'Term this holiday starts in'
+    school_year_name = 'school_year'
+    school_year_desc = 'School year this holiday starts in'
 
-    term_field = coreapi.Field(
-        name=term_name,
+    school_year_field = coreapi.Field(
+        name=school_year_name,
         required=True,
         location="form",
-        description=term_desc,
-        schema=coreschema.Integer(title=term_name))
+        description=school_year_desc,
+        schema=coreschema.Integer(title=school_year_name))
 
-    create_fields = (
-        term_field,
-    )
-    update_fields = (
-        term_field,
-    )
-    partial_update_fields = (
-        term_field,
-    )
+    schema = AutoSchema(manual_fields=[
+        school_year_field,
+    ])
+
 
 class SectionViewSetSchema(AutoSchema):
     """
@@ -500,6 +553,29 @@ class BehaviorViewSet(NestedDynamicViewSet):
             description=desc_enrollment,
             schema=coreschema.Integer(title=name_enrollment)),
     )
+
+
+class AttendanceRecordViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "AttendanceRecord" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AttendanceRecordSerializer
+    queryset = AttendanceRecord.objects.all()
+
+    """ ensure variables show as correct type for docs """
+    name_enrollment = 'enrollment'
+    desc_enrollment = 'ID of the enrollment (student and section) of this attendance report'
+
+    enrollment_field = coreapi.Field(name=name_enrollment,
+                                     required=True,
+                                     location="form",
+                                     description=desc_enrollment,
+                                     schema=coreschema.Integer(title=name_enrollment))
+
+    schema = AutoSchema(manual_fields=[
+        enrollment_field,
+    ])
 
 
 class StandardizedTestViewSetSchema(AutoSchema):
@@ -850,17 +926,21 @@ class SproutUserViewSet(WithDynamicViewSetMixin,
     serializer_class = SproutUserSerializer
     def get_queryset(self, queryset=None):
         queryset = SproutUser.objects.all()
+        # Get rid of the "deleted_user" user
+        queryset = queryset.exclude(email='deleted_user')
         return queryset
 
-
-class NotificationViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    NotificationViewSetSchema class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(NotificationViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(NotificationViewSet, path, method, link)
+    def retrieve(self, request, *args, **kwargs):
+        """
+        If the user is specifically requested, allow access to 'deleted_user'
+        """
+        user = SproutUser.objects.get(id=kwargs['pk'])
+        if user.email == 'deleted_user':
+            serializer = self.get_serializer(user)
+            return Response(serializer.data)
+            pass
+        else:
+            return super(SproutUserViewSet, self).retrieve(request, *args, **kwargs)
 
 
 class NotificationViewSet(NestedDynamicViewSet):
@@ -891,57 +971,89 @@ class NotificationViewSet(NestedDynamicViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
 
-    """ define custom schema for documentation """
-    schema = NotificationViewSetSchema()
-
     """ ensure variables show as correct type for docs """
     name_user = 'user'
     name_student = 'student'
     desc_user = 'ID of the user to whom this notification should be displayed'
     desc_student = 'ID of the student to whom this notification refers'
-    create_fields = (
-        coreapi.Field(
-            name=name_user,
-            required=True,
-            location="form",
-            description=desc_user,
-            schema=coreschema.Integer(title=name_user)),
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_user,
-            required=True,
-            location="form",
-            description=desc_user,
-            schema=coreschema.Integer(title=name_user)),
+    user_field = coreapi.Field(
+        name=name_user,
+        required=True,
+        location="form",
+        description=desc_user,
+        schema=coreschema.Integer(title=name_user))
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_user,
-            location="form",
-            description=desc_user,
-            schema=coreschema.Integer(title=name_user)),
+    student_field = coreapi.Field(
+        name=name_student,
+        required=True,
+        location="form",
+        description=desc_student,
+        schema=coreschema.Integer(title=name_student))
 
-        coreapi.Field(
-            name=name_student,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
+    schema = AutoSchema(
+        manual_fields=[
+            user_field,
+            student_field
+        ])
+
+    def list(self, request, *args, **kwargs):
+        """
+        Generate some notifications for the requester's enjoyment
+
+        :param request:
+        :return:
+        """
+        queryset = self.get_queryset()
+
+        # Generate student birthday notifications for all students this user
+        # should see
+        birthday_title_template = "{first_name} {last_name}'s Birthday"
+        birthday_body_template = "{first_name} {last_name} has a birthday coming up on {date}"
+        # Get notifications for this user
+        user = SproutUser.objects.get(id=kwargs['parent_lookup_user'])
+
+        # Query for all students: Students for whom this user is a case manager and students for whom this users is a section teacher
+        all_students_query = Q(case_manager=user.id) | Q(enrollment__section__teacher=user.id)
+
+        all_students = Student.objects.filter(all_students_query).distinct()
+        for student in all_students:
+            now = datetime.datetime.now()
+            year = now.year
+            category = NotificationCategories.BIRTHDAY
+            # If the birthday has already passed, notify for next year
+            if now.month > student.birthdate.month or\
+                (now.month == student.birthdate.month and now.day > student.birthdate.day):
+                year += 1
+            birthdate = datetime.datetime(year=year,
+                                          month=student.birthdate.month,
+                                          day=student.birthdate.day,
+                                          hour=00,
+                                          )
+            # I am not sure I actually want this, but Django whines if I don't
+            birthdate = timezone.make_aware(birthdate, timezone.utc)
+            title = birthday_title_template.format(first_name=student.first_name,
+                                                   last_name=student.last_name)
+            body = birthday_body_template.format(first_name=student.first_name,
+                                                 last_name=student.last_name,
+                                                 date=str(birthdate.date()))
+            # See if the notification already exists
+            try:
+                queryset.get(category=category, student=student, user=user, date=birthdate)
+            except Notification.DoesNotExist:
+                # The notification did not exist. Make one!
+                Notification.objects.create(title=title,
+                                            body=body,
+                                            date=birthdate,
+                                            student=student,
+                                            user=user,
+                                            category=category,
+                                            partial_link="/",
+                                            unread=True,
+                                            )
+
+        # Now make the normal call to list to let Dynamic REST do its magic
+        return super(NotificationViewSet, self).list(request, *args, **kwargs)
 
 
 class FocusStudentViewSetSchema(AutoSchema):
@@ -1167,17 +1279,6 @@ class IEPGoalNoteViewSet(NestedDynamicViewSet):
     )
 
 
-class ServiceRequirementViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    HolidayViewSetSchema class in the coreapi documentation.
-    """
-
-    def get_link(self, path, method, base_url):
-        link = super(ServiceRequirementViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(ServiceRequirementViewSet, path, method, link)
-
-
 class ServiceRequirementViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
@@ -1186,12 +1287,11 @@ class ServiceRequirementViewSet(NestedDynamicViewSet):
     queryset = ServiceRequirement.objects.all()
     serializer_class = ServiceRequirementSerializer
 
-    # define custom schema for documentation
-    schema = ServiceRequirementViewSetSchema()
-
     # ensure variables show as correct types for docs
     student_name = 'student'
     student_desc = 'Student to whom this service requirement applies'
+    fulfilled_user_name = 'fulfilled_user'
+    fulfilled_user_desc = 'User who marked this service requirement fulfilled'
 
     student_field = coreapi.Field(
         name=student_name,
@@ -1200,12 +1300,15 @@ class ServiceRequirementViewSet(NestedDynamicViewSet):
         description=student_desc,
         schema=coreschema.Integer(title=student_name))
 
-    create_fields = (
-        student_field,
-    )
-    update_fields = (
-        student_field,
-    )
-    partial_update_fields = (
-        student_field,
-    )
+    fulfilled_user_field = coreapi.Field(
+        name=fulfilled_user_name,
+        required=True,
+        location="form",
+        description=fulfilled_user_desc,
+        schema=coreschema.Integer(title=fulfilled_user_name))
+
+    schema = AutoSchema(
+        manual_fields=[
+            student_field,
+            fulfilled_user_field,
+        ])

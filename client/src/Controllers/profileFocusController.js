@@ -1,31 +1,29 @@
-app.controller("focusStudentsController", function ($scope, $q, toastService, studentData, focusData,
-                                                    userService, testService, behaviorService,
-                                                    sectionService, studentService) {
+app.controller("profileFocusController", function ($scope, $q, $location, toastService, studentData, focusData,
+                                                   userService, testService, behaviorService,
+                                                   sectionService, studentService) {
+    $scope.location = $location;
+
     $scope.studentSearch = {
         text: "",
     };
 
     // set students if there are any
-    $scope.students = [];
-    $scope.studentsLookup = {}; //studentsLookup not used at all
+    $scope.students       = [];
+    $scope.studentsLookup = {};
     $scope.focusGraphs = {};
-    if (studentData.students !== null && studentData.students !== undefined) {
-        $scope.students = studentData.students;
+    if(studentData.students !== null && studentData.students !== undefined) {
+        $scope.students       = studentData.students;
         $scope.studentsLookup = _.indexBy(studentData.students, 'id');
     }
 
     // set focus students if there are any
     $scope.focusStudents = [];
-    if (focusData.focus_students !== null && focusData.focus_students !== undefined) {
+    if(focusData.focus_students !== null && focusData.focus_students !== undefined) {
         $scope.focusStudents = _.sortBy(focusData.focus_students, 'ordering');
     }
 
-    //todo:remove
-    console.log($scope.focusStudents);
-
-
     $scope.editing = false;
-    $scope.toggleEdit = function () {
+    $scope.toggleEdit = function() {
         $scope.editing = !$scope.editing;
         if($scope.editing === false) {
             $scope.adding = false;
@@ -35,8 +33,8 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
     };
 
     $scope.adding = false;
-    $scope.toggleAdd = function (val) {
-        if (val === null || val === undefined) {
+    $scope.toggleAdd = function(val) {
+        if(val === null || val === undefined) {
             $scope.adding = !$scope.adding;
         }
         else {
@@ -50,10 +48,8 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
      * Filter used for students
      * @param {student} student - student to be filtered.
      */
-    $scope.studentFilter = function (student) {
-        if (_.find($scope.focusStudents, function (elem) {
-              return elem.student === student.id;
-          })) {
+    $scope.studentFilter = function(student) {
+        if(_.find($scope.focusStudents, function(elem) { return elem.student === student.id; })) {
             return false;
         }
         if($scope.studentSearch.text === null || $scope.studentSearch.text === undefined) {
@@ -61,9 +57,9 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
         }
         var input = $scope.studentSearch.text.toUpperCase();
         var fullname = student.first_name + " " + student.last_name;
-        if (student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
-          student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
-          fullname.toUpperCase().includes(input)) {
+        if(student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
+            student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
+            fullname.toUpperCase().includes(input)) {
             return true;
         }
         return false;
@@ -71,17 +67,31 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
 
 
     // set up for sortable drag/drop
+    //var origOrder = [];
     var tempOrder = [];
     $scope.sortableOptions = {
-        // update is called before changes to order of focusStudents are final
-        update: function (e, ui) {
+        start: function(e, ui) {
             // save the order we had
             tempOrder = [];
-            _.each($scope.focusStudents, function (elem) {
+            _.each($scope.focusStudents, function(elem) {
                 tempOrder.push(elem.id);
             });
         },
-        stop: function (e, ui) {
+        stop: function(e, ui) {
+            // don't bother the server if nothing actually changed
+            if($scope.focusStudents.length === tempOrder.length) {
+                var changed = false;
+                for(var i = 0; i < $scope.focusStudents.length; ++i) {
+                    if($scope.focusStudents[i].id !== tempOrder[i]) {
+                        changed = true;
+                    }
+                }
+                if(changed === false) {
+                    return;
+                }
+            }
+
+            // otherwise bother the server
             var promises = saveOrder();
             $q.all(promises)
                 .then(function(data) {
@@ -105,6 +115,7 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                     toastService.error('The server wasn\'t able to save your reordering.');
                 });
         },
+        cancel: '.not-sortable',
     };
 
     /***
@@ -117,7 +128,7 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
      */
     function saveOrder() {
         var promises = [];
-        _.each($scope.focusStudents, function (elem, index) {
+        _.each($scope.focusStudents, function(elem, index) {
             var editedFocusStudent = _.clone(elem);
             editedFocusStudent.ordering = index;
             promises.push(userService.updateFocusForUser(userService.user.id, elem.id, editedFocusStudent));
@@ -133,13 +144,11 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
      *
      * @return {void}
      */
-    $scope.removeFocusStudent = function (focusStudent) {
+    $scope.removeFocusStudent = function(focusStudent) {
         userService.deleteFocusForUser(userService.user.id, focusStudent.id).then(
-          function success(data) {
-              var index = _.findIndex($scope.focusStudents, function (elem) {
-                  return elem.id === focusStudent.id;
-              });
-              $scope.focusStudents.splice(index, 1);
+            function success(data) {
+                var index = _.findIndex($scope.focusStudents, function(elem) { return elem.id === focusStudent.id; });
+                $scope.focusStudents.splice(index, 1);
 
                 var promises = saveOrder();
                 $q.all(promises).then(function(data) {
@@ -164,17 +173,17 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
      *
      * @return {void}
      */
-    $scope.addStudent = function (student) {
+    $scope.addStudent = function(student) {
         var newFocus = {
             ordering: $scope.focusStudents.length,
             user: userService.user.id,
             student: student.id,
-            focus_category: "none", //todo: add user selectable focus category
+            focus_category: "none",
         };
 
         userService.createFocusForUser(userService.user.id, newFocus).then(
-          function success(data) {
-              $scope.focusStudents.push(data['focus_student']);
+            function success(data) {
+                $scope.focusStudents.push(data['focus_student']);
 
                 var promises = saveOrder();
                 $q.all(promises).then(function(data) {
@@ -183,15 +192,16 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                         elem.ordering = tempLookup[elem.id].ordering;
                     });
                 });
+
+                if($scope.focusStudents.length >= 5) {
+                    $scope.toggleAdd(false);
+                }
             },
             function error(response) {
                 // notify the user
                 toastService.error('The server wasn\'t able to save your addition.');
             }
         );
-
-        console.log("focus student data:");
-        console.log($scope.focusStudents);
     };
 
     /**
@@ -299,8 +309,8 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
 
             //Focus Graph
             //temporarily getting a month of behavior
-            serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 23, "extra shit");
-            serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 24, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 1, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 42, "extra shit");
 
             console.log("focus graph:");
             console.log($scope.focusGraphs[elem.student]['focus']);
@@ -464,11 +474,45 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
     }
 
 
-    $('.sortable').on('mousedown', function () {
-        $(this).css('cursor', 'move');
-    }).on('mouseup', function () {
-        $(this).css('cursor', 'auto');
-    });
+
+
+    // // All of the following belongs to the hard-coded angular-charts on the Focus Students page
+    // $scope.focus_labels = ["January", "February", "March", "April", "May", "June", "July"];
+    // $scope.focus_data = [
+    // [28, 48, 40, 19, 86, 27, 90]
+    // ];
+    // $scope.progress_labels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    // $scope.progress_data = [
+    // [2, 3, 3, 4, 5]
+    // ];
+    // $scope.progress_colours = ["rgba(80,255,80,1)"]
+    // $scope.caution_labels = ["Math", "Reading", "Music", "History", "Spanish"];
+    // $scope.caution_data = [
+    // [77, 81, 66, 50, 35]
+    // ];
+    // $scope.caution_colours = [
+    //   "rgba(255,99,132,1)"
+    // ];
+    // $scope.onClick = function (points, evt) {
+    //   console.log(points, evt);
+    // };
+    // $scope.options = {
+    //   responsive: true,
+    //   maintainAspectRatio: false
+    // };
+    // $scope.options_behavior = {
+    //   responsive: true,
+    //   maintainAspectRatio: false,
+    //   scales:{
+    //     yAxes: [{
+    //       display: true,
+    //       ticks: {
+    //         min: 1,
+    //         max: 5
+    //       }
+    //     }]
+    //   }
+    // };
 
     updateFocusGraphs();
 
@@ -476,7 +520,5 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
     console.log("The graph data:");
     console.log($scope.focusGraphs);
 
-    //todo: is setting up all the graphs at the very get go a good idea?
+
 });
-
-

@@ -81,7 +81,9 @@ class StudentGenerator(object):
                         first_name=first_name,
                         last_name=last_name,
                         birthdate=str(datetime.date(year=birthdate.year, month=birthdate.month, day=birthdate.day)),
+                        created=None,
                         case_manager=case_manager,
+                        picture=None,
                         id=None,
                     )
                     students.append(student)

@@ -12,15 +12,16 @@ from standardized_test_score_generator import StandardizedTestScoreGenerator
 from student_generator import Student, StudentGenerator
 from teacher_generator import TeacherGenerator
 from grades_generator import GradesGenerator
+from iep_generator import IEPGenerator
+from service_generator import ServiceGenerator
+from attendance_generator import AttendanceGenerator
 
 from services.authorization import AuthorizationService
 from services.enrollment import Enrollment, EnrollmentService
 from services.section import Section, SectionService
-from services.settings import SchoolSettings, DailySchedule, TermSettings, SettingsService
+from services.settings import SchoolSettings, DailySchedule, TermSettings, SchoolYear, SettingsService
 from services.term import Term, TermService
 from services.users import User, UsersService
-from services.assignment import Assignment, AssignmentService
-from services.grades import Grade, GradesService
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
@@ -39,7 +40,11 @@ if __name__ == "__main__":
     parser.add_argument("--boring", "-b", action="store_true",
                         help="setup with old, non randomized data")
     parser.add_argument("--num-students", "-n", action='store', default=20, type=int,
-                        help="number of students to generate. will scale everything based on num-students")
+                        help="number of students to generate. Will scale everything based on num-students")
+    parser.add_argument("--num-iep-goals", action='store', default=2, type=int,
+                        help="number of IEP Goals to generate per student")
+    parser.add_argument("--num-services", action='store', default=2, type=int,
+                        help="number of services to generate per student")
 
     args = parser.parse_args()
 
@@ -77,20 +82,45 @@ if __name__ == "__main__":
     num_assignments_per_section = 5
     num_grades_per_assignment = 1
 
-    settings_service = SettingsService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
-    term_service = TermService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
-    sections_service = SectionService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
-    enrollments_service = EnrollmentService(headers=headers, protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
+    service_args = {'protocol': args.protocol,
+                    'hostname': args.host,
+                    'verify': False,
+                    'headers': headers,
+                    'port_num': args.port,
+                    }
+    settings_service = SettingsService(**service_args)
+    term_service = TermService(**service_args)
+    sections_service = SectionService(**service_args)
+    enrollments_service = EnrollmentService(**service_args)
 
-    student_generator = StudentGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
-    teacher_generator = TeacherGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
-    behavior_generator = BehaviorGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
-    grades_generator = GradesGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
-    std_test_score_generator = StandardizedTestScoreGenerator(protocol=args.protocol, hostname=args.host, verify=False, headers=headers)
+    generator_args = {'protocol': args.protocol,
+                      'hostname': args.host,
+                      'verify': False,
+                      'headers': headers,
+                      'port_num': args.port,
+                      }
+    attendance_generator = AttendanceGenerator(**generator_args)
+    student_generator = StudentGenerator(**generator_args)
+    teacher_generator = TeacherGenerator(**generator_args)
+    behavior_generator = BehaviorGenerator(**generator_args)
+    grades_generator = GradesGenerator(**generator_args)
+    std_test_score_generator = StandardizedTestScoreGenerator(**generator_args)
+    iep_generator = IEPGenerator(**generator_args)
+    service_generator = ServiceGenerator(**generator_args)
 
     # Setup the school
-    school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", id=None)
+    school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", grade_range_lower=6, grade_range_upper=8, id=None)
     settings_service.add_school(school_settings)
+
+    school_year_start = datetime.date(year=2017, month=9, day=5)
+    school_year_end = datetime.date(year=2018, month=6, day=6)
+    school_year = SchoolYear(
+        start_date=str(school_year_start),
+        end_date=str(school_year_end),
+        num_terms=4,
+        title="2017/18 School Year")
+    response = settings_service.add_school_year(school_year)
+    school_year_id = response.json()['school_years'][0]['id']
 
     ab_schedule = DailySchedule(name="A/B Periods", total_periods=8, periods_per_day=4, id=None)
     block_schedule = DailySchedule(name="Block Periods", total_periods=8, periods_per_day=8, id=None)
@@ -124,10 +154,10 @@ if __name__ == "__main__":
     students = [Student(**data) for data in response.json()['students']]
 
     terms = []
-    term = Term(name="Fall", start_date="2017-08-21", end_date="2017-12-07", settings=term_settings_id, id=None)
+    term = Term(name="Fall", start_date="2017-08-21", end_date="2017-12-07", settings=term_settings_id, school_year=school_year_id, id=None)
     response = term_service.add_term(term)
     terms.extend([Term(**data) for data in response.json()['terms']])
-    term = Term(name="Spring", start_date="2018-01-06", end_date="2018-04-24", settings=term_settings_id, id=None)
+    term = Term(name="Spring", start_date="2018-01-06", end_date="2018-04-24", settings=term_settings_id, school_year=school_year_id, id=None)
     response = term_service.add_term(term)
     terms.extend([Term(**data) for data in response.json()['terms']])
 
@@ -176,7 +206,8 @@ if __name__ == "__main__":
     response = enrollments_service.add_many_enrollments(enrollments)
     enrollments = [Enrollment(**enrollment) for enrollment in response.json()['enrollments']]
 
-    # generate behaviors
+    # generate behaviors. Depends: enrollments
+    behaviors = []
     for enrollment in enrollments:
         section = sections_lookup[enrollment.section]
         term = term_lookup[section.term]
@@ -190,8 +221,48 @@ if __name__ == "__main__":
         else:
             num_days = (end_date - start_date).days
 
-        behaviors = behavior_generator.generate_random_behavior(enrollment, date_range_start=start_date, num_days=num_days)
-        behavior_generator.behaviorService.add_many_behaviors(behaviors)
+        # moving all behaviors to one big "add" after the loop will time out the server
+        # so add them one at a time in the loop
+        # behaviors = behavior_generator.generate_random_behavior(enrollment, date_range_start=start_date, num_days=num_days)
+        # behavior_generator.behaviorService.add_many_behaviors(behaviors)
+        new_behaviors = behavior_generator.generate_random_behavior(enrollment, date_range_start=start_date, num_days=num_days)
+        behaviors.extend(new_behaviors)
+
+    # moving all behaviors to one big "add" after the loop will time out the server
+    # so add them in chunks
+    # TODO: make this not dumb
+    split_behaviors = [[], ]
+    cur_index = -1
+    for i in range(0, len(behaviors)):
+        if (i % 200) == 0:
+            cur_index += 1
+            split_behaviors.append([])
+        split_behaviors[cur_index].append(behaviors[i])
+
+    for behaviors_chunk in split_behaviors:
+        # adding an empty array will error out, could happen on last array
+        if len(behaviors_chunk) == 0:
+            continue
+        behavior_generator.behaviorService.add_many_behaviors(behaviors_chunk)
+
+    # generate attendances. Depends: enrollments
+    attendances = attendance_generator.generate_attendances(
+        date_range_start=datetime.datetime.combine(school_year_start, datetime.time()),
+        date_range_end=datetime.datetime.today())
+    # same issue as behaviors -- adding all at once times out server
+    # TODO: make this not dumb
+    split_attendances = [[], ]
+    cur_index = -1
+    for i in range(0, len(attendances)):
+        if (i % 200) == 0:
+            cur_index += 1
+            split_attendances.append([])
+        split_attendances[cur_index].append(attendances[i])
+
+    for attendance_chunk in split_attendances:
+        if len(attendance_chunk) == 0:
+            continue
+        attendance_generator.attendanceService.add_many_attendance_records(attendance_chunk)
 
     # generate assignments
     assignments = grades_generator.generate_assignments(num_assignments_per_section)
@@ -209,7 +280,16 @@ if __name__ == "__main__":
                 grades_generator.gradeService.add_many_grades(grades[enrollment][section][assignment],
                                                               section=section,
                                                               assignment=assignment)
-    
+
+    # generate IEPs
+    iep_goals = iep_generator.generate_many_random_iep_goals(num=args.num_iep_goals)
+    for student_id in iep_goals:
+        iep_generator.iepService.add_many_iep_goals(iep_goals[student_id], student_id)
+
+    # generate ServiceRequirements
+    services = service_generator.generate_many_random_services(num=args.num_services)
+    for student_id in services:
+        service_generator.serviceService.add_many_services(services[student_id], student_id)
 
     std_test_score_generator.setup_tests()
     toPost = std_test_score_generator.generate(10,

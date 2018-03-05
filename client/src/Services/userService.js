@@ -105,6 +105,43 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
     };
 
     /**
+     * Send a login attempt while already logged in
+     *
+     * Response will be:
+     * 200 OK, indicating a successful login, in which case the auth token will be
+     * response.data["token"]
+     * 400 Bad Request, indicating a failed login, in which case a list of errors will
+     * be response.data["non_field_errors"]
+     *
+     * @param {string} email - the user's email
+     * @param {string} password - the user's password
+     *
+     * @return {promise} promise that will resolve to the response
+     */
+    userService.loggedInLogin = function(email, password) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/login/',
+            headers: { 'Content-Type': 'application/json' },
+            data: { 'email': email, 'password': password },
+        }).then(function success(response) {
+            // save token and user
+            saveToken(response.data.token);
+            saveUser(response.data.user);
+            user.auth = true;
+
+            // notify app that user has logged in
+            $rootScope.$emit('user:auth', { type: 'login' });
+
+            deferred.resolve(response);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
      * Send a logout attempt
      *
      * Response will be:
@@ -246,6 +283,9 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
             url: 'https://' + $rootScope.backend + '/users/' + userId,
             data: userObj,
         }).then(function success(response) {
+            if (user.id === response.data.sprout_user.pk) {
+                saveUser(response.data.sprout_user);
+            }
             deferred.resolve(response.data);
         }, function error(response) {
             deferred.reject(response);
@@ -386,6 +426,14 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
 
     /*** NOTIFICATION RECORDS ***/
 
+    userService.notificationData = {
+        relevantItems: [],
+        relevantOffset: {
+            value: 14,
+            unit: 'd',
+        }
+    };
+
     /**
      * Get all of a user's notifications
      * @param {number} userId - ID of the user
@@ -400,6 +448,18 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
             url: 'https://' + $rootScope.backend + '/users/' + userId +
                 '/notifications' + query,
         }).then(function success(response) {
+            if(response !== null && response !== undefined) {
+                if(response.data !== null && response.data !== undefined) {
+                    if(response.data.notifications !== null && response.data.notifications !== undefined) {
+                        userService.notificationData.relevantItems.length = 0;
+                        var relevantDate = moment().add(userService.notificationData.relevantOffset.value, userService.notificationData.relevantOffset.unit);
+
+                        _.each(_.filter(response.data.notifications, function(elem) { return moment(elem.date) < relevantDate && elem.unread; }), function(elem) {
+                            userService.notificationData.relevantItems.push(elem);
+                        });
+                    }
+                }
+            }
             deferred.resolve(response.data);
         }, function error(response) {
             deferred.reject(response);
@@ -484,6 +544,25 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
             url: 'https://' + $rootScope.backend + '/users/' + userId +
                 '/notifications/' + notificationId,
             data: notificationObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Update user password
+     * @param {password} passwordObj - the password object containing the new password.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.changePassword = function (passwordObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/password/change/',
+            data: passwordObj,
         }).then(function success(response) {
             deferred.resolve(response.data);
         }, function error(response) {

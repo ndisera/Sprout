@@ -2,8 +2,30 @@
 from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
-from sprout_user import SproutUser, SproutUserProfile
+from sprout_user import SproutUser
+
+
+def get_sentinel_user():
+    return get_user_model().objects.get_or_create(email='deleted_user',)[0]
+
+
+class ProfilePicture(models.Model):
+    file = models.ImageField(upload_to='profile_pictures/', null=True, default='profile_pictures/default.png')
+    upload_time = models.DateTimeField(auto_now=True)
+
+
+class SproutUserProfile(models.Model):
+    user = models.OneToOneField(SproutUser, on_delete=models.CASCADE,
+                                help_text="User to which this profile information belongs")
+    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="User first name")
+    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                 help_text="User last name")
+    picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
+                                   blank=True, null=True,
+                                   help_text="User's Profile Picture")
 
 from school_settings.models import *
 
@@ -19,28 +41,19 @@ class Student(models.Model):
     last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
-    case_manager = models.ForeignKey(SproutUser, blank=True, null=True)
+    case_manager = models.ForeignKey(SproutUser, blank=True, null=True, on_delete=models.SET_NULL)
+    picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
+                                   blank=True, null=True,
+                                   help_text="Student's Profile Picture")
 
     class Meta:
         ordering = ('id',)
 
+    def __repr__(self):
+        return "{} {}".format(self.first_name, self.last_name)
 
-class Holiday(models.Model):
-    """
-    Holiday
-    Represent a time period when school is not in session but normally would be
-    """
-    name = models.CharField(unique=True, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                            help_text="Human-readable name of the holiday")
-    start_date = models.DateField(blank=False,
-                                  help_text="Holiday start date")
-    end_date = models.DateField(blank=False,
-                                help_text="Holiday end date. May be outside the Term the holiday starts in")
-    term = models.ForeignKey(Term, on_delete=models.CASCADE,
-                             help_text="Term this holiday starts in")
-
-    class Meta:
-        unique_together = (('term', 'name', 'start_date', ),)
+    def __str__(self):
+        return self.__repr__();
 
 
 class Section(models.Model):
@@ -50,7 +63,7 @@ class Section(models.Model):
     teacher is a foreign key to the User who teaches leads the section
     """
     title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    teacher = models.ForeignKey(SproutUser)
+    teacher = models.ForeignKey(SproutUser, on_delete=models.SET(get_sentinel_user))
     term = models.ForeignKey(Term, on_delete=models.CASCADE,
                              help_text="Term this section takes place in")
     # Lookup the class schedule via term's TermSettings
@@ -68,12 +81,25 @@ class Enrollment(models.Model):
     student that is enrolled in a section.
     section and student are a composite, unique key
     """
-    section = models.ForeignKey(Section)
-    student = models.ForeignKey(Student)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (('section', 'student'),)
         ordering = ('section',)
+
+    def delete(self, using=None, keep_parents=False):
+        """
+        Cleanup notifications between this enrollment's section's teacher
+        and the student if the enrollment is deleted
+        :return: 
+        """
+        old_student = self.student
+        old_teacher = self.section.teacher
+        old_notifications = Notification.objects.filter(student=old_student, user=old_teacher)
+        for notification in old_notifications:
+            notification.delete()
+        return super(Enrollment, self).delete(using, keep_parents)
 
 
 class Behavior(models.Model):
@@ -82,7 +108,7 @@ class Behavior(models.Model):
     Represents a student's behavior score in a class on a
     given day.
     """
-    enrollment = models.ForeignKey(Enrollment, related_name='enrollment')
+    enrollment = models.ForeignKey(Enrollment, related_name='enrollment', on_delete=models.CASCADE)
     date = models.DateField()
     behavior = models.IntegerField(blank=True, null=True)
     effort = models.IntegerField(blank=True, null=True)
@@ -90,6 +116,24 @@ class Behavior(models.Model):
     class Meta:
         unique_together = (('enrollment', 'date'),)
         ordering = ('date',)
+
+
+class AttendanceRecord(models.Model):
+    """
+    AttendanceRecord
+    Keep track of whether a student did not attend a particular class or was late, etc.
+    """
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE,
+                                   help_text="Enrollment associated with this attendance report")
+    date = models.DateTimeField(null=False, blank=False,
+                                help_text="Date this attendace record was recorded")
+    short_code = models.CharField(blank=False, max_length=3,
+                                  help_text="Short code of this attendance record, for digest viewing")
+    description = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="Human-readable description of this attendance record")
+
+    class Meta:
+        unique_together = [('enrollment', 'date'),]
 
 class StandardizedTest(models.Model):
     """
@@ -108,8 +152,8 @@ class StandardizedTestScore(models.Model):
     StandardizedTestScore
     Represents a particular student's score on a particular standardized test on a particular date
     """
-    standardized_test = models.ForeignKey(StandardizedTest, related_name='standardized_test')
-    student = models.ForeignKey(Student, related_name="student")
+    standardized_test = models.ForeignKey(StandardizedTest, related_name='standardized_test', on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, related_name="student", on_delete=models.CASCADE)
     date = models.DateField()
     score = models.IntegerField(blank=False, null=False)
 
@@ -123,7 +167,7 @@ class Assignment(models.Model):
     Assignment
     Represent a class's assignment
     """
-    section = models.ForeignKey(Section, related_name='assignment_section',
+    section = models.ForeignKey(Section, related_name='assignment_section', on_delete=models.CASCADE,
                                    verbose_name="Section to which this assigment belongs")
     assignment_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     score_min = models.IntegerField(blank=False, verbose_name="Minimum Score")
@@ -140,9 +184,11 @@ class Grade(models.Model):
     Grade
     Represent a student grade report
     """
-    assignment = models.ForeignKey(Assignment, related_name='grade_assignment',
-                                  verbose_name="Assignment being reported")
-    student = models.ForeignKey(Student, related_name='grade_student')
+    assignment = models.ForeignKey(Assignment, related_name='grade_assignment', on_delete=models.CASCADE,
+                                   verbose_name="Assignment being reported",
+                                   help_text="Assignment being reported")
+    student = models.ForeignKey(Student, related_name='grade_student', on_delete=models.CASCADE,
+                                help_text="Student being graded")
     score = models.IntegerField(blank=False, verbose_name="Assignment score")
     handin_datetime = models.DateTimeField(blank=False)
 
@@ -156,14 +202,21 @@ class Notification(models.Model):
     Notification
     Represent and store a notification which should be displayed to a User
     """
-    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    date = models.DateTimeField(blank=False)
-    student = models.ForeignKey(Student, blank=False)
-    user = models.ForeignKey(SproutUser, blank=False)
-    category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this notification")
+    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                            help_text="Longer description of this notification")
+    date = models.DateTimeField(blank=False,
+                                help_text="Date this notification is 'due'")
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE,
+                                help_text="Student to whom this notification refers")
+    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE,
+                             help_text="User who should be notified")
+    partial_link = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                 help_text="Partial string of an API call, combined with student to create a URL from this notification")
     unread = models.BooleanField(blank=False, default=False)
+    category = models.IntegerField(blank=False,
+                                   help_text="Machine-readable category of this notification. See api/constants.py")
 
     class Meta:
         # Do we want to enforce any uniqueness for notifications?
@@ -171,8 +224,8 @@ class Notification(models.Model):
 
 
 class FocusStudent(models.Model):
-    student = models.ForeignKey(Student, blank=False)
-    user = models.ForeignKey(SproutUser, blank=False)
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE)
     ordering = models.IntegerField(blank=False)
     focus_category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                       help_text="Category selected by the user to display")
@@ -193,7 +246,7 @@ class IEPGoal(models.Model):
     IEPGoal
     Represent a student's Individualized Education Plan goal
     """
-    student = models.ForeignKey(Student, blank=False)
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Short name of this IEP Goal")
     quantitative = models.BooleanField(blank=True,
@@ -204,6 +257,8 @@ class IEPGoal(models.Model):
                                                  help_text="If defined, lower bound of the quantitative category value")
     quantitative_range_upper = models.IntegerField(null=True,
                                                    help_text="If defined, upper bound of the quantitative category value")
+    due_date = models.DateField(null=False,
+                                help_text="Date when this IEP Goal should be completed")
 
 
 class IEPGoalDatapoint(models.Model):
@@ -213,8 +268,14 @@ class IEPGoalDatapoint(models.Model):
     """
     goal = models.OneToOneField(IEPGoal, blank=False, on_delete=models.CASCADE,
                                 help_text="IEPGoal this datapoint belongs to")
-    value = models.IntegerField(null=True,
-                                help_text="Data value of this datapoint")
+    value = models.IntegerField(help_text="Data value of this datapoint")
+    date = models.DateTimeField(help_text="Datetime this measurement was taken")
+    note = models.CharField(null=True, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                            help_text="Note associated with this datapoint (max length {})".format(
+                                settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+    class Meta:
+        ordering = ('goal', 'date', )
 
 
 class IEPGoalNote(models.Model):
@@ -228,11 +289,46 @@ class IEPGoalNote(models.Model):
                              help_text="Name of this note")
     body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
                              help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+    date = models.DateTimeField(auto_now=True,
+                                help_text="Datetime this note was last update")
+
+    class Meta:
+        ordering = ('goal', 'date', )
 
 
 class ServiceRequirement(models.Model):
-    student = models.ForeignKey(Student, blank=False)
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Short name of this service requirement")
     description = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
-                                   help_text="Description of this service requirement (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+                                   help_text="Description of this service requirement (max length {})".format(
+                                       settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+    fulfilled = models.BooleanField(help_text="Whether or not this service has been fulfilled")
+    fulfilled_date = models.DateField(null=True,
+                                      help_text="Date this service was marked fulfilled")
+    fulfilled_user = models.ForeignKey(SproutUser, null=True, on_delete=models.SET(get_sentinel_user),
+                                       help_text="User who marked this service fulfilled")
+    fulfilled_description = models.CharField(null=True, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                                             help_text="How this service is fulfilled (max length {})".format(
+                                                 settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+    def __repr__(self):
+        if self.fulfilled :
+            try:
+                user_email = self.fulfilled_user.email
+            except SproutUser.DoesNotExist:
+                user_email = 'deleted user'
+            return 'ServiceRequirement: {title} for {student_first} {student_last}: fulfilled by {user}'.format(
+                title=self.title,
+                student_first=self.student.first_name,
+                student_last=self.student.last_name,
+                user=user_email,
+            )
+        return 'ServiceRequirement: {title} for {student_first} {student_last}: unfulfilled'.format(
+            title=self.title,
+            student_first=self.student.first_name,
+            student_last=self.student.last_name,
+        )
+
+    def __str__(self):
+        return self.__repr__()

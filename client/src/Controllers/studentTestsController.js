@@ -1,4 +1,5 @@
-app.controller("studentTestsController", function ($scope, $rootScope, $routeParams, testService, studentData) {
+app.controller("studentTestsController", function ($scope, $rootScope, $location, $routeParams, testService, studentData) {
+    $scope.location = $location;
 
     $scope.student = studentData.student;
     $scope.testGraphs = {};

@@ -7,17 +7,58 @@ from rest_auth.registration.serializers import RegisterSerializer
 from focus_category.category_calculator import CategoryCalculator
 
 
+class ProfilePictureSerializer(DynamicModelSerializer):
+    file = serializers.ImageField(max_length=None)
+
+    class Meta:
+        fields = '__all__'
+        model = ProfilePicture
+
+    def to_representation(self, instance):
+        representation = super(ProfilePictureSerializer, self).to_representation(instance)
+        del (representation['file']) # Hide the file path from the response
+        return representation
+
+
 class StudentSerializer(DynamicModelSerializer):
     class Meta:
         model = Student
-        fields = ('id', 'student_id', 'first_name', 'last_name', 'birthdate', 'case_manager')
+        fields = '__all__'
+
+    def update(self, instance, validated_data):
+        """
+        Clean up notifications for a case manager when a student is reassigned
+        """
+        if 'case_manager' in validated_data:
+            # If the case_manager is being updated, wipe all notifications
+            # between the student and the old case manager
+            old_case_manager = instance.case_manager
+            old_notifications = Notification.objects.filter(student=instance, user=old_case_manager)
+            for notification in old_notifications:
+                notification.delete()
+        return super(StudentSerializer, self).update(instance, validated_data)
+
     case_manager = DynamicRelationField('SproutUserSerializer')
+    picture = DynamicRelationField('ProfilePictureSerializer')
 
 
 class SchoolSettingsSerializer(DynamicModelSerializer):
     class Meta:
         model = SchoolSettings
         fields = '__all__'
+
+
+class SchoolYearSerializer(DynamicModelSerializer):
+    class Meta:
+        model = SchoolYear
+        fields = '__all__'
+
+    def validate(self, data):
+        super(SchoolYearSerializer, self).validate(data)
+
+        if data['end_date'] < data['start_date']:
+            raise serializers.ValidationError("A school year cannot end before it starts!")
+        return data
 
 
 class DailyScheduleSerializer(DynamicModelSerializer):
@@ -36,6 +77,7 @@ class TermSettingsSerializer(DynamicModelSerializer):
 
 class TermSerializer(DynamicModelSerializer):
     settings = DynamicRelationField('TermSettingsSerializer')
+    school_year = DynamicRelationField('SchoolYearSerializer')
 
     class Meta:
         model = Term
@@ -59,6 +101,8 @@ class HolidaySerializer(DynamicModelSerializer):
             raise serializers.ValidationError("A semester cannot end before it starts!")
         return data
 
+    school_year = DynamicRelationField('SchoolYearSerializer')
+
 
 class SectionSerializer(DynamicModelSerializer):
     class Meta:
@@ -71,6 +115,18 @@ class EnrollmentSerializer(DynamicModelSerializer):
     class Meta:
         model = Enrollment
         fields = ('id', 'section', 'student')
+
+    def update(self, instance, validated_data):
+        """
+        Clean up notifications for a teacher when a student's enrollment changes
+        """
+        old_student = instance.student
+        old_teacher = instance.section.teacher
+        old_notifications = Notification.objects.filter(student=old_student, user=old_teacher)
+        for notification in old_notifications:
+            notification.delete()
+        return super(EnrollmentSerializer, self).update(instance, validated_data)
+
     section = DynamicRelationField('SectionSerializer')
     student = DynamicRelationField('StudentSerializer')
 
@@ -79,6 +135,13 @@ class BehaviorSerializer(DynamicModelSerializer):
     class Meta:
         model = Behavior
         fields = ('id', 'enrollment', 'date', 'behavior', 'effort')
+    enrollment = DynamicRelationField('EnrollmentSerializer')
+
+
+class AttendanceRecordSerializer(DynamicModelSerializer):
+    class Meta:
+        model = AttendanceRecord
+        fields = '__all__'
     enrollment = DynamicRelationField('EnrollmentSerializer')
 
 
@@ -206,7 +269,7 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
 class NotificationSerializer(DynamicModelSerializer):
     class Meta:
         model = Notification
-        fields = ('id', 'title', 'body', 'date', 'student', 'user', 'category', 'unread', )
+        fields = '__all__'
     user = DynamicRelationField('SproutUserSerializer')
     student = DynamicRelationField('StudentSerializer')
 
@@ -257,7 +320,29 @@ class IEPGoalNoteSerializer(DynamicModelSerializer):
 
 
 class ServiceRequirementSerializer(DynamicModelSerializer):
+    student = DynamicRelationField('StudentSerializer')
+    fulfilled_user = DynamicRelationField('SproutUserSerializer')
+
     class Meta:
         model = ServiceRequirement
         fields = '__all__'
-    student = DynamicRelationField('StudentSerializer')
+
+    def validate(self, data):
+        """
+        Ensure that if the service has been marked as fulfilled that the
+        other fulfilled fields are filled
+
+        :param fulfilled: Whether the service has been fulfilled
+        :return:
+        """
+        data = super(ServiceRequirementSerializer, self).validate(data)
+        fulfilled = data['fulfilled']
+        if fulfilled:
+            errors = {}
+            for field in 'fulfilled_date', 'fulfilled_user', 'fulfilled_description':
+                if not field in self.get_initial():
+                    errors[field] = ['Required if this service is fulfilled']
+            if len(errors) > 0:
+                raise serializers.ValidationError(errors)
+
+        return data

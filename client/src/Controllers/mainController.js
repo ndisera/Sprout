@@ -1,4 +1,5 @@
 app.controller('mainController', function ($scope, $rootScope, $location, userService, studentService) {
+    $scope.location = $location;
 
     $scope.user = userService.user;
     $scope.studentInfo = studentService.studentInfo;
@@ -27,32 +28,37 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
         {
             title: "Home",
             glyph: "home",
-            href: "/focus",
+            href: "/profile",
             click: $scope.clearSearch,
+            badgeList: [],
         },
         {
             title: "Manage",
             glyph: "briefcase",
             href: "/manage",
             click: $scope.clearSearch,
+            badgeList: [],
         },
         {
             title: "Scores Input",
             glyph: "pencil",
-            href: "/scores",
+            href: "/input",
             click: $scope.clearSearch,
+            badgeList: [],
         },
         {
             title: "Notifications",
             glyph: "bell",
-            href: "/",
+            href: "/notifications",
             click: $scope.clearSearch,
+            badgeList: userService.notificationData.relevantItems,
         },
         {
             title: "Settings",
             glyph: "cog",
             href: "/settings",
             click: $scope.clearSearch,
+            badgeList: [],
         },
         {
             title: "Logout",
@@ -60,6 +66,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
             href: "/login",
             click: "logout(); $scope.clearSearch();",
             click: $scope.logout,
+            badgeList: [],
         },
     ];
 
@@ -74,25 +81,19 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
        link.click();
     };
 
-    /**
-     * Toggles navbar if it isn't collapsed and has a window width < 768px
-     */
-    $scope.closeNavbar = function () {
-        if ($(".navbar-toggle").hasClass("collapsed")) {
-            // Closed
-        } else {
-            // Open
-            if (window.innerWidth < 768) {
-                $('.btn-navbar').click(); //bootstrap 2.x
-                $('.navbar-toggle').click() //bootstrap 3.x by Richard
-            }
+    $rootScope.$on('user:auth', function(event, data) {
+        if(data.type === 'login') {
+            userService.getAllNotificationsForUser(userService.user.id, null).then(
+                function success(data) {},
+                function error(response) {},
+            );
         }
-    }
+    });
 
     // closes navbar when an element is clicked in tablet/mobile view
-    $('.nav a').on('click', function () {
-        $scope.closeNavbar();
-    });
+    //$('.nav a').on('click', function () {
+        //$scope.closeNavbar();
+    //});
 
     /**
      * Navigates to student's page if name in navigation search bar is valid.
@@ -101,7 +102,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
         if ($scope.studentName.toUpperCase() in $scope.studentInfo.studentsLookup) {
             $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentName.toUpperCase()].id);
             $scope.clearSearch();
-            $scope.closeNavbar();
         }
         else {
             //TODO: notify the user in some way
@@ -112,12 +112,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     // enables autofocus in IE
     $(function () {
         $('[autofocus]:not(:focus)').eq(0).focus();
-    });
-
-    $(document).ready(function () {
-        $(".navbar-toggle").on("click", function () {
-            $(this).toggleClass("active");
-        });
     });
 
 });

@@ -14,6 +14,7 @@
 
 .pencilEdit {
     cursor: pointer;
+    color: #0b3c5d;
 }
 
 .pencilEdit:hover {
@@ -54,6 +55,10 @@
 .heading-glyphicon {
     float:right;
     cursor:pointer
+}
+
+.button-container {
+    height: 15px;
 }
 
 @media (max-width: 500px) {
