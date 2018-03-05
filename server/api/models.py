@@ -195,14 +195,21 @@ class Notification(models.Model):
     Notification
     Represent and store a notification which should be displayed to a User
     """
-    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    date = models.DateTimeField(blank=False)
-    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
-    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE)
-    category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this notification")
+    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                            help_text="Longer description of this notification")
+    date = models.DateTimeField(blank=False,
+                                help_text="Date this notification is 'due'")
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE,
+                                help_text="Student to whom this notification refers")
+    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE,
+                             help_text="User who should be notified")
+    partial_link = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                 help_text="Partial string of an API call, combined with student to create a URL from this notification")
     unread = models.BooleanField(blank=False, default=False)
+    category = models.IntegerField(blank=False,
+                                   help_text="Machine-readable category of this notification. See api/constants.py")
 
     class Meta:
         # Do we want to enforce any uniqueness for notifications?
