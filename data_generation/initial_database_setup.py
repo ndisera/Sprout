@@ -14,6 +14,7 @@ from teacher_generator import TeacherGenerator
 from grades_generator import GradesGenerator
 from iep_generator import IEPGenerator
 from service_generator import ServiceGenerator
+from attendance_generator import AttendanceGenerator
 
 from services.authorization import AuthorizationService
 from services.enrollment import Enrollment, EnrollmentService
@@ -98,6 +99,7 @@ if __name__ == "__main__":
                       'headers': headers,
                       'port_num': args.port,
                       }
+    attendance_generator = AttendanceGenerator(**generator_args)
     student_generator = StudentGenerator(**generator_args)
     teacher_generator = TeacherGenerator(**generator_args)
     behavior_generator = BehaviorGenerator(**generator_args)
@@ -110,9 +112,11 @@ if __name__ == "__main__":
     school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", grade_range_lower=6, grade_range_upper=8, id=None)
     settings_service.add_school(school_settings)
 
+    school_year_start = datetime.date(year=2017, month=9, day=5)
+    school_year_end = datetime.date(year=2018, month=6, day=6)
     school_year = SchoolYear(
-        start_date=str(datetime.date(year=2017, month=9, day=5)),
-        end_date=str(datetime.date(year=2018, month=6, day=6)),
+        start_date=str(school_year_start),
+        end_date=str(school_year_end),
         num_terms=4,
         title="2017/18 School Year")
     response = settings_service.add_school_year(school_year)
@@ -202,7 +206,8 @@ if __name__ == "__main__":
     response = enrollments_service.add_many_enrollments(enrollments)
     enrollments = [Enrollment(**enrollment) for enrollment in response.json()['enrollments']]
 
-    # generate behaviors
+    # generate behaviors. Depends: enrollments
+    behaviors = []
     for enrollment in enrollments:
         section = sections_lookup[enrollment.section]
         term = term_lookup[section.term]
@@ -216,8 +221,15 @@ if __name__ == "__main__":
         else:
             num_days = (end_date - start_date).days
 
-        behaviors = behavior_generator.generate_random_behavior(enrollment, date_range_start=start_date, num_days=num_days)
-        behavior_generator.behaviorService.add_many_behaviors(behaviors)
+        new_behaviors = behavior_generator.generate_random_behavior(enrollment, date_range_start=start_date, num_days=num_days)
+        behaviors.extend(new_behaviors)
+    behavior_generator.behaviorService.add_many_behaviors(behaviors)
+
+    # generate attendances. Depends: enrollments
+    attendances = attendance_generator.generate_attendances(
+        date_range_start=datetime.datetime.combine(school_year_start, datetime.time()),
+        date_range_end=datetime.datetime.today())
+    attendance_generator.attendanceService.add_many_attendance_records(attendances)
 
     # generate assignments
     assignments = grades_generator.generate_assignments(num_assignments_per_section)
