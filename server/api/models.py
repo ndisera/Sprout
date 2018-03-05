@@ -130,6 +130,24 @@ class Behavior(models.Model):
         unique_together = (('enrollment', 'date'),)
         ordering = ('date',)
 
+
+class AttendanceRecord(models.Model):
+    """
+    AttendanceRecord
+    Keep track of whether a student did not attend a particular class or was late, etc.
+    """
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE,
+                                   help_text="Enrollment associated with this attendance report")
+    date = models.DateTimeField(null=False, blank=False,
+                                help_text="Date this attendace record was recorded")
+    short_code = models.CharField(blank=False, max_length=3,
+                                  help_text="Short code of this attendance record, for digest viewing")
+    description = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="Human-readable description of this attendance record")
+
+    class Meta:
+        unique_together = [('enrollment', 'date'),]
+
 class StandardizedTest(models.Model):
     """
     StandardizedTest

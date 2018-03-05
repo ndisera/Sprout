@@ -573,6 +573,29 @@ class BehaviorViewSet(NestedDynamicViewSet):
     )
 
 
+class AttendanceRecordViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "AttendanceRecord" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AttendanceRecordSerializer
+    queryset = AttendanceRecord.objects.all()
+
+    """ ensure variables show as correct type for docs """
+    name_enrollment = 'enrollment'
+    desc_enrollment = 'ID of the enrollment (student and section) of this attendance report'
+
+    enrollment_field = coreapi.Field(name=name_enrollment,
+                                     required=True,
+                                     location="form",
+                                     description=desc_enrollment,
+                                     schema=coreschema.Integer(title=name_enrollment))
+
+    schema = AutoSchema(manual_fields=[
+        enrollment_field,
+    ])
+
+
 class StandardizedTestViewSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the

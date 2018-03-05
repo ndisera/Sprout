@@ -135,6 +135,13 @@ class BehaviorSerializer(DynamicModelSerializer):
     enrollment = DynamicRelationField('EnrollmentSerializer')
 
 
+class AttendanceRecordSerializer(DynamicModelSerializer):
+    class Meta:
+        model = AttendanceRecord
+        fields = '__all__'
+    enrollment = DynamicRelationField('EnrollmentSerializer')
+
+
 class StandardizedTestSerializer(DynamicModelSerializer):
     class Meta:
         model = StandardizedTest
