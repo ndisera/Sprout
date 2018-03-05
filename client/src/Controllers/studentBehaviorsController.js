@@ -181,7 +181,19 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                 $scope.sharedGraph.datasetOverride = [];
 
                 var termsToInclude = termsByDateRange($scope.terms, $scope.graphStartDate, $scope.graphEndDate);
-                if(termsToInclude.length === 0) {
+
+                var hasSection = false;
+                _.each(termsToInclude, function(termId) {
+                    _.each($scope.sectionsByTerm[$scope.termToSectionsByTerm[termId]], function(section) {
+                        hasSection = true;
+                        $scope.sharedGraph.series.push(section.title);
+                        $scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                        $scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                        $scope.sectionToDataIndex[section.id] = $scope.behaviorGraph.data.length - 1;
+                    });
+                });
+
+                if(hasSection === false) {
                     $scope.sharedGraph.series = ["", ];
                     $scope.sectionToDataIndex = {};
                     $scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
@@ -191,15 +203,6 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                 else {
                     $scope.sharedGraph.options.legend.display = true;
                 }
-
-                _.each(termsToInclude, function(termId) {
-                    _.each($scope.sectionsByTerm[$scope.termToSectionsByTerm[termId]], function(section) {
-                        $scope.sharedGraph.series.push(section.title);
-                        $scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
-                        $scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
-                        $scope.sectionToDataIndex[section.id] = $scope.behaviorGraph.data.length - 1;
-                    });
-                });
 
                 // iterate through each date, setting data as necessary
                 var iterDate = $scope.graphStartDate.clone();
