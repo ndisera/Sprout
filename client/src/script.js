@@ -128,6 +128,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 auth: function(userService) {
                     return userService.authVerify();
                 },
+                holidays: function(holidayService) {
+                    return holidayService.getHolidays();
+                },
             },
         })
 
@@ -190,7 +193,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                                 filter: [ { name: 'case_manager', val: userService.user.id, }, ],
                             };
                             deferreds.push(studentService.getStudents(studentConfig));
-                            
+
                             $q.all(deferreds)
                                 .then(function(data) {
                                     deferred.resolve(data);

@@ -22,7 +22,7 @@
                 </div>
                 <div class="panel-body">
                     <h4 class="centerText" ng-show="holidays.length === 0">No Holidays</h4>
-                    <div class="table-responsive scrollableTableDiv" ng-if="holidays.length !== 0">
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="holidays.length !== 0">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -31,38 +31,32 @@
                                     <th>Ends</th>
                                     <th class="text-button-column"></th>
                                     <th class="text-button-column"></th>
-                                    <th class="buttonColumn"></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="holiday in holidays | orderBy:'end_date'">
-                                    <span ng-if="!editHoliday[$index]">
-                                    <td>{{ holiday.name }}</td>
-                                    <td>{{ holiday.start_date }}</td>
-                                    <td>{{ holiday.end_date }}</td>
-                                    <td>
-                                        <span ng-click="editHoliday()" class="glyphicon glyphicon-pencil pencilEdit"></span>
+                                <tr class="pointer" id="holiday-row{{$index}}" ng-repeat="holiday in holidays | orderBy:'start_date'" ng-click="editHoliday($index)">
+                                    <td ng-hide="editHolidays[$index]">{{ holiday.name }}</td>
+                                    <td ng-hide="editHolidays[$index]">{{ holiday.start_date }}</td>
+                                    <td ng-hide="editHolidays[$index]">{{ holiday.end_date }}</td>
+                                    <td ng-hide="editHolidays[$index]">
+                                        <span ng-click="editHoliday($index)" class="glyphicon glyphicon-pencil pencilEdit"></span>
                                     </td>
-                                    <td></td>
-                                    </span>
-                                    <span ng-if="editHoliday[$index]">
-                                    <td>{{ holiday.name }}</td>
-                                    <td>{{ holiday.start_date }}</td>
-                                    <td>{{ holiday.end_date }}</td>
-                                    <td>
-                                        <button class="btn btn-xs" type="button">
-                                            Update
+                                    <td ng-show="editHolidays[$index]"><input type="text" class="form-control" value="{{ holiday.name }}"></td>
+                                    <td ng-show="editHolidays[$index]"><input type="text" class="form-control" value="{{ holiday.start_date }}"></td>
+                                    <td ng-show="editHolidays[$index]"><input type="text" class="form-control" value="{{ holiday.end_date }}"></td>
+                                    <td ng-show="editHolidays[$index]">
+                                        <button class="btn btn-success" type="button">
+                                            Save
                                         </button>
                                     </td>
-                                    <td>
-                                        <button class="btn btn-xs" type="button">
+                                    <td ng-show="editHolidays[$index]">
+                                        <button class="btn btn-default" type="button" ng-click="cancelEditHoliday($index); $event.stopPropagation();">
                                             Cancel
                                         </button>
                                     </td>
-                                    </span>
-                                    <td>
-                                        <button class="btn btn-danger btn-xs" type="button">
-                                            <i class="glyphicon glyphicon-minus white"></i>
+                                    <td ng-hide="editHolidays[$index]">
+                                        <button class="btn btn-danger btn-xs pull-right" type="button">
+                                            Delete
                                         </button>
                                     </td>
                                 </tr>

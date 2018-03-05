@@ -266,6 +266,11 @@ a {
     cursor: pointer;
 }
 
+.table-select-default > table.table-hover > tbody > tr:hover {
+    background-color: #d2ecf9;
+    color: #0c405a;
+}
+
 .table-select > table.table-hover > tbody > tr.active > td {
     background-color: #d2ecf9;
     color: #0c405a;
@@ -570,7 +575,7 @@ ul.dropdown-menu > li > a:hover {
     padding-right: 0px;
     font-family: 'Glyphicons Halflings';
     font-size: 20px;
-} 
+}
 
 #toast-container > .toast-warning:before {
     content: "\e101";
@@ -741,8 +746,3 @@ ul.dropdown-menu > li > a:hover {
     background-color: #3a926c;
     border-color: #33805e;
 }
-
-
-
-
-
