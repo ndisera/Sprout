@@ -154,6 +154,26 @@ class StandardizedTestScoreSerializer(DynamicModelSerializer):
     class Meta:
         model = StandardizedTestScore
         fields = ('id', 'standardized_test', 'student', 'date', 'score',)
+
+    def validate(self, data):
+        """
+        Run the default validators, then ensure the score is in-range for the related test
+        :return: data, but validated
+        """
+        validated_data = super(StandardizedTestScoreSerializer, self).validate(data)
+        if 'score' in validated_data:
+            # Make sure the score is not out of range
+            if 'standardized_test' in validated_data:
+                test = validated_data['standardized_test']
+            else:
+                test = self.instance.standardized_test
+            min_score = test.min_score
+            max_score = test.max_score
+            score = validated_data['score']
+            if score < min_score or score > max_score:
+                raise serializers.ValidationError({'score': 'Out of range for test with id {id}'.format(id=test.id)})
+        return validated_data
+
     standardized_test = DynamicRelationField('StandardizedTestSerializer')
     student = DynamicRelationField('StudentSerializer')
 
@@ -169,6 +189,37 @@ class GradeSerializer(DynamicModelSerializer):
     class Meta:
         model = Grade
         fields = ('id', 'assignment', 'student', 'handin_datetime', 'score',)
+
+    def validate(self, data):
+        """
+        Run the default validators, then:
+            ensure the score is in-range for the related test
+            ensure the student is enrolled in the class to which the assignment belongs
+
+        :return: data, but validated
+        """
+        validated_data = super(GradeSerializer, self).validate(data)
+
+        if 'assignment' in validated_data:
+            assignment = validated_data['assignment']
+        else:
+            assignment = self.instance.assignment
+
+        if 'score' in validated_data:
+            # Make sure the score is not out of range
+            score = validated_data['score']
+            if score < assignment.score_min or score > assignment.score_max:
+                raise serializers.ValidationError({'score': 'Out of range for assignment with id {id}'.format(id=assignment.id)})
+
+        # Check that the student is enrolled in the class to which the assignment belongs
+        section = assignment.section
+        student = validated_data['student']
+        try:
+            Enrollment.objects.get(section=section, student=student)
+        except Enrollment.DoesNotExist:
+            raise serializers.ValidationError({'student': 'This student is not enrolled in section with id {id}'.format(id=section.id)})
+        return validated_data
+
     assignment = DynamicRelationField('AssignmentSerializer')
     student = DynamicRelationField('StudentSerializer')
 
