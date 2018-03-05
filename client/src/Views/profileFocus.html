@@ -1,11 +1,13 @@
 <div ng-include="'html/profileTabs.html'"></div>
-<div class="row voffset3">
+<div class="row">
     <div class="col-xs-12">
-        <button ng-if="!editing" ng-click="toggleEdit()" class="btn btn-primary pull-right" type="button">Choose Students</button>
-        <button ng-if="editing" ng-click="toggleEdit()" class="btn btn-danger pull-right" type="button">Stop</button>
+        <h3 class="inlineHeading">Focus Students</h3>
+        <button ng-if="!editing" ng-click="toggleEdit()" class="btn btn-primary pull-right focus-top-button" type="button">Choose Students</button>
+        <button ng-if="editing" ng-click="toggleEdit()" class="btn btn-danger pull-right focus-top-button" type="button">Stop</button>
     </div>
 </div>
-<div class="row voffset3" ng-if="focusStudents.length === 0 && !editing">
+<hr>
+<div class="row" ng-if="focusStudents.length === 0 && !editing">
     <div class="col-xs-12">
         <div class="alert alert-info no-bottom-margin" role="alert">
             <span><b>Tip:</b> It looks like you don't have any Focus Students. Click the "Choose Students" button to select one.</span>

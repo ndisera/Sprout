@@ -362,6 +362,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                         }
                     );
                 },
+                termData: function(termService) {
+                    return termService.getTerms();
+                },
                 studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },

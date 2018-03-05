@@ -471,15 +471,11 @@ ul.dropdown-menu > li > a:hover {
     color: #31708f;
 }
 
-/*.input-group-btn.open ul.dropdown-menu {*/
-    /*max-height: 167px;*/
-    /*overflow: auto;*/
-/*}*/
-
-/*.input-group-btn.open ul.dropdown-menu > li > a:hover {*/
-    /*background-color: #d9edf7;*/
-    /*color: #31708f;*/
-/*}*/
+.dropdown-menu > .active > a, .dropdown-menu > .active > a:hover, .dropdown-menu > .active > a:focus {
+    background-color: #d9edf7;
+    color: #31708f;
+    cursor: default;
+}
 
 .panel-header-btn {
     margin-top: -23px;
