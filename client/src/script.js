@@ -131,6 +131,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 holidays: function(holidayService) {
                     return holidayService.getHolidays();
                 },
+                terms: function(termService) {
+                    return termService.getTerms();
+                },
+                tests: function(testService) {
+                    return testService.getTests();
+                },
             },
         })
 
