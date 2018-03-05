@@ -35,6 +35,10 @@
     width: 40px;
 }
 
+.text-button-column {
+    width: 60px;
+}
+
 .scrollableTableDiv {
     max-height:261px;
     overflow-y:auto;

@@ -22,7 +22,52 @@
                 </div>
                 <div class="panel-body">
                     <h4 class="centerText" ng-show="holidays.length === 0">No Holidays</h4>
-                    <div ng-hide="holidays.length === 0">
+                    <div class="table-responsive scrollableTableDiv" ng-if="holidays.length !== 0">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Begins</th>
+                                    <th>Ends</th>
+                                    <th class="text-button-column"></th>
+                                    <th class="text-button-column"></th>
+                                    <th class="buttonColumn"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="holiday in holidays | orderBy:'end_date'">
+                                    <span ng-if="!editHoliday[$index]">
+                                    <td>{{ holiday.name }}</td>
+                                    <td>{{ holiday.start_date }}</td>
+                                    <td>{{ holiday.end_date }}</td>
+                                    <td>
+                                        <span ng-click="editHoliday()" class="glyphicon glyphicon-pencil pencilEdit"></span>
+                                    </td>
+                                    <td></td>
+                                    </span>
+                                    <span ng-if="editHoliday[$index]">
+                                    <td>{{ holiday.name }}</td>
+                                    <td>{{ holiday.start_date }}</td>
+                                    <td>{{ holiday.end_date }}</td>
+                                    <td>
+                                        <button class="btn btn-xs" type="button">
+                                            Update
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-xs" type="button">
+                                            Cancel
+                                        </button>
+                                    </td>
+                                    </span>
+                                    <td>
+                                        <button class="btn btn-danger btn-xs" type="button">
+                                            <i class="glyphicon glyphicon-minus white"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

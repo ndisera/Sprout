@@ -3,6 +3,4 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.terms = [];
     $scope.holidays = [];
     $scope.tests = [];
-
-    
 });
