@@ -347,6 +347,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/studentServices.html',
             controller: 'studentServicesController',
             resolve: {
+                services: function(studentService, $route) {
+                    return studentService.getServicesForStudent($route.current.params.id);
+                },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },

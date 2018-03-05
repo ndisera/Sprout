@@ -6,6 +6,10 @@
         *display: inline; /* ie7 fix */
         zoom: 1; /* hasLayout ie7 trigger */
     }
+
+    .student-mobile-spacer {
+        margin-top: 15px;
+    }
 }
 
 .student-name-title {
@@ -122,6 +126,47 @@
 .student-behaviors-no-input-classes > h4 {
     margin: 20px 0px;
 }
+
+.student-services-panel .form-control-static {
+    display: inline-block;
+}
+
+.student-services-panel .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.student-services-panel .panel-title {
+    display: inline-block;
+}
+
+.student-services-panel .panel-heading .glyphicon {
+    font-size: 30px;
+    margin-top: -5px;
+    margin-right: -10px;
+    color: #c9302c;
+}
+
+.student-services-panel {
+    border-color: #c9302c;
+}
+
+.student-services-panel > .panel > .panel-heading {
+    background-color: #f6d6d5;
+}
+
+.student-services-panel.fulfilled {
+    border-color: #57bc90;
+}
+
+.student-services-panel.fulfilled > .panel > .panel-heading {
+    background-color: #dbf0e7;
+}
+
+.student-services-panel.fulfilled .panel-heading .glyphicon {
+    color: #57bc90;
+}
+
 
 @media (max-width: 768px) {
     #student-overview-title {

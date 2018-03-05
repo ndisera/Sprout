@@ -1,2 +1,56 @@
 <div ng-include="'html/studentTabs.html'"></div>
+<div id="student-services-wrapper" class="voffset4">
+    <div class="row" ng-repeat="service in services">
+        <div class="col-xs-12">
+            <div class="panel-wrapper student-services-panel" ng-class="{ 'fulfilled': service.fulfilled, }">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">{{ service.title }}</h4>
+                        <div class="pull-right hidden-xs">
+                            <span class="glyphicon glyphicon-ok-sign" ng-if="service.fulfilled"></span>
+                            <span class="glyphicon glyphicon-remove-sign" ng-if="!service.fulfilled"></span>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-horizontal" name="editServiceForm" ng-submit="saveService(service);">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="control-label">Description: </label>
+                                        <p class="form-control-static" ng-show="!service.editing">{{ service.description }}</p>
+                                        <div id="student-overview-edit-input-group" class="input-group" ng-show="service.editing">
+                                            <input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required auto-focus>
+                                            <input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <label class="control-label">Description: </label>
+                                        <p class="form-control-static" ng-show="!service.editing">{{ service.description }}</p>
+                                        <div id="student-overview-edit-input-group" class="input-group" ng-show="service.editing">
+                                            <input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required auto-focus>
+                                            <input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel panel-default panel-add pointer" ng-show="!adding" ng-click="toggleAdd(true)">
+                <div class="panel-heading">
+                    <h4 class="panel-title centerText">
+                        <span class="glyphicon glyphicon-plus blackish"></span>
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div ng-include="'html/bottomSpacer.html'"></div>
