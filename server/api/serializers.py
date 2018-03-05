@@ -189,6 +189,26 @@ class GradeSerializer(DynamicModelSerializer):
     class Meta:
         model = Grade
         fields = ('id', 'assignment', 'student', 'handin_datetime', 'score',)
+
+    def validate(self, data):
+        """
+        Run the default validators, then ensure the score is in-range for the related test
+        :return: data, but validated
+        """
+        validated_data = super(GradeSerializer, self).validate(data)
+        if 'score' in validated_data:
+            # Make sure the score is not out of range
+            if 'assignment' in validated_data:
+                assignment = validated_data['assignment']
+            else:
+                assignment = self.instance.assignment
+            min_score = assignment.score_min
+            max_score = assignment.score_max
+            score = validated_data['score']
+            if score < min_score or score > max_score:
+                raise serializers.ValidationError({'score': 'Out of range for assignment with id {id}'.format(id=assignment.id)})
+        return validated_data
+
     assignment = DynamicRelationField('AssignmentSerializer')
     student = DynamicRelationField('StudentSerializer')
 
