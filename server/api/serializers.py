@@ -154,6 +154,26 @@ class StandardizedTestScoreSerializer(DynamicModelSerializer):
     class Meta:
         model = StandardizedTestScore
         fields = ('id', 'standardized_test', 'student', 'date', 'score',)
+
+    def validate(self, data):
+        """
+        Run the default validators, then ensure the score is in-range for the related test
+        :return: data, but validated
+        """
+        validated_data = super(StandardizedTestScoreSerializer, self).validate(data)
+        if 'score' in validated_data:
+            # Make sure the score is not out of range
+            if 'standardized_test' in validated_data:
+                test = validated_data['standardized_test']
+            else:
+                test = self.instance.standardized_test
+            min_score = test.min_score
+            max_score = test.max_score
+            score = validated_data['score']
+            if score < min_score or score > max_score:
+                raise serializers.ValidationError({'score': 'Out of range for test with id {id}'.format(id=test.id)})
+        return validated_data
+
     standardized_test = DynamicRelationField('StandardizedTestSerializer')
     student = DynamicRelationField('StudentSerializer')
 

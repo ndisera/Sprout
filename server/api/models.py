@@ -147,6 +147,13 @@ class StandardizedTest(models.Model):
     class Meta:
         ordering = ('id',)
 
+    def __repr__(self):
+        return str(self.test_name)
+
+    def __str__(self):
+        return self.__repr__();
+
+
 class StandardizedTestScore(models.Model):
     """
     StandardizedTestScore
