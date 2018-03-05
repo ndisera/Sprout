@@ -36,7 +36,7 @@ class AttendanceGenerator():
                              date_range_end=datetime.datetime.now() + datetime.timedelta(days=100)):
         """
         Generate an attendance record for each enrollment for each day in the date range,
-        with a chance chance that the student was not present for class
+        with a chance that the student was not present for class
 
         :param chance: chance that a non-present AttendanceRecord will be generated
         :return: list[AttendanceRecord]

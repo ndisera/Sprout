@@ -221,15 +221,48 @@ if __name__ == "__main__":
         else:
             num_days = (end_date - start_date).days
 
+        # moving all behaviors to one big "add" after the loop will time out the server
+        # so add them one at a time in the loop
+        # behaviors = behavior_generator.generate_random_behavior(enrollment, date_range_start=start_date, num_days=num_days)
+        # behavior_generator.behaviorService.add_many_behaviors(behaviors)
         new_behaviors = behavior_generator.generate_random_behavior(enrollment, date_range_start=start_date, num_days=num_days)
         behaviors.extend(new_behaviors)
-    behavior_generator.behaviorService.add_many_behaviors(behaviors)
+
+    # moving all behaviors to one big "add" after the loop will time out the server
+    # so add them in chunks
+    # TODO: make this not dumb
+    split_behaviors = [[], ]
+    cur_index = -1
+    for i in range(0, len(behaviors)):
+        if (i % 200) == 0:
+            cur_index += 1
+            split_behaviors.append([])
+        split_behaviors[cur_index].append(behaviors[i])
+
+    for behaviors_chunk in split_behaviors:
+        # adding an empty array will error out, could happen on last array
+        if len(behaviors_chunk) == 0:
+            continue
+        behavior_generator.behaviorService.add_many_behaviors(behaviors_chunk)
 
     # generate attendances. Depends: enrollments
     attendances = attendance_generator.generate_attendances(
         date_range_start=datetime.datetime.combine(school_year_start, datetime.time()),
         date_range_end=datetime.datetime.today())
-    attendance_generator.attendanceService.add_many_attendance_records(attendances)
+    # same issue as behaviors -- adding all at once times out server
+    # TODO: make this not dumb
+    split_attendances = [[], ]
+    cur_index = -1
+    for i in range(0, len(attendances)):
+        if (i % 200) == 0:
+            cur_index += 1
+            split_attendances.append([])
+        split_attendances[cur_index].append(attendances[i])
+
+    for attendance_chunk in split_attendances:
+        if len(attendance_chunk) == 0:
+            continue
+        attendance_generator.attendanceService.add_many_attendance_records(attendance_chunk)
 
     # generate assignments
     assignments = grades_generator.generate_assignments(num_assignments_per_section)
