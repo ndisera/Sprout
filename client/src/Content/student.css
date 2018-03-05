@@ -54,6 +54,30 @@
     padding-right: 15px;
 }
 
+#student-overview-select > .input-group-addon {
+    width: unset;
+}
+
+#student-overview-select > .input-group-btn {
+    width: 100%;
+}
+
+#student-overview-select > .input-group-btn > button {
+    width: 100%;
+}
+
+#student-overview-select > .input-group-btn > ul {
+    width: 100%;
+}
+
+#student-overview-no-classes {
+    border: 1px solid #DDD;
+}
+
+#student-overview-no-classes > h4 {
+    margin: 20px 0px;
+}
+
 
 .studentHeading {
     display: inline-block;

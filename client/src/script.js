@@ -261,6 +261,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                         }
                     );
                 },
+                termData: function(termService) {
+                    var config = {
+                        include: ['settings.*', 'settings.schedule.*', ],
+                    };
+                    return termService.getTerms(config);
+                },
                 userData: function(userService) {
                     return userService.getUsers();
                 },

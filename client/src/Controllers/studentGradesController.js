@@ -17,7 +17,7 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
     }
 
     if(enrollmentData.sections !== null && enrollmentData.sections !== undefined) {
-        $scope.sections = _.sortBy(enrollmentData.sections, 'title');
+        $scope.sections = _.sortBy(enrollmentData.sections, 'schedule_position');
     }
 
     // find biggest current term

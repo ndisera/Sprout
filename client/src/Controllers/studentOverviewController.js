@@ -1,17 +1,84 @@
-app.controller("studentOverviewController", function ($scope, $location, $routeParams, toastService, studentService, enrollmentData, userData, studentData) {
+app.controller("studentOverviewController", function ($scope, $location, $routeParams, toastService, studentService, termData, enrollmentData, userData, studentData) {
     $scope.location = $location;
 
+    console.log(termData);
+
     // set important scope variables
-    $scope.student     = studentData.student;
-    $scope.enrollments = [];
-    $scope.sections    = [];
+    $scope.student         = studentData.student;
+    $scope.enrollments     = [];
+    $scope.sections        = [];
+    var termsLookup        = {};
+    var termSettingsLookup = {};
+    var scheduleLookup     = {};
+
+    if(termData.terms !== null && termData.terms !== undefined) {
+        $scope.terms = termData.terms;
+        _.each($scope.terms, function(elem) {
+            elem.start_date = moment(elem.start_date);
+            elem.end_date   = moment(elem.end_date);
+        });
+        // sort so most current first
+        $scope.terms       = _.sortBy($scope.terms, function(elem) { return -elem.start_date; });
+        termsLookup        = _.indexBy($scope.terms, 'id');
+        termSettingsLookup = _.indexBy(termData.term_settings, 'id');
+        scheduleLookup     = _.indexBy(termData.daily_schedules, 'id');
+    }
 
     if(enrollmentData.enrollments !== null && enrollmentData.enrollments !== undefined) {
         $scope.enrollments = enrollmentData.enrollments;
     }
     if(enrollmentData.sections !== null && enrollmentData.sections !== undefined) {
-        $scope.sections = enrollmentData.sections;
+        $scope.sections = _.sortBy(enrollmentData.sections, 'schedule_position');
+        // set display 'period' information
+        _.each($scope.sections, function(elem) {
+            if(elem.schedule_position !== null) {
+                var term = termsLookup[elem.term];
+                var termSettings = termSettingsLookup[term.settings];
+                var schedule = scheduleLookup[termSettings.schedule];
+                elem.period = 'Day ' + Math.floor((elem.schedule_position / schedule.periods_per_day) + 1) + ' Period ' + ((elem.schedule_position % schedule.periods_per_day) + 1);
+            }
+        });
     }
+
+    // find biggest current term
+    $scope.selectedTerm = null;
+    _.each($scope.terms, function(elem) {
+        if(moment() > elem.start_date && moment() < elem.end_date) {
+            // I have found a candidate
+            // but we want the biggest current term
+            if($scope.selectedTerm === null) {
+                $scope.selectedTerm = elem;
+            }
+            else {
+                // take the bigger one
+                var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
+                var newDelta = elem.end_date - elem.start_date;
+                if(newDelta > curDelta) {
+                    $scope.selectedTerm = elem;
+                }
+            }
+        }
+    });
+
+    // if we're between terms (over break)
+    if($scope.selectedTerm === null) {
+        $scope.selectedTerm = $scope.terms[0];
+    }
+
+    $scope.selectTerm = function(term) {
+        $scope.selectedTerm = term;
+        $scope.termSections = _.filter($scope.sections, function(elem) { return elem.term === term.id; });
+        console.log($scope.termSections);
+        //var sectionsInTerm = _.filter($scope.sections, function(elem) { return elem.term === term.id; });
+        //if(sectionsInTerm.length === 0) {
+            //$scope.selectedSection = null;
+        //}
+        //else {
+            //$scope.selectSection(sectionsInTerm[0]);
+        //}
+    };
+
+    $scope.selectTerm($scope.selectedTerm);
 
     // create teacher lookup
     $scope.teachers = _.indexBy(userData.sprout_users, 'pk');
