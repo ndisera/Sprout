@@ -91,28 +91,13 @@
     margin-bottom: 20px;
 }
 
-.panel-wrapper.ng-enter {
-    transition: 0.4s linear all;
-    opacity: 0;
-    margin-top: 5px;
+.student-behaviors-no-input-classes {
+    border: 1px solid #DDD;
 }
 
-.panel-wrapper.ng-enter.ng-enter-active {
-    opacity: 1;
-    margin-top: 0px;
+.student-behaviors-no-input-classes > h4 {
+    margin: 20px 0px;
 }
-
-.panel-wrapper.ng-leave {
-    transition: 0.2s linear all;
-    opacity: 1;
-    margin-top: 0px;
-}
-
-.panel-wrapper.ng-leave.ng-leave-active {
-    opacity: 0;
-    margin-top: 5px;
-}
-
 
 @media (max-width: 768px) {
     #student-overview-title {
