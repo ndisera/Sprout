@@ -340,24 +340,26 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
         //  grades
         //      assignment id
 
-        var behaviorAndEffortConfig = {
-            include: ['enrollment.section.*',],
-            exclude: ['id',],
-            filter: [
-                {name: 'date.range', val: beginDate,},
-                {name: 'date.range', val: endDate,},
-                {name: 'enrollment.student', val: studentID,},
-            ],
-            sort: ['date',],
-        };
+
 
         var graphStart = moment(beginDate);
         var graphEnd = moment(endDate);
         //todo: set chartjs type of graph depending on the type of graph displayed
+        /**
+         * Behavior/Effort
+         * Needs the student ID, and uses the specificID for a class ID
+         */
         if (category === "behavior" || category === "effort") {
-            /**
-             * Behavior/Effort
-             */
+            var behaviorAndEffortConfig = {
+                include: ['enrollment.section.*',],
+                exclude: ['id',],
+                filter: [
+                    {name: 'date.range', val: beginDate,},
+                    {name: 'date.range', val: endDate,},
+                    {name: 'enrollment.student', val: studentID,},
+                ],
+                sort: ['date',],
+            };
             behaviorService.getStudentBehavior(behaviorAndEffortConfig).then(
               function success(data) {
                   // clear labels and data
@@ -401,6 +403,7 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                       //iterate through each datapoint, calculate the date difference, and place data at that index
 
                       //filter on the specificID. In this case, the enrollment ID
+                      //todo:can't I move this into the config somehow?
                       if (data.behaviors[i].enrollment === specificID) {
                           var pointDate = moment(data.behaviors[i].date);
                           var pointIndex = pointDate.diff(graphStart, 'd');
@@ -444,7 +447,20 @@ app.controller("focusStudentsController", function ($scope, $q, toastService, st
                   toastService.error('The server wasn\'t able to get the behavior for focus students.');
               }
             );
-        } //else if...
+        } else if (category === "test") {
+            var testConfig = {
+                // include: ['enrollment.section.*',],
+                // exclude: ['id',],
+                filter: [
+                    {name: 'enrollment.student', val: studentID,},
+                ],
+            };
+            console.log("Test category does not exist yet");
+        } else if (category === "grades") {
+            console.log("Grades category does not exist yet");
+        } else {
+            console.error("Requested category of " + category + "does not exist");
+        }
     }
 
 

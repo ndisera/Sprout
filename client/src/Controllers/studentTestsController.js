@@ -41,8 +41,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $routePar
 
         //Start by getting all of the tests, and mapping test IDs to indexes and names
         var testConfig = {
-            //nothing, since we want all of the tests
-            //TODO(Guy): Figure out if we need to filter on something here
+            //This gets all of the tests, not the test scores themselves
         };
 
         testService.getTests(testConfig).then(
