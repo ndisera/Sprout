@@ -218,10 +218,17 @@
     margin-right: -11px;
 }
 
-.student-services-panel.panel-add > .panel > .panel-heading {
+.student-services-panel.student-services-add > .panel > .panel-heading {
     background-color: #eee;
 }
 
+.student-services-panel.student-services-add {
+    border-color: #5ab9ea;
+}
+
+.student-services-checkbox {
+    padding-top: 7px;
+}
 
 @media (max-width: 768px) {
     #student-overview-title {

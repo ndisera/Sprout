@@ -240,11 +240,11 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
      * @param {service} serviceObj - the service object.
      * @return {promise} promise that will resolve with data or reject with response code.
      */
-    function addServiceForStudent(studentId, serviceId, serviceObj) {
+    function addServiceForStudent(studentId, serviceObj) {
         var deferred = $q.defer();
         $http({
             method: 'POST',
-            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/services/' + serviceId,
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/services',
             data: serviceObj,
         }).then(function success(response) {
             deferred.resolve(response.data);

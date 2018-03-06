@@ -153,5 +153,56 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
         );
     };
 
+    $scope.deleteService = function(service) {
+        studentService.deleteServiceForStudent($scope.student.id, service.id).then(
+            function success(data) {
+                var index = _.findIndex($scope.services, function(elem) { return elem.id === service.id; });
+                if(index !== -1) {
+                    $scope.services.splice(index, 1);
+                }
+            },
+            function error(data) {
+                toastService.error('The server wasn\'t able to delete the service.');
+            },
+        );
+    };
+
+    $scope.addService = function() {
+        var toSave = copyService($scope.newService);
+        if(toSave.fulfilled === 'Yes') {
+            toSave.fulfilled             = true;
+            toSave.fulfilled_date        = moment().format('YYYY-MM-DD').toString();
+            toSave.fulfilled_description = service.fulfilled_description_temp;
+            toSave.fulfilled_user        = userService.user.id;
+        }
+        else {
+            toSave.fulfilled             = false;
+            toSave.fulfilled_date        = null;
+            toSave.fulfilled_description = null;
+            toSave.fulfilled_user        = null;
+        }
+
+        studentService.addServiceForStudent($scope.student.id, toSave).then(
+            function success(data) {
+                var newService = data.service_requirement;
+                newService.editing = false;
+                newService.title_temp = newService.title;
+                newService.description_temp           = newService.description;
+                newService.fulfilled_description_temp = newService.fulfilled_description;
+
+                // make sure each service knows who marked it fulfilled
+                if(newService.fulfilled === true && newService.fulfilled_user !== null) {
+                    newService.teacher = $scope.teachersLookup[newService.fulfilled_user];
+                }
+
+                $scope.services.push(newService);
+                resetNewService();
+            },
+            function error(data) {
+                toastService.error('The server wasn\'t able to save your new service.');
+            },
+        );
+    };
+
     resetNewService();
 });
