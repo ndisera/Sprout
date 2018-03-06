@@ -139,7 +139,12 @@ if __name__ == "__main__":
         teachers = teacher_generator.generate_random_teachers(num_teachers)
     teacher_ids = []
     for teacher in teachers:
-        response = teacher_generator.usersService.register_user(teacher, throw_error=False)
+        # Assign all generated accounts a password, if one was passed, so they can be logged in
+        if args.password:
+            teacher_password = args.password
+        else:
+            teacher_password = None
+        response = teacher_generator.usersService.register_user(teacher, password=teacher_password, throw_error=False)
         if 'user' in response.json():
             teacher_ids.append(response.json()['user']['pk'])
 
