@@ -1,16 +1,16 @@
-app.factory("termService", function ($rootScope, $http, $q, queryService) {
+app.factory("holidayService", function ($rootScope, $http, $q, queryService) {
     return {
         /**
-         * Get terms
+         * Get holidays
          * @param {object} config - config object for query parameters (see queryService)
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getTerms: function (config) {
+        getHolidays: function (config) {
             var query = queryService.generateQuery(config);
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/terms' + query,
+                url: 'https://' + $rootScope.backend + '/holidays' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -20,35 +20,16 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
         },
 
         /**
-         * Get term settings
-         * @param {object} config - config object for query parameters (see queryService)
+         * Add a holiday
+         * @param {object} holidayObj - holiday to be added to terms.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getTermSettings: function (config) {
-            var query = queryService.generateQuery(config);
-            var deferred = $q.defer();
-            $http({
-                method: 'GET',
-                url: 'https://' + $rootScope.backend + '/settings/terms' + query,
-            }).then(function success(response) {
-                deferred.resolve(response.data);
-            }, function error(response) {
-                deferred.reject(response);
-            });
-            return deferred.promise;
-        },
-
-        /**
-         * Add a term
-         * @param {object} termObj - object to be added to terms.
-         * @return {promise} promise that will resolve with data or reject with response code.
-         */
-        addTerm: function (termObj) {
+        addHoliday: function (holidayObj) {
             var deferred = $q.defer();
             $http({
                 method: 'POST',
-                url: 'https://' + $rootScope.backend + '/terms',
-                data: termObj,
+                url: 'https://' + $rootScope.backend + '/holidays',
+                data: holidayObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -58,17 +39,17 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
         },
 
         /**
-         * Update term
-         * @param {number} termId - the term id.
-         * @param {object} termObj - the object used to update the term.
+         * Update holiday
+         * @param {number} holidayId - the holiday id.
+         * @param {object} holidayObj - the object used to update the holiday.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        updateTerm: function (termId, termObj) {
+        updateHoliday: function (holidayId, holidayObj) {
             var deferred = $q.defer();
             $http({
                 method: 'PUT',
-                url: 'https://' + $rootScope.backend + '/terms/' + termId,
-                data: termObj,
+                url: 'https://' + $rootScope.backend + '/holidays/' + holidayId,
+                data: holidayObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -78,15 +59,15 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
         },
 
         /**
-         * Delete term
-         * @param {number} termId - the term id.
+         * Delete holiday
+         * @param {number} holidayId - the holiday id.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        deleteTerm: function (termId) {
+        deleteHoliday: function (holidayId) {
             var deferred = $q.defer();
             $http({
                 method: 'DELETE',
-                url: 'https://' + $rootScope.backend + '/terms/' + termId,
+                url: 'https://' + $rootScope.backend + '/holidays/' + holidayId,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

@@ -54,6 +54,21 @@ class BaseService():
 
         return toReturn
 
+    def _patch_model(self, model, uri):
+        """
+        Send a PATCH request to the endpoint specified with the specified model
+        """
+        data = model._asdict()
+
+        headers = self.headers
+        #headers['content-type'] = 'application/json'
+
+        response = requests.patch(uri, verify=self.verify, headers=headers, data=data)
+
+        response.raise_for_status()
+
+        return response
+
     def _add_many_models(self, models, uri):
         data = []
 
