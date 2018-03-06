@@ -21,25 +21,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="pointer" id="term-row{{$index}}" ng-repeat="term in terms | orderBy:'start_date'" ng-click="edit($index, 'term')">
-                                    <td ng-hide="editTerms[$index]">{{ term.name }}</td>
-                                    <td ng-hide="editTerms[$index]">{{ term.start_date }}</td>
-                                    <td ng-hide="editTerms[$index]">{{ term.end_date }}</td>
-                                    <td ng-hide="editTerms[$index]"></td>
-                                    <td ng-show="editTerms[$index]"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTerms[term.id].name"></td>
-                                    <td ng-show="editTerms[$index]"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                    <td ng-show="editTerms[$index]"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                    <td ng-show="editTerms[$index]">
+                                <tr class="pointer" id="term-row{{$index}}" ng-repeat="term in terms | orderBy:'start_date'" ng-click="showEdit($index, 'term');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
+                                    <td ng-hide="edit">{{ term.name }}</td>
+                                    <td ng-hide="edit">{{ term.start_date }}</td>
+                                    <td ng-hide="edit">{{ term.end_date }}</td>
+                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTerms[term.id].name"></td>
+                                    <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                    <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                    <td ng-show="edit">
                                         <button class="btn btn-success" type="button" ng-click="updateTerm(term.id, $index); $event.stopPropagation();">
                                             Save
                                         </button>
                                     </td>
-                                    <td ng-show="editTerms[$index]">
-                                        <button class="btn btn-default" type="button" ng-click="cancelEdit($index, 'term'); $event.stopPropagation();">
+                                    <td ng-show="edit">
+                                        <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'term'); $event.stopPropagation();">
                                             Cancel
                                         </button>
                                     </td>
-                                    <td ng-hide="editTerms[$index]">
+                                    <td ng-hide="edit">
                                         <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(term, 'term'); $event.stopPropagation();">
                                             Delete
                                         </button>
@@ -111,25 +111,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="pointer" id="holiday-row{{$index}}" ng-repeat="holiday in holidays | orderBy:'start_date'" ng-click="edit($index, 'holiday')">
-                                    <td ng-hide="editHolidays[$index]">{{ holiday.name }}</td>
-                                    <td ng-hide="editHolidays[$index]">{{ holiday.start_date }}</td>
-                                    <td ng-hide="editHolidays[$index]">{{ holiday.end_date }}</td>
-                                    <td ng-hide="editHolidays[$index]"></td>
-                                    <td ng-show="editHolidays[$index]"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eHolidays[holiday.id].name"></td>
-                                    <td ng-show="editHolidays[$index]"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                    <td ng-show="editHolidays[$index]"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                    <td ng-show="editHolidays[$index]">
+                                <tr class="pointer" id="holiday-row{{$index}}" ng-repeat="holiday in holidays | orderBy:'start_date'" ng-click="showEdit($index, 'holiday');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
+                                    <td ng-hide="edit">{{ holiday.name }}</td>
+                                    <td ng-hide="edit">{{ holiday.start_date }}</td>
+                                    <td ng-hide="edit">{{ holiday.end_date }}</td>
+                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eHolidays[holiday.id].name"></td>
+                                    <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                    <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                    <td ng-show="edit">
                                         <button class="btn btn-success" type="button" ng-click="updateHoliday(holiday.id, $index); $event.stopPropagation();">
                                             Save
                                         </button>
                                     </td>
-                                    <td ng-show="editHolidays[$index]">
-                                        <button class="btn btn-default" type="button" ng-click="cancelEdit($index, 'holiday'); $event.stopPropagation();">
+                                    <td ng-show="edit">
+                                        <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'holiday'); $event.stopPropagation();">
                                             Cancel
                                         </button>
                                     </td>
-                                    <td ng-hide="editHolidays[$index]">
+                                    <td ng-hide="edit">
                                         <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(holiday, 'holiday'); $event.stopPropagation();">
                                             Delete
                                         </button>
@@ -201,25 +201,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="pointer" id="test-row{{$index}}" ng-repeat="test in tests | orderBy:'test_name'" ng-click="edit($index, 'test')">
-                                    <td ng-hide="editTests[$index]">{{ test.test_name }}</td>
-                                    <td ng-hide="editTests[$index]">{{ test.min_score }}</td>
-                                    <td ng-hide="editTests[$index]">{{ test.max_score }}</td>
-                                    <td ng-hide="editTests[$index]"></td>
-                                    <td ng-show="editTests[$index]"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTests[test.id].test_name"></td>
-                                    <td ng-show="editTests[$index]"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].min_score"></td>
-                                    <td ng-show="editTests[$index]"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].max_score"></td>
-                                    <td ng-show="editTests[$index]">
+                                <tr class="pointer" id="term-row{{$index}}" ng-repeat="test in tests | orderBy:'test_name'" ng-click="showEdit($index, 'test');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
+                                    <td ng-hide="edit">{{ test.test_name }}</td>
+                                    <td ng-hide="edit">{{ test.min_score }}</td>
+                                    <td ng-hide="edit">{{ test.max_score }}</td>
+                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTests[test.id].test_name"></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].min_score"></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].max_score"></td>
+                                    <td ng-show="edit">
                                         <button class="btn btn-success" type="button" ng-click="updateTest(test.id, $index); $event.stopPropagation();">
                                             Save
                                         </button>
                                     </td>
-                                    <td ng-show="editTests[$index]">
-                                        <button class="btn btn-default" type="button" ng-click="cancelEdit($index, 'test'); $event.stopPropagation();">
+                                    <td ng-show="edit">
+                                        <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'test'); $event.stopPropagation();">
                                             Cancel
                                         </button>
                                     </td>
-                                    <td ng-hide="editTests[$index]">
+                                    <td ng-hide="edit">
                                         <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(test, 'test'); $event.stopPropagation();">
                                             Delete
                                         </button>

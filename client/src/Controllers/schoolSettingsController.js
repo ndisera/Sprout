@@ -4,10 +4,6 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.tests = tests.standardized_tests;
     $scope.terms = terms.terms;
 
-    $scope.editHolidays = [];
-    $scope.editTests = [];
-    $scope.editTerms = [];
-
     $scope.newHoliday = {};
     $scope.newTest = {};
     $scope.newTerm = {};
@@ -16,40 +12,26 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.displayHolidayForm = false;
     $scope.displayTermForm = false;
 
-    function setupIndexArrays() {
-        for (var i = 0; i < $scope.tests.length; i++) {
-            $scope.editTests.push(null);
-        }
-        for (var i = 0; i < $scope.holidays.length; i++) {
-            $scope.editHolidays.push(null);
-        }
-        for (var i = 0; i < $scope.terms.length; i++) {
-            $scope.editTerms.push(null);
-        }
+    $scope.edit = false;
+
+    /**
+     * Cancels row edit
+     * @param {number} index - row index.
+     * @param {string} type - type of item.
+     */
+    $scope.removeEdit = function(index, type) {
+        this.edit = false;
+        $("#" + type + "-row" + index).addClass('pointer');
     }
 
-    setupIndexArrays();
-
-    function insertIndex(indexArray, objectArray, orderByKey, newId) {
-        // this is after item has been added
-        var sortedArray = _.sortBy(objectArray, orderByKey);
-        for (var i = 0; i < sortedArray.length; i++) {
-            if (sortedArray[i].id === newId) {
-                indexArray.splice(i, 0, null);
-                break;
-            }
-        }
-    }
-
-    function removeIndex(indexArray, objectArray, orderByKey, newId) {
-        // this is before item has been deleted
-        var sortedArray = _.sortBy(objectArray, orderByKey);
-        for (var i = 0; i < sortedArray.length; i++) {
-            if (sortedArray[i].id === newId) {
-                indexArray.splice(i, 1);
-                break;
-            }
-        }
+    /**
+     * Makes a row editable
+     * @param {number} index - row index.
+     * @param {string} type - type of item.
+     */
+    $scope.showEdit = function(index, type) {
+        this.edit = true;
+        $("#" + type + "-row" + index).removeClass('pointer');
     }
 
     /**
@@ -79,6 +61,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
 
     /**
      * Sets up properties of the item to display in the delete form
+     * @param {object} item - item to take values from.
+     * @param {string} type - the type of item.
      */
     function setItemProperties(item, type) {
         switch (type) {
@@ -131,57 +115,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     }
 
     /**
-     * Make a selected item editable
-     * @param {number} index - index of item to be edited (from ng-repeat).
-     * @param {string} item - type of item to be edited.
-     */
-    $scope.edit = function(index, item) {
-        switch (item) {
-            case "holiday":
-                if (!_.has($scope.editHolidays, index) || $scope.editHolidays[index] == null) {
-                    $scope.editHolidays[index] = true;
-                    $("#holiday-row" + index).removeClass('pointer');
-                }
-                break;
-            case "test":
-                if (!_.has($scope.editTests, index) || $scope.editTests[index] == null) {
-                    $scope.editTests[index] = true;
-                    $("#test-row" + index).removeClass('pointer');
-                }
-                break;
-            case "term":
-                if (!_.has($scope.editTerms, index) || $scope.editTerms[index] == null) {
-                    $scope.editTerms[index] = true;
-                    $("#term-row" + index).removeClass('pointer');
-                }
-                break;
-        }
-    };
-
-    /**
-     * Cancel item edit
-     * @param {number} index - index of item being edited (from ng-repeat).
-     * @param {string} item - type of item being edited.
-     */
-    $scope.cancelEdit = function(index, item) {
-        switch (item) {
-            case "holiday":
-                $scope.editHolidays[index] = null;
-                $("#holiday-row" + index).addClass('pointer');
-                break;
-            case "test":
-                $scope.editTests[index] = null;
-                $("#test-row" + index).addClass('pointer');
-                break;
-            case "term":
-                $scope.editTerms[index] = null;
-                $("#term-row" + index).addClass('pointer');
-                break;
-        }
-    };
-
-    /**
-     * Displays delete modal with item and itemType
+     * Displays delete modal with item and item type
+     * @param {object} item - item to take values from.
+     * @param {string} type - the type of item.
      */
     $scope.setItem = function(item, type) {
         setItemProperties(item, type);
@@ -190,6 +126,11 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         $("#deleteItemModal").modal();
     };
 
+    /**
+     * Deletes an item
+     * @param {number} id - the item id.
+     * @param {string} type - the type of item.
+     */
     $scope.deleteItem = function(id, type) {
         switch (type) {
             case "holiday":
@@ -204,11 +145,13 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         }
     }
 
+    /**
+     * Deletes a holiday
+     * @param {number} holidayId - id of holiday to be deleted.
+     */
     function deleteHoliday(holidayId) {
         holidayService.deleteHoliday(holidayId).then(
             function success(response) {
-                // update index array
-                removeIndex($scope.editHolidays, $scope.holidays, 'start_date', holidayId);
                 // remove from display array
                 for (var i = 0; i < $scope.holidays.length; i++) {
                     if ($scope.holidays[i].id === holidayId) {
@@ -225,11 +168,13 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Deletes a term
+     * @param {number} termId - id of term to be deleted.
+     */
     function deleteTerm(termId) {
         termService.deleteTerm(termId).then(
             function success(response) {
-                // update index array
-                removeIndex($scope.editTerms, $scope.terms, 'start_date', termId);
                 // remove from display array
                 for (var i = 0; i < $scope.terms.length; i++) {
                     if ($scope.terms[i].id === termId) {
@@ -246,16 +191,13 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Deletes a test
+     * @param {number} testId - id of test to be deleted.
+     */
     function deleteTest(testId) {
         testService.deleteTest(testId).then(
             function success(response) {
-                // correct the indexArray
-                var tests = [];
-                for (var i = 0; i < $scope.tests.length; i++) {
-                    tests.push(Object.assign({}, $scope.tests[i]));
-                    tests[i].test_name = tests[i].test_name.toUpperCase();
-                }
-                removeIndex($scope.editTests, tests, 'test_name', testId);
                 // remove from display array
                 for (var i = 0; i < $scope.tests.length; i++) {
                     if ($scope.tests[i].id === testId) {
@@ -272,6 +214,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Creates a new holiday
+     */
     $scope.addHoliday = function() {
         $scope.newHoliday.start_date = moment($scope.newHoliday.start_date).format('YYYY-MM-DD').toString();
         $scope.newHoliday.end_date = moment($scope.newHoliday.end_date).format('YYYY-MM-DD').toString();
@@ -285,9 +230,6 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.eHolidays[copy.id] = copy;
                 $scope.displayHolidayForm = false;
                 $scope.newHoliday = {};
-
-                // this is done after it's added to regular array
-                insertIndex($scope.editHolidays, $scope.holidays, 'start_date', response.holiday.id);
             },
             function error(response) {
                 setErrorMessage(response);
@@ -296,6 +238,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Creates a new term
+     */
     $scope.addTerm = function() {
         $scope.newTerm.start_date = moment($scope.newTerm.start_date).format('YYYY-MM-DD').toString();
         $scope.newTerm.end_date = moment($scope.newTerm.end_date).format('YYYY-MM-DD').toString();
@@ -310,9 +255,6 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.eTerms[copy.id] = copy;
                 $scope.displayTermForm = false;
                 $scope.newTerm = {};
-
-                // this is done after it's added to regular array
-                insertIndex($scope.editTerms, $scope.terms, 'start_date', response.term.id);
             },
             function error(response) {
                 setErrorMessage(response);
@@ -321,6 +263,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Creates a new test
+     */
     $scope.addTest = function() {
         testService.addTest($scope.newTest).then(
             function success(response) {
@@ -331,14 +276,6 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.eTests[copy.id] = copy;
                 $scope.displayTestForm = false;
                 $scope.newTest = {};
-
-                // correct the indexArray
-                var tests = [];
-                for (var i = 0; i < $scope.tests.length; i++) {
-                    tests.push(Object.assign({}, $scope.tests[i]));
-                    tests[i].test_name = tests[i].test_name.toUpperCase();
-                }
-                insertIndex($scope.editTests, tests, 'test_name', copy.id);
             },
             function error(response) {
                 setErrorMessage(response);
@@ -347,6 +284,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Updates a holiday
+     * @param {number} holidayId - id of holiday to be updated.
+     */
     $scope.updateHoliday = function(holidayId, index) {
         if (typeof $scope.eHolidays[holidayId].start_date !== 'string' && $scope.eHolidays[holidayId].start_date != null) {
             $scope.eHolidays[holidayId].start_date = moment($scope.eHolidays[holidayId].start_date).format('YYYY-MM-DD').toString();
@@ -364,7 +305,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.holidays[i] = response.holiday;
                     }
                 }
-                $scope.cancelEdit(index, 'holiday')
+                $scope.removeEdit(index, 'holiday');
             },
             function error(response) {
                 setErrorMessage(response);
@@ -373,6 +314,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Updates a test
+     * @param {number} holidayId - id of test to be updated.
+     */
     $scope.updateTest = function(testId, index) {
         var newTest = Object.assign({}, $scope.eTests[testId]);
         delete newTest.id;
@@ -384,7 +329,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.tests[i] = response.standardized_test;
                     }
                 }
-                $scope.cancelEdit(index, 'test')
+                $scope.removeEdit(index, 'test');
             },
             function error(response) {
                 setErrorMessage(response);
@@ -393,6 +338,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Updates a term
+     * @param {number} holidayId - id of term to be updated.
+     */
     $scope.updateTerm = function(termId, index) {
         if (typeof $scope.eTerms[termId].start_date !== 'string' && $scope.eTerms[termId].start_date != null) {
             $scope.eTerms[termId].start_date = moment($scope.eTerms[termId].start_date).format('YYYY-MM-DD').toString();
@@ -410,7 +359,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.terms[i] = response.term;
                     }
                 }
-                $scope.cancelEdit(index, 'term')
+                $scope.removeEdit(index, 'term');
             },
             function error(response) {
                 setErrorMessage(response);
