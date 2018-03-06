@@ -41,15 +41,17 @@ class CategoryCalculator():
         # test_scores = [score for score in StandardizedTestScore.objects.filter(student=representation['student'])]
 
         # todo: remove import for random call once fleshed out
-        # todo: document string format/maybe look at json
-        # name__StartDate__EndDate__id
+
+        # separator character is 2 underscores
+
+        # name__StartDate__EndDate__specificId
         # ex) test__2018-02-21__2018-02-28__1
         randVal = random.randint(1, 4)
 
         # if randVal == 1:
         #     return 'test'
         # if randVal == 2:
-        return 'behavior'
+        return 'effort__2018-01-01__2018-02-01__42'
         # if randVal == 3:
         #     return 'effort'
         # return 'grades'
@@ -68,7 +70,7 @@ class CategoryCalculator():
         # if randVal == 2:
         #     return 'behavior'
         # if randVal == 3:
-        return 'effort'
+        return 'test__2018-01-01__2018-02-01__1'
         # return 'grades'
 
 
