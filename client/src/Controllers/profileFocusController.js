@@ -262,7 +262,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                             display: true,
                             ticks: {
                                 min: 1,
-                                stepSize: 1,
+                                // stepSize: 1,
                                 max: 5
                                 //todo: change these to be set later
                             }
@@ -292,7 +292,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                             display: true,
                             ticks: {
                                 min: 1,
-                                stepSize: 1,
+                                // stepSize: 1,
                                 max: 5
                             }
                         }]
@@ -321,7 +321,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                             display: true,
                             ticks: {
                                 min: 1,
-                                stepSize: 1,
+                                // stepSize: 1,
                                 max: 5
                             }
                         }]
@@ -337,15 +337,16 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
             //Focus Graph
             //temporarily getting a month of behavior
-            serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 3, "extra shit");
-            serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 4, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 1, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 42, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['caution'], "test", "2018-01-01", "2018-02-01", elem.student, 1, "extra shit");
 
-            console.log("focus graph:");
-            console.log($scope.focusGraphs[elem.student]['focus']);
-            console.log("progress graph:");
-            console.log($scope.focusGraphs[elem.student]['progress']);
-            console.log("caution graph:");
-            console.log($scope.focusGraphs[elem.student]['caution']);
+            // console.log("focus graph:");
+            // console.log($scope.focusGraphs[elem.student]['focus']);
+            // console.log("progress graph:");
+            // console.log($scope.focusGraphs[elem.student]['progress']);
+            // console.log("caution graph:");
+            // console.log($scope.focusGraphs[elem.student]['caution']);
         });
     }
 
@@ -414,26 +415,8 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
 
                   // console log to get the data we're working with
-                  console.log("service call data");
-                  console.log(data);
-                  // This is the data we have
-                  //     {enrollments: Array(1), behaviors: Array(19), sections: Array(1)}
-                  //     behaviors: Array(19)
-                  //     0:
-                  //        {date: "2018-01-08", enrollment: 24, effort: 4, behavior: 4}
-                  //     1:
-                  //        {date: "2018-01-09", enrollment: 24, effort: 2, behavior: 1}
-                  //     2:
-                  //        {date: "2018-01-10", enrollment: 24, effort: 1, behavior: 3}
-                  //     ...(19 of them for this example student)
-                  //
-                  //     enrollments: Array(1)
-                  //     0:
-                  //        {section: 10, id: 24, student: 12}
-                  //
-                  //     sections: Array(1)
-                  //     0:
-                  //        {id: 10, schedule_position: 1, teacher: 3, term: 2, title: "English 4945"}
+                  // console.log("service call data");
+                  // console.log(data);
 
                   var i;
                   //Set the data points
@@ -486,13 +469,96 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
               }
             );
         } else if (category === "test") {
-            var testConfig = {
-                // include: ['enrollment.section.*',],
-                // exclude: ['id',],
-                filter: [
-                    {name: 'enrollment.student', val: studentID,},
-                ],
+            /**
+             * Test scores
+             * Uses the specificID for the standardized test id
+             */
+            //tag: start of test
+            //Start by getting all of the tests, and mapping test IDs to indexes and names
+            var testConfig = { //This gets all of the tests, not the test scores themselves
             };
+
+            testService.getTests(testConfig).then(
+              function success(testInfoData) {
+                  console.log("test info data");
+                  console.log(testInfoData);
+                  //set up lookups for info
+                  var testIdToInfo = {}; //name, max, min
+                  _.each(testInfoData.standardized_tests, function (testElem) {
+                      //map the id to test info
+                      testIdToInfo[testElem.id] = {
+                          name: testElem.test_name,
+                          min: testElem.min_score,
+                          max: testElem.max_score
+                      };
+                  });
+                  var testScoresConfig = {
+                      filter: [
+                          //get the student's test scores and start populating the graphs,
+                          {name: 'student', val: studentID},
+                          {name: 'date.range', val: beginDate,}, //todo: change to the beginning of the term until now
+                          {name: 'date.range', val: endDate,},
+                      ]
+                  };
+                  testService.getTestScores(testScoresConfig).then(
+                    function success(studentTestScoresRaw) {
+                        console.log("test scores");
+                        console.log(studentTestScoresRaw);
+
+                        //todo: Display the five most recent scores of the test given to us
+                        //sort the test scores data by date and then go down the list, breaking out when 5 tests have been counted
+                        var studentTestScores = _.sortBy(studentTestScoresRaw.standardized_test_scores, 'date');
+
+                        currentGraph.data = [];
+                        currentGraph.labels = [];
+                        currentGraph.data.push(_.times(5, _.constant(null)));
+                        currentGraph.labels.push(_.times(5, _.constant(null)));
+
+                        //set data and label
+                        var scoreCounter = 0;
+                        for (var i = 0; i < studentTestScores.length; i++) {
+                            if (studentTestScores[i].standardized_test === specificID) {
+                                var currentDate = studentTestScores[i].date;
+                                currentGraph.data[0][scoreCounter] = studentTestScores[i].score;
+                                currentGraph.labels[scoreCounter] = moment(currentDate).format('MM/DD').toString();
+                                scoreCounter++;
+                            }
+                            if(scoreCounter > 5)
+                                break;
+                        }
+
+                        //set the y-axis bounds
+                        currentGraph.options.scales.yAxes[0].ticks.min = testIdToInfo[specificID].min;
+                        currentGraph.options.scales.yAxes[0].ticks.max = testIdToInfo[specificID].max;
+
+                        //set the series name to the test name
+                        currentGraph.series[0] = testIdToInfo[specificID].name;
+
+                        //other options for the graph
+                        currentGraph.options.scales.xAxes = [{
+                            ticks: {
+                                autoSkipPadding: 15
+                            }
+                        }];
+
+                        //set the category:
+                        currentGraph.category = "Test Score";
+                    }
+                  )
+              }
+            );
+
+
+
+
+
+
+
+
+
+
+
+
             console.log("Test category does not exist yet");
         } else if (category === "grades") {
             console.log("Grades category does not exist yet");
@@ -501,46 +567,6 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
         }
     }
 
-
-
-
-    // // All of the following belongs to the hard-coded angular-charts on the Focus Students page
-    // $scope.focus_labels = ["January", "February", "March", "April", "May", "June", "July"];
-    // $scope.focus_data = [
-    // [28, 48, 40, 19, 86, 27, 90]
-    // ];
-    // $scope.progress_labels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    // $scope.progress_data = [
-    // [2, 3, 3, 4, 5]
-    // ];
-    // $scope.progress_colours = ["rgba(80,255,80,1)"]
-    // $scope.caution_labels = ["Math", "Reading", "Music", "History", "Spanish"];
-    // $scope.caution_data = [
-    // [77, 81, 66, 50, 35]
-    // ];
-    // $scope.caution_colours = [
-    //   "rgba(255,99,132,1)"
-    // ];
-    // $scope.onClick = function (points, evt) {
-    //   console.log(points, evt);
-    // };
-    // $scope.options = {
-    //   responsive: true,
-    //   maintainAspectRatio: false
-    // };
-    // $scope.options_behavior = {
-    //   responsive: true,
-    //   maintainAspectRatio: false,
-    //   scales:{
-    //     yAxes: [{
-    //       display: true,
-    //       ticks: {
-    //         min: 1,
-    //         max: 5
-    //       }
-    //     }]
-    //   }
-    // };
 
     updateFocusGraphs();
 
