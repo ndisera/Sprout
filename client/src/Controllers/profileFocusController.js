@@ -1,4 +1,4 @@
-app.controller("profileFocusController", function ($scope, $q, $location, toastService, studentData, focusData,
+app.controller("profileFocusController", function ($scope, $q, $location, toastService, studentData, focusData, testData,
                                                    userService, testService, behaviorService,
                                                    sectionService, studentService) {
     $scope.location = $location;
@@ -204,6 +204,34 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
         );
     };
 
+    /** FOCUS CATEGORY PICKER RELATED CODE **/
+    // add any static categories here
+    $scope.focusCategories = [
+        {
+            // category is what's returned by server, may be the same as displayName so you can remove display name if you want
+            // I'm not sure if you wanted to introduce some kind of scheme to category, like 'test:1' would mean the test with id 1
+            category: 'Behavior',
+            displayName: 'Behavior',
+        },
+    ];
+
+    // add on dynamic categories here
+    // categories like tests are determined by the user
+    _.each(testData.standardized_tests, function(elem) {
+        $scope.focusCategories.push({ category: elem.test_name, displayName: elem.test_name, });
+    });
+
+    // this is called when the user selects a different focus category
+    $scope.selectFocusCategory = function(focusStudent, category) {
+        // the dropdown will switch to the matching category of whatever you set focusStudentsGraph[studendId].focus.category to
+        $scope.focusGraphs[focusStudent.student].focus.category = category.category;
+
+        // this is where you would need to save the choice to the server
+        // and update the graphs
+
+
+    };
+
     /**
      * Get all of the data needed for the focus student graphs
      * Insert that data into the $scope.focusStudentsGraph dictionary at ['studentID']['category']
@@ -309,8 +337,8 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
             //Focus Graph
             //temporarily getting a month of behavior
-            serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 1, "extra shit");
-            serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 42, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 3, "extra shit");
+            serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 4, "extra shit");
 
             console.log("focus graph:");
             console.log($scope.focusGraphs[elem.student]['focus']);

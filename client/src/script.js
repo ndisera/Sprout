@@ -165,6 +165,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                     );
                     return deferred.promise;
                 },
+                testData: function(testService) {
+                    return testService.getTests();
+                },
             }
         })
 

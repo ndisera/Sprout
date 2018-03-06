@@ -34,8 +34,26 @@
                             <div class="panel-body">
                                 <div class="row">
                                     <div class="col-sm-4 centerText">
-                                        <label>Focus Category: {{ focusGraphs[focusStudent.student]['focus'].category }}</label>
-                                        <span class="glyphicon glyphicon-heart-empty"></span>
+                                        <div id="focus-student-select" class="input-group">
+                                            <span class="input-group-addon focus-category">
+                                                <div class="focus-student-table">
+                                                    <div class="focus-student-cell"><span class="glyphicon glyphicon-heart"></span></div>
+                                                    <div class="focus-student-cell"><span>Focus</span></div>
+                                                </div>
+                                            </span>
+                                            <div class="input-group-btn">
+                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    {{ focusGraphs[focusStudent.student].focus.category }} <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                    <li ng-repeat="entry in focusCategories" ng-click="selectFocusCategory(focusStudent, entry)" ng-class="{ 'active': entry.category === focusGraphs[focusStudent.student].focus.category, }">
+                                                        <a class="focus-student-assign-link">{{ entry.displayName }}  
+                                                            <span ng-if="entry.category === focusGraphs[focusStudent.student].focus.category" class="glyphicon glyphicon-ok"></span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                         <div class="col-sm-12 focusGraph">
                                             <canvas id="focus_graph" class="chart chart-line"
                                                     chart-data="focusGraphs[focusStudent.student]['focus'].data"
@@ -47,8 +65,17 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-4 centerText">
-                                        <label>Progress Category: {{ focusGraphs[focusStudent.student]['progress'].category }}</label>
-                                        <span class="glyphicon glyphicon-fire"></span>
+                                        <div id="focus-student-select" class="input-group">
+                                            <span class="input-group-addon progress-category">
+                                                <div class="focus-student-table">
+                                                    <div class="focus-student-cell"><span class="glyphicon glyphicon-fire"></span></div>
+                                                    <div class="focus-student-cell"><span>Progress</span></div>
+                                                </div>
+                                            </span>
+                                            <div class="input-group-btn fake-btn">
+                                                <span class="input-group-text">{{ focusGraphs[focusStudent.student].progress.category }}</span>
+                                            </div>
+                                        </div>
                                         <div class="col-sm-12 focusProgress">
                                             <canvas id="focus_progress_graph" class="chart chart-line"
                                                     chart-data="focusGraphs[focusStudent.student]['progress'].data"
@@ -60,8 +87,17 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-4 centerText">
-                                        <label>Caution Category: {{ focusGraphs[focusStudent.student]['caution'].category }}</label>
-                                        <span class="glyphicon glyphicon-alert"></span>
+                                        <div id="focus-student-select" class="input-group">
+                                            <span class="input-group-addon caution-category">
+                                                <div class="focus-student-table">
+                                                    <div class="focus-student-cell"><span class="glyphicon glyphicon-alert"></span></div>
+                                                    <div class="focus-student-cell"><span>Caution</span></div>
+                                                </div>
+                                            </span>
+                                            <div class="input-group-btn fake-btn">
+                                                <span class="input-group-text">{{ focusGraphs[focusStudent.student].caution.category }}</span>
+                                            </div>
+                                        </div>
                                         <div class="col-sm-12 focusCaution">
                                             <canvas id="focus_caution_graph" class="chart chart-line"
                                                     chart-data="focusGraphs[focusStudent.student]['caution'].data"
