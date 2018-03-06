@@ -109,7 +109,7 @@ if __name__ == "__main__":
     service_generator = ServiceGenerator(**generator_args)
 
     # Setup the school
-    school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", grade_range_lower=6, grade_range_upper=8, id=None)
+    school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", grade_range_lower=6, grade_range_upper=8, id=1)
     settings_service.add_school(school_settings)
 
     school_year_start = datetime.date(year=2017, month=9, day=5)

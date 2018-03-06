@@ -5,6 +5,7 @@ import coreschema
 import datetime
 from django.db.models import Q
 from django.utils import timezone
+import django.db.utils
 from django.http.response import HttpResponseNotFound, HttpResponse
 from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
 from rest_framework import mixins, generics
@@ -192,6 +193,13 @@ class SchoolSettingsViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = SchoolSettingsSerializer
+    # Build the 'singleton' object if it doesn't exist
+    try:
+        SchoolSettings.objects.get_or_create(id=1, grade_range_lower=6, grade_range_upper=8)
+    except django.db.utils.OperationalError:
+        # While the setup scripts are running, before the DB is built, this code gets hit.
+        # Crashing then would be bad. So don't.
+        pass
     queryset = SchoolSettings.objects.all()
 
     """ define custom schema for documentation """
