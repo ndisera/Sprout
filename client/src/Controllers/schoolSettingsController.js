@@ -1,22 +1,20 @@
-app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, terms, tests, holidayService, testService) {
+app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, terms, tests, holidayService, testService, termService) {
     $scope.location = $location;
     $scope.holidays = holidays.holidays;
     $scope.tests = tests.standardized_tests;
-    //$scope.tests = [];
-    //$scope.terms = terms.terms;
-    $scope.terms = [];
-
-    //$scope.editHolidays = {};
-    //$scope.editTests = {};
+    $scope.terms = terms.terms;
 
     $scope.editHolidays = [];
     $scope.editTests = [];
+    $scope.editTerms = [];
 
     $scope.newHoliday = {};
     $scope.newTest = {};
+    $scope.newTerm = {};
 
     $scope.displayTestForm = false;
     $scope.displayHolidayForm = false;
+    $scope.displayTermForm = false;
 
     function setupIndexArrays() {
         for (var i = 0; i < $scope.tests.length; i++) {
@@ -24,6 +22,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         }
         for (var i = 0; i < $scope.holidays.length; i++) {
             $scope.editHolidays.push(null);
+        }
+        for (var i = 0; i < $scope.terms.length; i++) {
+            $scope.editTerms.push(null);
         }
     }
 
@@ -67,6 +68,11 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
             holidays.push(Object.assign({}, $scope.holidays[i]));
         }
         $scope.eHolidays = _.indexBy(holidays, "id");
+
+        for (var i = 0; i < $scope.terms.length; i++) {
+            terms.push(Object.assign({}, $scope.terms[i]));
+        }
+        $scope.eTerms = _.indexBy(terms, "id");
     }
 
     setupLookups();
@@ -107,6 +113,19 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 ];
                 break;
             case "term":
+                $scope.item = [{
+                        title: 'Name',
+                        value: item.name
+                    },
+                    {
+                        title: 'Begins',
+                        value: item.start_date
+                    },
+                    {
+                        title: 'Ends',
+                        value: item.end_date
+                    }
+                ];
                 break;
         }
     }
@@ -131,6 +150,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 }
                 break;
             case "term":
+                if (!_.has($scope.editTerms, index) || $scope.editTerms[index] == null) {
+                    $scope.editTerms[index] = true;
+                    $("#term-row" + index).removeClass('pointer');
+                }
                 break;
         }
     };
@@ -151,6 +174,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $("#test-row" + index).addClass('pointer');
                 break;
             case "term":
+                $scope.editTerms[index] = null;
+                $("#term-row" + index).addClass('pointer');
                 break;
         }
     };
@@ -174,6 +199,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 deleteTest(id);
                 break;
             case "term":
+                deleteTerm(id)
                 break;
         }
     }
@@ -191,6 +217,27 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 }
                 // remove from edit lookup
                 delete $scope.eHolidays[holidayId];
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save your edit." + errorResponse());
+            }
+        );
+    };
+
+    function deleteTerm(termId) {
+        termService.deleteTerm(termId).then(
+            function success(response) {
+                // update index array
+                removeIndex($scope.editTerms, $scope.terms, 'start_date', termId);
+                // remove from display array
+                for (var i = 0; i < $scope.terms.length; i++) {
+                    if ($scope.terms[i].id === termId) {
+                        $scope.terms.splice(i, 1);
+                    }
+                }
+                // remove from edit lookup
+                delete $scope.eTerms[termId];
             },
             function error(response) {
                 setErrorMessage(response);
@@ -241,9 +288,35 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
 
                 // this is done after it's added to regular array
                 insertIndex($scope.editHolidays, $scope.holidays, 'start_date', response.holiday.id);
-            }, function error(response) {
+            },
+            function error(response) {
                 setErrorMessage(response);
                 toastService.error("The server was unable to save the new holiday." + errorResponse());
+            }
+        );
+    };
+
+    $scope.addTerm = function() {
+        $scope.newTerm.start_date = moment($scope.newTerm.start_date).format('YYYY-MM-DD').toString();
+        $scope.newTerm.end_date = moment($scope.newTerm.end_date).format('YYYY-MM-DD').toString();
+        $scope.newTerm.school_year = 1;
+        $scope.newTerm.settings = 1;
+        termService.addTerm($scope.newTerm).then(
+            function success(response) {
+                // add to display array
+                $scope.terms.push(response.term);
+                // add to edit lookup (should point to different object)
+                var copy = Object.assign({}, response.term);
+                $scope.eTerms[copy.id] = copy;
+                $scope.displayTermForm = false;
+                $scope.newTerm = {};
+
+                // this is done after it's added to regular array
+                insertIndex($scope.editTerms, $scope.terms, 'start_date', response.term.id);
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save the new term." + errorResponse());
             }
         );
     };
@@ -266,7 +339,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                     tests[i].test_name = tests[i].test_name.toUpperCase();
                 }
                 insertIndex($scope.editTests, tests, 'test_name', copy.id);
-            }, function error(response) {
+            },
+            function error(response) {
                 setErrorMessage(response);
                 toastService.error("The server was unable to save the new test." + errorResponse());
             }
@@ -311,6 +385,32 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                     }
                 }
                 $scope.cancelEdit(index, 'test')
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save your edit." + errorResponse());
+            }
+        );
+    };
+
+    $scope.updateTerm = function(termId, index) {
+        if (typeof $scope.eTerms[termId].start_date !== 'string' && $scope.eTerms[termId].start_date != null) {
+            $scope.eTerms[termId].start_date = moment($scope.eTerms[termId].start_date).format('YYYY-MM-DD').toString();
+        }
+        if (typeof $scope.eTerms[termId].end_date !== 'string' && $scope.eTerms[termId].end_date != null) {
+            $scope.eTerms[termId].end_date = moment($scope.eTerms[termId].end_date).format('YYYY-MM-DD').toString();
+        }
+        var newTerm = Object.assign({}, $scope.eTerms[termId]);
+        delete newTerm.id;
+        termService.updateTerm(termId, newTerm).then(
+            function success(response) {
+                // update $scope.terms
+                for (var i = 0; i < $scope.terms.length; i++) {
+                    if ($scope.terms[i].id === termId) {
+                        $scope.terms[i] = response.term;
+                    }
+                }
+                $scope.cancelEdit(index, 'term')
             },
             function error(response) {
                 setErrorMessage(response);

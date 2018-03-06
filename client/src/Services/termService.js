@@ -66,7 +66,7 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
         updateTerm: function (termId, termObj) {
             var deferred = $q.defer();
             $http({
-                method: 'UPDATE',
+                method: 'PUT',
                 url: 'https://' + $rootScope.backend + '/terms/' + termId,
                 data: termObj,
             }).then(function success(response) {
