@@ -1,17 +1,12 @@
 #!/usr/bin/env python2
 
-import argparse
 import datetime
 import os
 import random
-import requests
-import sys
 
-from services.authorization import AuthorizationService
+from lib.services.student import Student, StudentService
+from lib.services.users import UsersService
 
-from services.student import Student, StudentService
-
-from services.users import User, UsersService
 
 class StudentGenerator(object):
     """StudentGenerator contains various methods for generating student data
@@ -30,8 +25,8 @@ class StudentGenerator(object):
     def generate_many_random_students(self,
                                       num_students,
                                       case_manager_ids,
-                                      first_names_file="services/first_names.txt",
-                                      last_names_file="services/last_names.txt",
+                                      first_names_file="first_names.txt",
+                                      last_names_file="last_names.txt",
                                       birthdate_range_start=datetime.date(2006, 9, 1),
                                       birthdate_range_end=datetime.date(2008, 9, 1)):
         """Generate a specified number of students by reading first and last names from text files
@@ -129,39 +124,3 @@ class StudentGenerator(object):
                                  )
 
         return (student_nico, student_simon, student_guy, student_graham)
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
-    parser.add_argument("--url", "-u", action='store', default="localhost", type=str,
-                        help="hostname or IP address to connect to (default: localhost)")
-    parser.add_argument("--port", "-p", action='store', default=8000, type=int,
-                        help="port to connect on (default: 8000)")
-    parser.add_argument("--username", "-l", action="store", type=str,
-                        help="login username")
-    parser.add_argument("--password", "-s", action="store", type=str,
-                        help="login password (warning: insecure!)")
-    parser.add_argument("--token", action="store", type=str,
-                        help="auth token -- supersedes username and password")
-
-    args = parser.parse_args()
-
-    if not args.token:
-        args.username, args.password = AuthorizationService.display_login_prompt(args.username, args.password)
-
-        authorizationHandler = AuthorizationService(url="https://{}".format(args.url),
-                                                    port_num=args.port,
-                                                    verify=False)
-
-        try:
-            args.token = authorizationHandler.send_login_request(args.username, args.password)
-        except requests.exceptions.HTTPError as err:
-            print "Unable to send login request:"
-            print err
-            sys.exit(1)
-
-    headers['Authorization'] = 'JWT ' + args.token
-
-    generator = StudentGenerator(url=args.url, verify=False, headers=headers)
-
-    students = generator.generate_many_random_students(5)
-    generator.studentService.add_many_students(students)

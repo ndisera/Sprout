@@ -1,4 +1,4 @@
-app.controller("profileStudentsController", function ($scope, $q, $location, data) {
+app.controller("profileStudentsController", function ($scope, $location, data) {
     $scope.location = $location;
 
     // I know the order because I specified it in the route

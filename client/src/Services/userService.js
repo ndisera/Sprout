@@ -426,6 +426,14 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
 
     /*** NOTIFICATION RECORDS ***/
 
+    userService.notificationData = {
+        relevantItems: [],
+        relevantOffset: {
+            value: 14,
+            unit: 'd',
+        }
+    };
+
     /**
      * Get all of a user's notifications
      * @param {number} userId - ID of the user
@@ -440,6 +448,18 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
             url: 'https://' + $rootScope.backend + '/users/' + userId +
                 '/notifications' + query,
         }).then(function success(response) {
+            if(response !== null && response !== undefined) {
+                if(response.data !== null && response.data !== undefined) {
+                    if(response.data.notifications !== null && response.data.notifications !== undefined) {
+                        userService.notificationData.relevantItems.length = 0;
+                        var relevantDate = moment().add(userService.notificationData.relevantOffset.value, userService.notificationData.relevantOffset.unit);
+
+                        _.each(_.filter(response.data.notifications, function(elem) { return moment(elem.date) < relevantDate && elem.unread; }), function(elem) {
+                            userService.notificationData.relevantItems.push(elem);
+                        });
+                    }
+                }
+            }
             deferred.resolve(response.data);
         }, function error(response) {
             deferred.reject(response);

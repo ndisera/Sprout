@@ -17,6 +17,7 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from api.models import *
 from api.serializers import *
+from api.constants import NotificationCategories
 
 def union_fields(fields, new_fields):
     """
@@ -925,7 +926,21 @@ class SproutUserViewSet(WithDynamicViewSetMixin,
     serializer_class = SproutUserSerializer
     def get_queryset(self, queryset=None):
         queryset = SproutUser.objects.all()
+        # Get rid of the "deleted_user" user
+        queryset = queryset.exclude(email='deleted_user')
         return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        If the user is specifically requested, allow access to 'deleted_user'
+        """
+        user = SproutUser.objects.get(id=kwargs['pk'])
+        if user.email == 'deleted_user':
+            serializer = self.get_serializer(user)
+            return Response(serializer.data)
+            pass
+        else:
+            return super(SproutUserViewSet, self).retrieve(request, *args, **kwargs)
 
 
 class NotificationViewSet(NestedDynamicViewSet):
@@ -990,7 +1005,6 @@ class NotificationViewSet(NestedDynamicViewSet):
         :return:
         """
         queryset = self.get_queryset()
-        stored_notifications = self.get_serializer(queryset, many=True).data
 
         # Generate student birthday notifications for all students this user
         # should see
@@ -1003,10 +1017,10 @@ class NotificationViewSet(NestedDynamicViewSet):
         all_students_query = Q(case_manager=user.id) | Q(enrollment__section__teacher=user.id)
 
         all_students = Student.objects.filter(all_students_query).distinct()
-        birthday_notifications = []
         for student in all_students:
             now = datetime.datetime.now()
             year = now.year
+            category = NotificationCategories.BIRTHDAY
             # If the birthday has already passed, notify for next year
             if now.month > student.birthdate.month or\
                 (now.month == student.birthdate.month and now.day > student.birthdate.day):
@@ -1025,7 +1039,7 @@ class NotificationViewSet(NestedDynamicViewSet):
                                                  date=str(birthdate.date()))
             # See if the notification already exists
             try:
-                queryset.get(title=title, student=student, user=user, date=birthdate)
+                queryset.get(category=category, student=student, user=user, date=birthdate)
             except Notification.DoesNotExist:
                 # The notification did not exist. Make one!
                 Notification.objects.create(title=title,
@@ -1033,7 +1047,8 @@ class NotificationViewSet(NestedDynamicViewSet):
                                             date=birthdate,
                                             student=student,
                                             user=user,
-                                            category="/",
+                                            category=category,
+                                            partial_link="/",
                                             unread=True,
                                             )
 

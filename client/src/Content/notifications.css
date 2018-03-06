@@ -1,0 +1,85 @@
+#notifications-title {
+    margin: 3px 0px 0px 0px;
+}
+
+.notifications-panel {
+    -webkit-box-shadow: 0px 0px 13px -2px rgba(119,119,119,0.57);
+    -moz-box-shadow: 0px 0px 13px -2px rgba(119,119,119,0.57);
+    box-shadow: 0px 0px 13px -2px rgba(119,119,119,0.57);
+    background-color: #F7F7F7;
+}
+
+.notifications-panel:hover {
+    cursor: pointer;
+}
+
+.notifications-content {
+    display: table;
+}
+
+.notifications-remove-icon {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    padding: 5px;
+    border: none;
+    background-color: #FFF;
+    color: #d9534f;
+    opacity: 0;
+}
+
+.notifications-remove-icon:active:focus {
+    background-color: #ac2925;
+    color: #EEE;
+}
+
+.notifications-panel:hover .notifications-remove-icon {
+    opacity: 1;
+}
+
+.notifications-content-icon {
+    margin-right: 15px;
+    color: #57bc90;
+}
+
+.notifications-content-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+    .notifications-remove-icon {
+        right: 22px;
+        opacity: 1;
+    }
+}
+
+.notifications-none.panel-wrapper {
+    border-color: #57bc90;
+}
+
+.notifications-none .notifications-panel:hover {
+    cursor: default;
+}
+
+.notifications-birthday.panel-wrapper {
+    border-color: #5ab9ea;
+}
+
+.notifications-birthday .notifications-panel:hover {
+    background-color: #d2ecf9;
+}
+
+.notifications-birthday .notifications-panel:hover .notifications-remove-icon {
+    background-color: #d2ecf9;
+}
+
+.notifications-birthday .notifications-content-icon {
+    color: #5ab9ea;
+}
+
+.notifications-panel:hover .notifications-remove-icon:hover, .notifications-remove-icon:hover, .notifications-remove-icon:focus {
+    background-color: #d9534f;
+    color: #EEE;
+}
+

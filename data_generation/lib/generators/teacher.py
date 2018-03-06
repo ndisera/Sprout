@@ -2,13 +2,14 @@
 import random
 import os
 
-from services.users import User, UsersService
+from lib.services.users import User, UsersService
+
 
 class TeacherGenerator:
 
     def __init__(self, headers=None, protocol='https', hostname="localhost", port_num=8000, verify=False,
-                 first_names_file="services/first_names.txt",
-                 last_names_file="services/last_names.txt",):
+                 first_names_file="first_names.txt",
+                 last_names_file="last_names.txt",):
         self.files_path = os.path.dirname(os.path.abspath(__file__))
         self.first_names_file=os.path.join(self.files_path, first_names_file)
         self.last_names_file=os.path.join(self.files_path, last_names_file)

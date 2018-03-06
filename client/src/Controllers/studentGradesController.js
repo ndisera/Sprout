@@ -1,11 +1,51 @@
-app.controller("studentGradesController", function ($scope, $rootScope, $location, $routeParams, toastService, sectionService, studentService, studentData, enrollmentData) {
+app.controller("studentGradesController", function ($scope, $rootScope, $location, $routeParams, toastService, sectionService, studentService, studentData, termData, enrollmentData) {
     $scope.location = $location;
     $scope.student  = studentData.student;
+
     $scope.sections = [];
+    $scope.selectedSection = {};
+
+
+    if(termData.terms !== null && termData.terms !== undefined) {
+        $scope.terms = termData.terms;
+        _.each($scope.terms, function(elem) {
+            elem.start_date = moment(elem.start_date);
+            elem.end_date   = moment(elem.end_date);
+        });
+        // sort so most current first
+        $scope.terms = _.sortBy($scope.terms, function(elem) { return -elem.start_date; });
+    }
 
     if(enrollmentData.sections !== null && enrollmentData.sections !== undefined) {
-        $scope.sections = _.sortBy(enrollmentData.sections, 'title');
+        $scope.sections = _.sortBy(enrollmentData.sections, 'schedule_position');
     }
+
+    // find biggest current term
+    $scope.selectedTerm = null;
+    _.each($scope.terms, function(elem) {
+        if(moment() > elem.start_date && moment() < elem.end_date) {
+            // I have found a candidate
+            // but we want the biggest current term
+            if($scope.selectedTerm === null) {
+                $scope.selectedTerm = elem;
+            }
+            else {
+                // take the bigger one
+                var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
+                var newDelta = elem.end_date - elem.start_date;
+                if(newDelta > curDelta) {
+                    $scope.selectedTerm = elem;
+                }
+            }
+        }
+    });
+
+    // if we're between terms (over break)
+    if($scope.selectedTerm === null) {
+        $scope.selectedTerm = $scope.terms[0];
+    }
+
+
 
     $scope.assignmentsGraph = {
         data: [],
@@ -52,7 +92,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
             borderColor: _.map($rootScope.colors, function(elem) { return elem.setAlpha(0.7).toRgbString(); }),
         },
     };
-
 
     $scope.selectSection = function(section) {
 
@@ -108,7 +147,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
 
                 studentService.getGradesForStudent($scope.student.id, gradesConfig).then(
                     function success(data) {
-                        console.log(data);
 
                         // reset relevant data
                         $scope.classGrade              = 0;
@@ -183,11 +221,19 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
         );
     };
 
-    if($scope.sections.length > 0) {
-        $scope.selectSection($scope.sections[0]);
-    }
-    else {
-        $scope.selectedSection = {};
-    }
+    $scope.selectTerm = function(term) {
+        $scope.selectedTerm = term;
+        var sectionsInTerm = _.filter($scope.sections, function(elem) { return elem.term === term.id; });
+        if(sectionsInTerm.length === 0) {
+            $scope.selectedSection = null;
+        }
+        else {
+            $scope.selectSection(sectionsInTerm[0]);
+        }
+    };
+
+
+
+    $scope.selectTerm($scope.selectedTerm);
 
 });

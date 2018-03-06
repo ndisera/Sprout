@@ -18,7 +18,7 @@
                             {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-right">
-                            <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)">
+                            <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)" ng-class="{ 'active': entry.pk === caseManager.pk, }">
                                 <a class="student-overview-assign-link">
                                     {{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.pk === caseManager.pk" class="glyphicon glyphicon-ok"></span>
                                 </a>
@@ -77,7 +77,21 @@
                             <h3 class="panel-title">Class Schedule</h3>
                         </div>
                         <div class="panel-body">
-                            <div class="table-responsive" ng-if="sections.length !== 0">
+                            <div id="student-overview-select" class="input-group">
+                                <span class="input-group-addon">Term</span>
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTerm.name }} <span class="caret"></span></button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li ng-repeat="entry in terms" ng-click="selectTerm(entry)" ng-class="{ 'active': entry.id === selectedTerm.id, }">
+                                            <a class="student-overview-assign-link">{{ entry.name }}  <span ng-if="entry.id === selectedTerm.id" class="glyphicon glyphicon-ok"></span></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div id="student-overview-no-classes" class="voffset3" ng-show="termSections.length === 0">
+                                <h4 class="centerText">No Classes</h4>
+                            </div>
+                            <div class="table-responsive voffset3" ng-show="termSections.length > 0">
                                 <table ng-if="sections.length > 0" class="table">
                                     <thead>
                                         <tr>
@@ -87,8 +101,8 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="section in sections">
-                                            <td>{{ $index + 1 }}</td>
+                                        <tr ng-repeat="section in sections | filter:{ term: selectedTerm.id, }">
+                                            <td>{{ section.period }}</td>
                                             <td>{{ section.title }}</td>
                                             <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
                                         </tr>

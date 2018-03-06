@@ -6,17 +6,12 @@ import random
 import requests
 import sys
 
-from services.authorization import AuthorizationService
-
-from services.assignment import Assignment, AssignmentService
-
-from services.enrollment import EnrollmentService
-
-from services.grades import GradesService, Grade
-
-from services.term import TermService
-
-from services.section import SectionService
+from lib.services.authorization import AuthorizationService
+from lib.services.assignment import Assignment, AssignmentService
+from lib.services.enrollment import EnrollmentService
+from lib.services.grades import GradesService, Grade
+from lib.services.term import TermService
+from lib.services.section import SectionService
 
 ASSIGNMENT_NAMES = ['Homework', 'Quiz', 'Worksheet', 'Lab', 'Test',]
 

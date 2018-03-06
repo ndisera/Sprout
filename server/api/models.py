@@ -2,8 +2,13 @@
 from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 from sprout_user import SproutUser
+
+
+def get_sentinel_user():
+    return get_user_model().objects.get_or_create(email='deleted_user',)[0]
 
 
 class ProfilePicture(models.Model):
@@ -36,7 +41,7 @@ class Student(models.Model):
     last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     birthdate = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
-    case_manager = models.ForeignKey(SproutUser, blank=True, null=True)
+    case_manager = models.ForeignKey(SproutUser, blank=True, null=True, on_delete=models.SET_NULL)
     picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
                                    blank=True, null=True,
                                    help_text="Student's Profile Picture")
@@ -58,7 +63,7 @@ class Section(models.Model):
     teacher is a foreign key to the User who teaches leads the section
     """
     title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    teacher = models.ForeignKey(SproutUser)
+    teacher = models.ForeignKey(SproutUser, on_delete=models.SET(get_sentinel_user))
     term = models.ForeignKey(Term, on_delete=models.CASCADE,
                              help_text="Term this section takes place in")
     # Lookup the class schedule via term's TermSettings
@@ -68,6 +73,12 @@ class Section(models.Model):
     class Meta:
         ordering = ('id',)
 
+    def __repr__(self):
+        return str(self.teacher) + ' ' + str(self.title)
+
+    def __str__(self):
+        return self.__repr__()
+
 
 class Enrollment(models.Model):
     """
@@ -76,8 +87,8 @@ class Enrollment(models.Model):
     student that is enrolled in a section.
     section and student are a composite, unique key
     """
-    section = models.ForeignKey(Section)
-    student = models.ForeignKey(Student)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (('section', 'student'),)
@@ -103,7 +114,7 @@ class Behavior(models.Model):
     Represents a student's behavior score in a class on a
     given day.
     """
-    enrollment = models.ForeignKey(Enrollment, related_name='enrollment')
+    enrollment = models.ForeignKey(Enrollment, related_name='enrollment', on_delete=models.CASCADE)
     date = models.DateField()
     behavior = models.IntegerField(blank=True, null=True)
     effort = models.IntegerField(blank=True, null=True)
@@ -142,13 +153,20 @@ class StandardizedTest(models.Model):
     class Meta:
         ordering = ('id',)
 
+    def __repr__(self):
+        return str(self.test_name)
+
+    def __str__(self):
+        return self.__repr__();
+
+
 class StandardizedTestScore(models.Model):
     """
     StandardizedTestScore
     Represents a particular student's score on a particular standardized test on a particular date
     """
-    standardized_test = models.ForeignKey(StandardizedTest, related_name='standardized_test')
-    student = models.ForeignKey(Student, related_name="student")
+    standardized_test = models.ForeignKey(StandardizedTest, related_name='standardized_test', on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, related_name="student", on_delete=models.CASCADE)
     date = models.DateField()
     score = models.IntegerField(blank=False, null=False)
 
@@ -162,7 +180,7 @@ class Assignment(models.Model):
     Assignment
     Represent a class's assignment
     """
-    section = models.ForeignKey(Section, related_name='assignment_section',
+    section = models.ForeignKey(Section, related_name='assignment_section', on_delete=models.CASCADE,
                                    verbose_name="Section to which this assigment belongs")
     assignment_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     score_min = models.IntegerField(blank=False, verbose_name="Minimum Score")
@@ -173,15 +191,23 @@ class Assignment(models.Model):
         unique_together = (('section', 'assignment_name', 'due_date'),)
         ordering = ('due_date',)
 
+    def __repr__(self):
+        return str(self.section) + ' ' + str(self.assignment_name)
+
+    def __str__(self):
+        return self.__repr__()
+
 
 class Grade(models.Model):
     """
     Grade
     Represent a student grade report
     """
-    assignment = models.ForeignKey(Assignment, related_name='grade_assignment',
-                                  verbose_name="Assignment being reported")
-    student = models.ForeignKey(Student, related_name='grade_student')
+    assignment = models.ForeignKey(Assignment, related_name='grade_assignment', on_delete=models.CASCADE,
+                                   verbose_name="Assignment being reported",
+                                   help_text="Assignment being reported")
+    student = models.ForeignKey(Student, related_name='grade_student', on_delete=models.CASCADE,
+                                help_text="Student being graded")
     score = models.IntegerField(blank=False, verbose_name="Assignment score")
     handin_datetime = models.DateTimeField(blank=False)
 
@@ -195,14 +221,21 @@ class Notification(models.Model):
     Notification
     Represent and store a notification which should be displayed to a User
     """
-    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    date = models.DateTimeField(blank=False)
-    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
-    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE)
-    category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this notification")
+    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                            help_text="Longer description of this notification")
+    date = models.DateTimeField(blank=False,
+                                help_text="Date this notification is 'due'")
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE,
+                                help_text="Student to whom this notification refers")
+    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE,
+                             help_text="User who should be notified")
+    partial_link = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                 help_text="Partial string of an API call, combined with student to create a URL from this notification")
     unread = models.BooleanField(blank=False, default=False)
+    category = models.IntegerField(blank=False,
+                                   help_text="Machine-readable category of this notification. See api/constants.py")
 
     class Meta:
         # Do we want to enforce any uniqueness for notifications?
@@ -210,8 +243,8 @@ class Notification(models.Model):
 
 
 class FocusStudent(models.Model):
-    student = models.ForeignKey(Student, blank=False)
-    user = models.ForeignKey(SproutUser, blank=False)
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE)
     ordering = models.IntegerField(blank=False)
     focus_category = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                       help_text="Category selected by the user to display")
@@ -232,7 +265,7 @@ class IEPGoal(models.Model):
     IEPGoal
     Represent a student's Individualized Education Plan goal
     """
-    student = models.ForeignKey(Student, blank=False)
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Short name of this IEP Goal")
     quantitative = models.BooleanField(blank=True,
@@ -283,7 +316,7 @@ class IEPGoalNote(models.Model):
 
 
 class ServiceRequirement(models.Model):
-    student = models.ForeignKey(Student, blank=False)
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE)
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Short name of this service requirement")
     description = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
@@ -292,8 +325,29 @@ class ServiceRequirement(models.Model):
     fulfilled = models.BooleanField(help_text="Whether or not this service has been fulfilled")
     fulfilled_date = models.DateField(null=True,
                                       help_text="Date this service was marked fulfilled")
-    fulfilled_user = models.ForeignKey(SproutUser, null=True, on_delete=models.PROTECT,
+    fulfilled_user = models.ForeignKey(SproutUser, null=True, on_delete=models.SET(get_sentinel_user),
                                        help_text="User who marked this service fulfilled")
     fulfilled_description = models.CharField(null=True, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
                                              help_text="How this service is fulfilled (max length {})".format(
                                                  settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+    def __repr__(self):
+        if self.fulfilled :
+            try:
+                user_email = self.fulfilled_user.email
+            except SproutUser.DoesNotExist:
+                user_email = 'deleted user'
+            return 'ServiceRequirement: {title} for {student_first} {student_last}: fulfilled by {user}'.format(
+                title=self.title,
+                student_first=self.student.first_name,
+                student_last=self.student.last_name,
+                user=user_email,
+            )
+        return 'ServiceRequirement: {title} for {student_first} {student_last}: unfulfilled'.format(
+            title=self.title,
+            student_first=self.student.first_name,
+            student_last=self.student.last_name,
+        )
+
+    def __str__(self):
+        return self.__repr__()

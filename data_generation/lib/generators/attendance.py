@@ -3,9 +3,8 @@
 import datetime
 import random
 
-from services.assignment import Assignment, AssignmentService
-from services.enrollment import Enrollment, EnrollmentService
-from services.attendance import AttendanceRecord, AttendanceService
+from lib.services.enrollment import EnrollmentService
+from lib.services.attendance import AttendanceRecord, AttendanceService
 
 ATTENDANCE_CODES_DESCS = [
     ('T', 'Tardy'),
@@ -36,7 +35,7 @@ class AttendanceGenerator():
                              date_range_end=datetime.datetime.now() + datetime.timedelta(days=100)):
         """
         Generate an attendance record for each enrollment for each day in the date range,
-        with a chance chance that the student was not present for class
+        with a chance that the student was not present for class
 
         :param chance: chance that a non-present AttendanceRecord will be generated
         :return: list[AttendanceRecord]
