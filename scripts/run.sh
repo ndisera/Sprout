@@ -40,7 +40,7 @@ killgroup()
 gulp_build
 (
 while true; do
-  inotifywait -e close_write,moved_to,create -m "${FRONTEND_SRC_DIR}/src"
+  inotifywait -e close_write,moved_to,create,modify,delete -r "${FRONTEND_SRC_DIR}/src"
   gulp_build
 done
 ) &
