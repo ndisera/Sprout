@@ -6,6 +6,10 @@
         *display: inline; /* ie7 fix */
         zoom: 1; /* hasLayout ie7 trigger */
     }
+
+    .student-mobile-spacer {
+        margin-top: 15px;
+    }
 }
 
 .student-name-title {
@@ -123,6 +127,83 @@
     margin: 20px 0px;
 }
 
+.student-services-panel .form-control-static {
+    display: inline-block;
+}
+
+.student-services-panel .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.student-services-panel > .panel > .panel-heading.panel-heading-editing {
+    padding: 3px 15px;
+}
+
+.student-services-panel > .panel > .panel-heading.panel-heading-editing .glyphicon {
+    margin-top: 2px;
+}
+
+.student-services-panel > .panel > .panel-heading > .panel-heading-container {
+    display: inline-block;
+}
+
+.student-services-panel > .panel > .panel-heading.panel-heading-editing > .panel-heading-container {
+    width: 70%;
+}
+
+.student-services-panel .panel-title {
+    display: inline-block;
+}
+
+.student-services-panel .panel-heading .glyphicon {
+    font-size: 30px;
+    margin-top: -5px;
+    margin-right: -10px;
+    color: #c9302c;
+}
+
+.student-services-panel {
+    border-color: #c9302c;
+}
+
+.student-services-panel > .panel > .panel-heading {
+    background-color: #f6d6d5;
+}
+
+.student-services-panel.fulfilled {
+    border-color: #57bc90;
+}
+
+.student-services-panel.fulfilled > .panel > .panel-heading {
+    background-color: #dbf0e7;
+}
+
+.student-services-panel.fulfilled .panel-heading .glyphicon {
+    color: #57bc90;
+}
+
+.student-services-red {
+    color: #813332;
+}
+
+.student-services-add .panel-header-btn {
+    margin-top: 2px;
+    margin-right: -11px;
+}
+
+.student-services-panel.student-services-add > .panel > .panel-heading {
+    background-color: #eee;
+}
+
+.student-services-panel.student-services-add {
+    border-color: #5ab9ea;
+}
+
+.student-services-checkbox {
+    padding-top: 7px;
+}
+
 @media (max-width: 768px) {
     #student-overview-title {
         margin-top: 15px;
@@ -138,6 +219,10 @@
 
     #student-overview-edit-input-group {
         padding-left: 15px;
+    }
+
+    .student-services-panel > .panel > .panel-heading.panel-heading-editing > .panel-heading-container {
+        width: 100%;
     }
 }
 

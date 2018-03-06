@@ -356,6 +356,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/studentServices.html',
             controller: 'studentServicesController',
             resolve: {
+                services: function(studentService, $route) {
+                    var config = {
+                        include: ['fulfilled_user.*', ],
+                    };
+                    return studentService.getServicesForStudent($route.current.params.id, config);
+                },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
