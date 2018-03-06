@@ -7,21 +7,21 @@ import sys
 import random
 import math
 
-from behavior_generator import BehaviorGenerator
-from standardized_test_score_generator import StandardizedTestScoreGenerator
-from student_generator import Student, StudentGenerator
-from teacher_generator import TeacherGenerator
-from grades_generator import GradesGenerator
-from iep_generator import IEPGenerator
-from service_generator import ServiceGenerator
-from attendance_generator import AttendanceGenerator
+from lib.generators.behavior import BehaviorGenerator
+from lib.generators.standardized_test_score import StandardizedTestScoreGenerator
+from lib.generators.student import Student, StudentGenerator
+from lib.generators.teacher import TeacherGenerator
+from lib.generators.grades import GradesGenerator
+from lib.generators.iep import IEPGenerator
+from lib.generators.service import ServiceGenerator
+from lib.generators.attendance import AttendanceGenerator
 
-from services.authorization import AuthorizationService
-from services.enrollment import Enrollment, EnrollmentService
-from services.section import Section, SectionService
-from services.settings import SchoolSettings, DailySchedule, TermSettings, SchoolYear, SettingsService
-from services.term import Term, TermService
-from services.users import User, UsersService
+from lib.services.authorization import AuthorizationService
+from lib.services.enrollment import Enrollment, EnrollmentService
+from lib.services.section import Section, SectionService
+from lib.services.settings import SchoolSettings, DailySchedule, TermSettings, SchoolYear, SettingsService
+from lib.services.term import Term, TermService
+from lib.services.users import User, UsersService
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
@@ -139,7 +139,12 @@ if __name__ == "__main__":
         teachers = teacher_generator.generate_random_teachers(num_teachers)
     teacher_ids = []
     for teacher in teachers:
-        response = teacher_generator.usersService.register_user(teacher, throw_error=False)
+        # Assign all generated accounts a password, if one was passed, so they can be logged in
+        if args.password:
+            teacher_password = args.password
+        else:
+            teacher_password = None
+        response = teacher_generator.usersService.register_user(teacher, password=teacher_password, throw_error=False)
         if 'user' in response.json():
             teacher_ids.append(response.json()['user']['pk'])
 
