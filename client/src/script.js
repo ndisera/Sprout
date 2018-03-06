@@ -346,6 +346,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
+                ieps: function(studentService, $route) {
+                    return studentService.getIepsForStudent($route.current.params.id);
+                },
                 auth: function(userService) {
                     return userService.authVerify();
                 },
