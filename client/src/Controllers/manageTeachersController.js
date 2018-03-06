@@ -39,6 +39,7 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      */
     $scope.setTeacherD = function(teacher) {
         $scope.teacherD = teacher;
+        $("#deleteTeacherModal").modal();
     };
 
     /**
@@ -244,8 +245,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             }
             var pk = $scope.teacherD.pk;
             $scope.teacherD = {};
-            //$scope.deleteTeacherSuccess = true; assuming this isn't necessary
-            $scope.displayTeacherDeleteSearch = true;
             $scope.teacherDeleteSearch = "";
             // check to see if teacherV/E is this deleted teacher and change view accordingly
             if ($scope.teacherV.pk === pk) {

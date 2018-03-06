@@ -97,6 +97,7 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
      */
     $scope.setStudentD = function(student) {
         $scope.studentD = student;
+        $("#deleteStudentModal").modal();
     };
 
     /**
@@ -142,8 +143,7 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
         var studentPromise = studentService.deleteStudent($scope.studentD.id);
         studentPromise.then(function success(data) {
             $scope.studentD = {};
-            //$scope.deleteStudentSuccess = true; assuming this is unnecessary
-            $scope.displayStudentDeleteSearch = true;
+            //$scope.displayStudentDeleteSearch = true;
             $scope.studentDeleteSearch = "";
         }, function error(response) {
             setErrorMessage(response);

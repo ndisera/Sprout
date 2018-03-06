@@ -416,7 +416,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             $scope.sectionD = {};
             $scope.sectionDeleteSearch = "";
             $scope.deleteSectionSuccess = true;
-            $scope.displaySectionDeleteSearch = true;
             $scope.displaySectionInfo = false;
             // check to see if sectionV/E is this deleted section and change view accordingly
             if ($scope.sectionV.id === id) {
@@ -438,6 +437,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      */
     $scope.setSectionD = function(section) {
         $scope.sectionD = section;
+        $("#deleteSectionModal").modal();
     }
 
     /**
