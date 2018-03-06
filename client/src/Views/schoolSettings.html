@@ -61,11 +61,46 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="panel panel-default panel-add pointer no-bottom-margin">
+                    <div class="panel panel-default panel-add pointer no-bottom-margin" ng-hide="displayHolidayForm" ng-click="displayHolidayForm = true">
                         <div class="panel-heading">
                             <h4 class="panel-title centerText">
                                 <span class="glyphicon glyphicon-plus blackish"></span>
                             </h4>
+                        </div>
+                    </div>
+                    <div class="panel-wrapper" ng-show="displayHolidayForm">
+                        <div class="panel panel-default no-bottom-margin">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Add Holiday</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" name="addHolidayForm" ng-submit="addHoliday()">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Name:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Holiday/Break Name" ng-model="newHoliday.name">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Begins:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newHoliday.start_date" view="year" min-view="date" format="YYYY-MM-DD">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Ends:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newHoliday.end_date" view="year" min-view="date" format="YYYY-MM-DD">
+                                        </div>
+                                    </div>
+                                    <div class="form-group no-bottom-margin">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button ng-disabled="addHolidayForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
+                                            <button type="button" class="btn btn-default" ng-click="displayHolidayForm = false">Cancel</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -95,8 +130,8 @@
                                     <td ng-hide="editTests[$index]">{{ test.max_score }}</td>
                                     <td ng-hide="editTests[$index]"></td>
                                     <td ng-show="editTests[$index]"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTests[test.id].test_name"></td>
-                                    <td ng-show="editTests[$index]"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTests[test.id].min_score"></td>
-                                    <td ng-show="editTests[$index]"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTests[test.id].max_score"></td>
+                                    <td ng-show="editTests[$index]"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].min_score"></td>
+                                    <td ng-show="editTests[$index]"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].max_score"></td>
                                     <td ng-show="editTests[$index]">
                                         <button class="btn btn-success" type="button" ng-click="updateTest(test.id, $index); $event.stopPropagation();">
                                             Save
@@ -116,11 +151,46 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="panel panel-default panel-add pointer no-bottom-margin">
+                    <div class="panel panel-default panel-add pointer no-bottom-margin" ng-hide="displayTestForm" ng-click="displayTestForm = true">
                         <div class="panel-heading">
                             <h4 class="panel-title centerText">
                                 <span class="glyphicon glyphicon-plus blackish"></span>
                             </h4>
+                        </div>
+                    </div>
+                    <div class="panel-wrapper" ng-show="displayTestForm">
+                        <div class="panel panel-default no-bottom-margin">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Add Test</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" name="addTestForm" ng-submit="addTest()">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Name:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Test Name" ng-model="newTest.test_name">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Min Score:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Minimum Score" ng-model="newTest.min_score">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Max Score:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Maximum Score" ng-model="newTest.max_score">
+                                        </div>
+                                    </div>
+                                    <div class="form-group no-bottom-margin">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button ng-disabled="addTestForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
+                                            <button type="button" class="btn btn-default" ng-click="displayTestForm = false">Cancel</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

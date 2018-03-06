@@ -260,7 +260,7 @@
     <div class="panel-wrapper" ng-show="displaySectionForm">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Class Info</h3>
+                <h3 class="panel-title">Add Class</h3>
             </div>
             <div class="panel-body">
                 <form class="form-horizontal" name="addSectionForm" ng-submit="addSection()">
@@ -293,7 +293,7 @@
                             <select ng-model="newSectionPeriod" class="form-control" ng-options="x for x in periodArraysLookup[newSectionTerm.name]"></select>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group no-bottom-margin">
                         <div class="col-sm-offset-2 col-sm-10">
                             <button ng-disabled="addSectionForm.$invalid || !addValidTeacher" type="submit" class="btn btn-success">Add</button>
                         </div>

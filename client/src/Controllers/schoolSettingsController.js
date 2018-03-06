@@ -5,8 +5,51 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     //$scope.tests = [];
     //$scope.terms = terms.terms;
     $scope.terms = [];
-    $scope.editHolidays = {};
-    $scope.editTests = {};
+
+    //$scope.editHolidays = {};
+    //$scope.editTests = {};
+
+    $scope.editHolidays = [];
+    $scope.editTests = [];
+
+    $scope.newHoliday = {};
+    $scope.newTest = {};
+
+    $scope.displayTestForm = false;
+    $scope.displayHolidayForm = false;
+
+    function setupIndexArrays() {
+        for (var i = 0; i < $scope.tests.length; i++) {
+            $scope.editTests.push(null);
+        }
+        for (var i = 0; i < $scope.holidays.length; i++) {
+            $scope.editHolidays.push(null);
+        }
+    }
+
+    setupIndexArrays();
+
+    function insertIndex(indexArray, objectArray, orderByKey, newId) {
+        // this is after item has been added
+        var sortedArray = _.sortBy(objectArray, orderByKey);
+        for (var i = 0; i < sortedArray.length; i++) {
+            if (sortedArray[i].id === newId) {
+                indexArray.splice(i, 0, null);
+                break;
+            }
+        }
+    }
+
+    function removeIndex(indexArray, objectArray, orderByKey, newId) {
+        // this is before item has been deleted
+        var sortedArray = _.sortBy(objectArray, orderByKey);
+        for (var i = 0; i < sortedArray.length; i++) {
+            if (sortedArray[i].id === newId) {
+                indexArray.splice(i, 1);
+                break;
+            }
+        }
+    }
 
     /**
      * Creates lookups containing edit values
@@ -138,6 +181,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     function deleteHoliday(holidayId) {
         holidayService.deleteHoliday(holidayId).then(
             function success(response) {
+                // update index array
+                removeIndex($scope.editHolidays, $scope.holidays, 'start_date', holidayId);
                 // remove from display array
                 for (var i = 0; i < $scope.holidays.length; i++) {
                     if ($scope.holidays[i].id === holidayId) {
@@ -157,6 +202,13 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     function deleteTest(testId) {
         testService.deleteTest(testId).then(
             function success(response) {
+                // correct the indexArray
+                var tests = [];
+                for (var i = 0; i < $scope.tests.length; i++) {
+                    tests.push(Object.assign({}, $scope.tests[i]));
+                    tests[i].test_name = tests[i].test_name.toUpperCase();
+                }
+                removeIndex($scope.editTests, tests, 'test_name', testId);
                 // remove from display array
                 for (var i = 0; i < $scope.tests.length; i++) {
                     if ($scope.tests[i].id === testId) {
@@ -174,11 +226,51 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     };
 
     $scope.addHoliday = function() {
+        $scope.newHoliday.start_date = moment($scope.newHoliday.start_date).format('YYYY-MM-DD').toString();
+        $scope.newHoliday.end_date = moment($scope.newHoliday.end_date).format('YYYY-MM-DD').toString();
+        $scope.newHoliday.school_year = 1;
+        holidayService.addHoliday($scope.newHoliday).then(
+            function success(response) {
+                // add to display array
+                $scope.holidays.push(response.holiday);
+                // add to edit lookup (should point to different object)
+                var copy = Object.assign({}, response.holiday);
+                $scope.eHolidays[copy.id] = copy;
+                $scope.displayHolidayForm = false;
+                $scope.newHoliday = {};
 
+                // this is done after it's added to regular array
+                insertIndex($scope.editHolidays, $scope.holidays, 'start_date', response.holiday.id);
+            }, function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save the new holiday." + errorResponse());
+            }
+        );
     };
 
     $scope.addTest = function() {
+        testService.addTest($scope.newTest).then(
+            function success(response) {
+                // add to display array
+                $scope.tests.push(response.standardized_test);
+                // add to edit lookup (should point to different object)
+                var copy = Object.assign({}, response.standardized_test);
+                $scope.eTests[copy.id] = copy;
+                $scope.displayTestForm = false;
+                $scope.newTest = {};
 
+                // correct the indexArray
+                var tests = [];
+                for (var i = 0; i < $scope.tests.length; i++) {
+                    tests.push(Object.assign({}, $scope.tests[i]));
+                    tests[i].test_name = tests[i].test_name.toUpperCase();
+                }
+                insertIndex($scope.editTests, tests, 'test_name', copy.id);
+            }, function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save the new test." + errorResponse());
+            }
+        );
     };
 
     $scope.updateHoliday = function(holidayId, index) {
@@ -207,7 +299,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
-    $scope.updateTest = function(testId) {
+    $scope.updateTest = function(testId, index) {
         var newTest = Object.assign({}, $scope.eTests[testId]);
         delete newTest.id;
         testService.updateTest(testId, newTest).then(
@@ -215,7 +307,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 // update $scope.tests
                 for (var i = 0; i < $scope.tests.length; i++) {
                     if ($scope.tests[i].id === testId) {
-                        $scope.tests[i] = response.test;
+                        $scope.tests[i] = response.standardized_test;
                     }
                 }
                 $scope.cancelEdit(index, 'test')

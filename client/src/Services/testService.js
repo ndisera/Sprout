@@ -57,7 +57,7 @@ app.factory("testService", function ($rootScope, $http, $q, queryService) {
          * @param {object} testObj - the test object.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        addTestScore: function (testObj) {
+        addTest: function (testObj) {
             var deferred = $q.defer();
             $http({
                 method: 'POST',
