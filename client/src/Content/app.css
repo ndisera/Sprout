@@ -428,11 +428,11 @@ a {
 }
 
 .panel-add {
-    border: 3px dashed #49b687;
+    border: 2px solid #49b687;
 }
 
 .panel-add:hover {
-    border: 3px dashed #41a479;
+    border: 2px solid #41a479;
 }
 
 .panel-add > .panel-heading {
@@ -462,6 +462,10 @@ a {
 
 .zero-width {
     width: 0px;
+}
+
+.full-width {
+    width: 100%;
 }
 
 [date-picker] {
@@ -760,6 +764,31 @@ ul.dropdown-menu > li > a:hover {
 
 .btn-glyphicon > span.btn-text {
     margin-top: -5px;
+}
+
+.table-container {
+    display: table;
+}
+
+.table-row {
+    display: table-row;
+}
+
+.table-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.btn.hover-success:hover {
+    background-color: #57bc90;
+    color: #eee;
+    border-color: #49b687;
+}
+
+.btn.hover-danger:hover {
+    background-color:#d9534f;
+    color: #eee;
+    border-color: #d43f3a;
 }
 
 

@@ -127,6 +127,23 @@
     margin: 20px 0px;
 }
 
+#student-services-wrapper .table-container {
+    width: 100%;
+}
+
+#student-services-wrapper .table-cell {
+    vertical-align: bottom;
+}
+
+#student-services-wrapper .table-cell:first-child {
+    width: 1px;
+    vertical-align: middle;
+}
+
+#student-services-wrapper .table-cell:first-child label {
+    margin-right: 20px;
+}
+
 .student-services-panel .form-control-static {
     display: inline-block;
 }
@@ -135,6 +152,26 @@
     margin-right: 0px;
     margin-left: 0px;
 }
+
+.student-services-panel > .panel > .panel-heading.panel-heading-editing {
+    padding: 3px 15px;
+}
+
+.student-services-panel > .panel > .panel-heading.panel-heading-editing .glyphicon {
+    margin-top: 2px;
+}
+
+.student-services-panel > .panel > .panel-heading > .panel-heading-container {
+    display: inline-block;
+}
+
+.student-services-panel > .panel > .panel-heading.panel-heading-editing > .panel-heading-container {
+    width: 70%;
+}
+
+/*.student-services-panel > .panel > .panel-heading > input.form-control {*/
+    /*width: 70%;*/
+/*}*/
 
 .student-services-panel .panel-title {
     display: inline-block;
@@ -167,6 +204,24 @@
     color: #57bc90;
 }
 
+.student-services-bigger {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.student-services-red {
+    color: #813332;
+}
+
+.student-services-add .panel-header-btn {
+    margin-top: 2px;
+    margin-right: -11px;
+}
+
+.student-services-panel.panel-add > .panel > .panel-heading {
+    background-color: #eee;
+}
+
 
 @media (max-width: 768px) {
     #student-overview-title {
@@ -183,6 +238,10 @@
 
     #student-overview-edit-input-group {
         padding-left: 15px;
+    }
+
+    .student-services-panel > .panel > .panel-heading.panel-heading-editing > .panel-heading-container {
+        width: 100%;
     }
 }
 

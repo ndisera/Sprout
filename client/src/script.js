@@ -348,7 +348,10 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             controller: 'studentServicesController',
             resolve: {
                 services: function(studentService, $route) {
-                    return studentService.getServicesForStudent($route.current.params.id);
+                    var config = {
+                        include: ['fulfilled_user.*', ],
+                    };
+                    return studentService.getServicesForStudent($route.current.params.id, config);
                 },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
