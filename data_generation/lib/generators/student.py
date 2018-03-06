@@ -25,8 +25,8 @@ class StudentGenerator(object):
     def generate_many_random_students(self,
                                       num_students,
                                       case_manager_ids,
-                                      first_names_file="services/first_names.txt",
-                                      last_names_file="services/last_names.txt",
+                                      first_names_file="first_names.txt",
+                                      last_names_file="last_names.txt",
                                       birthdate_range_start=datetime.date(2006, 9, 1),
                                       birthdate_range_end=datetime.date(2008, 9, 1)):
         """Generate a specified number of students by reading first and last names from text files
