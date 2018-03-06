@@ -508,6 +508,18 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                         //todo: Display the five most recent scores of the test given to us
                         //sort the test scores data by date and then go down the list, breaking out when 5 tests have been counted
                         var studentTestScores = _.sortBy(studentTestScoresRaw.standardized_test_scores, 'date');
+                        var interestingScores = [];
+                        var interestingDates = [];
+                        //filter the list to only include the last 5 interesting scores
+                        var i;
+                        for (i = 0; i < studentTestScores.length; i++) {
+                            if (studentTestScores[i].standardized_test === specificID) {
+                                interestingScores.push(studentTestScores[i].score);
+                                interestingDates.push(moment(studentTestScores[i].date).format('MM/DD').toString());
+                            }
+                        }
+                        interestingScores = interestingScores.slice(-5);
+                        interestingDates = interestingScores.slice(-5);
 
                         currentGraph.data = [];
                         currentGraph.labels = [];
@@ -515,16 +527,9 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                         currentGraph.labels.push(_.times(5, _.constant(null)));
 
                         //set data and label
-                        var scoreCounter = 0;
-                        for (var i = 0; i < studentTestScores.length; i++) {
-                            if (studentTestScores[i].standardized_test === specificID) {
-                                var currentDate = studentTestScores[i].date;
-                                currentGraph.data[0][scoreCounter] = studentTestScores[i].score;
-                                currentGraph.labels[scoreCounter] = moment(currentDate).format('MM/DD').toString();
-                                scoreCounter++;
-                            }
-                            if(scoreCounter > 5)
-                                break;
+                        for (i = 0; i < interestingScores.length; i++) {
+                            currentGraph.data[0][i] = interestingScores[i];
+                            currentGraph.labels[i] = interestingDates[i];
                         }
 
                         //set the y-axis bounds
