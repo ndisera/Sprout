@@ -17,18 +17,24 @@
 <div class="sortable voffset3" ui-sortable="sortableOptions" ng-model="focusStudents">
     <div class="row focus-student-row" ng-repeat="focusStudent in focusStudents" ng-class="{ 'not-sortable': !editing, }">
         <div class="col-xs-12">
-            <div class="focus-remove-button" ng-if="editing">
-                <button ng-click="removeFocusStudent(focusStudent)" class="btn btn-danger" type="button">
-                    <span class="glyphicon glyphicon-minus white"></span>
-                </button>
-            </div>
+            <!--<div class="focus-remove-button" ng-if="editing">-->
+                <!--<button ng-click="removeFocusStudent(focusStudent)" class="btn btn-danger" type="button">-->
+                    <!--<span class="glyphicon glyphicon-minus white"></span>-->
+                <!--</button>-->
+            <!--</div>-->
             <div ng-class="{ 'focus-student-panel-editing': editing, }">
+            <!--<div>-->
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
                         <div class="panel-heading panel-heading-link" ng-click="editing ? noop() : location.path('/student/' + focusStudent.student)">
                             <h4 class="panel-title big">
                                 {{ studentsLookup[focusStudent.student].first_name }} {{ studentsLookup[focusStudent.student].last_name }}
                             </h4>
+                            <div class="focus-delete-group" ng-if="editing">
+                                <button class="btn btn-danger btn-manipulate" type="button" ng-click="removeFocusStudent(focusStudent)">
+                                    <span class="glyphicon glyphicon-minus"></span>
+                                </button>
+                            </div>
                         </div>
                         <div id="collapse-{{ $index }}" class="panel-collapse collapse" ng-class="{ 'in': !editing, }">
                             <div class="panel-body">
@@ -117,17 +123,15 @@
         </div>
     </div>
 </div>
-<div class="row" ng-if="editing && focusStudents.length < 5">
+<div class="btn-manipulate-row-bottom" ng-if="editing && focusStudents.length < 5 && !adding">
+    <button class="btn btn-success btn-manipulate" type="button" data-toggle="tooltip" title="Add Focus Student" ng-click="toggleAdd(true)">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
+</div>
+<div class="row voffset4" ng-if="editing && focusStudents.length < 5">
     <div class="col-xs-12">
-        <div class="panel panel-default panel-add pointer" ng-show="!adding" ng-click="toggleAdd(true)">
-            <div class="panel-heading">
-                <h4 class="panel-title centerText">
-                    <span class="glyphicon glyphicon-plus blackish"></span>
-                </h4>
-            </div>
-        </div>
         <div class="panel-wrapper" ng-show="adding">
-            <div class="panel panel-default">
+            <div class="panel panel-default no-bottom-margin">
                 <div class="panel-heading">
                     <h4 class="panel-title">Add Student</h4>
                     <button type="button" class="btn btn-danger panel-header-btn pull-right" ng-click="toggleAdd(false)">Cancel</button>
@@ -153,7 +157,7 @@
                                         <td>{{ student.last_name }}</td>
                                         <td>{{ student.student_id }}</td>
                                         <td>{{ student.birthdate }}</td>
-                                        <td>
+                                        <td class="buttonColumn table-button-col">
                                             <button class="btn btn-success btn-xs" type="button">
                                                 <span class="glyphicon glyphicon-plus"></span>
                                             </button>
@@ -168,7 +172,7 @@
         </div>
     </div>
 </div>
-<div class="row" ng-if="editing">
+<div class="row voffset4" ng-if="editing">
     <div class="col-xs-12">
         <div class="alert alert-info">
             <span><b>Tip:</b> You can reorder your focus students by dragging and dropping.</span>

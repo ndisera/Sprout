@@ -6,6 +6,10 @@
         *display: inline; /* ie7 fix */
         zoom: 1; /* hasLayout ie7 trigger */
     }
+
+    .student-mobile-spacer {
+        margin-top: 15px;
+    }
 }
 
 .student-name-title {
@@ -22,6 +26,7 @@
 }
 
 #student-overview-title {
+    font-weight: 200;
     margin-top: 60px;
     overflow-wrap: break-word;
 }
@@ -123,6 +128,94 @@
     margin: 20px 0px;
 }
 
+.student-services-panel .form-control-static {
+    display: inline-block;
+}
+
+.student-services-panel .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.student-services-panel {
+    border-color: #c9302c;
+}
+
+.student-services-panel.fulfilled {
+    border-color: #57bc90;
+}
+
+.student-services-red {
+    color: #813332;
+}
+
+.student-services-checkbox {
+    padding-top: 7px;
+}
+
+.student-services-panel .panel-body {
+    background-color: #faebea;
+}
+
+.student-services-panel.fulfilled .panel-body {
+    background-color: #edf7f3;
+}
+
+.student-services-panel .student-services-delete {
+    margin-top: -9px;
+    margin-right: -9px;
+}
+
+.student-ieps-spacer {
+    margin-top: 20px;
+}
+
+.student-ieps-tiny-col {
+    width: 17%;
+}
+
+.student-ieps-min-col {
+    width: 1px;
+}
+
+.student-ieps-hover-pencil {
+    margin-right: 20px;
+}
+
+.student-ieps-note-title {
+    font-weight: 400;
+}
+
+.student-ieps-note-spacer {
+    margin-top: 2px;
+}
+
+#student-ieps-select > .input-group-addon {
+    width: unset;
+}
+
+#student-ieps-select > .input-group-btn {
+    width: 100%;
+}
+
+#student-ieps-select > .input-group-btn > button {
+    width: 100%;
+}
+
+#student-ieps-select > .input-group-btn > ul {
+    width: 100%;
+}
+
+#student-ieps-select > .input-group-btn > ul {
+    width: 100%;
+}
+
+#student-ieps-edit-form .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+
 @media (max-width: 768px) {
     #student-overview-title {
         margin-top: 15px;
@@ -138,6 +231,10 @@
 
     #student-overview-edit-input-group {
         padding-left: 15px;
+    }
+
+    .student-services-panel > .panel > .panel-heading.panel-heading-editing > .panel-heading-container {
+        width: 100%;
     }
 }
 

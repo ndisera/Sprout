@@ -182,13 +182,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             document.getElementById('cAddButton').classList.remove('active');
             document.getElementById('cAddButton2').classList.remove('active');
         }
-        if (task === 'delete') {
-            document.getElementById('cDeleteButton').classList.add('active');
-            document.getElementById('cDeleteButton2').classList.add('active');
-        } else {
-            document.getElementById('cDeleteButton').classList.remove('active');
-            document.getElementById('cDeleteButton2').classList.remove('active');
-        }
     }
 
     /**
@@ -257,11 +250,9 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Sets edit all button according to what edit fields are ready to edit.
      */
     function checkIfAllSelected() {
-        if ($scope.viewCTitle === true && $scope.viewCTeacher === true &&
-            $scope.viewCTerm === true && $scope.viewCPeriod === true) {
+        if ($scope.viewCTitle && $scope.viewCTeacher && $scope.viewCTerm && $scope.viewCPeriod) {
             $scope.editingAll = true;
-        } else if ($scope.viewCTitle === false && $scope.viewCTeacher === false &&
-            $scope.viewCTerm === false && $scope.viewCPeriod === false) {
+        } else if (!$scope.viewCTitle && !$scope.viewCTeacher && !$scope.viewCTerm && !$scope.viewCPeriod) {
             $scope.editingAll = false;
         }
     }
@@ -416,7 +407,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             $scope.sectionD = {};
             $scope.sectionDeleteSearch = "";
             $scope.deleteSectionSuccess = true;
-            $scope.displaySectionDeleteSearch = true;
             $scope.displaySectionInfo = false;
             // check to see if sectionV/E is this deleted section and change view accordingly
             if ($scope.sectionV.id === id) {
@@ -438,6 +428,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      */
     $scope.setSectionD = function(section) {
         $scope.sectionD = section;
+        $("#deleteSectionModal").modal();
     }
 
     /**

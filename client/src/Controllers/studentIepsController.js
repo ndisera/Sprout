@@ -1,4 +1,417 @@
-app.controller("studentIepsController", function($scope, $rootScope, $location, $routeParams, student) {
+app.controller("studentIepsController", function($scope, $rootScope, $location, $routeParams, toastService, studentService, student, ieps) {
     $scope.location = $location;
     $scope.student = student.student;
+
+    $scope.ieps        = [];
+    $scope.selectedIep = {};
+
+    if(ieps !== null && ieps !== undefined) {
+        if(ieps.iep_goals !== null && ieps.iep_goals !== undefined) {
+            //TODO(gzuber): REMOVE
+            $scope.ieps = _.sortBy(ieps.iep_goals, function(elem) { return elem.id * -1; });
+            _.each($scope.ieps, function(elem) {
+                elem.editing = false;
+                elem.addingData = false;
+                elem.addingNote = false;
+                elem.due_date = moment(elem.due_date);
+                elem.due_date_temp = moment(elem.due_date);
+                elem.title_temp = elem.title;
+                resetNewData(elem);
+                resetNewNote(elem);
+            });
+        }
+    }
+
+    $scope.selectIep = function(iep) {
+        $scope.selectedIep = iep;
+        $scope.updateIep(iep);
+    }
+
+    function resetNewData(iep) {
+        iep.newData = {
+            date: moment(),
+            goal: iep.id,
+            note: '',
+            value: 0,
+        };
+    }
+
+    function resetNewNote(iep) {
+        iep.newNote = {
+            goal: iep.id,
+            title: '',
+            note: '',
+        };
+    }
+
+    $scope.noteValidation = function(note) {
+        if(note.title_temp === null || note.title_temp === undefined || note.title_temp === '') {
+            return true;
+        }
+        if(note.body_temp === null || note.body_temp === undefined || note.body_temp === '') {
+            return true;
+        }
+        return false;
+    }
+
+    $scope.dataValidation = function(iep, data) {
+        if(data.date_temp === null || data.date_temp === undefined || data.date_temp === '') {
+            return true;
+        }
+        return $scope.dataValueValidation(iep, data);
+    }
+
+    $scope.dataValueValidation = function(iep, data) {
+        if(iep.quantitative) {
+            if(data.value_temp === null || data.value_temp === undefined || data.value_temp === '') {
+                return true;
+            }
+            var val = parseInt(data.value_temp);
+            if(val === NaN || val < iep.quantitative_range_low || val > iep.quantitative_range_upper) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    $scope.dataNewValueValidation = function(iep, data) {
+        if(iep.quantitative) {
+            if(data.value === null || data.value === undefined || data.value === '') {
+                return true;
+            }
+            var val = parseInt(data.value);
+            if(val === NaN || val < iep.quantitative_range_low || val > iep.quantitative_range_upper) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    $scope.toggleEditIep = function(iep, value) {
+        iep.editing = value;
+        if(!iep.editing) {
+            iep.title_temp = iep.title;
+            iep.due_date_temp = iep.due_date;
+        }
+    };
+
+    $scope.toggleEditData = function(data, value) {
+        data.editing = value;
+        if(!data.editing) {
+            data.date_temp = data.date;
+            data.value_temp = data.value;
+            data.note_temp = data.note;
+        }
+    };
+
+    $scope.toggleEditNote = function(note, value) {
+        note.editing = value;
+        if(!note.editing) {
+            note.title_temp = note.title;
+            note.body_temp = note.body;
+        }
+    };
+
+    $scope.toggleAddData = function(iep, value) {
+        iep.addingData = value;
+        if(!iep.addingData) {
+            resetNewData(iep);
+        }
+    };
+
+    $scope.toggleAddNote = function(iep, value) {
+        iep.addingNote = value;
+        if(!iep.addingNote) {
+            resetNewNote(iep);
+        }
+    };
+
+    $scope.updateIep = function(iep) {
+        studentService.getIepDatasForStudent($scope.student.id, iep.id).then(
+            function success(data) {
+                if(data !== null && data !== undefined) {
+                    if(data.iep_goal_datapoints !== null && data.iep_goal_datapoints !== undefined) {
+                        iep.datapoints = data.iep_goal_datapoints;
+                        _.each(iep.datapoints, function(e) {
+                            e.date = moment(e.date);
+                            e.date_temp = moment(e.date);
+                            e.value_temp = e.value;
+                            e.note_temp = e.note;
+                            e.editing = false;
+                        });
+                        iep.datapoints = _.sortBy(iep.datapoints, 'date');
+
+                        var backgroundColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.2).toRgbString();
+                        var borderColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.7).toRgbString();
+
+                        iep.graph = {
+                            labels: [],
+                            series: ['Progress', ],
+                            data: [],
+                            options: {
+                                elements: {
+                                    line: {
+                                        fill: true,
+                                    },
+                                },
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    yAxes: [
+                                        {
+                                            display: true,
+                                            ticks: {
+                                                min: iep.quantitative_range_low,
+                                                max: iep.quantitative_range_upper,
+                                            },
+                                        },
+                                    ],
+                                },
+                                spanGaps: true,
+                            },
+                            datasetOverride: {
+                                backgroundColor: [backgroundColor, ],
+                                borderColor: [borderColor, ],
+                            },
+                        };
+
+                        if(iep.datapoints.length === 0) {
+                            iep.graph.show = false;
+                        }
+                        else {
+                            iep.graph.show = true;
+
+                            // iterate through each date, setting data as necessary
+                            // can take first and last because it's sorted
+                            var iterDate = iep.datapoints[0].date.clone();
+                            var dateDiff = iep.datapoints[iep.datapoints.length - 1].date.diff(iep.datapoints[0].date, 'd');
+                            var j = 0;
+                            for(var i = 0; i < dateDiff + 1; i++) {
+                                iep.graph.labels[i] = iterDate.format('MM/DD').toString();
+
+                                if(iep.datapoints[j]) {
+                                    var date = moment(iep.datapoints[j].date);
+                                    var average = 0;
+                                    var averageCount = 0;
+                                    while(date.diff(iterDate, 'd') === 0) {
+                                        average += iep.datapoints[j].value;
+                                        averageCount++;
+
+                                        j++;
+                                        if(j >= iep.datapoints.length) { break; }
+                                        date = moment(iep.datapoints[j].date);
+                                    }
+
+                                    if(averageCount !== 0) {
+                                        iep.graph.data[i] = average / averageCount;
+                                    }
+                                    else {
+                                        iep.graph.data[i] = null;
+                                    }
+                                }
+                                iterDate.add(1, 'd');
+                            }
+                        }
+                        console.log(iep);
+                    }
+                }
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to get this IEP Goal.');
+            },
+        );
+
+        studentService.getIepNotesForStudent($scope.student.id, iep.id).then(
+            function success(data) {
+                if(data !== null && data !== undefined) {
+                    if(data.iep_goal_notes !== null && data.iep_goal_notes !== undefined) {
+                        iep.notes = data.iep_goal_notes;
+                        _.each(iep.notes, function(e) {
+                            e.date = moment(e.date);
+                            e.title_temp = e.title;
+                            e.body_temp = e.body;
+                            e.editing = false;
+                        });
+                    }
+                }
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to get this IEP Goal.');
+            },
+        );
+    }
+
+    function copyData(data) {
+        return {
+            goal: data.goal,
+            date: moment(data.date),
+            value: data.value,
+            note: data.note,
+        };
+    }
+
+    function copyNote(note) {
+        return {
+            goal: note.goal,
+            title: note.title,
+            body: note.body,
+        };
+    }
+
+    function copyIep(iep) {
+        return {
+            due_date: moment(iep.due_date),
+            title: iep.title,
+            student: iep.student,
+            quantitative: iep.quantitative,
+            quantitative_range_low: iep.quantitative_range_low,
+            quantitative_range_upper: iep.quantitative_range_upper,
+            quantitative_category: iep.quantitative_category,
+        };
+    }
+
+    $scope.addData = function(iep) {
+        var toSave = copyData(iep.newData);
+        if(toSave.note === undefined || toSave.note === '') {
+            toSave.note = null;
+        }
+        else {
+            toSave.note = iep.newData.note;
+        }
+
+        toSave.goal = iep.id;
+        toSave.value = iep.newData.value;
+
+        //TODO(gzuber): get simon to change this
+        toSave.date = moment(iep.newData.date).hour(moment().hour()).minute(moment().minute()).format().toString();
+        //toSave.date = iep.newData.date.format('YYYY-MM-DDThh:mm').toString();
+        //toSave.data.hour(moment().hour());
+        //toSave.data.minute(moment().minute());
+
+        studentService.addIepDataForStudent($scope.student.id, iep.id, toSave).then(
+            function success(data) {
+                // take the cowards way out
+                // TODO(gzuber): stitch into existing graph?
+                $scope.updateIep(iep);
+                if(iep.addingData) {
+                    $scope.toggleAddData(iep, false);
+                }
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to add the measurement.');
+            },
+        );
+    }
+
+    $scope.saveData = function(iep, data) {
+        var toSave = copyData(data);
+        if(toSave.note === undefined || toSave.note === '') {
+            toSave.note = null;
+        }
+        else {
+            toSave.note = data.note_temp;
+        }
+
+        //TODO(gzuber): get simon to change this
+        toSave.date = moment(data.date_temp).hour(moment().hour()).minute(moment().minute()).format().toString();
+        toSave.value = data.value_temp;
+
+        studentService.updateIepDataForStudent($scope.student.id, iep.id, data.id, toSave).then(
+            function success(data) {
+                //data.date = moment(data.iep_goal_datapoint.date);
+                //data.date_temp = moment(data.iep_goal_datapoint.date);
+                //data.value = data.iep_goal_datapoint.value;
+                //data.value_temp = data.iep_goal_datapoint.value;
+                //data.note = data.iep_goal_datapoint.note;
+                //data.note_temp = data.iep_goal_datapoint.note;
+                
+                $scope.updateIep(iep);
+
+                if(data.editing) {
+                    $scope.toggleEditData(data, false);
+                }
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to save the measurement.');
+            },
+        );
+
+
+    }
+
+    $scope.addNote = function(iep) {
+        var toSave = copyNote(iep.newNote);
+        
+        toSave.title = iep.newNote.title;
+        toSave.body = iep.newNote.body;
+
+        studentService.addIepNoteForStudent($scope.student.id, iep.id, toSave).then(
+            function success(data) {
+                var newNote = data.iep_goal_note;
+                newNote.date = moment(newNote.date);
+                newNote.title_temp = newNote.title;
+                newNote.body_temp = newNote.body;
+                newNote.editing = false;
+
+                iep.notes.push(newNote);
+
+                if(iep.addingNote) {
+                    $scope.toggleAddNote(iep, false);
+                }
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to add the note.');
+            },
+        );
+
+    }
+
+    $scope.saveNote = function(iep, note) {
+        var toSave = copyNote(note);
+        
+        toSave.title = note.title_temp;
+        toSave.body = note.body_temp;
+
+        studentService.updateIepNoteForStudent($scope.student.id, iep.id, note.id, toSave).then(
+            function success(data) {
+                note.date = moment(data.iep_goal_note.date);
+                note.title = data.iep_goal_note.title;
+                note.title_temp = data.iep_goal_note.title;
+                note.body = data.iep_goal_note.body;
+                note.body_temp = data.iep_goal_note.body;
+
+                if(note.editing) {
+                    $scope.toggleEditNote(note, false);
+                }
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to save the note.');
+            },
+        );
+    }
+
+    $scope.saveIep = function(iep) {
+        var toSave = copyIep(iep);
+
+        toSave.title = iep.title_temp;
+        toSave.due_date = iep.due_date_temp.format('YYYY-MM-DD').toString();
+
+        studentService.updateIepForStudent($scope.student.id, iep.id, toSave).then(
+            function success(data) {
+                iep.title = data.iep_goal.title;
+                iep.title_temp = data.iep_goal.title;
+                iep.due_date = moment(data.iep_goal.due_date);
+                iep.due_date_temp = moment(data.iep_goal.due_date);
+
+                if(iep.editing) {
+                    $scope.toggleEditIep(iep, false);
+                }
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to save the measurement.');
+            },
+        );
+    }
+
+    $scope.selectIep($scope.ieps[0]);
 });

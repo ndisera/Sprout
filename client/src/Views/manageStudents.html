@@ -5,13 +5,11 @@
         <div class="taskSelection btn-group hidden-xs">
             <button id="sViewButton" type="button" class="btn btn-primary active" ng-click="changeStudentTask('view/edit')">View/Edit</button>
             <button id="sAddButton" type="button" class="btn btn-primary" ng-click="changeStudentTask('add')">Add</button>
-            <button id="sDeleteButton" type="button" class="btn btn-primary" ng-click="changeStudentTask('delete')">Delete</button>
         </div>
         <h3 class="hidden-sm hidden-md hidden-lg hidden-xl centerText">Students</h3>
         <div class="btn-group hidden-sm hidden-md hidden-lg hidden-xl smBtnGroup">
             <button id="sViewButton2" type="button" class="btn btn-primary active" ng-click="changeStudentTask('view/edit')">View/Edit</button>
             <button id="sAddButton2" type="button" class="btn btn-primary" ng-click="changeStudentTask('add')">Add</button>
-            <button id="sDeleteButton2" type="button" class="btn btn-primary" ng-click="changeStudentTask('delete')">Delete</button>
         </div>
         <hr />
         <div class="panel-wrapper" ng-show="displayStudentViewSearch">
@@ -32,14 +30,22 @@
                                         <th>Last Name</th>
                                         <th>Student ID</th>
                                         <th>Birthday</th>
+                                        <th class="buttonColumn"></th>
+                                        <th class="buttonColumn"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="student in studentInfo.students | filter:viewStudentFilter | orderBy:'last_name'" ng-click="viewStudent(student.id)" class="pointer">
+                                    <tr ng-repeat="student in studentInfo.students | filter:viewStudentFilter | orderBy:'last_name'" ng-click="viewStudent(student.id)" class="pointer" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
                                         <td>{{ student.first_name }}</td>
                                         <td>{{ student.last_name }}</td>
                                         <td>{{ student.student_id }}</td>
                                         <td>{{ student.birthdate }}</td>
+                                        <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                        <td class="buttonColumn table-button-col">
+                                            <button class="btn btn-danger btn-xs" type="button" ng-click="setStudentD(student); $event.stopPropagation();">
+                                                <i class="glyphicon glyphicon-trash white"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -79,7 +85,7 @@
                                 <input required autocomplete="off" type="text" date-time class="form-control" id="sbirthday" placeholder="Enter Birthday (Example: '1996-05-20')" name="sbirthday" ng-model="newStudent.birthdate" view="year" min-view="date" format="YYYY-MM-DD">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group no-bottom-margin">
                             <div class="col-sm-offset-2 col-sm-10">
                                 <button ng-disabled="addStudentForm.$invalid" type="submit" class="btn btn-success">Add</button>
                             </div>
@@ -115,8 +121,8 @@
                                         <td>{{ student.last_name }}</td>
                                         <td>{{ student.student_id }}</td>
                                         <td>{{ student.birthdate }}</td>
-                                        <td>
-                                            <button class="btn btn-danger btn-xs" type="button">Delete</button>
+                                        <td class="table-button-col">
+                                            <button class="btn btn-danger btn-xs" type="button"><span class="glyphicon glyphicon-trash"></span></button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -163,9 +169,13 @@
                         <div class="alert alert-warning">
                             <span><b>Warning:</b> This can't be undone.</span>
                         </div>
-                    </div>
-                    <div class="modal-footer grey">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="deleteStudent()">Delete</button>
+                        <div class="voffset4">
+                        </div>
+                        <div class="btn-manipulate-row">
+                            <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteStudent()">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

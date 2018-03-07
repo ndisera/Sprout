@@ -91,7 +91,7 @@
                                     <label class="control-label" for="cnewpwd">Confirm New Password:</label>
                                     <input required min-length="8" type="password" class="form-control" id="cnewpwd" placeholder="Enter New Password" name="cnewpwd" ng-model="confirmPassword">
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group no-bottom-margin">
                                     <button ng-disabled="passwordForm.$invalid" type="submit" class="btn btn-success">Update</button>
                                 </div>
                             </form>
@@ -102,3 +102,4 @@
         </div>
     </div>
 </div>
+<div ng-include="'html/bottomSpacer.html'"></div>

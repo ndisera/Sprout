@@ -39,6 +39,7 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      */
     $scope.setTeacherD = function(teacher) {
         $scope.teacherD = teacher;
+        $("#deleteTeacherModal").modal();
     };
 
     /**
@@ -244,8 +245,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             }
             var pk = $scope.teacherD.pk;
             $scope.teacherD = {};
-            //$scope.deleteTeacherSuccess = true; assuming this isn't necessary
-            $scope.displayTeacherDeleteSearch = true;
             $scope.teacherDeleteSearch = "";
             // check to see if teacherV/E is this deleted teacher and change view accordingly
             if ($scope.teacherV.pk === pk) {
@@ -294,9 +293,9 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      * Sets edit all button according to what edit fields are ready to edit.
      */
     function checkIfAllSelected() {
-        if ($scope.viewTFirstName === true && $scope.viewTLastName === true) {
+        if ($scope.viewTFirstName && $scope.viewTLastName) {
             $scope.editingAll = true;
-        } else if ($scope.viewTFirstName === false && $scope.viewTLastName === false) {
+        } else if (!$scope.viewTFirstName && !$scope.viewTLastName) {
             $scope.editingAll = false;
         }
     }
@@ -416,13 +415,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         } else {
             document.getElementById('tAddButton').classList.remove('active');
             document.getElementById('tAddButton2').classList.remove('active');
-        }
-        if (task === 'delete') {
-            document.getElementById('tDeleteButton').classList.add('active');
-            document.getElementById('tDeleteButton2').classList.add('active');
-        } else {
-            document.getElementById('tDeleteButton').classList.remove('active');
-            document.getElementById('tDeleteButton2').classList.remove('active');
         }
     }
 

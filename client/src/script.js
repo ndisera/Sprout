@@ -128,6 +128,23 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 auth: function(userService) {
                     return userService.authVerify();
                 },
+                holidays: function(holidayService) {
+                    return holidayService.getHolidays();
+                },
+                termsInfo: function(termService) {
+                    return termService.getTerms({
+                        include: ['settings.schedule.*']
+                    });
+                },
+                tests: function(testService) {
+                    return testService.getTests();
+                },
+                schools: function(schoolService) {
+                    return schoolService.getSchools();
+                },
+                schedules: function(scheduleService) {
+                    return scheduleService.getSchedules();
+                },
             },
         })
 
@@ -193,7 +210,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                                 filter: [ { name: 'case_manager', val: userService.user.id, }, ],
                             };
                             deferreds.push(studentService.getStudents(studentConfig));
-                            
+
                             $q.all(deferreds)
                                 .then(function(data) {
                                     deferred.resolve(data);
@@ -340,6 +357,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
+                ieps: function(studentService, $route) {
+                    return studentService.getIepsForStudent($route.current.params.id);
+                },
                 auth: function(userService) {
                     return userService.authVerify();
                 },
@@ -350,6 +370,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/studentServices.html',
             controller: 'studentServicesController',
             resolve: {
+                services: function(studentService, $route) {
+                    var config = {
+                        include: ['fulfilled_user.*', ],
+                    };
+                    return studentService.getServicesForStudent($route.current.params.id, config);
+                },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },

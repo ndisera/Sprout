@@ -45,7 +45,11 @@ class SettingsService(BaseService):
         return self._get_models(SchoolYear, self.complete_uri_school_years)
 
     def add_school(self, school):
-        return self._add_many_models([school], self.complete_uri_school)
+        """
+        Patch the one-and-only school model (fake-o singleton)
+        """
+        uri = self.complete_uri_template.format(endpoint="/settings/school/{id}").format(id=school.id)
+        return self._patch_model(school, uri)
 
     def add_schedule(self, schedule):
         return self.add_many_schedules([schedule])

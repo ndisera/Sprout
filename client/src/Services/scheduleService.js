@@ -1,16 +1,16 @@
-app.factory("termService", function ($rootScope, $http, $q, queryService) {
+app.factory("scheduleService", function ($rootScope, $http, $q, queryService) {
     return {
         /**
-         * Get terms
+         * Get schedules
          * @param {object} config - config object for query parameters (see queryService)
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getTerms: function (config) {
+        getSchedules: function (config) {
             var query = queryService.generateQuery(config);
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/terms' + query,
+                url: 'https://' + $rootScope.backend + '/settings/schedules' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -20,35 +20,16 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
         },
 
         /**
-         * Get term settings
-         * @param {object} config - config object for query parameters (see queryService)
+         * Add a schedule
+         * @param {object} scheduleObj - object to be added to schedules.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        getTermSettings: function (config) {
-            var query = queryService.generateQuery(config);
-            var deferred = $q.defer();
-            $http({
-                method: 'GET',
-                url: 'https://' + $rootScope.backend + '/settings/terms' + query,
-            }).then(function success(response) {
-                deferred.resolve(response.data);
-            }, function error(response) {
-                deferred.reject(response);
-            });
-            return deferred.promise;
-        },
-
-        /**
-         * Add a term
-         * @param {object} termObj - object to be added to terms.
-         * @return {promise} promise that will resolve with data or reject with response code.
-         */
-        addTerm: function (termObj) {
+        addSchedule: function (scheduleObj) {
             var deferred = $q.defer();
             $http({
                 method: 'POST',
-                url: 'https://' + $rootScope.backend + '/terms',
-                data: termObj,
+                url: 'https://' + $rootScope.backend + '/settings/schedules',
+                data: scheduleObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -58,17 +39,17 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
         },
 
         /**
-         * Update term
-         * @param {number} termId - the term id.
-         * @param {object} termObj - the object used to update the term.
+         * Update schedule
+         * @param {number} scheduleId - the schedule id.
+         * @param {object} scheduleObj - the object used to update the schedule.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        updateTerm: function (termId, termObj) {
+        updateSchedule: function (scheduleId, scheduleObj) {
             var deferred = $q.defer();
             $http({
                 method: 'PUT',
-                url: 'https://' + $rootScope.backend + '/terms/' + termId,
-                data: termObj,
+                url: 'https://' + $rootScope.backend + '/settings/schedules/' + scheduleId,
+                data: scheduleObj,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {
@@ -78,15 +59,15 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
         },
 
         /**
-         * Delete term
-         * @param {number} termId - the term id.
+         * Delete schedule
+         * @param {number} scheduleId - the schedule id.
          * @return {promise} promise that will resolve with data or reject with response code.
          */
-        deleteTerm: function (termId) {
+        deleteSchedule: function (scheduleId) {
             var deferred = $q.defer();
             $http({
                 method: 'DELETE',
-                url: 'https://' + $rootScope.backend + '/terms/' + termId,
+                url: 'https://' + $rootScope.backend + '/settings/schedules/' + scheduleId,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

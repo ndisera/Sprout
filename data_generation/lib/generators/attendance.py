@@ -3,9 +3,8 @@
 import datetime
 import random
 
-from services.assignment import Assignment, AssignmentService
-from services.enrollment import Enrollment, EnrollmentService
-from services.attendance import AttendanceRecord, AttendanceService
+from lib.services.enrollment import EnrollmentService
+from lib.services.attendance import AttendanceRecord, AttendanceService
 
 ATTENDANCE_CODES_DESCS = [
     ('T', 'Tardy'),

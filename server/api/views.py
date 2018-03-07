@@ -5,6 +5,7 @@ import coreschema
 import datetime
 from django.db.models import Q
 from django.utils import timezone
+import django.db.utils
 from django.http.response import HttpResponseNotFound, HttpResponse
 from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
 from rest_framework import mixins, generics
@@ -192,6 +193,17 @@ class SchoolSettingsViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = SchoolSettingsSerializer
+
+    # Build the 'singleton' object if it doesn't exist
+    try:
+        try:
+            SchoolSettings.objects.get(id=1)
+        except SchoolSettings.DoesNotExist:
+            SchoolSettings.objects.create(id=1, grade_range_lower=6, grade_range_upper=8)
+    except django.db.utils.OperationalError:
+        # While the setup scripts are running, before the DB is built, this code gets hit.
+        # Crashing then would be bad. So don't.
+        pass
     queryset = SchoolSettings.objects.all()
 
     """ define custom schema for documentation """
@@ -243,24 +255,16 @@ class TermSettingsViewSet(NestedDynamicViewSet):
     """ ensure variables show as correct types for docs """
     name_schedule = 'schedule'
     desc_schedule = "ID of the TermSettings object controlling this term"
-    name_school_year = 'school_year'
-    desc_school_year = "ID of the SchoolSettings object this term takes place in"
 
     schedule_field = coreapi.Field(name=name_schedule,
                                    required=True,
                                    location="form",
                                    description=desc_schedule,
                                    schema=coreschema.Integer(title=name_schedule))
-    school_year_field = coreapi.Field(name=name_school_year,
-                                      required=True,
-                                      location="form",
-                                      description=desc_school_year,
-                                      schema=coreschema.Integer(title=name_school_year))
 
     schema = AutoSchema(
         manual_fields=[
             schedule_field,
-            school_year_field,
         ])
 
 
