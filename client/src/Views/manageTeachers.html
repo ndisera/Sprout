@@ -34,14 +34,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter | orderBy:'last_name'" ng-click="viewTeacher(teacher)" class="pointer"
-                                        ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
+                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter | orderBy:'last_name'" ng-click="viewTeacher(teacher)" class="pointer" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
                                         <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
-                                        <td>
-                                            <button class="btn btn-danger btn-xs" type="button" ng-click="setTeacherD(teacher); $event.stopPropagation();">Delete</button>
+                                        <td class="buttonColumn table-button-col">
+                                            <button class="btn btn-danger btn-xs" type="button" ng-click="setTeacherD(teacher); $event.stopPropagation();">
+                                                <i class="glyphicon glyphicon-trash white"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -128,7 +129,7 @@
                         <div class="panel-body" ng-show="sections.length === 0">
                             <h4 class="centerText">No Classes</h4>
                         </div>
-                        <div class="manage-teachers-border-table table-responsive" ng-hide="sections.length === 0">
+                        <div class="table-responsive" ng-hide="sections.length === 0">
                             <table class="table">
                                 <tbody>
                                     <tr ng-repeat="section in sections | orderBy:'title'">
@@ -202,10 +203,8 @@
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
-                                        <td class="table-button-col">
-                                            <button class="btn btn-danger btn-xs" type="button">
-                                                <span class="glyphicon glyphicon-trash"></span>
-                                            </button>
+                                        <td>
+                                            <button class="btn btn-danger btn-xs" type="button">Delete</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -249,10 +248,10 @@
                         <div class="voffset4">
                         </div>
                         <div class="btn-manipulate-row">
-                            <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteStudent()">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
-                    </div>
+                            <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteTeacher()">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                        </div>
                     </div>
                 </div>
             </div>
