@@ -1,8 +1,17 @@
-app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, terms, tests, holidayService, testService, termService) {
+app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, termsInfo, tests, schools, holidayService, testService, termService, schoolService) {
     $scope.location = $location;
     $scope.holidays = holidays.holidays;
     $scope.tests = tests.standardized_tests;
-    $scope.terms = terms.terms;
+    $scope.terms = termsInfo.terms;
+
+    $scope.termsLookup = _.indexBy(termsInfo.terms, "id");
+    $scope.termSettings = _.indexBy(termsInfo.term_settings, "id");
+    $scope.dailySchedules = _.indexBy(termsInfo.daily_schedules, "id");
+
+    schools.school_settings.length > 0 ? $scope.school = schools.school_settings[0] : $scope.school = {};
+    $scope.gradeLevels = ["K", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    $scope.schoolMinGrade = $scope.school.grade_range_lower;
+    $scope.schoolMaxGrade = $scope.school.grade_range_upper;
 
     $scope.newHoliday = {};
     $scope.newTest = {};
@@ -13,6 +22,127 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.displayTermForm = false;
 
     $scope.edit = false;
+
+    $scope.editSchool = function(field) {
+        switch (field) {
+            case "name":
+                $scope.editSchoolName = true;
+                checkIfAllSelected();
+                break;
+            case "location":
+                $scope.editSchoolLocation = true;
+                checkIfAllSelected();
+                break;
+            case "minGrade":
+                $scope.editSchoolMinGrade = true;
+                checkIfAllSelected();
+                break;
+            case "maxGrade":
+                $scope.editSchoolMaxGrade = true;
+                checkIfAllSelected();
+                break;
+            case "all":
+                $scope.editSchoolName = true;
+                $scope.editSchoolLocation = true;
+                $scope.editSchoolMinGrade = true;
+                $scope.editSchoolMaxGrade = true;
+                $scope.editingAll = true;
+                break;
+            case "none":
+                $scope.editSchoolName = false;
+                $scope.editSchoolLocation = false;
+                $scope.editSchoolMinGrade = false;
+                $scope.editSchoolMaxGrade = false;
+                $scope.editingAll = false;
+                break;
+        }
+    };
+
+    $scope.cancelSchoolEdit = function(field) {
+        switch (field) {
+            case "name":
+                $scope.editSchoolName = false;
+                $scope.schoolName = "";
+                break;
+            case "location":
+                $scope.editSchoolLocation = false;
+                $scope.schoolLocation = "";
+                break;
+            case "minGrade":
+                $scope.editSchoolMinGrade = false;
+                break;
+            case "maxGrade":
+                $scope.editSchoolMaxGrade = false;
+                break;
+        }
+        checkIfAllSelected();
+    };
+
+    /**
+     * Updates school with the newly edited field.
+     * @param {string} field - the name of the field that the user is editing.
+     */
+    $scope.saveSchoolEdit = function(field) {
+        $scope.schoolE = Object.assign({}, $scope.school);
+        switch (field) {
+            // update field
+            case "name":
+                $scope.schoolE.school_name = $scope.schoolName;
+                break;
+            case "location":
+                $scope.schoolE.school_location = $scope.schoolLocation;
+                break;
+            case "minGrade":
+                $scope.schoolMinGrade === "K" ? $scope.schoolE.grade_range_lower = 0 : $scope.schoolE.grade_range_lower = $scope.schoolMinGrade;
+                break;
+            case "maxGrade":
+                $scope.schoolMaxGrade === "K" ? $scope.schoolE.grade_range_upper = 0 : $scope.schoolE.grade_range_upper = $scope.schoolMaxGrade;
+                break;
+            default:
+        }
+        // save with schoolE
+        delete $scope.schoolE.id;
+        schoolService.updateSchool(1, $scope.schoolE).then(
+            function success(data) {
+                $scope.school = data.school_settings;
+                switch (field) {
+                    // set view after call returns
+                    case "name":
+                        $scope.editSchoolName = false;
+                        $scope.schoolName = "";
+                        break;
+                    case "location":
+                        $scope.editSchoolLocation = false;
+                        $scope.schoolLocation = "";
+                        break;
+                    case "minGrade":
+                        $scope.editSchoolMinGrade = false;
+                        $scope.schoolMinGrade = $scope.school.grade_range_lower;
+                        break;
+                    case "maxGrade":
+                        $scope.editSchoolMaxGrade = false;
+                        $scope.schoolMaxGrade = $scope.school.grade_range_upper;
+                        break;
+                    default:
+                }
+                checkIfAllSelected();
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save your edit." + errorResponse());
+            });
+    };
+
+    /**
+     * Sets edit all button according to what edit fields are ready to edit.
+     */
+    function checkIfAllSelected() {
+        if ($scope.editSchoolName && $scope.editSchoolLocation && $scope.editSchoolMinGrade && $scope.editSchoolMaxGrade) {
+            $scope.editingAll = true;
+        } else if (!$scope.editSchoolName && !$scope.editSchoolLocation && !$scope.editSchoolMinGrade && !$scope.editSchoolMaxGrade) {
+            $scope.editingAll = false;
+        }
+    }
 
     /**
      * Cancels row edit

@@ -293,9 +293,9 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      * Sets edit all button according to what edit fields are ready to edit.
      */
     function checkIfAllSelected() {
-        if ($scope.viewTFirstName === true && $scope.viewTLastName === true) {
+        if ($scope.viewTFirstName && $scope.viewTLastName) {
             $scope.editingAll = true;
-        } else if ($scope.viewTFirstName === false && $scope.viewTLastName === false) {
+        } else if (!$scope.viewTFirstName && !$scope.viewTLastName) {
             $scope.editingAll = false;
         }
     }

@@ -58,9 +58,9 @@ app.controller("userSettingsController", function($scope, $rootScope, $location,
      * Sets edit all button according to what edit fields are ready to edit.
      */
     function checkIfAllSelected() {
-        if ($scope.viewUFirstName === true && $scope.viewULastName === true) {
+        if ($scope.viewUFirstName && $scope.viewULastName) {
             $scope.editingAll = true;
-        } else if ($scope.viewUFirstName === false && $scope.viewULastName === false) {
+        } else if (!$scope.viewUFirstName && !$scope.viewULastName) {
             $scope.editingAll = false;
         }
     }

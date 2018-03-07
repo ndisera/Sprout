@@ -131,12 +131,17 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 holidays: function(holidayService) {
                     return holidayService.getHolidays();
                 },
-                terms: function(termService) {
-                    return termService.getTerms();
+                termsInfo: function(termService) {
+                    return termService.getTerms({
+                        include: ['settings.schedule.*']
+                    });
                 },
                 tests: function(testService) {
                     return testService.getTests();
                 },
+                schools: function(schoolService) {
+                    return schoolService.getSchools();
+                }
             },
         })
 
