@@ -276,15 +276,15 @@ a {
     cursor: pointer;
 }
 
+.table-select-default > table.table-hover > tbody > tr:hover {
+    background-color: #d2ecf9;
+    color: #0c405a;
+}
+
 .table-select > table.table-hover > tbody > tr:hover {
     background-color: #d2ecf9;
     color: #0c405a;
     cursor: pointer;
-}
-
-.table-select-default > table.table-hover > tbody > tr:hover {
-    background-color: #d2ecf9;
-    color: #0c405a;
 }
 
 .table-select > table.table-hover > tbody > tr.active > td {

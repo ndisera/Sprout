@@ -131,12 +131,17 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 holidays: function(holidayService) {
                     return holidayService.getHolidays();
                 },
-                terms: function(termService) {
-                    return termService.getTerms();
+                termsInfo: function(termService) {
+                    return termService.getTerms({
+                        include: ['settings.schedule.*']
+                    });
                 },
                 tests: function(testService) {
                     return testService.getTests();
                 },
+                schools: function(schoolService) {
+                    return schoolService.getSchools();
+                }
             },
         })
 
@@ -199,7 +204,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                                 filter: [ { name: 'case_manager', val: userService.user.id, }, ],
                             };
                             deferreds.push(studentService.getStudents(studentConfig));
-
+                            
                             $q.all(deferreds)
                                 .then(function(data) {
                                     deferred.resolve(data);
