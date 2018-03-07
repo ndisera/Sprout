@@ -141,7 +141,10 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 schools: function(schoolService) {
                     return schoolService.getSchools();
-                }
+                },
+                schedules: function(scheduleService) {
+                    return scheduleService.getSchedules();
+                },
             },
         })
 
@@ -204,7 +207,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                                 filter: [ { name: 'case_manager', val: userService.user.id, }, ],
                             };
                             deferreds.push(studentService.getStudents(studentConfig));
-                            
+
                             $q.all(deferreds)
                                 .then(function(data) {
                                     deferred.resolve(data);

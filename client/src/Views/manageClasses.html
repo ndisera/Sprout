@@ -51,15 +51,18 @@
                                         <th>Term</th>
                                         <th>Period</th>
                                         <th class="buttonColumn"></th>
+                                        <th class="buttonColumn"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="section in sections | filter:{ term: viewSectionTerm.id } | filter:viewSectionFilter | orderBy:['schdule_position', 'title']" ng-click="viewSection(section)" class="pointer" ng-class="{ 'active': sectionV.id === section.id, }">
+                                    <tr ng-repeat="section in sections | filter:{ term: viewSectionTerm.id } | filter:viewSectionFilter | orderBy:['schdule_position', 'title']" ng-click="viewSection(section)"
+                                        class="pointer" ng-class="{ 'active': sectionV.id === section.id, }" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
                                         <td>{{ section.title }}</td>
                                         <td>{{ teacherIdLookup[section.teacher] }}</td>
                                         <td>{{ termsLookup[section.term].name }}</td>
                                         <td ng-if="section.schedule_position == null"></td>
                                         <td ng-if="section.schedule_position != null">{{ periodArraysLookup[termsLookup[section.term].name][section.schedule_position] }}</td>
+                                        <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
                                         <td>
                                             <button class="btn btn-danger btn-xs" type="button" ng-click="setSectionD(section); $event.stopPropagation();">Delete</button>
                                         </td>
