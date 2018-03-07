@@ -157,6 +157,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                         elem.ordering = tempLookup[elem.id].ordering;
                     });
                 });
+                updateFocusGraphs();
             },
             function error(response) {
                 // notify the user
@@ -196,6 +197,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                 if($scope.focusStudents.length >= 5) {
                     $scope.toggleAdd(false);
                 }
+                updateFocusGraphs();
             },
             function error(response) {
                 // notify the user
@@ -204,36 +206,39 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
         );
     };
 
-    /** tag: FOCUS CATEGORY PICKER RELATED CODE **/ //todo: These are Graham's changes. Integrate them with the rest of the process
+    /** tag: FOCUS CATEGORY PICKER RELATED CODE **/
     // add any static categories here
     $scope.focusCategories = [
         {
-            // category is what's returned by server, may be the same as displayName so you can remove display name if you want
-            // I'm not sure if you wanted to introduce some kind of scheme to category, like 'test:1' would mean the test with id 1
+            // category gets passed to UpdateFocusGraphs, along with the specificID.
             category: 'behavior',
             displayName: 'Behavior',
+            specificID: 1, //todo: placeholder. We would need a list of the student's classes before doing this
         },
         {
             category: 'effort',
             displayName: 'Effort',
+            specificID: 1,
         },
     ];
 
     // add on dynamic categories here
     // categories like tests are determined by the user
     _.each(testData.standardized_tests, function(elem) {
-        $scope.focusCategories.push({ category: elem.test_name, displayName: elem.test_name, });
+        $scope.focusCategories.push({ category: 'test', displayName: elem.test_name, specificID: elem.id,});
     });
 
     // this is called when the user selects a different focus category
     $scope.selectFocusCategory = function(focusStudent, category) {
-        // the dropdown will switch to the matching category of whatever you set focusStudentsGraph[studendId].focus.category to
+        // the dropdown will switch to the matching category of whatever you set focusStudentsGraph[studentId].focus.category to
         $scope.focusGraphs[focusStudent.student].focus.category = category.category;
+        $scope.focusGraphs[focusStudent.student].focus.specificID = category.specificID;
 
         // this is where you would need to save the choice to the server
         // and update the graphs
+        //todo: how do I save the choice to the server?
 
-
+        updateFocusGraphs(); //todo: update seems really sluggish. Maybe find a way to selectively update a graph, instead of the whole thing
     };
 
     /**
@@ -242,24 +247,30 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
      */
 
     function updateFocusGraphs() {
-        //todo: call this whenever the focus students change
-
         //for each focus student, create the three displayed graphs
         _.each($scope.focusStudents, function (elem) {
-            //todo: The return value for the focus category info in the backend is contained here:
+            //The return value for the focus category info in the backend is contained here:
             // elem.(focus|progress|caution)_category
             // The format is: type__startDate__endDate__specificID
-            //todo: decipher the category string
             var progressStringSections = elem.progress_category.split("__"); //Look! It's a face ;)
             var progressType  = progressStringSections[0];
             var progressStart = progressStringSections[1];
             var progressEnd   = progressStringSections[2];
             var progressID    = parseInt(progressStringSections[3]);
             var cautionStringSections = elem.caution_category.split("__");
-            var cautionType  = cautionStringSections[0];
-            var cautionStart = cautionStringSections[1];
-            var cautionEnd   = cautionStringSections[2];
-            var cautionID    = parseInt(cautionStringSections[3]);
+            var cautionType   = cautionStringSections[0];
+            var cautionStart  = cautionStringSections[1];
+            var cautionEnd    = cautionStringSections[2];
+            var cautionID     = parseInt(cautionStringSections[3]);
+
+            //save off the user selected category before recreating all the graphs
+            if ($scope.focusGraphs[elem.student] !== null && $scope.focusGraphs[elem.student] !== undefined) {
+                var focusType = $scope.focusGraphs[elem.student].focus.category;
+                var focusID = $scope.focusGraphs[elem.student].focus.specificID;
+            } else { //default to the first thing in the dropdown
+                focusType = $scope.focusCategories[0].category;
+                focusID = $scope.focusCategories[0].specificID;
+            }
 
               //create the structure for the graphs array
             $scope.focusGraphs[elem.student] = {};
@@ -267,7 +278,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                 data: [],
                 labels: [],
                 series: [],
-                category: 'derp', //todo: remove. This is mainly for testing to make sure that it got generated
+                category: focusType,
                 options: {
                     elements: {
                         line: {
@@ -283,7 +294,6 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                                 min: 1,
                                 // stepSize: 1,
                                 max: 5
-                                //todo: change these to be set later
                             }
                         }]
                     },
@@ -297,7 +307,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                 data: [1, 2, 3, 4],
                 labels: [1, 2, 3, 4],
                 series: [],
-                category: progressType, //todo: remove. This is mainly for testing to make sure that it got generated
+                category: progressType,
                 options: {
                     elements: {
                         line: {
@@ -326,7 +336,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                 data: [1, 2, 3, 4],
                 labels: [1, 2, 3, 4],
                 series: [],
-                category: 'cautionType', //todo: remove. This is mainly for testing to make sure that it got generated
+                category: cautionType,
                 options: {
                     elements: {
                         line: {
@@ -355,21 +365,20 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
 
             //Focus Graphs
-            //temporarily getting a month of behavior
-            //todo: I don't think we need this last parameter for now
-            serviceCaller($scope.focusGraphs[elem.student]['focus'], "behavior", "2018-01-01", "2018-02-01", elem.student, 1, "extra shit");
-            serviceCaller($scope.focusGraphs[elem.student]['progress'], progressType, progressStart, progressEnd, elem.student, progressID, "extra shit");
-            serviceCaller($scope.focusGraphs[elem.student]['caution'],  cautionType,  cautionStart,  cautionEnd,  elem.student, cautionID,  "extra shit");
+            //todo: fix placeholder for focus category information
+            serviceCaller($scope.focusGraphs[elem.student]['focus'], focusType, "2018-01-01", "2018-02-01", elem.student, focusID);
+            serviceCaller($scope.focusGraphs[elem.student]['progress'], progressType, progressStart, progressEnd, elem.student, progressID);
+            serviceCaller($scope.focusGraphs[elem.student]['caution'],  cautionType,  cautionStart,  cautionEnd,  elem.student, cautionID);
             // serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 42, "extra shit");
             // serviceCaller($scope.focusGraphs[elem.student]['caution'], "test", "2018-01-01", "2018-02-01", elem.student, 1, "extra shit");
 
 
-            // console.log("focus graph:");
-            // console.log($scope.focusGraphs[elem.student]['focus']);
-            // console.log("progress graph:");
-            // console.log($scope.focusGraphs[elem.student]['progress']);
-            // console.log("caution graph:");
-            // console.log($scope.focusGraphs[elem.student]['caution']);
+            console.log("focus graph for student " + elem.student + ": ");
+            console.log($scope.focusGraphs[elem.student]['focus']);
+            console.log("progress graph for student " + elem.student + ": ");
+            console.log($scope.focusGraphs[elem.student]['progress']);
+            console.log("caution graph for student " + elem.student + ": ");
+            console.log($scope.focusGraphs[elem.student]['caution']);
         });
     }
 
@@ -381,17 +390,14 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
      * @param endDate - the end date of the data to put into the graph
      * @param studentID - the id of the student
      * @param specificID - an id specific to the graph being requested. Typically something like the class or assignment id
-     * @param extraParameters - extra parameters needed to generate a specific graph. Ignored if not needed
-
      * */
-    function serviceCaller(currentGraph, category, beginDate, endDate, studentID, specificID, extraParameters) {
+    function serviceCaller(currentGraph, category, beginDate, endDate, studentID, specificID) {
 
         // todo: possible feature: pass along the days that were troublesome so we can highlight them in the graph
         //  the caution graph is already red though...
 
         var graphStart = moment(beginDate);
         var graphEnd = moment(endDate);
-        //todo: set chartjs type of graph depending on the type of graph displayed
 
         /**
          * Behavior/Effort
@@ -453,7 +459,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                   }
                   //Set the line label
                   //Grab the section id from the enrollments array
-                  var sectionID;
+                  var sectionID = -1;
                   for (i = 0; i < data.enrollments.length; i++) {
                       if(data.enrollments[i].id === specificID) {
                           sectionID = data.enrollments[i].section;
@@ -513,7 +519,6 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                         console.log("test scores");
                         console.log(studentTestScoresRaw);
 
-                        //todo: Display the five most recent scores of the test given to us
                         //sort the test scores data by date and then go down the list, breaking out when 5 tests have been counted
                         var studentTestScores = _.sortBy(studentTestScoresRaw.standardized_test_scores, 'date');
                         var interestingScores = [];
@@ -527,7 +532,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                             }
                         }
                         interestingScores = interestingScores.slice(-5);
-                        interestingDates = interestingScores.slice(-5);
+                        interestingDates = interestingDates.slice(-5);
 
                         currentGraph.data = [];
                         currentGraph.labels = [];
@@ -571,8 +576,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
     updateFocusGraphs();
 
-    //todo: remove
-    console.log("The graph data:");
-    console.log($scope.focusGraphs);
+    // console.log("The graph data:");
+    // console.log($scope.focusGraphs);
 
 });
