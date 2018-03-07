@@ -204,6 +204,20 @@
     padding-top: 7px;
 }
 
+.student-ieps-spacer {
+    margin-top: 20px;
+}
+
+.student-ieps-tiny-col {
+    width: 15%;
+}
+
+.student-ieps-note-title {
+    font-weight: 400;
+}
+
+
+
 @media (max-width: 768px) {
     #student-overview-title {
         margin-top: 15px;
