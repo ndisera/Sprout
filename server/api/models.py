@@ -285,7 +285,7 @@ class IEPGoalDatapoint(models.Model):
     IEPGoalDatapoint
     Represent one custom quantitative datapoint associated with an IEPGoal
     """
-    goal = models.OneToOneField(IEPGoal, blank=False, on_delete=models.CASCADE,
+    goal = models.ForeignKey(IEPGoal, blank=False, on_delete=models.CASCADE,
                                 help_text="IEPGoal this datapoint belongs to")
     value = models.IntegerField(help_text="Data value of this datapoint")
     date = models.DateTimeField(help_text="Datetime this measurement was taken")
@@ -302,7 +302,7 @@ class IEPGoalNote(models.Model):
     IEPGoalNote
     Represent a note associated with an IEPGoal
     """
-    goal = models.OneToOneField(IEPGoal, blank=False, on_delete=models.CASCADE,
+    goal = models.ForeignKey(IEPGoal, blank=False, on_delete=models.CASCADE,
                                 help_text="IEPGoal this note belongs to")
     title = models.CharField(null=False, blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Name of this note")
