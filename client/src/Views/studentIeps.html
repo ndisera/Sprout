@@ -1,199 +1,105 @@
 <div ng-include="'html/studentTabs.html'"></div>
 <div class="voffset4">
-    <div class="row iep-wrapper" ng-repeat="iep in ieps">
+    <div id="student-ieps-select" class="input-group">
+        <span class="input-group-addon">IEP Goal</span>
+        <div class="input-group-btn">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedIep.title }} <span class="caret"></span></button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <li ng-repeat="entry in ieps" ng-click="selectIep(entry)" ng-class="{ 'active': entry.id === selectedIep.id, }">
+                    <a class="student-overview-assign-link">{{ entry.title }}  <span ng-if="entry.id === selectedIep.id" class="glyphicon glyphicon-ok"></span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="voffset4" ng-repeat="iep in ieps" ng-if="iep.id === selectedIep.id">
+    <!-- chart -->
+    <div class="row" ng-if="iep.quantitative">
         <div class="col-xs-12">
             <div class="panel-wrapper">
                 <div class="panel panel-default">
-                    <div class="panel-heading" data-toggle="collapse" data-target="#collapse-iep{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
-                        <h4 class="panel-title panel-title-with-btn">{{ iep.title }}</h4>
-                        <span class="glyphicon blackish" ng-class="{ 'glyphicon-chevron-down': $index === 0, 'glyphicon-chevron-right': $index !== 0, }"></span>
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Progress</h4>
                     </div>
-                    <div id="collapse-iep{{$index}}" class="panel-body panel-collapse collapse" ng-class="{ 'in': $index === 0, }">
-                        <!-- chart -->
-                        <div class="row" ng-if="iep.quantitative">
-                            <div class="col-xs-12">
-                                <h3 class="centerText">Chart Goes Here</h4>
-                            </div>
-                        </div>
-                        <!-- due date -->
-                        <div class="row voffset3">
-                            <div class="col-xs-12">
-                                <div class="input-group">
-                                    <span class="input-group-addon">Due Date</span>
-                                    <input type="text" class="form-control" date-time ng-model="iep.due_date_temp" view="date" min-view="date" format="YYYY-MM-DD" date-change="dueDateChange" watch-direct-changes="true" ng-disabled="!iep.editing">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- datas -->
-                        <div class="row student-ieps-spacer">
-                            <div class="col-xs-12">
-                                <div class="panel-wrapper">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <h4 class="panel-title">Measurements</h4>
-                                        </div>
-                                        <div class="panel-body">
-                                            <div class="row">
-                                                <div class="col-xs-12">
-                                                    <div class="table-responsive">
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="student-ieps-tiny-col">Date</th>
-                                                                    <th class="student-ieps-tiny-col" ng-show="iep.quantitative">Score</th>
-                                                                    <th>Note</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr ng-repeat="data in iep.datapoints">
-                                                                    <td class="student-ieps-tiny-col">{{ data.date.format('YYYY-MM-DD') }}</td>
-                                                                    <td class="student-ieps-tiny-col" ng-show="iep.quantitative">{{ data.value }}</td>
-                                                                    <td>{{ data.note }}</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- click to add data panel -->
-                                            <div class="row voffset3" ng-if="!iep.addingData">
-                                                <div class="col-xs-12">
-                                                    <div class="panel panel-default panel-add pointer" ng-click="toggleAddData(iep, true)">
-                                                        <div class="panel-heading">
-                                                            <h4 class="panel-title centerText">
-                                                                <span class="glyphicon glyphicon-plus blackish"></span>
-                                                            </h4>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- add data panel -->
-                                            <div class="row voffset3" ng-if="iep.addingData">
-                                                <div class="col-xs-12">
-                                                    <div class="panel-wrapper">
-                                                        <div class="panel panel-default no-bottom-margin">
-                                                            <div class="panel-heading">
-                                                                <h4 class="panel-title">Add Measurement</h4>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <form class="form-horizontal" name="addDataForm{{$index}}" ng-submit="addData(iep)">
-                                                                    <div class="form-group">
-                                                                        <label class="control-label col-sm-2">Date: </label>
-                                                                        <div class="col-sm-10">
-                                                                            <input type="text" class="form-control" date-time ng-model="iep.newData.date" view="date" min-view="date" format="YYYY-MM-DD" required>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="form-group" ng-if="iep.quantitative">
-                                                                        <label class="control-label col-sm-2">Score: </label>
-                                                                        <div class="col-sm-10">
-                                                                            <input type="text" class="form-control" ng-model="iep.newData.value" ng-required="iep.quantitative">
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label class="control-label col-sm-2">Note: </label>
-                                                                        <div class="col-sm-10">
-                                                                            <input type="text" class="form-control" ng-model="iep.newData.note">
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="form-group no-bottom-margin">
-                                                                        <div class="col-sm-offset-2 col-sm-10">
-                                                                            <button class="btn btn-success" ng-disabled="addDataForm{{$index}}.$invalid" type="submit">Add</button>
-                                                                            <button class="btn btn-danger" ng-click="toggleAddData(iep, false)">Cancel</button>
-                                                                        </div>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- notes -->
+                    <div class="panel-body">
+                        <!-- chart goes here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- measurements -->
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel-wrapper">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Measurements</h4>
+                    </div>
+                    <div class="panel-body">
                         <div class="row">
                             <div class="col-xs-12">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="student-ieps-tiny-col">Date</th>
+                                                <th class="student-ieps-tiny-col" ng-show="iep.quantitative">Score</th>
+                                                <th>Note</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="data in iep.datapoints">
+                                                <td class="student-ieps-tiny-col">{{ data.date.format('YYYY-MM-DD') }}</td>
+                                                <td class="student-ieps-tiny-col" ng-show="iep.quantitative">{{ data.value }}</td>
+                                                <td>{{ data.note }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- click to add data panel -->
+                        <div class="btn-manipulate-row">
+                            <button class="btn btn-success" ng-if="!iep.addingData" ng-click="toggleAddData(iep, true)">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                        </div>
+                        <!-- add data panel -->
+                        <div class="row voffset3" ng-if="iep.addingData">
+                            <div class="col-xs-12">
                                 <div class="panel-wrapper">
-                                    <div class="panel panel-default">
+                                    <div class="panel panel-default no-bottom-margin">
                                         <div class="panel-heading">
-                                            <h4 class="panel-title">Notes</h4>
+                                            <h4 class="panel-title">Add Measurement</h4>
                                         </div>
                                         <div class="panel-body">
-                                            <div class="row">
-                                                <div class="col-xs-12">
-                                                    <div class="table-responsive">
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="student-ieps-tiny-col">Date</th>
-                                                                    <th>Note</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr ng-repeat="note in iep.notes">
-                                                                    <td class="student-ieps-tiny-col">{{ note.date.format('YYYY-MM-DD') }}</td>
-                                                                    <td>
-                                                                        <div ng-if="note.title && note.title.length > 0">
-                                                                            <span class="student-ieps-note-title">{{ note.title }}</span>
-                                                                        </div>
-                                                                        <div ng-if="note.body && note.body.length > 0">
-                                                                            "{{ note.body }}"
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
+                                            <form class="form-horizontal" name="addDataForm{{$index}}" ng-submit="addData(iep)">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-2">Date: </label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" date-time ng-model="iep.newData.date" view="date" min-view="date" format="YYYY-MM-DD" required>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <!-- click to add note panel -->
-                                            <div class="row voffset3" ng-if="!iep.addingNote">
-                                                <div class="col-xs-12">
-                                                    <div class="panel panel-default panel-add pointer" ng-click="toggleAddNote(iep, true)">
-                                                        <div class="panel-heading">
-                                                            <h4 class="panel-title centerText">
-                                                                <span class="glyphicon glyphicon-plus blackish"></span>
-                                                            </h4>
-                                                        </div>
+                                                <div class="form-group" ng-if="iep.quantitative">
+                                                    <label class="control-label col-sm-2">Score: </label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" ng-model="iep.newData.value" ng-required="iep.quantitative">
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <!-- add note panel -->
-                                            <div class="row voffset3" ng-if="iep.addingNote">
-                                                <div class="col-xs-12">
-                                                    <div class="panel-wrapper">
-                                                        <div class="panel panel-default no-bottom-margin">
-                                                            <div class="panel-heading">
-                                                                <h4 class="panel-title">Add Note</h4>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                <form class="form-horizontal" name="addNoteForm{{$index}}" ng-submit="addNote(iep)">
-                                                                    <div class="form-group">
-                                                                        <label class="control-label col-sm-2">Title: </label>
-                                                                        <div class="col-sm-10">
-                                                                            <input type="text" class="form-control" ng-model="iep.newNote.title" required>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label class="control-label col-sm-2">Note: </label>
-                                                                        <div class="col-sm-10">
-                                                                            <input type="text" class="form-control" ng-model="iep.newNote.body" required>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="form-group no-bottom-margin">
-                                                                        <div class="col-sm-offset-2 col-sm-10">
-                                                                            <button class="btn btn-success" ng-disabled="addNoteForm{{$index}}.$invalid" type="submit">Add</button>
-                                                                            <button class="btn btn-danger" ng-click="toggleAddNote(iep, false)">Cancel</button>
-                                                                        </div>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-2">Note: </label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" ng-model="iep.newData.note">
                                                     </div>
                                                 </div>
-                                            </div>
+                                                <div class="form-group no-bottom-margin">
+                                                    <div class="col-sm-offset-2 col-sm-10">
+                                                        <button class="btn btn-success" ng-disabled="addDataForm{{$index}}.$invalid" type="submit">Add</button>
+                                                        <button class="btn btn-danger" ng-click="toggleAddData(iep, false)">Cancel</button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -204,6 +110,139 @@
             </div>
         </div>
     </div>
+    <!-- notes -->
+    <div class="row voffset3">
+        <div class="col-xs-12">
+            <div class="panel-wrapper">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Notes</h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th class="student-ieps-tiny-col">Date</th>
+                                                <th>Note</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="note in iep.notes">
+                                                <td class="student-ieps-tiny-col">{{ note.date.format('YYYY-MM-DD') }}</td>
+                                                <td>
+                                                    <div ng-if="note.title && note.title.length > 0">
+                                                        <span class="student-ieps-note-title">{{ note.title }}</span>
+                                                    </div>
+                                                    <div ng-if="note.body && note.body.length > 0">
+                                                        "{{ note.body }}"
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- click to add note panel -->
+                        <div class="btn-manipulate-row">
+                            <button class="btn btn-success" ng-if="!iep.addingNote" ng-click="toggleAddNote(iep, true)">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                        </div>
+                        <!-- add note panel -->
+                        <div class="row voffset3" ng-if="iep.addingNote">
+                            <div class="col-xs-12">
+                                <div class="panel-wrapper">
+                                    <div class="panel panel-default no-bottom-margin">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">Add Note</h4>
+                                        </div>
+                                        <div class="panel-body">
+                                            <form class="form-horizontal" name="addNoteForm{{$index}}" ng-submit="addNote(iep)">
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-2">Title: </label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" ng-model="iep.newNote.title" required>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-2">Note: </label>
+                                                    <div class="col-sm-10">
+                                                        <input type="text" class="form-control" ng-model="iep.newNote.body" required>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group no-bottom-margin">
+                                                    <div class="col-sm-offset-2 col-sm-10">
+                                                        <button class="btn btn-success" ng-disabled="addNoteForm{{$index}}.$invalid" type="submit">Add</button>
+                                                        <button class="btn btn-danger" ng-click="toggleAddNote(iep, false)">Cancel</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- info -->
+    <div class="row voffset3">
+        <div class="col-xs-12">
+            <div class="panel-wrapper">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                    </div>
+                    <div class="panel-body">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<!--<div class="col-xs-12">-->
+    <!--<div class="panel-wrapper">-->
+        <!--<div class="panel panel-default">-->
+            <!--<div class="panel-heading" data-toggle="collapse" data-target="#collapse-iep{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">-->
+                <!--<h4 class="panel-title panel-title-with-btn">{{ iep.title }}</h4>-->
+                <!--<span class="glyphicon blackish" ng-class="{ 'glyphicon-chevron-down': $index === 0, 'glyphicon-chevron-right': $index !== 0, }"></span>-->
+            <!--</div>-->
+            <!--<div id="collapse-iep{{$index}}" class="panel-body panel-collapse collapse" ng-class="{ 'in': $index === 0, }">-->
+                <!--[> chart <]-->
+                <!--<div class="row" ng-if="iep.quantitative">-->
+                    <!--<div class="col-xs-12">-->
+                        <!--<h3 class="centerText">Chart Goes Here</h4>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--[> due date <]-->
+                <!--<div class="row voffset3">-->
+                    <!--<div class="col-xs-12">-->
+                        <!--<div class="input-group">-->
+                            <!--<span class="input-group-addon">Due Date</span>-->
+                            <!--<input type="text" class="form-control" date-time ng-model="iep.due_date_temp" view="date" min-view="date" format="YYYY-MM-DD" date-change="dueDateChange" watch-direct-changes="true" ng-disabled="!iep.editing">-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--[> datas <]-->
+                <!--<div class="row student-ieps-spacer">-->
+                    <!--<div class="col-xs-12">-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--[> notes <]-->
+                <!--<div class="row">-->
+                    <!--<div class="col-xs-12">-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
 <div ng-include="'html/bottomSpacer.html'"></div>
 

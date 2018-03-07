@@ -79,3 +79,11 @@
 #roundBorder {
     border-radius:4px
 }
+
+.panel-wrapper > .panel .table-responsive.manage-teachers-border-table {
+    border-top: none;
+}
+
+.panel-wrapper > .panel .table-responsive.manage-teachers-border-table > .table > tbody > tr:first-child > td {
+    border-top: none;
+}

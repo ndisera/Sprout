@@ -2,7 +2,8 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
     $scope.location = $location;
     $scope.student = student.student;
 
-    $scope.ieps = [];
+    $scope.ieps        = [];
+    $scope.selectedIep = {};
 
     if(ieps !== null && ieps !== undefined) {
         if(ieps.iep_goals !== null && ieps.iep_goals !== undefined) {
@@ -80,19 +81,10 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
 
     $scope.updateIeps();
 
+    $scope.selectedIep = $scope.ieps[0];
+
     console.log(ieps);
 
-        $('#collapse-iep0').slideDown();
-
-    $scope.toggleFirst = function(elem, index) {
-        if(index === 0) {
-
-        }
-
-        console.log("thing");
-        console.log(elem);
-        console.log(index);
-    };
 
 
 

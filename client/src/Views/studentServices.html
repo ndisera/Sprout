@@ -1,27 +1,10 @@
 <div ng-include="'html/studentTabs.html'"></div>
 <div id="student-services-wrapper" class="voffset4">
-    <div class="row" ng-repeat="service in services">
+    <div class="row voffset3" ng-repeat="service in services">
         <div class="col-xs-12">
             <div class="panel-wrapper student-services-panel" ng-class="{ 'fulfilled': service.fulfilled, }">
                 <div class="panel panel-default">
-                    <!--<div class="panel-heading" ng-class="{ 'panel-heading-editing': service.editing, }">-->
-                    <!--<div class="panel-heading-container" ng-if="!service.editing">-->
-                    <!--<h4 class="panel-title">{{ service.title }}</h4>-->
-                    <!--</div>-->
-                    <!--<div class="panel-heading-container" ng-if="service.editing">-->
-                    <!--<input type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="service.title_temp" placeholder="Service Requirement Title">-->
-                    <!--</div>-->
-                    <!--<div class="pull-right hidden-xs">-->
-                    <!--<span class="glyphicon glyphicon-ok-sign" ng-if="service.fulfilled"></span>-->
-                    <!--<span class="glyphicon glyphicon-remove-sign" ng-if="!service.fulfilled"></span>-->
-                    <!--</div>-->
-                    <!--</div>-->
                     <div class="panel-body">
-                        <div class="student-services-delete pull-right" ng-if="service.editing">
-                            <button class="btn btn-danger btn-xs" ng-click="deleteService(service)">
-                                <span>Delete</span>
-                            </button>
-                        </div>
                         <div class="row">
                             <div class="table-container">
                                 <div class="table-cell">
@@ -80,11 +63,6 @@
                                         </div>
                                         <div class="form-group no-bottom-margin">
                                             <div class="col-sm-offset-2 col-sm-10">
-                                                <div ng-if="!service.editing">
-                                                    <button class="btn btn-primary" ng-click="toggleEditService(service)">
-                                                        <span>Edit</span>
-                                                    </button>
-                                                </div>
                                                 <div ng-if="service.editing">
                                                     <button class="btn btn-success" type="submit" ng-disabled="editServiceForm{{$index}}.$invalid">
                                                         <span>Save</span>
@@ -99,25 +77,23 @@
                                 </div>
                             </div>
                         </div>
-                            <!--<div class="col-xs-offset-2 col-xs-10">-->
-                            <!--<button class="btn btn-danger" ng-if="service.editing" ng-click="deleteService(service)">-->
-                            <!--<span>Delete</span>-->
-                            <!--</button>-->
+                        <div class="btn-manipulate-row">
+                            <button class="btn btn-primary" ng-if="!service.editing" ng-click="toggleEditService(service)">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                            <button class="btn btn-danger" ng-if="service.editing" ng-click="deleteService(service)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row" ng-if="!adding">
-        <div class="col-xs-12">
-            <div class="panel panel-default panel-add pointer" ng-show="!adding" ng-click="toggleAdd(true)">
-                <div class="panel-heading">
-                    <h4 class="panel-title centerText">
-                        <span class="glyphicon glyphicon-plus blackish"></span>
-                    </h4>
-                </div>
-            </div>
-        </div>
+    <div class="btn-manipulate-row-bottom" ng-if="!adding">
+        <button class="btn btn-success btn-manipulate" type="button" data-toggle="tooltip" title="Add Service" ng-click="toggleAdd(true)">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
     </div>
     <div class="row" ng-if="adding">
         <div class="col-xs-12">
