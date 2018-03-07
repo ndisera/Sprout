@@ -173,14 +173,17 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                                 },
                                 function error(response) {
                                     deferred.reject(response);
-                                },
+                                }
                             );
                         },
                         function error(response) {
                             deferred.reject(response);
-                        },
+                        }
                     );
                     return deferred.promise;
+                },
+                testData: function(testService) {
+                    return testService.getTests();
                 },
             }
         })
