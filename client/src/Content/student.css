@@ -170,11 +170,23 @@
 }
 
 .student-ieps-tiny-col {
-    width: 15%;
+    width: 17%;
+}
+
+.student-ieps-min-col {
+    width: 1px;
+}
+
+.student-ieps-hover-pencil {
+    margin-right: 20px;
 }
 
 .student-ieps-note-title {
     font-weight: 400;
+}
+
+.student-ieps-note-spacer {
+    margin-top: 2px;
 }
 
 #student-ieps-select > .input-group-addon {
@@ -191,6 +203,15 @@
 
 #student-ieps-select > .input-group-btn > ul {
     width: 100%;
+}
+
+#student-ieps-select > .input-group-btn > ul {
+    width: 100%;
+}
+
+#student-ieps-edit-form .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
 }
 
 

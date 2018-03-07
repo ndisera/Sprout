@@ -298,6 +298,14 @@ a {
     cursor: default;
 }
 
+.table-select .editable-row > td > .glyphicon-pencil {
+    opacity: 0;
+}
+
+.table-select .editable-row:hover > td > .glyphicon-pencil {
+    opacity: 1;
+}
+
 .list-group.list-group-select > .list-group-item:hover, .list-group.list-group-select > .list-group-item:focus {
     background-color: #d2ecf9;
     color: #0c405a;
@@ -788,6 +796,10 @@ ul.dropdown-menu > li > a:hover {
 .table-cell {
     display: table-cell;
     vertical-align: middle;
+}
+
+.vertical-align-mid {
+    vertical-align: middle !important;
 }
 
 .btn.hover-success:hover {
