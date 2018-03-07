@@ -255,24 +255,16 @@ class TermSettingsViewSet(NestedDynamicViewSet):
     """ ensure variables show as correct types for docs """
     name_schedule = 'schedule'
     desc_schedule = "ID of the TermSettings object controlling this term"
-    name_school_year = 'school_year'
-    desc_school_year = "ID of the SchoolSettings object this term takes place in"
 
     schedule_field = coreapi.Field(name=name_schedule,
                                    required=True,
                                    location="form",
                                    description=desc_schedule,
                                    schema=coreschema.Integer(title=name_schedule))
-    school_year_field = coreapi.Field(name=name_school_year,
-                                      required=True,
-                                      location="form",
-                                      description=desc_school_year,
-                                      schema=coreschema.Integer(title=name_school_year))
 
     schema = AutoSchema(
         manual_fields=[
             schedule_field,
-            school_year_field,
         ])
 
 
