@@ -1,142 +1,123 @@
 <div ng-include="'html/studentTabs.html'"></div>
 <div id="student-services-wrapper" class="voffset4">
-    <div class="row" ng-repeat="service in services">
+    <div class="row voffset3" ng-repeat="service in services">
         <div class="col-xs-12">
             <div class="panel-wrapper student-services-panel" ng-class="{ 'fulfilled': service.fulfilled, }">
                 <div class="panel panel-default">
-                    <div class="panel-heading" ng-class="{ 'panel-heading-editing': service.editing, }">
-                        <div class="panel-heading-container" ng-if="!service.editing">
-                            <h4 class="panel-title">{{ service.title }}</h4>
-                        </div>
-                        <div class="panel-heading-container" ng-if="service.editing">
-                            <input type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="service.title_temp" placeholder="Service Requirement Title">
-                        </div>
-                        <div class="pull-right hidden-xs">
-                            <span class="glyphicon glyphicon-ok-sign" ng-if="service.fulfilled"></span>
-                            <span class="glyphicon glyphicon-remove-sign" ng-if="!service.fulfilled"></span>
-                        </div>
-                    </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-xs-12">
-                                <form class="form-horizontal" name="editServiceForm" ng-submit="saveService(service);">
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-2">Description: </label>
-                                        <div class="col-sm-10">
-                                            <div ng-if="!service.editing">
-                                                <span class="form-control-static">{{ service.description }}</span>
-                                            </div>
-                                            <div ng-if="service.editing">
-                                                <input type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="service.description_temp" placeholder="Service Requirement Description">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <form class="form-horizontal" name="editServiceForm" ng-submit="saveService(service);">
-                                    <div class="form-group">
-                                        <label class="control-label col-sm-2">Fulfilled: </label>
-                                        <div class="col-sm-10">
-                                            <div ng-show="service.fulfilled && !service.editing">
-                                                <span class="form-control-static" ng-if="service.fulfilled_description !== null">{{ service.fulfilled_description }}</span>
-                                                <span class="form-control-static student-services-red" ng-if="service.fulfilled_description === null">No Description Provided</span>
-                                            </div>
-                                            <div ng-show="!service.fulfilled || service.editing">
-                                                <input type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="service.fulfilled_description_temp" placeholder="How is this service requirement fulfilled?">
+                            <div class="table-container">
+                                <div class="table-cell">
+                                    <span class="glyphicon glyphicon-ok-sign glyphicon-big-button" ng-if="service.fulfilled" ng-click="markFulfilled(service, false)"></span>
+                                    <span class="glyphicon glyphicon-remove-sign glyphicon-big-button" ng-if="!service.fulfilled" ng-click="markFulfilled(service, true)"></span>
+                                </div>
+                                <div class="table-cell full-width">
+                                    <form class="form-horizontal" name="editServiceForm{{$index}}" ng-submit="saveService(service)">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2">Title: </label>
+                                            <div class="col-sm-10">
+                                                <div ng-if="!service.editing">
+                                                    <span class="form-control-static">{{ service.title }}</span>
+                                                </div>
+                                                <div class="student-services-input" ng-if="service.editing">
+                                                    <input type="text" class="form-control" name="editServiceFormInput{{$index}}" ng-model="service.title_temp" placeholder="Service Requirement Title">
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-2 hidden-xs">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2">Description: </label>
+                                            <div class="col-sm-10">
+                                                <div ng-if="!service.editing">
+                                                    <span class="form-control-static">{{ service.description }}</span>
+                                                </div>
+                                                <div class="student-services-input" ng-if="service.editing">
+                                                    <input type="text" class="form-control" name="editServiceFormInput{{$index}}" ng-model="service.description_temp" placeholder="Service Requirement Description">
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-sm-10" ng-if="!service.editing && service.fulfilled">
-                                            <span>
-                                                Marked fulfilled 
-                                                <span ng-if="service.teacher.first_name !== null && service.teacher.last_name !== null">
-                                                    by {{ service.teacher.first_name }} {{ service.teacher.last_name }}
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-2">Fulfilled: </label>
+                                            <div class="col-sm-10">
+                                                <div ng-show="service.fulfilled && !service.editing">
+                                                    <span class="form-control-static" ng-if="service.fulfilled_description !== null">{{ service.fulfilled_description }}</span>
+                                                    <span class="form-control-static student-services-red" ng-if="service.fulfilled_description === null">No Description Provided</span>
+                                                </div>
+                                                <div class="student-services-input" ng-show="!service.fulfilled || service.editing">
+                                                    <input type="text" class="form-control" name="editServiceFormInput{{$index}}" ng-model="service.fulfilled_description_temp" placeholder="How is this service requirement fulfilled?">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                                <span ng-if="!service.editing && service.fulfilled">
+                                                    Marked fulfilled 
+                                                    <span ng-if="service.teacher.first_name !== null && service.teacher.last_name !== null">
+                                                        by {{ service.teacher.first_name }} {{ service.teacher.last_name }}
+                                                    </span>
+                                                    <span ng-if="service.fulfilled_date !== null">
+                                                        on {{ service.fulfilled_date }}
+                                                    </span>
                                                 </span>
-                                                <span ng-if="service.fulfilled_date !== null">
-                                                    on {{ service.fulfilled_date }}
+                                                <span ng-if="service.editing && service.fulfilled">
+                                                    &nbsp
                                                 </span>
-                                            </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <button class="btn btn-danger" ng-if="service.editing" ng-click="deleteService(service)">
-                                    <span>Delete</span>
-                                </button>
-                                <div class="pull-right">
-                                    <div ng-if="!service.editing">
-                                        <button class="btn btn-primary" ng-click="toggleEditService(service)">
-                                            <span>Edit</span>
-                                        </button>
-                                        <button class="btn btn-default hover-success" ng-if="!service.fulfilled" ng-click="markFulfilled(service, true)">
-                                            <span>Mark Fulfilled</span>
-                                        </button>
-                                        <button class="btn btn-default hover-danger" ng-if="service.fulfilled" ng-click="markFulfilled(service, false)">
-                                            <span>Mark Unfulfilled</span>
-                                        </button>
-                                    </div>
-                                    <div ng-if="service.editing">
-                                        <button class="btn btn-success" ng-click="saveService(service)">
-                                            <span>Save</span>
-                                        </button>
-                                        <button class="btn btn-danger" ng-click="toggleEditService(service)">
-                                            <span>Cancel</span>
-                                        </button>
-                                    </div>
+                                        <div class="form-group no-bottom-margin">
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                                <div ng-if="service.editing">
+                                                    <button class="btn btn-success" type="submit" ng-disabled="editServiceForm{{$index}}.$invalid">
+                                                        <span>Save</span>
+                                                    </button>
+                                                    <button class="btn btn-danger" ng-click="toggleEditService(service)">
+                                                        <span>Cancel</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
+                        <div class="btn-manipulate-row">
+                            <button class="btn btn-primary" ng-if="!service.editing" ng-click="toggleEditService(service)">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                            <button class="btn btn-danger" ng-if="service.editing" ng-click="deleteService(service)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row" ng-if="!adding">
-        <div class="col-xs-12">
-            <div class="panel panel-default panel-add pointer" ng-show="!adding" ng-click="toggleAdd(true)">
-                <div class="panel-heading">
-                    <h4 class="panel-title centerText">
-                        <span class="glyphicon glyphicon-plus blackish"></span>
-                    </h4>
-                </div>
-            </div>
-        </div>
+    <div class="btn-manipulate-row-bottom" ng-if="!adding">
+        <button class="btn btn-success btn-manipulate" type="button" data-toggle="tooltip" title="Add Service" ng-click="toggleAdd(true)">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
     </div>
     <div class="row" ng-if="adding">
         <div class="col-xs-12">
-            <div class="panel-wrapper student-services-panel student-services-add">
+            <div class="panel-wrapper student-services-add">
                 <div class="panel panel-default">
-                    <div class="panel-heading panel-heading-editing">
-                        <div class="panel-heading-container">
-                            <input type="text" class="form-control" name="addServiceTitle" ng-model="newService.title" placeholder="Service Requirement Title">
-                        </div>
-                        <button class="btn btn-danger panel-header-btn pull-right" ng-click="toggleAdd(false)">
-                            <span>Cancel</span>
-                        </button>
+                    <div class="panel-heading">
+                        <h4 class="panel-title">Add Service Requirement</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-xs-12">
-                                <form class="form-horizontal" name="editServiceForm" ng-submit="addService();">
+                                <form class="form-horizontal" name="addServiceForm" ng-submit="addService()">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Title: </label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" name="addServiceTitle" ng-model="newService.title" placeholder="Service Requirement Title" required>
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <label class="control-label col-sm-2">Description: </label>
                                         <div class="col-sm-10">
-                                            <input type="text" class="form-control" name="addServiceDescription" ng-model="newService.description" placeholder="Service Requirement Description">
+                                            <input type="text" class="form-control" name="addServiceDescription" ng-model="newService.description" placeholder="Service Requirement Description" required>
                                         </div>
                                     </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="row" ng-if="!service.fulfilled">
-                            <div class="col-xs-12">
-                                <form class="form-horizontal" name="editServiceForm" ng-submit="addService();">
                                     <div class="form-group">
                                         <label class="control-label col-sm-2">Fulfilled: </label>
                                         <div class="col-sm-10 student-services-checkbox">
@@ -149,16 +130,17 @@
                                             <input type="text" class="form-control" name="addStudentFulfilledDescription" ng-model="newService.fulfilled_description" placeholder="How is this service requirement fulfilled?">
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button class="btn btn-success" type="submit" ng-disabled="addServiceForm.$invalid">
+                                                <span>Add</span>
+                                            </button>
+                                            <button class="btn btn-danger" ng-click="toggleAdd()">
+                                                <span>Cancel</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </form>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <div class="pull-right">
-                                    <button class="btn btn-success" ng-click="addService()" ng-class="{ 'disabled': newService.title === '' || newService.description === '', }">
-                                        <span>Add</span>
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
