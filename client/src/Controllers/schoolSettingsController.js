@@ -1,9 +1,12 @@
-app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, termsInfo, tests, schools, holidayService, testService, termService, schoolService) {
+app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, termsInfo, tests, schools, schedules, holidayService, testService, termService, schoolService, scheduleService) {
     $scope.location = $location;
     $scope.holidays = holidays.holidays;
     $scope.tests = tests.standardized_tests;
     $scope.terms = termsInfo.terms;
+    // this is different from daily schedules gotten from terms, and dropdowns including schedules will use this
+    $scope.schedules = schedules.daily_schedules;
 
+    // need this to display schedule name
     $scope.termsLookup = _.indexBy(termsInfo.terms, "id");
     $scope.termSettings = _.indexBy(termsInfo.term_settings, "id");
     $scope.dailySchedules = _.indexBy(termsInfo.daily_schedules, "id");
@@ -17,13 +20,19 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.newHoliday = {};
     $scope.newTest = {};
     $scope.newTerm = {};
+    $scope.newSchedule = {};
 
     $scope.displayTestForm = false;
     $scope.displayHolidayForm = false;
     $scope.displayTermForm = false;
+    $scope.displayScheduleForm = false;
 
     $scope.edit = false;
 
+    /**
+     * Converts all grade 0 to K
+     * @param {object} schoolObj - the school object being checked.
+     */
     function zeroToK(schoolObj) {
         if (schoolObj.grade_range_lower === 0) {
             schoolObj.grade_range_lower = "K";
@@ -33,6 +42,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         }
     }
 
+    /**
+     * Converts all grade K to 0
+     * @param {object} schoolObj - the school object being checked.
+     */
     function kToZero(schoolObj) {
         if (schoolObj.grade_range_lower === "K") {
             schoolObj.grade_range_lower = 0;
@@ -42,6 +55,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         }
     }
 
+    /**
+     * Makes a field editable.
+     * @param {string} field - the field to be edited.
+     */
     $scope.editSchool = function(field) {
         switch (field) {
             case "name":
@@ -83,6 +100,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         }
     };
 
+    /**
+     * Cancels a field edit.
+     * @param {string} field - the field being edited.
+     */
     $scope.cancelSchoolEdit = function(field) {
         switch (field) {
             case "name":
@@ -211,6 +232,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         var tests = [];
         var holidays = [];
         var terms = [];
+        var schedules = [];
         for (var i = 0; i < $scope.tests.length; i++) {
             tests.push(Object.assign({}, $scope.tests[i]));
         }
@@ -225,6 +247,11 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
             terms.push(Object.assign({}, $scope.terms[i]));
         }
         $scope.eTerms = _.indexBy(terms, "id");
+
+        for (var i = 0; i < $scope.schedules.length; i++) {
+            schedules.push(Object.assign({}, $scope.schedules[i]));
+        }
+        $scope.eSchedules = _.indexBy(schedules, "id");
     }
 
     setupLookups();
@@ -281,6 +308,21 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                     }
                 ];
                 break;
+            case "schedule":
+                $scope.item = [{
+                        title: 'Name',
+                        value: item.name
+                    },
+                    {
+                        title: 'Total Periods',
+                        value: item.total_periods
+                    },
+                    {
+                        title: 'Periods Per Day',
+                        value: item.periods_per_day
+                    }
+                ];
+                break;
         }
     }
 
@@ -310,7 +352,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 deleteTest(id);
                 break;
             case "term":
-                deleteTerm(id)
+                deleteTerm(id);
+                break;
+            case "schedule":
+                deleteSchedule(id);
                 break;
         }
     }
@@ -385,6 +430,29 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     };
 
     /**
+     * Deletes a schedule
+     * @param {number} scheduleId - id of schedule to be deleted.
+     */
+    function deleteSchedule(scheduleId) {
+        scheduleService.deleteSchedule(scheduleId).then(
+            function success(response) {
+                // remove from display array
+                for (var i = 0; i < $scope.schedules.length; i++) {
+                    if ($scope.schedules[i].id === scheduleId) {
+                        $scope.schedules.splice(i, 1);
+                    }
+                }
+                // remove from edit lookup
+                delete $scope.eSchedules[scheduleId];
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save your edit." + errorResponse());
+            }
+        );
+    };
+
+    /**
      * Creates a new holiday
      */
     $scope.addHoliday = function() {
@@ -450,6 +518,27 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
             function error(response) {
                 setErrorMessage(response);
                 toastService.error("The server was unable to save the new test." + errorResponse());
+            }
+        );
+    };
+
+    /**
+     * Creates a new schedule
+     */
+    $scope.addSchedule = function() {
+        scheduleService.addSchedule($scope.newSchedule).then(
+            function success(response) {
+                // add to display array
+                $scope.schedules.push(response.daily_schedule);
+                // add to edit lookup (should point to different object)
+                var copy = Object.assign({}, response.daily_schedule);
+                $scope.eSchedules[copy.id] = copy;
+                $scope.displayScheduleForm = false;
+                $scope.newSchedule = {};
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save the new schedule." + errorResponse());
             }
         );
     };
@@ -530,6 +619,30 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                     }
                 }
                 $scope.removeEdit(index, 'term');
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save your edit." + errorResponse());
+            }
+        );
+    };
+
+    /**
+     * Updates a schedule
+     * @param {number} scheduleId - id of schedule to be updated.
+     */
+    $scope.updateSchedule = function(scheduleId, index) {
+        var newSchedule = Object.assign({}, $scope.eSchedules[scheduleId]);
+        delete newSchedule.id;
+        scheduleService.updateSchedule(scheduleId, newSchedule).then(
+            function success(response) {
+                // update $scope.schedules
+                for (var i = 0; i < $scope.schedules.length; i++) {
+                    if ($scope.schedules[i].id === scheduleId) {
+                        $scope.schedules[i] = response.daily_schedule;
+                    }
+                }
+                $scope.removeEdit(index, 'schedule');
             },
             function error(response) {
                 setErrorMessage(response);

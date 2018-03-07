@@ -205,6 +205,10 @@
     width: 100%;
 }
 
+#student-ieps-select > .input-group-btn > ul {
+    width: 100%;
+}
+
 #student-ieps-edit-form .form-group {
     margin-right: 0px;
     margin-left: 0px;

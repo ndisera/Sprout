@@ -30,16 +30,18 @@
                                         <th>Last Name</th>
                                         <th>Email</th>
                                         <th class="buttonColumn"></th>
+                                        <th class="buttonColumn"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter | orderBy:'last_name'" ng-click="viewTeacher(teacher)" class="pointer">
+                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter | orderBy:'last_name'" ng-click="viewTeacher(teacher)" class="pointer" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
                                         <td>{{ teacher.first_name }}</td>
                                         <td>{{ teacher.last_name }}</td>
                                         <td>{{ teacher.email }}</td>
-                                        <td class="table-button-col">
+                                        <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                        <td class="buttonColumn table-button-col">
                                             <button class="btn btn-danger btn-xs" type="button" ng-click="setTeacherD(teacher); $event.stopPropagation();">
-                                                <span class="glyphicon glyphicon-trash"></span>
+                                                <i class="glyphicon glyphicon-trash white"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -248,9 +250,9 @@
                         <div class="voffset4">
                         </div>
                         <div class="btn-manipulate-row">
-                            <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteStudent()">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
+                            <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteTeacher()">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
                         </div>
                     </div>
                 </div>
@@ -258,3 +260,4 @@
         </div>
     </div>
 </div>
+<div ng-include="'html/bottomSpacer.html'"></div>
