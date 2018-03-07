@@ -28,7 +28,7 @@ app.factory("schoolService", function ($rootScope, $http, $q, queryService) {
         updateSchool: function (schoolId, schoolObj) {
             var deferred = $q.defer();
             $http({
-                method: 'UPDATE',
+                method: 'PUT',
                 url: 'https://' + $rootScope.backend + '/settings/school/' + schoolId,
                 data: schoolObj,
             }).then(function success(response) {

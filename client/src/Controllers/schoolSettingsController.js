@@ -1,12 +1,18 @@
-app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, terms, tests, holidayService, testService, termService) {
+app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, termsInfo, tests, schools, holidayService, testService, termService, schoolService) {
     $scope.location = $location;
     $scope.holidays = holidays.holidays;
     $scope.tests = tests.standardized_tests;
-    $scope.terms = terms.terms;
+    $scope.terms = termsInfo.terms;
 
-    $scope.editHolidays = [];
-    $scope.editTests = [];
-    $scope.editTerms = [];
+    $scope.termsLookup = _.indexBy(termsInfo.terms, "id");
+    $scope.termSettings = _.indexBy(termsInfo.term_settings, "id");
+    $scope.dailySchedules = _.indexBy(termsInfo.daily_schedules, "id");
+
+    $scope.school = schools.school_settings[0];
+    zeroToK($scope.school);
+    $scope.gradeLevels = ["K", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    $scope.schoolMinGrade = $scope.school.grade_range_lower;
+    $scope.schoolMaxGrade = $scope.school.grade_range_upper;
 
     $scope.newHoliday = {};
     $scope.newTest = {};
@@ -16,40 +22,186 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.displayHolidayForm = false;
     $scope.displayTermForm = false;
 
-    function setupIndexArrays() {
-        for (var i = 0; i < $scope.tests.length; i++) {
-            $scope.editTests.push(null);
+    $scope.edit = false;
+
+    function zeroToK(schoolObj) {
+        if (schoolObj.grade_range_lower === 0) {
+            schoolObj.grade_range_lower = "K";
         }
-        for (var i = 0; i < $scope.holidays.length; i++) {
-            $scope.editHolidays.push(null);
-        }
-        for (var i = 0; i < $scope.terms.length; i++) {
-            $scope.editTerms.push(null);
+        if (schoolObj.grade_range_upper === 0) {
+            schoolObj.grade_range_upper = "K";
         }
     }
 
-    setupIndexArrays();
-
-    function insertIndex(indexArray, objectArray, orderByKey, newId) {
-        // this is after item has been added
-        var sortedArray = _.sortBy(objectArray, orderByKey);
-        for (var i = 0; i < sortedArray.length; i++) {
-            if (sortedArray[i].id === newId) {
-                indexArray.splice(i, 0, null);
-                break;
-            }
+    function kToZero(schoolObj) {
+        if (schoolObj.grade_range_lower === "K") {
+            schoolObj.grade_range_lower = 0;
+        }
+        if (schoolObj.grade_range_upper === "K") {
+            schoolObj.grade_range_upper = 0;
         }
     }
 
-    function removeIndex(indexArray, objectArray, orderByKey, newId) {
-        // this is before item has been deleted
-        var sortedArray = _.sortBy(objectArray, orderByKey);
-        for (var i = 0; i < sortedArray.length; i++) {
-            if (sortedArray[i].id === newId) {
-                indexArray.splice(i, 1);
+    $scope.editSchool = function(field) {
+        switch (field) {
+            case "name":
+                $scope.editSchoolName = true;
+                checkIfAllInfoSelected();
                 break;
-            }
+            case "location":
+                $scope.editSchoolLocation = true;
+                checkIfAllInfoSelected();
+                break;
+            case "minGrade":
+                $scope.editSchoolMinGrade = true;
+                checkIfAllRangeSelected();
+                break;
+            case "maxGrade":
+                $scope.editSchoolMaxGrade = true;
+                checkIfAllRangeSelected();
+                break;
+            case "allRange":
+                $scope.editSchoolMinGrade = true;
+                $scope.editSchoolMaxGrade = true;
+                $scope.editingAllRange = true;
+                break;
+            case "noRange":
+                $scope.editSchoolMinGrade = false;
+                $scope.editSchoolMaxGrade = false;
+                $scope.editingAllRange = false;
+                break;
+            case "allInfo":
+                $scope.editSchoolName = true;
+                $scope.editSchoolLocation = true;
+                $scope.editingAllInfo = true;
+                break;
+            case "noInfo":
+                $scope.editSchoolName = false;
+                $scope.editSchoolLocation = false;
+                $scope.editingAllInfo = false;
+                break;
         }
+    };
+
+    $scope.cancelSchoolEdit = function(field) {
+        switch (field) {
+            case "name":
+                $scope.editSchoolName = false;
+                $scope.schoolName = "";
+                break;
+            case "location":
+                $scope.editSchoolLocation = false;
+                $scope.schoolLocation = "";
+                break;
+            case "minGrade":
+                $scope.editSchoolMinGrade = false;
+                break;
+            case "maxGrade":
+                $scope.editSchoolMaxGrade = false;
+                break;
+        }
+        checkIfAllInfoSelected();
+        checkIfAllRangeSelected();
+    };
+
+    /**
+     * Updates school with the newly edited field.
+     * @param {string} field - the name of the field that the user is editing.
+     */
+    $scope.saveSchoolEdit = function(field) {
+        $scope.schoolE = Object.assign({}, $scope.school);
+        switch (field) {
+            // update field
+            case "name":
+                $scope.schoolE.school_name = $scope.schoolName;
+                break;
+            case "location":
+                $scope.schoolE.school_location = $scope.schoolLocation;
+                break;
+            case "minGrade":
+                $scope.schoolE.grade_range_lower = $scope.schoolMinGrade;
+                break;
+            case "maxGrade":
+                $scope.schoolE.grade_range_upper = $scope.schoolMaxGrade;
+                break;
+            default:
+        }
+        // save with schoolE
+        kToZero($scope.schoolE);
+        delete $scope.schoolE.id;
+        schoolService.updateSchool(1, $scope.schoolE).then(
+            function success(data) {
+                $scope.school = data.school_settings;
+                zeroToK($scope.school);
+                switch (field) {
+                    // set view after call returns
+                    case "name":
+                        $scope.editSchoolName = false;
+                        $scope.schoolName = "";
+                        break;
+                    case "location":
+                        $scope.editSchoolLocation = false;
+                        $scope.schoolLocation = "";
+                        break;
+                    case "minGrade":
+                        $scope.editSchoolMinGrade = false;
+                        $scope.schoolMinGrade = $scope.school.grade_range_lower;
+                        break;
+                    case "maxGrade":
+                        $scope.editSchoolMaxGrade = false;
+                        $scope.schoolMaxGrade = $scope.school.grade_range_upper;
+                        break;
+                    default:
+                }
+                checkIfAllRangeSelected();
+                checkIfAllInfoSelected();
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save your edit." + errorResponse());
+            });
+    };
+
+    /**
+     * Sets edit all info button according to what edit fields are ready to edit.
+     */
+    function checkIfAllInfoSelected() {
+        if ($scope.editSchoolName && $scope.editSchoolLocation) {
+            $scope.editingAllInfo = true;
+        } else if (!$scope.editSchoolName && !$scope.editSchoolLocation) {
+            $scope.editingAllInfo = false;
+        }
+    }
+
+    /**
+     * Sets edit all range button according to what edit fields are ready to edit.
+     */
+    function checkIfAllRangeSelected() {
+        if ($scope.editSchoolMinGrade && $scope.editSchoolMaxGrade) {
+            $scope.editingAllRange = true;
+        } else if (!$scope.editSchoolMinGrade && !$scope.editSchoolMaxGrade) {
+            $scope.editingAllRange = false;
+        }
+    }
+
+    /**
+     * Cancels row edit
+     * @param {number} index - row index.
+     * @param {string} type - type of item.
+     */
+    $scope.removeEdit = function(index, type) {
+        this.edit = false;
+        $("#" + type + "-row" + index).addClass('pointer');
+    }
+
+    /**
+     * Makes a row editable
+     * @param {number} index - row index.
+     * @param {string} type - type of item.
+     */
+    $scope.showEdit = function(index, type) {
+        this.edit = true;
+        $("#" + type + "-row" + index).removeClass('pointer');
     }
 
     /**
@@ -79,6 +231,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
 
     /**
      * Sets up properties of the item to display in the delete form
+     * @param {object} item - item to take values from.
+     * @param {string} type - the type of item.
      */
     function setItemProperties(item, type) {
         switch (type) {
@@ -131,57 +285,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     }
 
     /**
-     * Make a selected item editable
-     * @param {number} index - index of item to be edited (from ng-repeat).
-     * @param {string} item - type of item to be edited.
-     */
-    $scope.edit = function(index, item) {
-        switch (item) {
-            case "holiday":
-                if (!_.has($scope.editHolidays, index) || $scope.editHolidays[index] == null) {
-                    $scope.editHolidays[index] = true;
-                    $("#holiday-row" + index).removeClass('pointer');
-                }
-                break;
-            case "test":
-                if (!_.has($scope.editTests, index) || $scope.editTests[index] == null) {
-                    $scope.editTests[index] = true;
-                    $("#test-row" + index).removeClass('pointer');
-                }
-                break;
-            case "term":
-                if (!_.has($scope.editTerms, index) || $scope.editTerms[index] == null) {
-                    $scope.editTerms[index] = true;
-                    $("#term-row" + index).removeClass('pointer');
-                }
-                break;
-        }
-    };
-
-    /**
-     * Cancel item edit
-     * @param {number} index - index of item being edited (from ng-repeat).
-     * @param {string} item - type of item being edited.
-     */
-    $scope.cancelEdit = function(index, item) {
-        switch (item) {
-            case "holiday":
-                $scope.editHolidays[index] = null;
-                $("#holiday-row" + index).addClass('pointer');
-                break;
-            case "test":
-                $scope.editTests[index] = null;
-                $("#test-row" + index).addClass('pointer');
-                break;
-            case "term":
-                $scope.editTerms[index] = null;
-                $("#term-row" + index).addClass('pointer');
-                break;
-        }
-    };
-
-    /**
-     * Displays delete modal with item and itemType
+     * Displays delete modal with item and item type
+     * @param {object} item - item to take values from.
+     * @param {string} type - the type of item.
      */
     $scope.setItem = function(item, type) {
         setItemProperties(item, type);
@@ -190,6 +296,11 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         $("#deleteItemModal").modal();
     };
 
+    /**
+     * Deletes an item
+     * @param {number} id - the item id.
+     * @param {string} type - the type of item.
+     */
     $scope.deleteItem = function(id, type) {
         switch (type) {
             case "holiday":
@@ -204,11 +315,13 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         }
     }
 
+    /**
+     * Deletes a holiday
+     * @param {number} holidayId - id of holiday to be deleted.
+     */
     function deleteHoliday(holidayId) {
         holidayService.deleteHoliday(holidayId).then(
             function success(response) {
-                // update index array
-                removeIndex($scope.editHolidays, $scope.holidays, 'start_date', holidayId);
                 // remove from display array
                 for (var i = 0; i < $scope.holidays.length; i++) {
                     if ($scope.holidays[i].id === holidayId) {
@@ -225,11 +338,13 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Deletes a term
+     * @param {number} termId - id of term to be deleted.
+     */
     function deleteTerm(termId) {
         termService.deleteTerm(termId).then(
             function success(response) {
-                // update index array
-                removeIndex($scope.editTerms, $scope.terms, 'start_date', termId);
                 // remove from display array
                 for (var i = 0; i < $scope.terms.length; i++) {
                     if ($scope.terms[i].id === termId) {
@@ -246,16 +361,13 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Deletes a test
+     * @param {number} testId - id of test to be deleted.
+     */
     function deleteTest(testId) {
         testService.deleteTest(testId).then(
             function success(response) {
-                // correct the indexArray
-                var tests = [];
-                for (var i = 0; i < $scope.tests.length; i++) {
-                    tests.push(Object.assign({}, $scope.tests[i]));
-                    tests[i].test_name = tests[i].test_name.toUpperCase();
-                }
-                removeIndex($scope.editTests, tests, 'test_name', testId);
                 // remove from display array
                 for (var i = 0; i < $scope.tests.length; i++) {
                     if ($scope.tests[i].id === testId) {
@@ -272,6 +384,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Creates a new holiday
+     */
     $scope.addHoliday = function() {
         $scope.newHoliday.start_date = moment($scope.newHoliday.start_date).format('YYYY-MM-DD').toString();
         $scope.newHoliday.end_date = moment($scope.newHoliday.end_date).format('YYYY-MM-DD').toString();
@@ -285,9 +400,6 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.eHolidays[copy.id] = copy;
                 $scope.displayHolidayForm = false;
                 $scope.newHoliday = {};
-
-                // this is done after it's added to regular array
-                insertIndex($scope.editHolidays, $scope.holidays, 'start_date', response.holiday.id);
             },
             function error(response) {
                 setErrorMessage(response);
@@ -296,6 +408,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Creates a new term
+     */
     $scope.addTerm = function() {
         $scope.newTerm.start_date = moment($scope.newTerm.start_date).format('YYYY-MM-DD').toString();
         $scope.newTerm.end_date = moment($scope.newTerm.end_date).format('YYYY-MM-DD').toString();
@@ -310,9 +425,6 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.eTerms[copy.id] = copy;
                 $scope.displayTermForm = false;
                 $scope.newTerm = {};
-
-                // this is done after it's added to regular array
-                insertIndex($scope.editTerms, $scope.terms, 'start_date', response.term.id);
             },
             function error(response) {
                 setErrorMessage(response);
@@ -321,6 +433,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Creates a new test
+     */
     $scope.addTest = function() {
         testService.addTest($scope.newTest).then(
             function success(response) {
@@ -331,14 +446,6 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.eTests[copy.id] = copy;
                 $scope.displayTestForm = false;
                 $scope.newTest = {};
-
-                // correct the indexArray
-                var tests = [];
-                for (var i = 0; i < $scope.tests.length; i++) {
-                    tests.push(Object.assign({}, $scope.tests[i]));
-                    tests[i].test_name = tests[i].test_name.toUpperCase();
-                }
-                insertIndex($scope.editTests, tests, 'test_name', copy.id);
             },
             function error(response) {
                 setErrorMessage(response);
@@ -347,6 +454,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Updates a holiday
+     * @param {number} holidayId - id of holiday to be updated.
+     */
     $scope.updateHoliday = function(holidayId, index) {
         if (typeof $scope.eHolidays[holidayId].start_date !== 'string' && $scope.eHolidays[holidayId].start_date != null) {
             $scope.eHolidays[holidayId].start_date = moment($scope.eHolidays[holidayId].start_date).format('YYYY-MM-DD').toString();
@@ -364,7 +475,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.holidays[i] = response.holiday;
                     }
                 }
-                $scope.cancelEdit(index, 'holiday')
+                $scope.removeEdit(index, 'holiday');
             },
             function error(response) {
                 setErrorMessage(response);
@@ -373,6 +484,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Updates a test
+     * @param {number} holidayId - id of test to be updated.
+     */
     $scope.updateTest = function(testId, index) {
         var newTest = Object.assign({}, $scope.eTests[testId]);
         delete newTest.id;
@@ -384,7 +499,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.tests[i] = response.standardized_test;
                     }
                 }
-                $scope.cancelEdit(index, 'test')
+                $scope.removeEdit(index, 'test');
             },
             function error(response) {
                 setErrorMessage(response);
@@ -393,6 +508,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         );
     };
 
+    /**
+     * Updates a term
+     * @param {number} holidayId - id of term to be updated.
+     */
     $scope.updateTerm = function(termId, index) {
         if (typeof $scope.eTerms[termId].start_date !== 'string' && $scope.eTerms[termId].start_date != null) {
             $scope.eTerms[termId].start_date = moment($scope.eTerms[termId].start_date).format('YYYY-MM-DD').toString();
@@ -410,7 +529,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.terms[i] = response.term;
                     }
                 }
-                $scope.cancelEdit(index, 'term')
+                $scope.removeEdit(index, 'term');
             },
             function error(response) {
                 setErrorMessage(response);
