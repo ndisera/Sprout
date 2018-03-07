@@ -39,13 +39,13 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
             click: $scope.clearSearch,
             badgeList: [],
         },
-        {
-            title: "Scores Input",
-            glyph: "pencil",
-            href: "/input",
-            click: $scope.clearSearch,
-            badgeList: [],
-        },
+        //{
+            //title: "Scores Input",
+            //glyph: "pencil",
+            //href: "/input",
+            //click: $scope.clearSearch,
+            //badgeList: [],
+        //},
         {
             title: "Notifications",
             glyph: "bell",
