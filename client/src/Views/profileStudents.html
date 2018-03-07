@@ -65,7 +65,7 @@
                     <div class="panel-heading">
                         <h4 class="panel-title">{{ section.title }}</h4>
                     </div>
-                    <div class="list-group">
+                    <div class="list-group list-group-select">
                         <a class="list-group-item" href="/student/{{ student.id }}" ng-repeat="student in section.students">
                             <span>{{ student.first_name }} {{ student.last_name }}</span>
                             <span class="pull-right">{{ student.student_id }}</span>
@@ -83,7 +83,7 @@
                 <div class="panel-heading">
                     <h4 class="panel-title">{{ section.title }}</h4>
                 </div>
-                <div class="list-group">
+                <div class="list-group list-group-select">
                     <a class="list-group-item" href="/student/{{ student.id }}" ng-repeat="student in section.students">
                         <span>{{ student.first_name }} {{ student.last_name }}</span>
                         <span class="pull-right">{{ student.student_id }}</span>

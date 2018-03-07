@@ -129,7 +129,10 @@
                     <h3 class="panel-title">School Terms</h3>
                 </div>
                 <div class="panel-body">
-                    <div class="table-responsive scrollableTableDiv table-select-default table-above-add" ng-if="terms.length !== 0">
+                    <div class="table-fake" ng-if="terms.length === 0">
+                        <h4>No Terms</h4>
+                    </div>
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="terms.length !== 0">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -159,23 +162,21 @@
                                             Cancel
                                         </button>
                                     </td>
-                                    <td ng-hide="edit">
+                                    <td class="table-button-col" ng-hide="edit">
                                         <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(term, 'term'); $event.stopPropagation();">
-                                            Delete
+                                            <span class="glyphicon glyphicon-trash"></span>
                                         </button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="panel panel-default panel-add pointer no-bottom-margin" ng-hide="displayTermForm" ng-click="displayTermForm = true">
-                        <div class="panel-heading">
-                            <h4 class="panel-title centerText">
-                                <span class="glyphicon glyphicon-plus blackish"></span>
-                            </h4>
-                        </div>
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-success" ng-hide="displayTermForm" ng-click="displayTermForm = true">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </button>
                     </div>
-                    <div class="panel-wrapper" ng-show="displayTermForm">
+                    <div class="panel-wrapper voffset3" ng-show="displayTermForm">
                         <div class="panel panel-default no-bottom-margin">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Add Term</h3>
@@ -213,13 +214,16 @@
                 </div>
             </div>
         </div>
-        <div class="panel-wrapper">
+        <div class="panel-wrapper voffset4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Holidays and Breaks</h3>
                 </div>
                 <div class="panel-body">
-                    <div class="table-responsive scrollableTableDiv table-select-default table-above-add" ng-if="holidays.length !== 0">
+                    <div class="table-fake" ng-if="holidays.length === 0">
+                        <h4>No Holidays</h4>
+                    </div>
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="holidays.length !== 0">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -250,23 +254,21 @@
                                             Cancel
                                         </button>
                                     </td>
-                                    <td ng-hide="edit">
+                                    <td class="table-button-col" ng-hide="edit">
                                         <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(holiday, 'holiday'); $event.stopPropagation();">
-                                            Delete
+                                            <span class="glyphicon glyphicon-trash"></span>
                                         </button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="panel panel-default panel-add pointer no-bottom-margin" ng-hide="displayHolidayForm" ng-click="displayHolidayForm = true">
-                        <div class="panel-heading">
-                            <h4 class="panel-title centerText">
-                                <span class="glyphicon glyphicon-plus blackish"></span>
-                            </h4>
-                        </div>
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-success" ng-hide="displayHolidayForm" ng-click="displayHolidayForm = true">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </button>
                     </div>
-                    <div class="panel-wrapper" ng-show="displayHolidayForm">
+                    <div class="panel-wrapper voffset3" ng-show="displayHolidayForm">
                         <div class="panel panel-default no-bottom-margin">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Add Holiday</h3>
@@ -304,13 +306,16 @@
                 </div>
             </div>
         </div>
-        <div class="panel-wrapper">
+        <div class="panel-wrapper voffset4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">School Standardized Tests</h3>
                 </div>
                 <div class="panel-body">
-                    <div class="table-responsive scrollableTableDiv table-select-default table-above-add" ng-if="tests.length !== 0">
+                    <div class="table-fake" ng-if="tests.length === 0">
+                        <h4>No Tests</h4>
+                    </div>
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="tests.length !== 0">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -341,23 +346,21 @@
                                             Cancel
                                         </button>
                                     </td>
-                                    <td ng-hide="edit">
+                                    <td class="table-button-col" ng-hide="edit">
                                         <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(test, 'test'); $event.stopPropagation();">
-                                            Delete
+                                            <span class="glyphicon glyphicon-trash"></span>
                                         </button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="panel panel-default panel-add pointer no-bottom-margin" ng-hide="displayTestForm" ng-click="displayTestForm = true">
-                        <div class="panel-heading">
-                            <h4 class="panel-title centerText">
-                                <span class="glyphicon glyphicon-plus blackish"></span>
-                            </h4>
-                        </div>
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-success" ng-hide="displayTestForm" ng-click="displayTestForm = true">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </button>
                     </div>
-                    <div class="panel-wrapper" ng-show="displayTestForm">
+                    <div class="panel-wrapper voffset3" ng-show="displayTestForm">
                         <div class="panel panel-default no-bottom-margin">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Add Test</h3>
@@ -424,9 +427,13 @@
                         <div class="alert alert-warning">
                             <span><b>Warning:</b> This can't be undone.</span>
                         </div>
-                    </div>
-                    <div class="modal-footer grey">
-                        <button type="submit" class="btn btn-danger" data-dismiss="modal" ng-click="deleteItem(itemId, itemType)">Delete</button>
+                        <div class="voffset4">
+                        </div>
+                        <div class="btn-manipulate-row">
+                            <button type="submit" class="btn btn-danger" data-dismiss="modal" ng-click="deleteItem(itemId, itemType)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

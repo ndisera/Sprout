@@ -236,7 +236,6 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     /**
      * Add a service record for a specific student
      * @param {number} studentId - the student's id.
-     * @param {number} serviceId - the service record's id.
      * @param {service} serviceObj - the service object.
      * @return {promise} promise that will resolve with data or reject with response code.
      */
@@ -279,7 +278,6 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
      * Update specific service record for a specific student
      * @param {number} studentId - the student's id.
      * @param {number} serviceId - the service record's id.
-     * @param {service} serviceObj - the service object.
      * @return {promise} promise that will resolve with data or reject with response code.
      */
     function deleteServiceForStudent(studentId, serviceId) {
@@ -287,6 +285,275 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         $http({
             method: 'DELETE',
             url: 'https://' + $rootScope.backend + '/students/' + studentId + '/services/' + serviceId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Get ieps for a specific student
+     * @param {number} studentId - ID of the student
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function getIepsForStudent(studentId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Get specific iep for a specific student
+     * @param {number} studentId - ID of the student
+     * @param {number} iepId - ID of the iep
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function getIepForStudent(studentId, iepId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Add an iep for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {service} serviceObj - the service object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function addIepForStudent(studentId, iepObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps',
+            data: iepObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Update specific iep for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} iepId - the iep's id.
+     * @param {service} iepObj - the iep object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function updateIepForStudent(studentId, iepId, iepObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId,
+            data: iepObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Delete specific iep for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} iepId - the iep's id.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function deleteIepForStudent(studentId, iepId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Get iep datas for a specific student
+     * @param {number} studentId - ID of the student
+     * @param {number} iepId - ID of the iep
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function getIepDatasForStudent(studentId, iepId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId + '/data' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Add an iep for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} iepId - the iep's id.
+     * @param {service} iepDataObj - the iep data object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function addIepDataForStudent(studentId, iepId, iepDataObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId + '/data',
+            data: iepDataObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Update specific iep data for a specific iep for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} iepId - the iep's id.
+     * @param {number} iepDataId - the iep's id.
+     * @param {service} iepDataObj - the iep data object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function updateIepDataForStudent(studentId, iepId, iepDataId, iepDataObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId + '/data/' + iepDataId,
+            data: iepDataObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Delete specific iep for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} iepId - the iep's id.
+     * @param {number} iepDataId - the iep data's id.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function deleteIepDataForStudent(studentId, iepId, iepDataId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId + '/data/' + iepDataId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Get iep notes for a specific student
+     * @param {number} studentId - ID of the student
+     * @param {number} iepId - ID of the iep
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function getIepNotesForStudent(studentId, iepId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId + '/notes' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Add an iep note for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} iepId - the iep's id.
+     * @param {service} iepNoteObj - the iep data object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function addIepNoteForStudent(studentId, iepId, iepNoteObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId + '/notes',
+            data: iepNoteObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Update specific iep note for a specific iep for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} iepId - the iep's id.
+     * @param {number} iepNoteId - the iep's id.
+     * @param {service} iepNoteObj - the iep data object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function updateIepNoteForStudent(studentId, iepId, iepNoteId, iepNoteObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId + '/notes/' + iepNoteId,
+            data: iepNoteObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Delete specific iep note for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} iepId - the iep's id.
+     * @param {number} iepNoteId - the iep notes's id.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function deleteIepNoteForStudent(studentId, iepId, iepNoteId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/ieps/' + iepId + '/notes/' + iepNoteId,
         }).then(function success(response) {
             deferred.resolve(response.data);
         }, function error(response) {
@@ -310,5 +577,20 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         addServiceForStudent: addServiceForStudent,
         updateServiceForStudent: updateServiceForStudent,
         deleteServiceForStudent: deleteServiceForStudent,
+        getIepsForStudent: getIepsForStudent,
+        getIepForStudent: getIepForStudent,
+        addIepForStudent: addIepForStudent,
+        updateIepForStudent: updateIepForStudent,
+        deleteIepForStudent: deleteIepForStudent,
+        getIepDatasForStudent: getIepDatasForStudent,
+        //getIepDataForStudent: getIepDataForStudent,
+        addIepDataForStudent: addIepDataForStudent,
+        updateIepDataForStudent: updateIepDataForStudent,
+        deleteIepDataForStudent: deleteIepDataForStudent,
+        getIepNotesForStudent: getIepNotesForStudent,
+        //getIepNoteForStudent: getIepNoteForStudent,
+        addIepNoteForStudent: addIepNoteForStudent,
+        updateIepNoteForStudent: updateIepNoteForStudent,
+        deleteIepNoteForStudent: deleteIepNoteForStudent,
     };
 });

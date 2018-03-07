@@ -207,4 +207,9 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
     };
 
     resetNewService();
+
+    //TODO(gzuber): uncomment this to enable tooltips
+    //$(document).ready(function(){
+        //$('[data-toggle="tooltip"]').tooltip();
+    //});
 });

@@ -31,9 +31,14 @@
     width: 45px;
 }
 
-.focus-student-panel-editing {
-    margin-left: 55px;
+.focus-student-panel-editing .panel {
+    margin-bottom: 33px;
 }
+
+.sortable .focus-student-row:last-child .panel {
+    margin-bottom: 0px;
+}
+
 
 .focus-width-none {
     width: 0px;
@@ -56,4 +61,8 @@
     margin-top: 15px;
 }
 
+.focus-delete-group {
+    margin-top: -10px;
+    float: right !important;
+}
 
