@@ -182,13 +182,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             document.getElementById('cAddButton').classList.remove('active');
             document.getElementById('cAddButton2').classList.remove('active');
         }
-        if (task === 'delete') {
-            document.getElementById('cDeleteButton').classList.add('active');
-            document.getElementById('cDeleteButton2').classList.add('active');
-        } else {
-            document.getElementById('cDeleteButton').classList.remove('active');
-            document.getElementById('cDeleteButton2').classList.remove('active');
-        }
     }
 
     /**

@@ -8,7 +8,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.termSettings = _.indexBy(termsInfo.term_settings, "id");
     $scope.dailySchedules = _.indexBy(termsInfo.daily_schedules, "id");
 
-    schools.school_settings.length > 0 ? $scope.school = schools.school_settings[0] : $scope.school = {};
+    $scope.school = schools.school_settings[0];
+    zeroToK($scope.school);
     $scope.gradeLevels = ["K", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     $scope.schoolMinGrade = $scope.school.grade_range_lower;
     $scope.schoolMaxGrade = $scope.school.grade_range_upper;
@@ -23,37 +24,61 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
 
     $scope.edit = false;
 
+    function zeroToK(schoolObj) {
+        if (schoolObj.grade_range_lower === 0) {
+            schoolObj.grade_range_lower = "K";
+        }
+        if (schoolObj.grade_range_upper === 0) {
+            schoolObj.grade_range_upper = "K";
+        }
+    }
+
+    function kToZero(schoolObj) {
+        if (schoolObj.grade_range_lower === "K") {
+            schoolObj.grade_range_lower = 0;
+        }
+        if (schoolObj.grade_range_upper === "K") {
+            schoolObj.grade_range_upper = 0;
+        }
+    }
+
     $scope.editSchool = function(field) {
         switch (field) {
             case "name":
                 $scope.editSchoolName = true;
-                checkIfAllSelected();
+                checkIfAllInfoSelected();
                 break;
             case "location":
                 $scope.editSchoolLocation = true;
-                checkIfAllSelected();
+                checkIfAllInfoSelected();
                 break;
             case "minGrade":
                 $scope.editSchoolMinGrade = true;
-                checkIfAllSelected();
+                checkIfAllRangeSelected();
                 break;
             case "maxGrade":
                 $scope.editSchoolMaxGrade = true;
-                checkIfAllSelected();
+                checkIfAllRangeSelected();
                 break;
-            case "all":
-                $scope.editSchoolName = true;
-                $scope.editSchoolLocation = true;
+            case "allRange":
                 $scope.editSchoolMinGrade = true;
                 $scope.editSchoolMaxGrade = true;
-                $scope.editingAll = true;
+                $scope.editingAllRange = true;
                 break;
-            case "none":
-                $scope.editSchoolName = false;
-                $scope.editSchoolLocation = false;
+            case "noRange":
                 $scope.editSchoolMinGrade = false;
                 $scope.editSchoolMaxGrade = false;
-                $scope.editingAll = false;
+                $scope.editingAllRange = false;
+                break;
+            case "allInfo":
+                $scope.editSchoolName = true;
+                $scope.editSchoolLocation = true;
+                $scope.editingAllInfo = true;
+                break;
+            case "noInfo":
+                $scope.editSchoolName = false;
+                $scope.editSchoolLocation = false;
+                $scope.editingAllInfo = false;
                 break;
         }
     };
@@ -75,7 +100,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.editSchoolMaxGrade = false;
                 break;
         }
-        checkIfAllSelected();
+        checkIfAllInfoSelected();
+        checkIfAllRangeSelected();
     };
 
     /**
@@ -93,18 +119,20 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.schoolE.school_location = $scope.schoolLocation;
                 break;
             case "minGrade":
-                $scope.schoolMinGrade === "K" ? $scope.schoolE.grade_range_lower = 0 : $scope.schoolE.grade_range_lower = $scope.schoolMinGrade;
+                $scope.schoolE.grade_range_lower = $scope.schoolMinGrade;
                 break;
             case "maxGrade":
-                $scope.schoolMaxGrade === "K" ? $scope.schoolE.grade_range_upper = 0 : $scope.schoolE.grade_range_upper = $scope.schoolMaxGrade;
+                $scope.schoolE.grade_range_upper = $scope.schoolMaxGrade;
                 break;
             default:
         }
         // save with schoolE
+        kToZero($scope.schoolE);
         delete $scope.schoolE.id;
         schoolService.updateSchool(1, $scope.schoolE).then(
             function success(data) {
                 $scope.school = data.school_settings;
+                zeroToK($scope.school);
                 switch (field) {
                     // set view after call returns
                     case "name":
@@ -125,7 +153,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         break;
                     default:
                 }
-                checkIfAllSelected();
+                checkIfAllRangeSelected();
+                checkIfAllInfoSelected();
             },
             function error(response) {
                 setErrorMessage(response);
@@ -134,13 +163,24 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     };
 
     /**
-     * Sets edit all button according to what edit fields are ready to edit.
+     * Sets edit all info button according to what edit fields are ready to edit.
      */
-    function checkIfAllSelected() {
-        if ($scope.editSchoolName && $scope.editSchoolLocation && $scope.editSchoolMinGrade && $scope.editSchoolMaxGrade) {
-            $scope.editingAll = true;
-        } else if (!$scope.editSchoolName && !$scope.editSchoolLocation && !$scope.editSchoolMinGrade && !$scope.editSchoolMaxGrade) {
-            $scope.editingAll = false;
+    function checkIfAllInfoSelected() {
+        if ($scope.editSchoolName && $scope.editSchoolLocation) {
+            $scope.editingAllInfo = true;
+        } else if (!$scope.editSchoolName && !$scope.editSchoolLocation) {
+            $scope.editingAllInfo = false;
+        }
+    }
+
+    /**
+     * Sets edit all range button according to what edit fields are ready to edit.
+     */
+    function checkIfAllRangeSelected() {
+        if ($scope.editSchoolMinGrade && $scope.editSchoolMaxGrade) {
+            $scope.editingAllRange = true;
+        } else if (!$scope.editSchoolMinGrade && !$scope.editSchoolMaxGrade) {
+            $scope.editingAllRange = false;
         }
     }
 

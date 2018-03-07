@@ -3,102 +3,123 @@
     <div id="school" class="tab-pane fade in active">
         <h3 class="inlineHeading hidden-xs">School Settings</h3>
         <hr />
-        <div class="panel-wrapper">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title panel-title-with-btn">School Info</h3>
-                    <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editSchool('all')" ng-hide="editingAll">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 voffset2">
+                <div class="panel-wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title panel-title-with-btn">School Info</h3>
+                            <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editSchool('allInfo')" ng-hide="editingAllInfo">
                 Edit All
             </button>
-                    <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editSchool('none')" ng-show="editingAll">
+                            <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editSchool('noInfo')" ng-show="editingAllInfo">
                 Stop Editing
             </button>
+                        </div>
+                        <div class="panel-body">
+                            <form name="schoolNameForm" class="form-horizontal" ng-submit="saveSchoolEdit('name')">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Name:</label>
+                                    <div class="col-sm-9">
+                                        <p class="form-control-static" ng-hide="editSchoolName">{{school.school_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editSchool('name')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                        <div class="input-group" ng-show="editSchoolName">
+                                            <input required autocomplete="off" type="text" class="form-control" placeholder="{{school.school_name}}" ng-model="schoolName">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="schoolNameForm.$invalid">
+                                    <i class="glyphicon glyphicon-ok green"></i>
+                                </button>
+                                            </div>
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default" type="button" ng-click="cancelSchoolEdit('name')">
+                                    <i class="glyphicon glyphicon-remove red"></i>
+                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <form name="schoolLocationForm" class="form-horizontal" ng-submit="saveSchoolEdit('location')">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">Location:</label>
+                                    <div class="col-sm-9">
+                                        <p class="form-control-static" ng-hide="editSchoolLocation">{{school.school_location}}&nbsp;&nbsp;&nbsp;<span ng-click="editSchool('location')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                        <div class="input-group" ng-show="editSchoolLocation">
+                                            <input required autocomplete="off" type="text" class="form-control" placeholder="{{school.school_location}}" ng-model="schoolLocation">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="schoolLocationForm.$invalid">
+                                    <i class="glyphicon glyphicon-ok green"></i>
+                                </button>
+                                            </div>
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default" type="button" ng-click="cancelSchoolEdit('location')">
+                                    <i class="glyphicon glyphicon-remove red"></i>
+                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <form name="schoolNameForm" class="form-horizontal" ng-submit="saveSchoolEdit('name')">
-                        <div class="form-group">
-                            <label class="control-label col-sm-3">Name:</label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static" ng-hide="editSchoolName">{{school.school_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editSchool('name')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                                <div class="input-group" ng-show="editSchoolName">
-                                    <input required autocomplete="off" type="text" class="form-control" placeholder="{{school.school_name}}" ng-model="schoolName">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default checkBtn" type="submit" ng-disabled="schoolNameForm.$invalid">
+            </div>
+            <div class="col-xs-12 col-sm-6 voffset2">
+                <div class="panel-wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title panel-title-with-btn">Grade Level Range</h3>
+                            <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editSchool('allRange')" ng-hide="editingAllRange">
+                Edit All
+            </button>
+                            <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editSchool('noRange')" ng-show="editingAllRange">
+                Stop Editing
+            </button>
+                        </div>
+                        <div class="panel-body">
+                            <form name="schoolMinGradeForm" class="form-horizontal" ng-submit="saveSchoolEdit('minGrade')">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">From Grade:</label>
+                                    <div class="col-sm-9">
+                                        <p class="form-control-static" ng-hide="editSchoolMinGrade">{{school.grade_range_lower}}&nbsp;&nbsp;&nbsp;<span ng-click="editSchool('minGrade')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                        <div class="input-group" ng-show="editSchoolMinGrade">
+                                            <select required ng-model="schoolMinGrade" ng-options="x for x in gradeLevels" class="form-control"></select>
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="schoolMinGradeForm.$invalid">
                                     <i class="glyphicon glyphicon-ok green"></i>
                                 </button>
-                                    </div>
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default" type="button" ng-click="cancelSchoolEdit('name')">
+                                            </div>
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default" type="button" ng-click="cancelSchoolEdit('minGrade')">
                                     <i class="glyphicon glyphicon-remove red"></i>
                                 </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </form>
-                    <form name="schoolLocationForm" class="form-horizontal" ng-submit="saveSchoolEdit('location')">
-                        <div class="form-group">
-                            <label class="control-label col-sm-3">Location:</label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static" ng-hide="editSchoolLocation">{{school.school_location}}&nbsp;&nbsp;&nbsp;<span ng-click="editSchool('location')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                                <div class="input-group" ng-show="editSchoolLocation">
-                                    <input required autocomplete="off" type="text" class="form-control" placeholder="{{school.school_location}}" ng-model="schoolLocation">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default checkBtn" type="submit" ng-disabled="schoolLocationForm.$invalid">
+                            </form>
+                            <form name="schoolMaxGradeForm" class="form-horizontal" ng-submit="saveSchoolEdit('maxGrade')">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">To Grade:</label>
+                                    <div class="col-sm-9">
+                                        <p class="form-control-static" ng-hide="editSchoolMaxGrade">{{school.grade_range_upper}}&nbsp;&nbsp;&nbsp;<span ng-click="editSchool('maxGrade')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                        <div class="input-group" ng-show="editSchoolMaxGrade">
+                                            <select required ng-model="schoolMaxGrade" ng-options="x for x in gradeLevels" class="form-control"></select>
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="schoolMaxGradeForm.$invalid">
                                     <i class="glyphicon glyphicon-ok green"></i>
                                 </button>
-                                    </div>
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default" type="button" ng-click="cancelSchoolEdit('location')">
+                                            </div>
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-default" type="button" ng-click="cancelSchoolEdit('maxGrade')">
                                     <i class="glyphicon glyphicon-remove red"></i>
                                 </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
-                    </form>
-                    <form name="schoolMinGradeForm" class="form-horizontal" ng-submit="saveSchoolEdit('minGrade')">
-                        <div class="form-group">
-                            <label class="control-label col-sm-3">From Grade Level:</label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static" ng-hide="editSchoolMinGrade">{{school.grade_range_lower}}&nbsp;&nbsp;&nbsp;<span ng-click="editSchool('minGrade')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                                <div class="input-group" ng-show="editSchoolMinGrade">
-                                    <select required ng-model="schoolMinGrade" ng-options="x for x in gradeLevels" class="form-control"></select>
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default checkBtn" type="submit" ng-disabled="schoolMinGradeForm.$invalid">
-                                    <i class="glyphicon glyphicon-ok green"></i>
-                                </button>
-                                    </div>
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default" type="button" ng-click="cancelSchoolEdit('minGrade')">
-                                    <i class="glyphicon glyphicon-remove red"></i>
-                                </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                    <form name="schoolMaxGradeForm" class="form-horizontal" ng-submit="saveSchoolEdit('maxGrade')">
-                        <div class="form-group">
-                            <label class="control-label col-sm-3">To Grade Level:</label>
-                            <div class="col-sm-9">
-                                <p class="form-control-static" ng-hide="editSchoolMaxGrade">{{school.grade_range_upper}}&nbsp;&nbsp;&nbsp;<span ng-click="editSchool('maxGrade')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                                <div class="input-group" ng-show="editSchoolMaxGrade">
-                                    <select required ng-model="schoolMaxGrade" ng-options="x for x in gradeLevels" class="form-control"></select>
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default checkBtn" type="submit" ng-disabled="schoolMaxGradeForm.$invalid">
-                                    <i class="glyphicon glyphicon-ok green"></i>
-                                </button>
-                                    </div>
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default" type="button" ng-click="cancelSchoolEdit('maxGrade')">
-                                    <i class="glyphicon glyphicon-remove red"></i>
-                                </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -214,7 +235,8 @@
                                     <td ng-hide="edit">{{ holiday.name }}</td>
                                     <td ng-hide="edit">{{ holiday.start_date }}</td>
                                     <td ng-hide="edit">{{ holiday.end_date }}</td>
-                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td></td>
+                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                    </td>
                                     <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eHolidays[holiday.id].name"></td>
                                     <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
                                     <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
@@ -304,7 +326,8 @@
                                     <td ng-hide="edit">{{ test.test_name }}</td>
                                     <td ng-hide="edit">{{ test.min_score }}</td>
                                     <td ng-hide="edit">{{ test.max_score }}</td>
-                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td></td>
+                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                    </td>
                                     <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTests[test.id].test_name"></td>
                                     <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].min_score"></td>
                                     <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].max_score"></td>

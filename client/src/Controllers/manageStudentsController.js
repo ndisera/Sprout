@@ -170,13 +170,6 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
             document.getElementById('sAddButton').classList.remove('active');
             document.getElementById('sAddButton2').classList.remove('active');
         }
-        if (task === 'delete') {
-            document.getElementById('sDeleteButton').classList.add('active');
-            document.getElementById('sDeleteButton2').classList.add('active');
-        } else {
-            document.getElementById('sDeleteButton').classList.remove('active');
-            document.getElementById('sDeleteButton2').classList.remove('active');
-        }
     }
 
     /**

@@ -416,13 +416,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             document.getElementById('tAddButton').classList.remove('active');
             document.getElementById('tAddButton2').classList.remove('active');
         }
-        if (task === 'delete') {
-            document.getElementById('tDeleteButton').classList.add('active');
-            document.getElementById('tDeleteButton2').classList.add('active');
-        } else {
-            document.getElementById('tDeleteButton').classList.remove('active');
-            document.getElementById('tDeleteButton2').classList.remove('active');
-        }
     }
 
     /**
