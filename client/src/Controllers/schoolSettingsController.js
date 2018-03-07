@@ -1,15 +1,16 @@
-app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, termsInfo, tests, schools, schedules, holidayService, testService, termService, schoolService, scheduleService) {
+app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, terms, tests, schools, schedules, termSettings, holidayService, testService, termService, schoolService, scheduleService) {
     $scope.location = $location;
     $scope.holidays = holidays.holidays;
     $scope.tests = tests.standardized_tests;
-    $scope.terms = termsInfo.terms;
-    // this is different from daily schedules gotten from terms, and dropdowns including schedules will use this
+    $scope.terms = terms.terms;
     $scope.schedules = schedules.daily_schedules;
 
-    // need this to display schedule name
-    $scope.termsLookup = _.indexBy(termsInfo.terms, "id");
-    $scope.termSettings = _.indexBy(termsInfo.term_settings, "id");
-    $scope.dailySchedules = _.indexBy(termsInfo.daily_schedules, "id");
+    // used for getting schedule name
+    $scope.termsLookup = _.indexBy($scope.terms, "id");
+    $scope.termSettingsLookup = _.indexBy(termSettings.term_settings, "id");
+    $scope.schedulesLookup = _.indexBy($scope.schedules, "id");
+    // remember that term setting has to be posted along with schedule setting
+    // I need to update (or get again) my term settings array/lookup everytime I delete a schedule
 
     $scope.school = schools.school_settings[0];
     zeroToK($scope.school);
@@ -396,6 +397,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.terms.splice(i, 1);
                     }
                 }
+                delete termsLookup[termId];
                 // remove from edit lookup
                 delete $scope.eTerms[termId];
             },
@@ -442,6 +444,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.schedules.splice(i, 1);
                     }
                 }
+                delete $scope.schedulesLookup[scheduleId];
                 // remove from edit lookup
                 delete $scope.eSchedules[scheduleId];
             },
@@ -488,6 +491,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
             function success(response) {
                 // add to display array
                 $scope.terms.push(response.term);
+                $scope.termsLookup[response.term.id] = response.term;
                 // add to edit lookup (should point to different object)
                 var copy = Object.assign({}, response.term);
                 $scope.eTerms[copy.id] = copy;
@@ -530,11 +534,26 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
             function success(response) {
                 // add to display array
                 $scope.schedules.push(response.daily_schedule);
+                $scope.schedulesLookup[response.daily_schedule.id] = response.daily_schedule;
                 // add to edit lookup (should point to different object)
                 var copy = Object.assign({}, response.daily_schedule);
                 $scope.eSchedules[copy.id] = copy;
                 $scope.displayScheduleForm = false;
                 $scope.newSchedule = {};
+
+                // now add the corresponding term settings
+                var termObj = {schedule: response.daily_schedule.id};
+                termService.addTermSetting(termObj).then(
+                    function success(tResponse) {
+                        // update my term settings array and lookup
+                        $scope.termSettings.push(tResponse.term_settings);
+                        $scope.termSettingsLookup[tResponse.term_settings.id] = tResponse.term_settings;
+                    },
+                    function error(tResponse) {
+                        setErrorMessage(response);
+                        toastService.error("The server was unable to save the new term setting." + errorResponse());
+                    }
+                )
             },
             function error(response) {
                 setErrorMessage(response);
@@ -618,6 +637,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.terms[i] = response.term;
                     }
                 }
+                $scope.termsLookup[response.term.id] = response.term;
                 $scope.removeEdit(index, 'term');
             },
             function error(response) {
@@ -642,6 +662,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                         $scope.schedules[i] = response.daily_schedule;
                     }
                 }
+                $scope.schedulesLookup[response.daily_schedule.id] = response.daily_schedule;
                 $scope.removeEdit(index, 'schedule');
             },
             function error(response) {
