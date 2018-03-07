@@ -797,11 +797,31 @@ ul.dropdown-menu > li > a:hover {
 }
 
 .btn.hover-danger:hover {
-    background-color:#d9534f;
+    background-color: #d9534f;
     color: #eee;
     border-color: #d43f3a;
 }
 
+.glyphicon-big-button {
+    font-size: 50px;
+    margin-left: 20px;
+    cursor: pointer;
+}
 
+.glyphicon-ok-sign.glyphicon-big-button {
+    color: #57bc90;
+}
+
+.glyphicon-ok-sign.glyphicon-big-button:hover {
+    color: #41a479;
+}
+
+.glyphicon-remove-sign.glyphicon-big-button {
+    color: #d9534f;
+}
+
+.glyphicon-remove-sign.glyphicon-big-button:hover {
+    color: #c9302c;
+}
 
 
