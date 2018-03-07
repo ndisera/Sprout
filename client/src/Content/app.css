@@ -871,6 +871,14 @@ input.ng-invalid:focus {
     height: 30px;
     width: 30px;
     margin-top: 3px;
+    margin-right: 5px;
 }
 
+.table-fake {
+    border: 1px solid #ddd;
+}
 
+.table-fake > h4 {
+    margin: 20px 0px;
+    text-align: center;
+}
