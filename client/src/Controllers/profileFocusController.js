@@ -1,6 +1,6 @@
 app.controller("profileFocusController", function ($scope, $q, $location, toastService, studentData, focusData, testData,
                                                    userService, testService, behaviorService,
-                                                   sectionService, studentService) {
+                                                   sectionService, studentService, enrollmentService) {
     $scope.location = $location;
 
     $scope.studentSearch = {
@@ -21,6 +21,19 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
     if(focusData.focus_students !== null && focusData.focus_students !== undefined) {
         $scope.focusStudents = _.sortBy(focusData.focus_students, 'ordering');
     }
+
+    //set default focus student info
+    //todo: This is horribly wrong and should be done on the backend or something
+    _.each($scope.focusStudents, function(elem) {
+       if(elem.focus_category === "none") {
+           var today = moment();
+           var pastWeek = moment(today).add(-7, 'd');
+           elem.focus_category = "test__"
+             + pastWeek.format('YYYY-MM-DD').toString() + "__"
+             + today.format('YYYY-MM-DD').toString() + "__"
+             + testData.standardized_tests[0].id;
+       }
+    });
 
     $scope.editing = false;
     $scope.toggleEdit = function() {
@@ -184,6 +197,16 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
         userService.createFocusForUser(userService.user.id, newFocus).then(
             function success(data) {
+
+                if(data.focus_student.focus_category === "none") {
+                    var today = moment();
+                    var pastWeek = moment(today).add(-7, 'd');
+                    data.focus_student.focus_category = "test__"
+                              + pastWeek.format('YYYY-MM-DD').toString() + "__"
+                              + today.format('YYYY-MM-DD').toString() + "__"
+                              + testData.standardized_tests[0].id;
+                }
+
                 $scope.focusStudents.push(data['focus_student']);
 
                 var promises = saveOrder();
@@ -231,14 +254,66 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
     // this is called when the user selects a different focus category
     $scope.selectFocusCategory = function(focusStudent, category) {
         // the dropdown will switch to the matching category of whatever you set focusStudentsGraph[studentId].focus.category to
-        $scope.focusGraphs[focusStudent.student].focus.category = category.category;
-        $scope.focusGraphs[focusStudent.student].focus.specificID = category.specificID;
+        // $scope.focusGraphs[focusStudent.student].focus.category = category.category;
+        // $scope.focusGraphs[focusStudent.student].focus.specificID = category.specificID;
 
+        if (category.category === "behavior") {
+
+            var today = moment();
+            var pastWeek = moment(today).add(-7, 'd');
+            focusStudent.focus_category = "behavior__"
+              + pastWeek.format('YYYY-MM-DD').toString() + "__"
+              + today.format('YYYY-MM-DD').toString() + "__";
+            var config = {
+                filter: [
+                    {name: 'student', val: focusStudent.id,},
+                ],
+            };
+            var studentEnrollment;
+            enrollmentService.getStudentEnrollments(config).then(
+              function success(data) {
+                  focusStudent.focus_category += data.enrollments[1].id;
+                  updateFocusGraphs(); 
+              }, function error(response) {
+
+              }
+            );
+        } else if (category.category === "effort") {
+
+            var today = moment();
+            var pastWeek = moment(today).add(-7, 'd');
+            focusStudent.focus_category = "effort__"
+              + pastWeek.format('YYYY-MM-DD').toString() + "__"
+              + today.format('YYYY-MM-DD').toString() + "__";
+            var config = {
+                filter: [
+                    {name: 'student', val: focusStudent.id,},
+                ],
+            };
+            var studentEnrollment;
+            enrollmentService.getStudentEnrollments(config).then(
+              function success(data) {
+                  focusStudent.focus_category += data.enrollments[1].id;
+                  updateFocusGraphs(); //todo: update seems really sluggish. Maybe find a way to selectively update a graph, instead of the whole thing
+              }, function error(response) {
+
+              }
+            );
+        } else if (category.category === "test") {
+
+            var today = moment();
+            var pastWeek = moment(today).add(-7, 'd');
+            focusStudent.focus_category = "test__"
+              + pastWeek.format('YYYY-MM-DD').toString() + "__"
+              + today.format('YYYY-MM-DD').toString() + "__"
+              + category.specificID;
+
+            updateFocusGraphs();
+        }
         // this is where you would need to save the choice to the server
         // and update the graphs
         //todo: how do I save the choice to the server?
 
-        updateFocusGraphs(); //todo: update seems really sluggish. Maybe find a way to selectively update a graph, instead of the whole thing
     };
 
     /**
@@ -262,15 +337,22 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
             var cautionStart  = cautionStringSections[1];
             var cautionEnd    = cautionStringSections[2];
             var cautionID     = parseInt(cautionStringSections[3]);
+            var focusStringSections = elem.focus_category.split("__");
+            var focusType     = focusStringSections[0];
+            var focusStart    = focusStringSections[1];
+            var focusEnd      = focusStringSections[2];
+            var focusID       = parseInt(focusStringSections[3]);
 
             //save off the user selected category before recreating all the graphs
-            if ($scope.focusGraphs[elem.student] !== null && $scope.focusGraphs[elem.student] !== undefined) {
-                var focusType = $scope.focusGraphs[elem.student].focus.category;
-                var focusID = $scope.focusGraphs[elem.student].focus.specificID;
-            } else { //default to the first thing in the dropdown
-                focusType = $scope.focusCategories[0].category;
-                focusID = $scope.focusCategories[0].specificID;
-            }
+            // if ($scope.focusGraphs[elem.student] !== null && $scope.focusGraphs[elem.student] !== undefined) {
+            //     var focusType = $scope.focusGraphs[elem.student].focus.category;
+            //     var focusID = $scope.focusGraphs[elem.student].focus.specificID;
+            // } else { //default to the first thing in the dropdown
+            //     // focusType = $scope.focusCategories[0].category;
+            //     // focusID = $scope.focusCategories[0].specificID;
+            //     focusType = "derp";
+            //     focusID = -21;
+            // }
 
               //create the structure for the graphs array
             $scope.focusGraphs[elem.student] = {};
@@ -366,7 +448,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
             //Focus Graphs
             //todo: fix placeholder for focus category information
-            serviceCaller($scope.focusGraphs[elem.student]['focus'], focusType, "2018-01-01", "2018-02-01", elem.student, focusID);
+            serviceCaller($scope.focusGraphs[elem.student]['focus'], focusType, focusStart, focusEnd, elem.student, focusID);
             serviceCaller($scope.focusGraphs[elem.student]['progress'], progressType, progressStart, progressEnd, elem.student, progressID);
             serviceCaller($scope.focusGraphs[elem.student]['caution'],  cautionType,  cautionStart,  cautionEnd,  elem.student, cautionID);
             // serviceCaller($scope.focusGraphs[elem.student]['progress'], "effort", "2018-01-01", "2018-02-01", elem.student, 42, "extra shit");
@@ -510,7 +592,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                       filter: [
                           //get the student's test scores and start populating the graphs,
                           {name: 'student', val: studentID},
-                          {name: 'date.range', val: beginDate,}, //todo: change to the beginning of the term until now
+                          {name: 'date.range', val: beginDate,}, //todo: change to the beginning of the term until now (backend)
                           {name: 'date.range', val: endDate,},
                       ]
                   };
@@ -545,6 +627,16 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                             currentGraph.labels[i] = interestingDates[i];
                         }
 
+                        if (interestingScores.length === 0) {
+                            var iterDate = moment(graphEnd);
+                            var k = 4;
+                            while (k >= 0) {
+                                currentGraph.labels[k] = iterDate.format("MM/DD").toString();
+                                k--;
+                                iterDate.subtract(1, 'd');
+                            }
+                        }
+
                         //set the y-axis bounds
                         currentGraph.options.scales.yAxes[0].ticks.min = testIdToInfo[specificID].min;
                         currentGraph.options.scales.yAxes[0].ticks.max = testIdToInfo[specificID].max;
@@ -569,7 +661,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
         } else if (category === "grades") {
             console.log("Grades category does not exist yet");
         } else {
-            console.error("Requested category of " + category + "does not exist");
+            console.error("Requested category of " + category + " does not exist");
         }
     }
 

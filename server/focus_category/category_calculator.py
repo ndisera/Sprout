@@ -58,7 +58,7 @@ class CategoryCalculator():
         #todo: enforce no duplicate progress and caution categories
 
         newlist = sorted(self.behavior_efforts, key=lambda x: x.date)
-        self.progress_category_choice = rand_val #todo: superhacky stuff
+        self.progress_category_choice = rand_val #todo: fix superhacky stuff
 
         if rand_val == 0:
             return 'test__2018-01-01__2018-03-08__' + str(self.test_scores[test_len - 1].standardized_test_id)
