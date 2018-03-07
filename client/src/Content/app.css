@@ -798,6 +798,10 @@ ul.dropdown-menu > li > a:hover {
     vertical-align: middle;
 }
 
+.vertical-align-mid {
+    vertical-align: middle !important;
+}
+
 .btn.hover-success:hover {
     background-color: #57bc90;
     color: #eee;
