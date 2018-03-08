@@ -281,12 +281,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
 
         toSave.goal = iep.id;
         toSave.value = iep.newData.value;
-
-        //TODO(gzuber): get simon to change this
-        toSave.date = moment(iep.newData.date).hour(moment().hour()).minute(moment().minute()).format().toString();
-        //toSave.date = iep.newData.date.format('YYYY-MM-DDThh:mm').toString();
-        //toSave.data.hour(moment().hour());
-        //toSave.data.minute(moment().minute());
+        toSave.date = iep.newData.date.format('YYYY-MM-DD').toString();
 
         studentService.addIepDataForStudent($scope.student.id, iep.id, toSave).then(
             function success(data) {
@@ -313,18 +308,11 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         }
 
         //TODO(gzuber): get simon to change this
-        toSave.date = moment(data.date_temp).hour(moment().hour()).minute(moment().minute()).format().toString();
+        toSave.date = moment(data.date_temp).format('YYYY-MM-DD').toString();
         toSave.value = data.value_temp;
 
         studentService.updateIepDataForStudent($scope.student.id, iep.id, data.id, toSave).then(
             function success(data) {
-                //data.date = moment(data.iep_goal_datapoint.date);
-                //data.date_temp = moment(data.iep_goal_datapoint.date);
-                //data.value = data.iep_goal_datapoint.value;
-                //data.value_temp = data.iep_goal_datapoint.value;
-                //data.note = data.iep_goal_datapoint.note;
-                //data.note_temp = data.iep_goal_datapoint.note;
-                
                 $scope.updateIep(iep);
 
                 if(data.editing) {
@@ -335,8 +323,17 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                 toastService.error('The server wasn\'t able to save the measurement.');
             },
         );
+    }
 
-
+    $scope.deleteData = function(iep, data) {
+        studentService.deleteIepDataForStudent($scope.student.id, iep.id, data.id).then(
+            function success(data) {
+                $scope.updateIep(iep);
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to delete the measurement.');
+            },
+        );
     }
 
     $scope.addNote = function(iep) {
@@ -386,6 +383,18 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the note.');
+            },
+        );
+    }
+
+    $scope.deleteNote = function(iep, note) {
+        studentService.deleteIepNoteForStudent($scope.student.id, iep.id, note.id).then(
+            function success(data) {
+                var index = _.findIndex(iep.notes, function(elem) { return elem.id === note.id; });
+                iep.notes.splice(index, 1);
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to delete the note.');
             },
         );
     }

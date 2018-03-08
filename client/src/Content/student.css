@@ -128,6 +128,10 @@
     margin: 20px 0px;
 }
 
+.student-behaviors-graph {
+    height: 300px;
+}
+
 .student-services-panel .form-control-static {
     display: inline-block;
 }
