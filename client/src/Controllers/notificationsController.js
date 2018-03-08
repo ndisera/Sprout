@@ -2,14 +2,44 @@ app.controller("notificationsController", function ($scope, $location, $q, userS
     $scope.location = $location;
 
     $scope.categories = {
-        '1': 'birthday',
+        1: {
+            panelClass: 'notifications-birthday',
+            iconClass: 'fa-birthday-cake',
+        },
+        2: {
+            panelClass: 'notifications-low-grade',
+            iconClass: 'fa-exclamation-triangle',
+        },
     }
 
     $scope.notifications = userService.notificationData.relevantItems;
+    console.log($scope.notifications);
 
     $scope.singleColumn = $scope.notifications;
     $scope.doubleColumn = [[], [], ];
     $scope.tripleColumn = [[], [], [], ];
+
+    $scope.notificationClass = function(notification) {
+       switch(notification.category) {
+           case 1:
+               return $scope.categories[1].panelClass;
+               break;
+           case 2:
+               return $scope.categories[2].panelClass;
+               break;
+       }
+    };
+
+    $scope.notificationIconClass = function(notification) {
+       switch(notification.category) {
+           case 1:
+               return $scope.categories[1].iconClass;
+               break;
+           case 2:
+               return $scope.categories[2].iconClass;
+               break;
+       }
+    };
 
 
     $scope.updateNotifications = function() {
