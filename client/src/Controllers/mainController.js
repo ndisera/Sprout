@@ -28,7 +28,14 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
         {
             title: "Home",
             glyph: "home",
-            href: "/profile",
+            href: "/profile/focus",
+            click: $scope.clearSearch,
+            badgeList: [],
+        },
+        {
+            title: "Students",
+            glyph: "leaf",
+            href: "/profile/students",
             click: $scope.clearSearch,
             badgeList: [],
         },
@@ -39,13 +46,13 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
             click: $scope.clearSearch,
             badgeList: [],
         },
-        {
-            title: "Scores Input",
-            glyph: "pencil",
-            href: "/input",
-            click: $scope.clearSearch,
-            badgeList: [],
-        },
+        //{
+            //title: "Scores Input",
+            //glyph: "pencil",
+            //href: "/input",
+            //click: $scope.clearSearch,
+            //badgeList: [],
+        //},
         {
             title: "Notifications",
             glyph: "bell",
@@ -71,8 +78,21 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     ];
 
     $scope.sidebarLinkActive = function(link) {
-        if($location.path().split('/')[1] === link.href.split('/')[1]) {
-            return true;
+        if(link.href === '/profile/students') {
+            if($location.path().split('/')[1] === 'student' || 
+                ($location.path().split('/')[1] === link.href.split('/')[1] && $location.path().split('/')[2] === link.href.split('/')[2])) {
+                return true;
+            }
+        }
+        else if(link.href === '/profile/focus') {
+            if($location.path().split('/')[1] === link.href.split('/')[1] && $location.path().split('/')[2] === link.href.split('/')[2]) {
+                return true;
+            }
+        }
+        else {
+            if($location.path().split('/')[1] === link.href.split('/')[1]) {
+                return true;
+            }
         }
         return false;
     };

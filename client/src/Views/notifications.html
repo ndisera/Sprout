@@ -28,7 +28,7 @@
 </div>
 <div class="row visible-xs">
     <div class="col-xs-12" ng-repeat="notification in singleColumn">
-        <div class="panel-wrapper notifications-birthday">
+        <div class="panel-wrapper" ng-class="notificationClass(notification)">
             <div class="panel panel-default notifications-panel" ng-click="navigate(notification)">
                 <div class="panel-body">
                     <button class="btn btn-default notifications-remove-icon" ng-click="markAsRead(notification);$event.stopPropagation();">
@@ -36,7 +36,7 @@
                     </button>
                     <div class="notifications-content">
                         <div class="notifications-content-cell">
-                            <i class="fas fa-2x fa-birthday-cake notifications-content-icon"></i>
+                            <i class="fas fa-2x notifications-content-icon" ng-class="notificationIconClass(notification)"></i>
                         </div>
                         <div class="notifications-content-cell">
                             <h5>{{ notification.title }}</h5>
@@ -51,7 +51,7 @@
 <div class="row hidden-xs hidden-lg">
     <div class="col-xs-6" ng-repeat="column in doubleColumn">
         <div class="col-xs-12 no-padding" ng-repeat="notification in column track by notification.id">
-            <div class="panel-wrapper notifications-birthday">
+            <div class="panel-wrapper" ng-class="notificationClass(notification)">
                 <div class="panel panel-default notifications-panel" ng-click="navigate(notification)">
                     <div class="panel-body">
                         <button class="btn btn-default notifications-remove-icon" ng-click="markAsRead(notification);$event.stopPropagation();">
@@ -59,7 +59,7 @@
                         </button>
                         <div class="notifications-content">
                             <div class="notifications-content-cell">
-                                <i class="fas fa-2x fa-birthday-cake notifications-content-icon"></i>
+                                <i class="fas fa-2x notifications-content-icon" ng-class="notificationIconClass(notification)"></i>
                             </div>
                             <div class="notifications-content-cell">
                                 <h5>{{ notification.title }}</h5>
@@ -75,7 +75,7 @@
 <div class="row visible-lg">
     <div class="col-xs-4" ng-repeat="column in tripleColumn">
         <div class="col-md-12 no-padding" ng-repeat="notification in column">
-            <div class="panel-wrapper notifications-birthday">
+            <div class="panel-wrapper" ng-class="notificationClass(notification)">
                 <div class="panel panel-default notifications-panel" ng-click="navigate(notification)">
                     <div class="panel-body">
                         <button class="btn btn-default notifications-remove-icon" ng-click="markAsRead(notification);$event.stopPropagation();">
@@ -83,7 +83,7 @@
                         </button>
                         <div class="notifications-content">
                             <div class="notifications-content-cell">
-                                <i class="fas fa-2x fa-birthday-cake notifications-content-icon"></i>
+                                <i class="fas fa-2x notifications-content-icon" ng-class="notificationIconClass(notification)"></i>
                             </div>
                             <div class="notifications-content-cell">
                                 <h5>{{ notification.title }}</h5>

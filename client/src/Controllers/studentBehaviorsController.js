@@ -166,7 +166,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                 { name: 'enrollment.student', val: $scope.student.id, },
             ],
             sort: ['date',],
-        }
+        };
 
         behaviorService.getStudentBehavior(config).then(
             function success(data) {

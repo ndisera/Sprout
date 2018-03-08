@@ -5,9 +5,9 @@
         <hr />
         <div class="row">
             <div class="col-xs-12 col-sm-6 voffset2">
-                <div class="panel-wrapper">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+        <div class="panel-wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading">
                             <h3 class="panel-title panel-title-with-btn">School Info</h3>
                             <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editSchool('allInfo')" ng-hide="editingAllInfo">
                                 Edit All
@@ -137,6 +137,7 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
+                                    <th>School Schedule</th>
                                     <th>Begins</th>
                                     <th>Ends</th>
                                     <th class="text-button-column"></th>
@@ -146,10 +147,12 @@
                             <tbody>
                                 <tr class="pointer" id="term-row{{$index}}" ng-repeat="term in terms | orderBy:'start_date'" ng-click="showEdit($index, 'term');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
                                     <td ng-hide="edit">{{ term.name }}</td>
+                                    <td ng-hide="edit">{{ term.schedule.name }}</td>
                                     <td ng-hide="edit">{{ term.start_date }}</td>
                                     <td ng-hide="edit">{{ term.end_date }}</td>
                                     <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
                                     <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTerms[term.id].name"></td>
+                                    <td ng-show="edit"><select ng-model="eTerms[term.id].schedule" ng-options="x.name for x in schedules" class="form-control"></select></td>
                                     <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
                                     <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
                                     <td ng-show="edit">
@@ -187,6 +190,12 @@
                                         <label class="control-label col-sm-2">Name:</label>
                                         <div class="col-sm-10">
                                             <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Term Name" ng-model="newTerm.name">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">School Schedule:</label>
+                                        <div class="col-sm-10">
+                                            <select required ng-model="newTermSchoolSchedule" ng-options="x.name for x in schedules" class="form-control"></select>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -401,11 +410,11 @@
         <div class="panel-wrapper voffset4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">School Periods</h3>
+                    <h3 class="panel-title">School Schedule</h3>
                 </div>
                 <div class="panel-body">
                     <div class="table-fake" ng-if="schedules.length === 0">
-                        <h4>No School Periods</h4>
+                        <h4>No School Schedule</h4>
                     </div>
                     <div class="table-responsive scrollableTableDiv table-select-default" ng-if="schedules.length !== 0">
                         <table class="table table-hover">
@@ -531,7 +540,7 @@
                             <button type="submit" class="btn btn-danger" data-dismiss="modal" ng-click="deleteItem(itemId, itemType)">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
-                        </div>
+                    </div>
                     </div>
                 </div>
             </div>

@@ -67,15 +67,31 @@
 }
 
 .notifications-birthday .notifications-panel:hover {
-    background-color: #d2ecf9;
+    background-color: #e8f6fc;
 }
 
 .notifications-birthday .notifications-panel:hover .notifications-remove-icon {
-    background-color: #d2ecf9;
+    background-color: #e8f6fc;
 }
 
 .notifications-birthday .notifications-content-icon {
     color: #5ab9ea;
+}
+
+.notifications-low-grade.panel-wrapper {
+    border-color: #d9534f;
+}
+
+.notifications-low-grade .notifications-panel:hover {
+    background-color: #faebea;
+}
+
+.notifications-low-grade .notifications-panel:hover .notifications-remove-icon {
+    background-color: #faebea;
+}
+
+.notifications-low-grade .notifications-content-icon {
+    color: #d9534f;
 }
 
 .notifications-panel:hover .notifications-remove-icon:hover, .notifications-remove-icon:hover, .notifications-remove-icon:focus {
