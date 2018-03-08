@@ -99,7 +99,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 }
                 noDays ? periodsForDisplay.push("Period " + period) : periodsForDisplay.push("Day " + day + " Period " + period);
             }
-            $scope.periodArraysLookup[$scope.terms[i].name] = periodsForDisplay;
+            $scope.periodArraysLookup[$scope.terms[i].id] = periodsForDisplay;
         }
     }
 
@@ -198,7 +198,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         $scope.viewCTeacher = true;
         $scope.viewCTerm = true;
         $scope.cTerm = $scope.termsLookup[section.term];
-        $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[section.term].name][section.schedule_position];
+        $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[section.term].id][section.schedule_position];
         $scope.viewCPeriod = true;
         // set enrolledStudents and unenrolledStudents
         $('#enrolledInput').val('');
@@ -299,7 +299,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 $scope.sectionE.term = $scope.cTerm.id;
                 break;
             case "period":
-                $scope.sectionE.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].name].indexOf($scope.cPeriod);
+                $scope.sectionE.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].id].indexOf($scope.cPeriod);
                 break;
             default:
         }
@@ -358,7 +358,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         $scope.newSection.teacher = $scope.teachersLookup[$scope.addTeacher.toUpperCase()];
         $scope.newSection.term = $scope.newSectionTerm.id;
         if ($scope.newSectionPeriod != null) {
-            $scope.newSection.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.newSection.term].name].indexOf($scope.newSectionPeriod);
+            $scope.newSection.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.newSection.term].id].indexOf($scope.newSectionPeriod);
         }
         var sectionPromise = sectionService.addSection($scope.newSection);
         sectionPromise.then(function success(data) {
