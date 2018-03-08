@@ -367,7 +367,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                 series: [],
                 category: focusType,
                 displayName: _.find($scope.focusCategories, function(elem) { 
-                    return elem.category === focusType && elem.specificID === focusID; 
+                    return elem.category === focusType && (elem.category !== 'test' || elem.specificID === progressID);
                 }).displayName,
                 options: {
                     spanGaps: true,
