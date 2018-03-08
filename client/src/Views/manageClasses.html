@@ -27,10 +27,10 @@
                                     <div class="input-group-btn">
                                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ viewSectionTerm.name }} <span class="caret"></span></button>
                                         <ul class="dropdown-menu dropdown-menu-right">
-                                            <li ng-repeat="term in terms" ng-click="selectTerm(term, 'view')" ng-class="{ 'active': term.name === viewSectionTerm.name, }">
+                                            <li ng-repeat="term in terms" ng-click="selectTerm(term, 'view')">
                                                 <a class="student-overview-assign-link">{{ term.name }}  <span ng-if="term.name === viewSectionTerm.name" class="glyphicon glyphicon-ok"></span></a>
                                             </li>
-                                            <li ng-click="selectTerm({name: 'All Terms'}, 'view')" ng-class="{ 'active': viewSectionTerm.name === 'All Terms', }">
+                                            <li ng-click="selectTerm({name: 'All Terms'}, 'view')">
                                                 <a class="student-overview-assign-link">All Terms  <span ng-if="viewSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
                                             </li>
                                         </ul>
@@ -61,7 +61,7 @@
                                         <td>{{ teacherIdLookup[section.teacher] }}</td>
                                         <td>{{ termsLookup[section.term].name }}</td>
                                         <td ng-if="section.schedule_position == null"></td>
-                                        <td ng-if="section.schedule_position != null">{{ periodArraysLookup[termsLookup[section.term].name][section.schedule_position] }}</td>
+                                        <td ng-if="section.schedule_position != null">{{ periodArraysLookup[termsLookup[section.term].id][section.schedule_position] }}</td>
                                         <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
                                         <td class="buttonColumn table-button-col">
                                             <button class="btn btn-danger btn-xs" type="button" ng-click="setSectionD(section); $event.stopPropagation();">
@@ -159,9 +159,9 @@
                             <div class="form-group">
                                 <label class="control-label col-sm-2" for="cperiod">Period:</label>
                                 <div class="col-sm-10">
-                                    <p class="form-control-static" ng-show="viewCPeriod">{{ periodArraysLookup[termsLookup[sectionV.term].name][sectionV.schedule_position] }}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('period')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                    <p class="form-control-static" ng-show="viewCPeriod">{{ periodArraysLookup[termsLookup[sectionV.term].id][sectionV.schedule_position] }}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('period')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
                                     <div class="input-group" ng-hide="viewCPeriod">
-                                        <select ng-model="cPeriod" class="form-control" ng-change="setPeriod(cPeriod)" ng-options="x for x in periodArraysLookup[termsLookup[sectionV.term].name]"></select>
+                                        <select id="cPeriod" ng-model="cPeriod" class="form-control" ng-change="setPeriod(cPeriod)" ng-options="x for x in periodArraysLookup[termsLookup[sectionV.term].id]"></select>
                                         <div class="input-group-btn">
                                             <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCPeriodForm.$invalid">
                                                 <i class="glyphicon glyphicon-ok green"></i>
@@ -295,7 +295,7 @@
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="cperiod2">Period:</label>
                         <div class="col-sm-10">
-                            <select ng-model="newSectionPeriod" class="form-control" ng-options="x for x in periodArraysLookup[newSectionTerm.name]"></select>
+                            <select ng-model="newSectionPeriod" class="form-control" ng-options="x for x in periodArraysLookup[newSectionTerm.id]"></select>
                         </div>
                     </div>
                     <div class="form-group no-bottom-margin">
@@ -354,9 +354,9 @@
                                     <td>{{ teacherIdLookup[section.teacher] }}</td>
                                     <td>{{ termsLookup[section.term].name }}</td>
                                     <td ng-if="section.schedule_position == null"></td>
-                                    <td ng-if="section.schedule_position != null">{{ periodArraysLookup[termsLookup[section.term].name][section.schedule_position] }}</td>
-                                    <td class="table-button-col">
-                                        <button class="btn btn-danger btn-xs" type="button"><span class="glyphicon glyphicon-trash"></span></button>
+                                    <td ng-if="section.schedule_position != null">{{ periodArraysLookup[termsLookup[section.term].id][section.schedule_position] }}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-xs" type="button">Delete</button>
                                     </td>
                                 </tr>
                             </tbody>

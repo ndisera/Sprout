@@ -58,6 +58,25 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
         },
 
         /**
+         * Add a term setting
+         * @param {object} termSettingObj - object to be added to term settings.
+         * @return {promise} promise that will resolve with data or reject with response code.
+         */
+        addTermSetting: function (termSettingObj) {
+            var deferred = $q.defer();
+            $http({
+                method: 'POST',
+                url: 'https://' + $rootScope.backend + '/settings/terms',
+                data: termSettingObj,
+            }).then(function success(response) {
+                deferred.resolve(response.data);
+            }, function error(response) {
+                deferred.reject(response);
+            });
+            return deferred.promise;
+        },
+
+        /**
          * Update term
          * @param {number} termId - the term id.
          * @param {object} termObj - the object used to update the term.
