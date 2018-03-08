@@ -94,6 +94,44 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
     $scope[graphStartDateKey] = moment().startOf('isoWeek');
     $scope[graphEndDateKey]   = moment().startOf('isoWeek').add(4, 'd');
 
+    //TODO(gzuber): there must be a better way to do this...
+    function legendClick(e, legendItem) {
+        var index = legendItem.datasetIndex;
+        var value = true;
+        if(this.chart.options.graph === 'behavior') {
+            if($scope.activeBehaviorLegendItem === index) {
+                value = null;
+                $scope.activeBehaviorLegendItem = null;
+            }
+            else {
+                $scope.activeBehaviorLegendItem = index;
+            }
+        }
+        if(this.chart.options.graph === 'effort') {
+            if($scope.activeEffortLegendItem === index) {
+                value = null;
+                $scope.activeEffortLegendItem = null;
+            }
+            else {
+                $scope.activeEffortLegendItem = index;
+            }
+        }
+
+        var i = 0;
+        var cont = true;
+        while(cont) {
+            try {
+                this.chart.getDatasetMeta(i).hidden = value;
+                i++;
+            }
+            catch(err) {
+                cont = false;
+            }
+        }
+        this.chart.getDatasetMeta(index).hidden = null;
+        this.chart.update();
+    }
+
     // all common behavior/effort graph settings
     $scope.sharedGraph = {
         labels: [],
@@ -118,14 +156,24 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
             },
             legend:
             {
-                display: true
+                onClick: legendClick,
+                display: true,
             }
         },
     };
 
     // start off the two graphs with empty datasets
-    $scope.behaviorGraph = { data: [], };
-    $scope.effortGraph   = { data: [], };
+    $scope.behaviorGraph = { 
+        data: [],
+        options: _.clone($scope.sharedGraph.options),
+    };
+    $scope.effortGraph = { 
+        data: [],
+        options: _.clone($scope.sharedGraph.options),
+    };
+
+    $scope.behaviorGraph.options.graph = 'behavior';
+    $scope.effortGraph.options.graph = 'effort';
 
     /**
      * called when start or end daterange picker changed

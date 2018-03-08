@@ -47,7 +47,7 @@
             <div class="panel-wrapper">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="panel-title">Measurements</h4>
+                        <h4 class="panel-title">Measurements <span ng-if="iep.quantitative">(Scored From {{ iep.quantitative_range_low }} to {{ iep.quantitative_range_upper }})</span></h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -75,7 +75,7 @@
                                                     <span class="glyphicon glyphicon-pencil pencilEdit student-ieps-hover-pencil"></span>
                                                 </td>
                                                 <td class="student-ieps-min-col table-button-col vertical-align-mid" ng-show="!data.editing">
-                                                    <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="deleteData(data)">
+                                                    <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="deleteData(iep, data); $event.stopPropagation();">
                                                         <span class="glyphicon glyphicon-trash"></span>
                                                     </button>
                                                 </td>
@@ -194,7 +194,7 @@
                                                     <span class="glyphicon glyphicon-pencil pencilEdit student-ieps-hover-pencil"></span>
                                                 </td>
                                                 <td class="student-ieps-min-col table-button-col vertical-align-mid" ng-show="!note.editing">
-                                                    <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="deleteNote(note)">
+                                                    <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="deleteNote(iep, note); $event.stopPropagation();">
                                                         <span class="glyphicon glyphicon-trash"></span>
                                                     </button>
                                                 </td>
