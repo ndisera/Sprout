@@ -18,6 +18,7 @@
 
 .focusProgress, .focusCaution, .focusGraph {
     height: 200px;
+    margin-top: 15px;
 }
 
 .focus-remove-button {

@@ -1,4 +1,4 @@
-app.controller("profileFocusController", function ($scope, $q, $location, toastService, studentData, focusData, testData,
+app.controller("profileFocusController", function ($scope, $rootScope, $q, $location, toastService, studentData, focusData, testData,
                                                    userService, testService, behaviorService,
                                                    sectionService, studentService, enrollmentService) {
     $scope.location = $location;
@@ -31,7 +31,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
            elem.focus_category = "test__"
              + pastWeek.format('YYYY-MM-DD').toString() + "__"
              + today.format('YYYY-MM-DD').toString() + "__"
-             + testData.standardized_tests[0].id;
+             + testData.standardized_tests[1].id;
        }
     });
 
@@ -204,7 +204,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                     data.focus_student.focus_category = "test__"
                               + pastWeek.format('YYYY-MM-DD').toString() + "__"
                               + today.format('YYYY-MM-DD').toString() + "__"
-                              + testData.standardized_tests[0].id;
+                              + testData.standardized_tests[1].id;
                 }
 
                 $scope.focusStudents.push(data['focus_student']);
@@ -248,7 +248,11 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
     // add on dynamic categories here
     // categories like tests are determined by the user
     _.each(testData.standardized_tests, function(elem) {
-        $scope.focusCategories.push({ category: 'test', displayName: elem.test_name, specificID: elem.id,});
+        $scope.focusCategories.push({ 
+            category: 'test', 
+            displayName: elem.test_name, 
+            specificID: elem.id,
+        });
     });
 
     // this is called when the user selects a different focus category
@@ -353,6 +357,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
             //     focusType = "derp";
             //     focusID = -21;
             // }
+            //
 
               //create the structure for the graphs array
             $scope.focusGraphs[elem.student] = {};
@@ -361,10 +366,17 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                 labels: [],
                 series: [],
                 category: focusType,
+                displayName: _.find($scope.focusCategories, function(elem) { 
+                    return elem.category === focusType && elem.specificID === focusID; 
+                }).displayName,
                 options: {
+                    spanGaps: true,
                     elements: {
+                        point: {
+                            radius: 0,
+                        },
                         line: {
-                            fill: false,
+                            fill: true,
                         },
                     },
                     responsive: true,
@@ -379,10 +391,17 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                             }
                         }]
                     },
-                    legend: {
-                        display: true
-                    }
+                    //legend: {
+                        //display: true
+                    //}
                 },
+                colors: [
+                    { 
+                        borderColor: $rootScope.colors[1].setAlpha(0.7).toRgbString(),
+                        //pointBackgroundColor: tinycolor('#d9534f').setAlpha(0.7).toRgbString(),
+                        backgroundColor: $rootScope.colors[1].setAlpha(0.2).toRgbString(), 
+                    }
+                ],
             };
 
             $scope.focusGraphs[elem.student]['progress'] = {
@@ -390,10 +409,16 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                 labels: [1, 2, 3, 4],
                 series: [],
                 category: progressType,
+                displayName: _.find($scope.focusCategories, function(elem) { 
+                    return elem.category === progressType && (elem.category !== 'test' || elem.specificID === progressID); }).displayName,
                 options: {
+                    spanGaps: true,
                     elements: {
+                        point: {
+                            radius: 0,
+                        },
                         line: {
-                            fill: false,
+                            fill: true,
                         },
                     },
                     responsive: true,
@@ -408,10 +433,17 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                             }
                         }]
                     },
-                    legend: {
-                        display: true
-                    }
+                    //legend: {
+                        //display: true
+                    //}
                 },
+                colors: [
+                    { 
+                        borderColor: $rootScope.colors[0].setAlpha(0.7).toRgbString(),
+                        //pointBackgroundColor: tinycolor('#d9534f').setAlpha(0.7).toRgbString(),
+                        backgroundColor: $rootScope.colors[0].setAlpha(0.2).toRgbString(), 
+                    }
+                ],
             };
 
             $scope.focusGraphs[elem.student]['caution'] = {
@@ -419,10 +451,16 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                 labels: [1, 2, 3, 4],
                 series: [],
                 category: cautionType,
+                displayName: _.find($scope.focusCategories, function(elem) { 
+                    return elem.category === cautionType && (elem.category !== 'test' || elem.specificID === cautionID); }).displayName,
                 options: {
+                    spanGaps: true,
                     elements: {
+                        point: {
+                            radius: 0,
+                        },
                         line: {
-                            fill: false,
+                            fill: true,
                         },
                     },
                     responsive: true,
@@ -437,10 +475,21 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                             }
                         }]
                     },
-                    legend: {
-                        display: true
-                    }
+                    //legend: {
+                        //display: true
+                    //}
                 },
+                //datasetOverride: {
+                    //backgroundColor: [tinycolor('#d9534f').setAlpha(0.2).toRgbString(), ],
+                    //borderColor: [tinycolor('#d9534f').setAlpha(0.7).toRgbString(), ],
+                //},
+                colors: [
+                    { 
+                        borderColor: tinycolor('#d9534f').setAlpha(0.7).toRgbString(),
+                        //pointBackgroundColor: tinycolor('#d9534f').setAlpha(0.7).toRgbString(),
+                        backgroundColor: tinycolor('#d9534f').setAlpha(0.2).toRgbString(), 
+                    }
+                ],
             };
 
             //With the graph framework set up, now we call services to get the data we need
@@ -455,12 +504,12 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
             // serviceCaller($scope.focusGraphs[elem.student]['caution'], "test", "2018-01-01", "2018-02-01", elem.student, 1, "extra shit");
 
 
-            console.log("focus graph for student " + elem.student + ": ");
-            console.log($scope.focusGraphs[elem.student]['focus']);
-            console.log("progress graph for student " + elem.student + ": ");
-            console.log($scope.focusGraphs[elem.student]['progress']);
-            console.log("caution graph for student " + elem.student + ": ");
-            console.log($scope.focusGraphs[elem.student]['caution']);
+            //console.log("focus graph for student " + elem.student + ": ");
+            //console.log($scope.focusGraphs[elem.student]['focus']);
+            //console.log("progress graph for student " + elem.student + ": ");
+            //console.log($scope.focusGraphs[elem.student]['progress']);
+            //console.log("caution graph for student " + elem.student + ": ");
+            //console.log($scope.focusGraphs[elem.student]['caution']);
         });
     }
 
@@ -480,6 +529,8 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
         var graphStart = moment(beginDate);
         var graphEnd = moment(endDate);
+
+        //console.log(currentGraph);
 
         /**
          * Behavior/Effort
@@ -541,24 +592,24 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                   }
                   //Set the line label
                   //Grab the section id from the enrollments array
-                  var sectionID = -1;
-                  for (i = 0; i < data.enrollments.length; i++) {
-                      if(data.enrollments[i].id === specificID) {
-                          sectionID = data.enrollments[i].section;
-                          break;
-                      }
-                  }
-                  var sectionTitle;
-                  for (i = 0; i < data.sections.length; i++) {
-                      if(data.sections[i].id === sectionID) {
-                          sectionTitle = data.sections[i].title;
-                          break;
-                      }
-                  }
-                  currentGraph.series[0] = sectionTitle;
+                  //var sectionID = -1;
+                  //for (i = 0; i < data.enrollments.length; i++) {
+                      //if(data.enrollments[i].id === specificID) {
+                          //sectionID = data.enrollments[i].section;
+                          //break;
+                      //}
+                  //}
+                  //var sectionTitle;
+                  //for (i = 0; i < data.sections.length; i++) {
+                      //if(data.sections[i].id === sectionID) {
+                          //sectionTitle = data.sections[i].title;
+                          //break;
+                      //}
+                  //}
+                  //currentGraph.series[0] = sectionTitle;
 
                   //Set the category label (capitalized)
-                  currentGraph.category = category[0].toUpperCase() + category.slice(1);
+                  //currentGraph.category = category[0].toUpperCase() + category.slice(1);
               },
               function error(response) {
                   //TODO: notify user hopefully only once
@@ -576,8 +627,8 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
 
             testService.getTests(testConfig).then(
               function success(testInfoData) {
-                  console.log("test info data");
-                  console.log(testInfoData);
+                  //console.log("test info data");
+                  //console.log(testInfoData);
                   //set up lookups for info
                   var testIdToInfo = {}; //name, max, min
                   _.each(testInfoData.standardized_tests, function (testElem) {
@@ -598,8 +649,8 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                   };
                   testService.getTestScores(testScoresConfig).then(
                     function success(studentTestScoresRaw) {
-                        console.log("test scores");
-                        console.log(studentTestScoresRaw);
+                        //console.log("test scores");
+                        //console.log(studentTestScoresRaw);
 
                         //sort the test scores data by date and then go down the list, breaking out when 5 tests have been counted
                         var studentTestScores = _.sortBy(studentTestScoresRaw.standardized_test_scores, 'date');
@@ -652,7 +703,7 @@ app.controller("profileFocusController", function ($scope, $q, $location, toastS
                         }];
 
                         //set the category:
-                        currentGraph.category = "Test Score";
+                        //currentGraph.category = "Test Score";
                     }
                   )
               }
