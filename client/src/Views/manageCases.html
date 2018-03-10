@@ -122,16 +122,17 @@
                         <div ng-repeat="manager in nonManagersArray | filter:nonManagerFilter | orderBy:'last_name'">
                             <div class="panel-wrapper">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading hidden-xs pointer" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
-                                        <h4 class="panel-title panel-title-with-btn">{{manager.first_name}} {{manager.last_name}} ({{manager.email}})</h4>
+                                    <div class="panel-heading pointer no-bottom-border" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
+                                        <h4 class="panel-title panel-title-with-btn hidden-xs">
+                                            {{manager.first_name}} {{manager.last_name}} ({{manager.email}})
+                                        </h4>
+                                        <span class="hidden-sm hidden-md hidden-lg hidden-xl">
+                                            {{manager.first_name}} {{manager.last_name}}
+                                        </span>
                                         <button id="assignManagerButton{{$index}}" class="btn btn-success pull-right heading-btn">
-                                        Assign Students
-                                    </button>
-                                    </div>
-                                    <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl pointer" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
-                                        {{manager.first_name}} {{manager.last_name}}
-                                        <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn">Assign</button>
-                                        <h5 class="no-bottom-margin">({{manager.email}})</h5>
+                                            Assign
+                                        </button>
+                                        <h5 class="no-bottom-margin hidden-sm hidden-md hidden-lg hidden-xl">({{manager.email}})</h5>
                                     </div>
                                     <div id="collapse-unassigned{{$index}}" class="panel-collapse collapse">
                                         <div class="panel-body" ng-if="toggleStudents[$index]">
