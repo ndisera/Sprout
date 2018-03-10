@@ -359,18 +359,30 @@ class IEPGoalSerializer(DynamicModelSerializer):
         Ensure that the quantitative range is non-empty and that
         the quantitative target is within the range
         """
-        if 'quantitative_range_low' or 'quantitative_range_upper' in data:
-            if not 'quantitative_range_low' and 'quantitative_range_upper' in data:
-                raise serializers.ValidationError('If one part of the quantitative range is defined, both must be')
+        if 'quantitative_range_low' in data:
             lower_bound = data['quantitative_range_low']
+        else:
+            lower_bound = getattr(self.instance, 'quantitative_range_low', None)
+
+        if 'quantitative_range_upper' in data:
             upper_bound = data['quantitative_range_upper']
+        else:
+            upper_bound = getattr(self.instance, 'quantitative_range_upper', None)
+
+        if 'quantitative_target' in data:
+            target = data['quantitative_target']
+        else:
+            target = getattr(self.instance, 'quantitative_target', None)
+
+        if lower_bound is not None or upper_bound is not None:
+            if lower_bound is None or upper_bound is None:
+                raise serializers.ValidationError('If one part of the quantitative range is defined, both must be')
             if upper_bound < lower_bound:
                 raise serializers.ValidationError('The upper bound of the quantitative range must not be below the lower bound of the range')
-            if 'quantitative_target' in data:
-                target = data['quantitative_target']
+            if target is not None:
                 if target < lower_bound or target > upper_bound:
                     raise serializers.ValidationError("Goal target must be within the lower and upper bounds of the range")
-        elif 'quantitative_target' in data:
+        elif target is not None:
             raise serializers.ValidationError("Does not make sense to declare a target without a range")
 
         return data
