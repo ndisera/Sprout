@@ -4,11 +4,14 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
 
     $scope.ieps        = [];
     $scope.selectedIep = {};
+    $scope.newIep      = {};
+    $scope.addingIep   = false;
+
+    resetNewIep();
 
     if(ieps !== null && ieps !== undefined) {
         if(ieps.iep_goals !== null && ieps.iep_goals !== undefined) {
-            //TODO(gzuber): REMOVE
-            $scope.ieps = _.sortBy(ieps.iep_goals, function(elem) { return elem.id * -1; });
+            $scope.ieps = ieps.iep_goals;
             _.each($scope.ieps, function(elem) {
                 elem.editing = false;
                 elem.addingData = false;
@@ -23,8 +26,29 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
     }
 
     $scope.selectIep = function(iep) {
+        if($scope.selectedIep === $scope.newIep) {
+            resetNewIep();
+        }
         $scope.selectedIep = iep;
-        $scope.updateIep(iep);
+        if(iep.id !== undefined && iep.id !== null) {
+            $scope.updateIep(iep);
+        }
+    }
+
+    /**
+     * helper functions for resetting "Add" forms.
+     * resets new iep, data, and note objects.
+     */
+    function resetNewIep() {
+        $scope.newIep = {
+            due_date: moment().add(1, 'y'),
+            quantitative: 'No',
+            quantitative_category: null,
+            quantitative_range_low: null,
+            quantitative_range_upper: null,
+            title: 'New IEP',
+            student: $scope.student.id,
+        };
     }
 
     function resetNewData(iep) {
@@ -44,6 +68,23 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         };
     }
 
+    $scope.iepRangeValidation = function() {
+        if($scope.newIep.quantitative === 'Yes') {
+            if($scope.newIep.quantitative_range_low === null || $scope.newIep.quantitative_range_low === undefined || $scope.newIep.quantitative_range_low === '') {
+                return true;
+            }
+            if($scope.newIep.quantitative_range_upper === null || $scope.newIep.quantitative_range_upper === undefined || $scope.newIep.quantitative_range_upper === '') {
+                return true;
+            }
+            var low = parseInt($scope.newIep.quantitative_range_low);
+            var upper = parseInt($scope.newIep.quantitative_range_upper);
+            if(low === NaN || upper === NaN || low >= upper) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     $scope.noteValidation = function(note) {
         if(note.title_temp === null || note.title_temp === undefined || note.title_temp === '') {
             return true;
@@ -52,14 +93,14 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             return true;
         }
         return false;
-    }
+    };
 
     $scope.dataValidation = function(iep, data) {
         if(data.date_temp === null || data.date_temp === undefined || data.date_temp === '') {
             return true;
         }
         return $scope.dataValueValidation(iep, data);
-    }
+    };
 
     $scope.dataValueValidation = function(iep, data) {
         if(iep.quantitative) {
@@ -72,7 +113,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             }
         }
         return false;
-    }
+    };
 
     $scope.dataNewValueValidation = function(iep, data) {
         if(iep.quantitative) {
@@ -85,13 +126,26 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             }
         }
         return false;
-    }
+    };
 
     $scope.toggleEditIep = function(iep, value) {
         iep.editing = value;
         if(!iep.editing) {
             iep.title_temp = iep.title;
             iep.due_date_temp = iep.due_date;
+        }
+    };
+
+    $scope.toggleAddIep = function(value) {
+        $scope.addingIep = value;
+        if(value) {
+            $scope.selectIep($scope.newIep);
+        }
+        else {
+            resetNewIep();
+            if($scope.ieps.length > 0) {
+                $scope.selectIep($scope.ieps[0]);
+            }
         }
     };
 
@@ -212,7 +266,6 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                                 iterDate.add(1, 'd');
                             }
                         }
-                        console.log(iep);
                     }
                 }
             },
@@ -307,7 +360,6 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             toSave.note = data.note_temp;
         }
 
-        //TODO(gzuber): get simon to change this
         toSave.date = moment(data.date_temp).format('YYYY-MM-DD').toString();
         toSave.value = data.value_temp;
 
@@ -399,6 +451,45 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         );
     }
 
+    $scope.addIep = function() {
+        var toSave = copyIep($scope.newIep);
+        if(toSave.quantitative === 'Yes') {
+            toSave.quantitative = true;
+            toSave.quantitative_category = 'none';
+        }
+        else {
+            toSave.quantitative = false;
+        }
+
+        toSave.due_date = toSave.due_date.format('YYYY-MM-DD').toString();
+
+        studentService.addIepForStudent($scope.student.id, toSave).then(
+            function success(data) {
+                var newIep = data.iep_goal;
+                newIep.editing = false;
+                newIep.addingData = false;
+                newIep.addingNote = false;
+                newIep.due_date = moment(newIep.due_date);
+                newIep.due_date_temp = moment(newIep.due_date);
+                newIep.title_temp = newIep.title;
+                resetNewData(newIep);
+                resetNewNote(newIep);
+                
+                $scope.ieps.push(newIep);
+
+                if($scope.addingIep) {
+                    $scope.toggleAddIep(false);
+                }
+
+                $scope.selectIep(newIep);
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to create the new IEP.');
+            },
+        );
+
+    };
+
     $scope.saveIep = function(iep) {
         var toSave = copyIep(iep);
 
@@ -422,5 +513,32 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         );
     }
 
-    $scope.selectIep($scope.ieps[0]);
+    $scope.deleteIep = function(iep) {
+        studentService.deleteIepForStudent($scope.student.id, iep.id).then(
+            function success(data) {
+                var index = _.findIndex($scope.ieps, function(elem) { return elem.id === iep.id; });
+                $scope.ieps.splice(index, 1);
+                if($scope.selectedIep.id === iep.id) {
+                    if($scope.ieps.length > 0) {
+                        $scope.selectIep($scope.ieps[0]);
+                    }
+                    else {
+                        $scope.selectIep({});
+                    }
+                }
+
+                toastService.success('Your IEP has been deleted.');
+            },
+            function error(data) {
+                toastService.error('The server wasn\'t able to delete the IEP.');
+            },
+        );
+    };
+
+    if($scope.ieps.length > 0) {
+        $scope.selectIep($scope.ieps[0]);
+    }
+    else {
+        $scope.selectIep({});
+    }
 });
