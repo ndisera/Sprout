@@ -34,13 +34,21 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
         elem.description_temp           = elem.description;
         elem.fulfilled_description_temp = elem.fulfilled_description;
 
-
-        // make sure each service knows who marked it fulfilled
-        if(elem.fulfilled === true && elem.fulfilled_user !== null) {
-            elem.teacher = $scope.teachersLookup[elem.fulfilled_user];
-        }
+        addTeacherToService(elem);
     });
 
+    // takes a service and adds a 'teacher' property of the teacher that
+    // fulfilled the service, if the service is fulfilled
+    function addTeacherToService(service) {
+        // make sure each service knows who marked it fulfilled
+        if(service.fulfilled === true && service.fulfilled_user !== null) {
+            service.teacher = $scope.teachersLookup[service.fulfilled_user];
+        }
+    }
+
+
+    // takes a service and returns a new object that represents
+    // the same service in a format that the server expects
     function copyService(service) {
         return {
             id: service.id,
@@ -54,6 +62,9 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
         };
     }
 
+    // resets the "newService" to its default state.
+    // "newService" is a scope variable used for the
+    // "Add Service" form.
     function resetNewService() {
         $scope.newService = {
             student: $scope.student.id,
@@ -86,7 +97,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
 
     $scope.saveService = function(service) {
         var toSave = copyService(service);
-        if(!service.fulfilled && service.fulfilled_description_temp.trim() !== '') {
+        if(!service.fulfilled && (service.fulfilled_description_temp !== null && service.fulfilled_description_temp !== undefined && service.fulfilled_description_temp.trim() !== '')) {
             toSave.fulfilled             = true;
             toSave.fulfilled_date        = moment().format('YYYY-MM-DD').toString();
             toSave.fulfilled_description = service.fulfilled_description_temp;
@@ -113,6 +124,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
                 service.fulfilled_description_temp = data.service_requirement.fulfilled_description;
                 service.fulfilled_user             = data.service_requirement.fulfilled_user;
 
+                addTeacherToService(service);
 
                 if(service.editing) {
                     $scope.toggleEditService(service);
@@ -146,6 +158,8 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
                 service.fulfilled_description      = data.service_requirement.fulfilled_description;
                 service.fulfilled_description_temp = data.service_requirement.fulfilled_description;
                 service.fulfilled_user             = data.service_requirement.fulfilled_user;
+
+                addTeacherToService(service);
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the service requirement.');
@@ -192,10 +206,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
                 newService.description_temp           = newService.description;
                 newService.fulfilled_description_temp = newService.fulfilled_description;
 
-                // make sure each service knows who marked it fulfilled
-                if(newService.fulfilled === true && newService.fulfilled_user !== null) {
-                    newService.teacher = $scope.teachersLookup[newService.fulfilled_user];
-                }
+                addTeacherToService(newService);
 
                 $scope.services.push(newService);
                 resetNewService();
