@@ -353,6 +353,28 @@ class IEPGoalSerializer(DynamicModelSerializer):
     class Meta:
         model = IEPGoal
         fields = '__all__'
+
+    def validate(self, data):
+        """
+        Ensure that the quantitative range is non-empty and that
+        the quantitative target is within the range
+        """
+        if 'quantitative_range_low' or 'quantitative_range_upper' in data:
+            if not 'quantitative_range_low' and 'quantitative_range_upper' in data:
+                raise serializers.ValidationError('If one part of the quantitative range is defined, both must be')
+            lower_bound = data['quantitative_range_low']
+            upper_bound = data['quantitative_range_upper']
+            if upper_bound < lower_bound:
+                raise serializers.ValidationError('The upper bound of the quantitative range must not be below the lower bound of the range')
+            if 'quantitative_target' in data:
+                target = data['quantitative_target']
+                if target < lower_bound or target > upper_bound:
+                    raise serializers.ValidationError("Goal target must be within the lower and upper bounds of the range")
+        elif 'quantitative_target' in data:
+            raise serializers.ValidationError("Does not make sense to declare a target without a range")
+
+        return data
+
     student = DynamicRelationField('StudentSerializer')
 
 
