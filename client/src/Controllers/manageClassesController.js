@@ -97,7 +97,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     day++;
                     period = 1;
                 }
-                noDays ? periodsForDisplay.push("Period " + period) : periodsForDisplay.push("Day " + day + " Period " + period);
+                noDays ? periodsForDisplay.push({period: j + 1, periodName: "Period " + period}) : periodsForDisplay.push({period: j + 1, periodName: "Day " + day + " Period " + period});
             }
             $scope.periodArraysLookup[$scope.terms[i].id] = periodsForDisplay;
         }
@@ -198,7 +198,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         $scope.viewCTeacher = true;
         $scope.viewCTerm = true;
         $scope.cTerm = $scope.termsLookup[section.term];
-        $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[section.term].id][section.schedule_position];
+        $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[section.term].id][section.schedule_position - 1];
         $scope.viewCPeriod = true;
         // set enrolledStudents and unenrolledStudents
         $('#enrolledInput').val('');
@@ -214,19 +214,19 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         switch (field) {
             case "title":
                 $scope.viewCTitle = false;
-                checkIfAllSelected()
+                checkIfAllSelected();
                 break;
             case "teacher":
                 $scope.viewCTeacher = false;
-                checkIfAllSelected()
+                checkIfAllSelected();
                 break;
             case "term":
                 $scope.viewCTerm = false;
-                checkIfAllSelected()
+                checkIfAllSelected();
                 break;
             case "period":
                 $scope.viewCPeriod = false;
-                checkIfAllSelected()
+                checkIfAllSelected();
                 break;
             case "none":
                 $scope.viewCTitle = true;
@@ -299,7 +299,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 $scope.sectionE.term = $scope.cTerm.id;
                 break;
             case "period":
-                $scope.sectionE.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].id].indexOf($scope.cPeriod);
+                $scope.sectionE.schedule_position = $scope.cPeriod.period;
                 break;
             default:
         }
