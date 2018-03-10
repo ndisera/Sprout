@@ -6,72 +6,23 @@
         </button>
     </div>
     <div id="student-ieps-select" class="input-group">
-        <span class="input-group-addon">IEP Goal</span>
-        <div class="input-group-btn">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedIep.title }} <span class="caret"></span></button>
-            <ul class="dropdown-menu dropdown-menu-right">
-                <li ng-repeat="entry in ieps" ng-click="selectIep(entry)" ng-class="{ 'active': entry.id === selectedIep.id, }">
-                    <a class="student-overview-assign-link">{{ entry.title }}  <span ng-if="entry.id === selectedIep.id" class="glyphicon glyphicon-ok"></span></a>
-                </li>
-            </ul>
+        <div class="full-width" ng-show="ieps.length > 0">
+            <span class="input-group-addon">IEP Goal</span>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedIep.title }} <span class="caret"></span></button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li ng-repeat="entry in ieps" ng-click="selectIep(entry)" ng-class="{ 'active': entry.id === selectedIep.id, }">
+                        <a class="student-overview-assign-link">{{ entry.title }}  <span ng-if="entry.id === selectedIep.id" class="glyphicon glyphicon-ok"></span></a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
-<!-- add iep -->
-<div class="row voffset4" ng-if="addingIep">
+<div class="row voffset4" ng-if="ieps.length === 0 && !addingIep">
     <div class="col-xs-12">
-        <div class="panel-wrapper">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title">Create IEP</h4>
-                </div>
-                <div class="panel-body">
-                    <form class="form-horizontal" name="addIepForm" ng-submit="addIep()">
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Title: </label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" ng-model="newIep.title" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Due Date: </label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" date-time ng-model="newIep.due_date" view="date" min-view="date" format="YYYY-MM-DD" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2">Measureable: </label>
-                            <div class="col-sm-10 form-checkbox-container">
-                                <input type="checkbox" ng-model="newIep.quantitative" ng-true-value="'Yes'" ng-false-value="'No'">
-                                <span>{{ newIep.quantitative }}</span>
-                            </div>
-                        </div>
-                        <div class="form-group" ng-show="newIep.quantitative === 'Yes'">
-                            <label class="control-label col-sm-2">Highest Possible Score: </label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" ng-model="newIep.quantitative_range_upper" ng-required="newIep.quantitative === 'Yes'" ng-class="{ 'invalid': iepRangeValidation(), }">
-                            </div>
-                        </div>
-                        <div class="form-group" ng-show="newIep.quantitative === 'Yes'">
-                            <label class="control-label col-sm-2">Lowest Possible Score: </label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" ng-model="newIep.quantitative_range_low" ng-required="newIep.quantitative === 'Yes'" ng-class="{ 'invalid': iepRangeValidation(), }">
-                            </div>
-                        </div>
-                        <div class="form-group no-bottom-margin">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <button class="btn btn-success" ng-disabled="addIepForm.$invalid || iepRangeValidation()" type="submit">Create</button>
-                                <button class="btn btn-danger" ng-click="toggleAddIep(false)">Cancel</button>
-                            </div>
-                        </div>
-                    </form>
-                    <!--<div class="col-xs-12 voffset3" ng-if="iepRangeValidation()">-->
-                        <!--<div class="alert alert-danger">-->
-                            <!--<span><b>Error:</b> You must define a highest and lowest score. Lowest must be a smaller value than highest.</span>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                </div>
-            </div>
+        <div class="alert alert-info" role="alert">
+            <span><b>Tip:</b> It looks like you don't have any IEPs. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
         </div>
     </div>
 </div>
@@ -382,6 +333,64 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- add iep -->
+<div class="row voffset4" ng-if="addingIep">
+    <div class="col-xs-12">
+        <div class="panel-wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Create IEP</h4>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" name="addIepForm" ng-submit="addIep()">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Title: </label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="newIep.title" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Due Date: </label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" date-time ng-model="newIep.due_date" view="date" min-view="date" format="YYYY-MM-DD" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2">Measureable: </label>
+                            <div class="col-sm-10 form-checkbox-container">
+                                <input type="checkbox" ng-model="newIep.quantitative" ng-true-value="'Yes'" ng-false-value="'No'">
+                                <span>{{ newIep.quantitative }}</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="newIep.quantitative === 'Yes'">
+                            <label class="control-label col-sm-2">Highest Possible Score: </label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="newIep.quantitative_range_upper" ng-required="newIep.quantitative === 'Yes'" ng-class="{ 'invalid': iepRangeValidation(), }">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="newIep.quantitative === 'Yes'">
+                            <label class="control-label col-sm-2">Lowest Possible Score: </label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="newIep.quantitative_range_low" ng-required="newIep.quantitative === 'Yes'" ng-class="{ 'invalid': iepRangeValidation(), }">
+                            </div>
+                        </div>
+                        <div class="form-group no-bottom-margin">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button class="btn btn-success" ng-disabled="addIepForm.$invalid || iepRangeValidation()" type="submit">Create</button>
+                                <button class="btn btn-danger" ng-click="toggleAddIep(false)">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!--<div class="col-xs-12 voffset3" ng-if="iepRangeValidation()">-->
+                        <!--<div class="alert alert-danger">-->
+                            <!--<span><b>Error:</b> You must define a highest and lowest score. Lowest must be a smaller value than highest.</span>-->
+                        <!--</div>-->
+                    <!--</div>-->
                 </div>
             </div>
         </div>

@@ -513,5 +513,32 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         );
     }
 
-    $scope.selectIep($scope.ieps[0]);
+    $scope.deleteIep = function(iep) {
+        studentService.deleteIepForStudent($scope.student.id, iep.id).then(
+            function success(data) {
+                var index = _.findIndex($scope.ieps, function(elem) { return elem.id === iep.id; });
+                $scope.ieps.splice(index, 1);
+                if($scope.selectedIep.id === iep.id) {
+                    if($scope.ieps.length > 0) {
+                        $scope.selectIep($scope.ieps[0]);
+                    }
+                    else {
+                        $scope.selectIep({});
+                    }
+                }
+
+                toastService.success('Your IEP has been deleted.');
+            },
+            function error(data) {
+                toastService.error('The server wasn\'t able to delete the IEP.');
+            },
+        );
+    };
+
+    if($scope.ieps.length > 0) {
+        $scope.selectIep($scope.ieps[0]);
+    }
+    else {
+        $scope.selectIep({});
+    }
 });

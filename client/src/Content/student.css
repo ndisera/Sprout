@@ -194,19 +194,19 @@
     margin-top: 2px;
 }
 
-#student-ieps-select > .input-group-addon {
+#student-ieps-select .input-group-addon {
     width: unset;
 }
 
-#student-ieps-select > .input-group-btn {
+#student-ieps-select .input-group-btn {
     width: 100%;
 }
 
-#student-ieps-select > .input-group-btn > button {
+#student-ieps-select .input-group-btn > button {
     width: 100%;
 }
 
-#student-ieps-select > .input-group-btn > ul {
+#student-ieps-select .input-group-btn > ul {
     width: 100%;
 }
 
