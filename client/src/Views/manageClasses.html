@@ -76,7 +76,7 @@
                 </div>
             </div>
         </div>
-        <div ng-show="displayCEditInfo && displaySectionViewSearch">
+        <div ng-if="displayCEditInfo && displaySectionViewSearch">
             <div class="panel-wrapper">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -180,7 +180,7 @@
                 </div>
             </div>
         </div>
-        <div class="panel-wrapper" ng-show="displayCEditInfo && displaySectionViewSearch">
+        <div class="panel-wrapper" ng-if="displayCEditInfo && displaySectionViewSearch">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Class Roster</h3>
@@ -218,7 +218,7 @@
                 </div>
             </div>
         </div>
-        <div class="panel-wrapper" ng-show="displayCEditInfo && displaySectionViewSearch">
+        <div class="panel-wrapper" ng-if="displayCEditInfo && displaySectionViewSearch">
             <div class="panel panel-default">
                 <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapse-{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
                     <h3 class="panel-title">
@@ -262,7 +262,7 @@
             </div>
         </div>
     </div>
-    <div class="panel-wrapper" ng-show="displaySectionForm">
+    <div class="panel-wrapper" ng-if="displaySectionForm">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Add Class</h3>
@@ -304,65 +304,6 @@
                         </div>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-    <div class="panel-wrapper" ng-show="displaySectionDeleteSearch">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">All Classes</h3>
-            </div>
-            <div class="panel-body">
-                <h4 class="centerText" ng-show="sections.length === 0">No Classes</h4>
-                <div ng-hide="sections.length === 0">
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-6 voffset2">
-                            <div id="student-grades-select" class="input-group">
-                                <span class="input-group-addon">Select Term</span>
-                                <div class="input-group-btn">
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ deleteSectionTerm.name }} <span class="caret"></span></button>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li ng-repeat="term in terms" ng-click="selectTerm(term, 'delete')">
-                                            <a class="student-overview-assign-link">{{ term.name }}  <span ng-if="term.name === deleteSectionTerm.name" class="glyphicon glyphicon-ok"></span></a>
-                                        </li>
-                                        <li ng-click="selectTerm({name: 'All Terms'}, 'delete')">
-                                            <a class="student-overview-assign-link">All Terms  <span ng-if="deleteSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-sm-6 voffset2">
-                            <input type="text" autocomplete="off" class="form-control" placeholder="Filter Classes" list="sectiond" name="sectiond" ng-model="sectionDeleteSearch">
-                        </div>
-                    </div>
-                    <br />
-                    <div class="table-responsive scrollableTableDiv table-remove">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Teacher</th>
-                                    <th>Term</th>
-                                    <th>Period</th>
-                                    <th class="buttonColumn"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="section in sections | filter:{ term: deleteSectionTerm.id } | filter:deleteSectionFilter | orderBy:'title'" data-toggle="modal" data-target="#deleteSectionModal" ng-click="setSectionD(section)">
-                                    <td>{{ section.title }}</td>
-                                    <td>{{ teacherIdLookup[section.teacher] }}</td>
-                                    <td>{{ termsLookup[section.term].name }}</td>
-                                    <td ng-if="section.schedule_position == null"></td>
-                                    <td ng-if="section.schedule_position != null">{{ periodArraysLookup[termsLookup[section.term].id][section.schedule_position] }}</td>
-                                    <td>
-                                        <button class="btn btn-danger btn-xs" type="button">Delete</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
