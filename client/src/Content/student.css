@@ -210,8 +210,15 @@
     width: 100%;
 }
 
-#student-ieps-select > .input-group-btn > ul {
-    width: 100%;
+#student-ieps-select-manipulate {
+    display: inline-block;
+    float: right;
+    margin-top: -3px;
+}
+
+#student-ieps-select {
+    display: inline-block;
+    width: calc(100% - 50px);
 }
 
 #student-ieps-edit-form .form-group {
@@ -219,6 +226,9 @@
     margin-left: 0px;
 }
 
+.student-ieps-checkbox {
+    padding-top: 7px;
+}
 
 @media (max-width: 768px) {
     #student-overview-title {
@@ -235,6 +245,17 @@
 
     #student-overview-edit-input-group {
         padding-left: 15px;
+    }
+
+    #student-ieps-select {
+        width: 100%;
+    }
+
+    #student-ieps-select-manipulate {
+        display: block;
+        float: none;
+        text-align: center;
+        margin-bottom: 20px;
     }
 
     .student-services-panel > .panel > .panel-heading.panel-heading-editing > .panel-heading-container {
