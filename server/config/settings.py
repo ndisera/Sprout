@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount', # Not actually needed/wanted, but required to work around a bug in django-rest-auth
     'rest_auth.registration',
     # End requirements for token-based authentication
+    # Permissions
+    'dry_rest_permissions',
+    # End Permissions
     'api',
     'rest_framework_swagger',
     'corsheaders',
