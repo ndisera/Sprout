@@ -144,7 +144,28 @@ class StudentViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = StudentSerializer
-    queryset = Student.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        A regular user should only be able to see students:
+            If the user is the student's case manager
+            If the student is in a class the user teaches
+
+        :return:
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = Student.objects.all()
+        if user.is_superuser:
+            # The superuser can see everything
+            return queryset
+        # A teacher may view students in their taught section
+        teaches = Q(enrollment__section__teacher=user)
+        # Or all students for whom they are case managers
+        manages = Q(case_manager=user)
+        queryset = queryset.filter(teaches | manages)
+        return queryset
+
 
     """ ensure variables show as correct types for docs """
     name_case_manager = 'case_manager'
