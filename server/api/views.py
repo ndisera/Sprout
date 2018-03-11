@@ -424,15 +424,6 @@ class SectionViewSet(NestedDynamicViewSet):
     )
 
 
-class EnrollmentViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    EnrollmentViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(EnrollmentViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(EnrollmentViewSet, path, method, link)
-
 class EnrollmentViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Enrollment" instances
@@ -459,56 +450,48 @@ class EnrollmentViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = EnrollmentSerializer
-    queryset = Enrollment.objects.all()
 
-    """ define custom schema """
-    schema = EnrollmentViewSetSchema()
+    def get_queryset(self, queryset=None):
+        """
+        Enrollments should only be visible:
+            - If the user teaches the related section
+            - If the enrollment refers to a student the teacher has another relation to
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = Enrollment.objects.all()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(section__teacher=user)
+        # Filter for other related students (only case manager at this time)
+        related = Q(student__case_manager=user)
+        queryset = queryset.filter(teaches | related)
+        return queryset
 
     """ ensure variables show as correct type for docs """
     name_student = 'student'
     name_section = 'section'
     desc_student = 'ID of the student'
     desc_section = 'ID of the section'
-    create_fields = (
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form", 
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-        coreapi.Field(
-            name=name_section,
-            required=True,
-            location="form", 
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form", 
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-        coreapi.Field(
-            name=name_section, 
-            required=True,
-            location="form", 
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_student,
-            location="form", 
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-        coreapi.Field(
-            name=name_section, 
-            location="form", 
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
+
+    student_field = coreapi.Field(
+        name=name_student,
+        required=True,
+        location="form",
+        description=desc_student,
+        schema=coreschema.Integer(title=name_student))
+    section_field = coreapi.Field(
+        name=name_section,
+        required=True,
+        location="form",
+        description=desc_section,
+        schema=coreschema.Integer(title=name_section))
+
+    schema = AutoSchema(manual_fields=[
+        student_field,
+        section_field,
+    ])
 
 
 class BehaviorViewSetSchema(AutoSchema):
