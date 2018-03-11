@@ -43,7 +43,48 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
 
     $scope.edit = false;
 
+    initializeSchoolYears();
     setupLookups();
+
+    /**
+     * Initializes termSchoolYear and holidaySchoolYear to the current school year
+     */
+    function initializeSchoolYears() {
+        var currentDate = getCurrentDate();
+        _.each($scope.schoolYears, function(elem) {
+            if (elem.start_date <= currentDate && elem.end_date >= currentDate) {
+                $scope.termSchoolYear = elem;
+                $scope.holidaySchoolYear = elem;
+            }
+        });
+    }
+
+    /**
+     * Gets today's date
+     */
+    function getCurrentDate() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        today = yyyy + "-" + mm + '-' + dd;
+        return today;
+    }
+
+    /**
+     * Sets specified school year to selected year
+     * @param {object} year - the school year selected.
+     * @param {string} type - the type the school year is associated with.
+     */
+    $scope.selectSchoolYear = function(year, type) {
+        type === "term" ? $scope.termSchoolYear = year : $scope.holidaySchoolYear = year;
+    }
 
     /**
      * Converts all grade 0 to K
@@ -520,7 +561,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.addHoliday = function() {
         $scope.newHoliday.start_date = moment($scope.newHoliday.start_date).format('YYYY-MM-DD').toString();
         $scope.newHoliday.end_date = moment($scope.newHoliday.end_date).format('YYYY-MM-DD').toString();
-        $scope.newHoliday.school_year = 1;
+        $scope.newHoliday.school_year = $scope.holidaySchoolYear.id;
         holidayService.addHoliday($scope.newHoliday).then(
             function success(response) {
                 // add to display array
@@ -544,7 +585,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.addTerm = function() {
         $scope.newTerm.start_date = moment($scope.newTerm.start_date).format('YYYY-MM-DD').toString();
         $scope.newTerm.end_date = moment($scope.newTerm.end_date).format('YYYY-MM-DD').toString();
-        $scope.newTerm.school_year = 1;
+        $scope.newTerm.school_year = $scope.termSchoolYear.id;
         //$scope.newTerm.settings = 1;
         // gets me the term settings object by using schedule id
         var settings = $scope.scheduleSettingsLookup[$scope.newTermSchoolSchedule.id];

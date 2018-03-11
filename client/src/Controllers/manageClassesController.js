@@ -36,9 +36,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.viewSectionTerm = {
         name: "All Terms"
     };
-    $scope.deleteSectionTerm = {
-        name: "All Terms"
-    };
 
     /**
      * Sets cPeriod to selected period
@@ -51,10 +48,9 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     /**
      * Sets term variables to selected term
      * @param {object} term - the term selected.
-     * @param {string} operation - the type of operation.
      */
-    $scope.selectTerm = function(term, operation) {
-        operation === "view" ? $scope.viewSectionTerm = term : $scope.deleteSectionTerm = term;
+    $scope.selectTerm = function(term) {
+        $scope.viewSectionTerm = term;
     }
 
     /**

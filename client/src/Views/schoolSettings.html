@@ -242,47 +242,65 @@
                         <div class="table-fake" ng-if="terms.length === 0">
                             <h4>No Terms</h4>
                         </div>
-                        <div class="table-responsive scrollableTableDiv table-select-default" ng-if="terms.length !== 0">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>School Schedule</th>
-                                        <th>Begins</th>
-                                        <th>Ends</th>
-                                        <th class="text-button-column"></th>
-                                        <th class="text-button-column"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="pointer" id="term-row{{$index}}" ng-repeat="term in terms | orderBy:'start_date'" ng-click="showEdit($index, 'term');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
-                                        <td ng-hide="edit">{{ term.name }}</td>
-                                        <td ng-hide="edit">{{ term.schedule.name }}</td>
-                                        <td ng-hide="edit">{{ term.start_date }}</td>
-                                        <td ng-hide="edit">{{ term.end_date }}</td>
-                                        <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
-                                        <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTerms[term.id].name"></td>
-                                        <td ng-show="edit"><select ng-model="eTerms[term.id].schedule" ng-options="x.name for x in schedules" class="form-control"></select></td>
-                                        <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                        <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                        <td ng-show="edit">
-                                            <button class="btn btn-success" type="button" ng-click="updateTerm(term.id, $index); $event.stopPropagation();">
+                        <div ng-if="terms.length !== 0">
+                            <div class="row">
+                                <div class="col-xs-12 voffset2">
+                                    <div id="student-grades-select" class="input-group">
+                                        <span class="input-group-addon">Year</span>
+                                        <div class="input-group-btn">
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ termSchoolYear.title }} <span class="caret"></span></button>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li ng-repeat="schoolYear in schoolYears" ng-click="selectSchoolYear(schoolYear, 'term')">
+                                                    <a class="student-overview-assign-link">{{ schoolYear.title }}  <span ng-if="schoolYear.title === termSchoolYear.title" class="glyphicon glyphicon-ok"></span></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="table-responsive scrollableTableDiv table-select-default">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>School Schedule</th>
+                                            <th>Begins</th>
+                                            <th>Ends</th>
+                                            <th class="text-button-column"></th>
+                                            <th class="text-button-column"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="pointer" id="term-row{{$index}}" ng-repeat="term in terms | filter:{ school_year: termSchoolYear.id } | orderBy:'start_date'" ng-click="showEdit($index, 'term');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
+                                            <td ng-hide="edit">{{ term.name }}</td>
+                                            <td ng-hide="edit">{{ term.schedule.name }}</td>
+                                            <td ng-hide="edit">{{ term.start_date }}</td>
+                                            <td ng-hide="edit">{{ term.end_date }}</td>
+                                            <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                            <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTerms[term.id].name"></td>
+                                            <td ng-show="edit"><select ng-model="eTerms[term.id].schedule" ng-options="x.name for x in schedules" class="form-control"></select></td>
+                                            <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                            <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                            <td ng-show="edit">
+                                                <button class="btn btn-success" type="button" ng-click="updateTerm(term.id, $index); $event.stopPropagation();">
                                             Save
                                         </button>
-                                        </td>
-                                        <td ng-show="edit">
-                                            <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'term'); $event.stopPropagation();">
+                                            </td>
+                                            <td ng-show="edit">
+                                                <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'term'); $event.stopPropagation();">
                                             Cancel
                                         </button>
-                                        </td>
-                                        <td class="table-button-col" ng-hide="edit">
-                                            <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(term, 'term'); $event.stopPropagation();">
+                                            </td>
+                                            <td class="table-button-col" ng-hide="edit">
+                                                <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(term, 'term'); $event.stopPropagation();">
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div class="btn-manipulate-row">
                             <button class="btn btn-success" ng-hide="displayTermForm" ng-click="displayTermForm = true">
@@ -347,45 +365,63 @@
                         <div class="table-fake" ng-if="holidays.length === 0">
                             <h4>No Holidays</h4>
                         </div>
-                        <div class="table-responsive scrollableTableDiv table-select-default" ng-if="holidays.length !== 0">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Begins</th>
-                                        <th>Ends</th>
-                                        <th class="text-button-column"></th>
-                                        <th class="text-button-column"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="pointer" id="holiday-row{{$index}}" ng-repeat="holiday in holidays | orderBy:'start_date'" ng-click="showEdit($index, 'holiday');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
-                                        <td ng-hide="edit">{{ holiday.name }}</td>
-                                        <td ng-hide="edit">{{ holiday.start_date }}</td>
-                                        <td ng-hide="edit">{{ holiday.end_date }}</td>
-                                        <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
-                                        </td>
-                                        <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eHolidays[holiday.id].name"></td>
-                                        <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                        <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                        <td ng-show="edit">
-                                            <button class="btn btn-success" type="button" ng-click="updateHoliday(holiday.id, $index); $event.stopPropagation();">
+                        <div ng-if="holidays.length !== 0">
+                            <div class="row">
+                                <div class="col-xs-12 voffset2">
+                                    <div id="student-grades-select" class="input-group">
+                                        <span class="input-group-addon">Year</span>
+                                        <div class="input-group-btn">
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ holidaySchoolYear.title }} <span class="caret"></span></button>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li ng-repeat="schoolYear in schoolYears" ng-click="selectSchoolYear(schoolYear, 'holiday')">
+                                                    <a class="student-overview-assign-link">{{ schoolYear.title }}  <span ng-if="schoolYear.title === holidaySchoolYear.title" class="glyphicon glyphicon-ok"></span></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="table-responsive scrollableTableDiv table-select-default">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Begins</th>
+                                            <th>Ends</th>
+                                            <th class="text-button-column"></th>
+                                            <th class="text-button-column"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="pointer" id="holiday-row{{$index}}" ng-repeat="holiday in holidays | filter:{ school_year: holidaySchoolYear.id } | orderBy:'start_date'" ng-click="showEdit($index, 'holiday');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
+                                            <td ng-hide="edit">{{ holiday.name }}</td>
+                                            <td ng-hide="edit">{{ holiday.start_date }}</td>
+                                            <td ng-hide="edit">{{ holiday.end_date }}</td>
+                                            <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                            </td>
+                                            <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eHolidays[holiday.id].name"></td>
+                                            <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                            <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                            <td ng-show="edit">
+                                                <button class="btn btn-success" type="button" ng-click="updateHoliday(holiday.id, $index); $event.stopPropagation();">
                                             Save
                                         </button>
-                                        </td>
-                                        <td ng-show="edit">
-                                            <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'holiday'); $event.stopPropagation();">
+                                            </td>
+                                            <td ng-show="edit">
+                                                <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'holiday'); $event.stopPropagation();">
                                             Cancel
                                         </button>
-                                        </td>
-                                        <td class="table-button-col" ng-hide="edit">
-                                            <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(holiday, 'holiday'); $event.stopPropagation();">
+                                            </td>
+                                            <td class="table-button-col" ng-hide="edit">
+                                                <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(holiday, 'holiday'); $event.stopPropagation();">
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div class="btn-manipulate-row">
                             <button class="btn btn-success" ng-hide="displayHolidayForm" ng-click="displayHolidayForm = true">
