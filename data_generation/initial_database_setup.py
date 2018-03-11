@@ -127,9 +127,13 @@ if __name__ == "__main__":
     response = settings_service.add_many_schedules([ab_schedule, block_schedule, ])
     schedule_ids = [schedule['id'] for schedule in response.json()['daily_schedules']]
 
-    term_settings = TermSettings(id=None, schedule=schedule_ids[0])
-    response = settings_service.add_term_settings(term_settings)
+    term_settings0 = TermSettings(id=None, schedule=schedule_ids[0])
+    response = settings_service.add_term_settings(term_settings0)
     term_settings_id = response.json()['term_settings'][0]['id']
+
+    term_settings1 = TermSettings(id=None, schedule=schedule_ids[1])
+    response = settings_service.add_term_settings(term_settings1)
+    # We don't care about this term_settings' ID
 
     # Setup the teachers
     teachers = []
