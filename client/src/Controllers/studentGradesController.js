@@ -100,8 +100,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
 
         sectionService.getAssignmentsForSection(section.id).then(
             function success(data) {
-                console.log(data);
-
                 $scope.selectedSection = section;
 
                 if(data.assignments.length === 0) {

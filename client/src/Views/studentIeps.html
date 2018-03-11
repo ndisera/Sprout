@@ -122,10 +122,8 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-xs-12">
-                                <div class="col-xs-12">
-                                    <div class="alert alert-info" ng-if="iep.datapoints.length === 0" role="alert">
-                                        <span><b>Tip:</b> It looks like you don't have any Measurements. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
-                                    </div>
+                                <div class="alert alert-info" ng-if="iep.datapoints.length === 0 && !iep.addingData" role="alert">
+                                    <span><b>Tip:</b> It looks like you don't have any Measurements. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
                                 </div>
                                 <div class="table-responsive table-select" ng-show="iep.datapoints.length !== 0">
                                     <table class="table table-hover">
@@ -238,10 +236,8 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-xs-12">
-                                <div class="col-xs-12">
-                                    <div class="alert alert-info" ng-if="iep.notes.length === 0" role="alert">
-                                        <span><b>Tip:</b> It looks like you don't have any Notes. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
-                                    </div>
+                                <div class="alert alert-info" ng-if="iep.notes.length === 0 && !iep.addingNote" role="alert">
+                                    <span><b>Tip:</b> It looks like you don't have any Notes. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
                                 </div>
                                 <div class="table-responsive table-select" ng-show="iep.notes.length !== 0">
                                     <table class="table table-hover">
