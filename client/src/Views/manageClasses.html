@@ -220,13 +220,13 @@
         </div>
         <div class="panel-wrapper" ng-if="displayCEditInfo && displaySectionViewSearch">
             <div class="panel panel-default">
-                <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapse-{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
+                <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapseEnrollStudents" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
                     <h3 class="panel-title">
                         Enroll Students
                         <span class="glyphicon glyphicon-chevron-right"></span>
                     </h3>
                 </div>
-                <div id="collapse-{{$index}}" class="panel-collapse collapse">
+                <div id="collapseEnrollStudents" class="panel-collapse collapse">
                     <div class="panel-body">
                         <h4 class="centerText" ng-show="unenrolledStudentsArray.length === 0">No Unenrolled Students</h4>
                         <div ng-hide="unenrolledStudentsArray.length === 0">
