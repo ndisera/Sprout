@@ -11,16 +11,19 @@ class CategoryCalculator():
         Otherwise, an instance of this class will be created, and:
             get_progress_category will be called
             get_caution_category will be called
+            prepare_focus_category will be called
             The instance will be destroyed
         Future focus student records will create a new instance of this class
     """
 
-    def __init__(self, grades, attendances, behavior_efforts, test_scores):
+    def __init__(self, student, grades, attendances, behavior_efforts, test_scores):
         """
         Construct a CategoryCalculator, storing all relevant datalists for future use
 
-        All parameters are lists of the corresponding models in the database
+        :param student: api.models.Student object who is being focused
+        All other parameters are QuerySets of the corresponding models in the database related to the focused student
         """
+        self.student = student
         self.progress_category_choice = None
         self.grades = grades
         self.attendances = attendances
@@ -87,3 +90,13 @@ class CategoryCalculator():
             return 'behavior__2018-02-22__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
         if rand_val == 2:
             return 'effort__2018-03-01__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
+
+    def prepare_focus_category(self, focus):
+        """
+        Convert the category the user has selected into the format expected by the frontend
+
+        :param focus: category string selected by the user
+        :return: prepared version of focus
+        :rtype: str
+        """
+        return focus

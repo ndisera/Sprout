@@ -336,16 +336,19 @@ class FocusStudentSerializer(DynamicModelSerializer):
         representation = super(FocusStudentSerializer, self).to_representation(instance)
 
         # Get the Sprout-generated categories
-        grades = [grade for grade in Grade.objects.filter(student=representation['student'])]
-        attendances = [] # Attendances not currently tracked by Sprout
-        behavior_efforts = [record for record in Behavior.objects.filter(enrollment__student=representation['student'])]
-        test_scores = [score for score in StandardizedTestScore.objects.filter(student=representation['student'])]
-        calculator = CategoryCalculator(grades=grades, attendances=attendances, behavior_efforts=behavior_efforts,
+        student = representation['student']
+        grades = Grade.objects.filter(student=student)
+        attendances = AttendanceRecord.objects.filter(enrollment__student=student) # Attendances not currently tracked by Sprout
+        behavior_efforts = Behavior.objects.filter(enrollment__student=student)
+        test_scores = StandardizedTestScore.objects.filter(student=student)
+        calculator = CategoryCalculator(student=student, grades=grades, attendances=attendances, behavior_efforts=behavior_efforts,
                                         test_scores=test_scores)
         progress = calculator.get_progress_category()
         caution = calculator.get_caution_category()
+        focus = calculator.prepare_focus_category(representation['focus_category'])
         representation['progress_category'] = progress
         representation['caution_category'] = caution
+        representation['focus_category'] = focus
         return representation
 
 
@@ -387,11 +390,14 @@ class ServiceRequirementSerializer(DynamicModelSerializer):
         :return:
         """
         data = super(ServiceRequirementSerializer, self).validate(data)
-        fulfilled = data['fulfilled']
+        if 'fulfilled' in data:
+            fulfilled = data['fulfilled']
+        else:
+            fulfilled = self.instance.fulfilled
         if fulfilled:
             errors = {}
             for field in 'fulfilled_date', 'fulfilled_user', 'fulfilled_description':
-                if not field in self.get_initial():
+                if (not field in data) and getattr(self.instance, field, None) is None:
                     errors[field] = ['Required if this service is fulfilled']
             if len(errors) > 0:
                 raise serializers.ValidationError(errors)
