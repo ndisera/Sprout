@@ -784,16 +784,6 @@ class AssignmentViewSet(NestedDynamicViewSet):
     )
 
 
-class GradeViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    GradeViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(GradeViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(GradeViewSet, path, method, link)
-
-
 class GradeViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Grade" instances
@@ -820,59 +810,44 @@ class GradeViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = GradeSerializer
-    queryset = Grade.objects.all()
 
-    """ define custom schema for documentation """
-    schema = GradeViewSetSchema()
+    def get_queryset(self, queryset=None):
+        user = self.request.user
+        if queryset is None:
+            queryset = Grade.objects.all()
+        if user.is_superuser:
+            # The superuser is allowed to view everything
+            return queryset
+        # A teacher may view grades for assignments in their taught section
+        teaches = Q(assignment__section__teacher=user)
+        # Or all grades of students for whom they are case managers
+        manages = Q(student__case_manager=user)
+        queryset = queryset.filter(teaches | manages)
+        return queryset
 
     """ ensure variables show as correct type for docs """
     name_assignment = 'assignment'
     name_student = 'student'
     desc_assignment = 'ID of the assignment to which this grade belongs'
     desc_student = 'ID of the student owning this grade report'
-    create_fields = (
-        coreapi.Field(
-            name=name_assignment,
-            required=True,
-            location="form",
-            description=desc_assignment,
-            schema=coreschema.Integer(title=name_assignment)),
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_assignment,
-            required=True,
-            location="form",
-            description=desc_assignment,
-            schema=coreschema.Integer(title=name_assignment)),
+    assignment_field = coreapi.Field(
+        name=name_assignment,
+        required=True,
+        location="form",
+        description=desc_assignment,
+        schema=coreschema.Integer(title=name_assignment))
+    student_field = coreapi.Field(
+        name=name_student,
+        required=True,
+        location="form",
+        description=desc_student,
+        schema=coreschema.Integer(title=name_student))
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_assignment,
-            location="form",
-            description=desc_assignment,
-            schema=coreschema.Integer(title=name_assignment)),
-
-        coreapi.Field(
-            name=name_student,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
+    schema = AutoSchema(manual_fields=[
+        assignment_field,
+        student_field,
+    ])
 
 
 class AuthVerifyView(generics.RetrieveAPIView):
