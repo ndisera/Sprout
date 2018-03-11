@@ -1,4 +1,4 @@
-﻿@media (max-width: 768px) {
+@media (max-width: 768px) {
     .nav-tabs > li, .nav-pills > li {
         float: none;
         width: 110px;
@@ -261,5 +261,18 @@
     .student-services-panel > .panel > .panel-heading.panel-heading-editing > .panel-heading-container {
         width: 100%;
     }
+}
+
+.student-grades-progress-circle {
+    width: 100%;
+    height: 150px;
+}
+
+.student-grades-progress-circle.progress-circle.warning .progress-circle-stroke {
+    stroke: rgba(240, 173, 78, 0.7);
+}
+
+.student-grades-progress-circle.progress-circle.danger .progress-circle-stroke, .student-grades-progress-circle .progress-circle.danger.warning .progress-circle-stroke {
+    stroke: rgba(201, 48, 44, 0.7);
 }
 

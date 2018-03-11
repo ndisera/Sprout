@@ -76,6 +76,8 @@ const include_paths = [
     bower_path + 'underscore/underscore.js',
     bower_path + 'tinycolor/dist/tinycolor-min.js',
     bower_path + 'tinycolor/tinycolor.js',
+    bower_path + 'Snap.svg/dist/snap.svg-min.js',
+    bower_path + 'Snap.svg/dist/snap.svg.js',
 ];
 
 const paths = {
