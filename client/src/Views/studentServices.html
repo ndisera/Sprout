@@ -90,7 +90,7 @@
             </div>
         </div>
     </div>
-    <div class="btn-manipulate-row-bottom" ng-if="!adding">
+    <div id="student-services-add-btn" class="pull-right" ng-if="!adding" ng-class="{ 'btn-manipulate-row-bottom': services.length > 0, }">
         <button class="btn btn-success btn-manipulate" type="button" data-toggle="tooltip" title="Add Service" ng-click="toggleAdd(true)">
             <span class="glyphicon glyphicon-plus"></span>
         </button>
@@ -146,6 +146,13 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<div id="student-services-add-tip" class="row" ng-if="services.length === 0 && !adding">
+    <div class="col-xs-12">
+        <div class="alert alert-info" role="alert">
+            <span><b>Tip:</b> It looks like you don't have any Services. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
         </div>
     </div>
 </div>

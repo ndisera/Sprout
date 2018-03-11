@@ -276,3 +276,15 @@
     stroke: rgba(201, 48, 44, 0.7);
 }
 
+#student-services-add-tip {
+    margin-top: 80px;
+}
+
+#student-services-add-btn {
+    margin-top: -3px;
+}
+
+#student-services-add-btn.btn-manipulate-row-bottom {
+    margin-top: 20px;
+}
+
