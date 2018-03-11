@@ -297,10 +297,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         delete tempSection.id;
         var sectionPromise = sectionService.updateSection($scope.sectionE.id, tempSection);
         sectionPromise.then(function success(data) {
-            // need to see if same section is currently selected for delete and update if so
-            if ($scope.sectionE.id === $scope.sectionD.id) {
-                $scope.sectionD = Object.assign({}, $scope.sectionE);
-            }
             // save previous title in case it was changed
             var tempTitle = $scope.sectionV.title.toUpperCase();
             // set sectionV to sectionE to reflect update
@@ -327,6 +323,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     break;
                 case "term":
                     $scope.viewCTerm = true;
+                    $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].id][$scope.sectionE.schedule_position - 1];
                     break;
                 case "period":
                     $scope.viewCPeriod = true;
@@ -524,7 +521,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      */
     $scope.viewSectionFilter = function(section) {
         if ($scope.sectionViewSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionViewSearch.toUpperCase()) ||
-            section.title.toUpperCase().includes($scope.sectionViewSearch.toUpperCase())) {
+            section.title.toUpperCase().includes($scope.sectionViewSearch.toUpperCase()) ||
+            $scope.periodArraysLookup[$scope.termsLookup[section.term].id][section.schedule_position - 1].periodName.toUpperCase().includes($scope.sectionViewSearch.toUpperCase())) {
             return true;
         }
         return false; // otherwise it won't be within the results
