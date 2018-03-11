@@ -120,8 +120,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
                 break;
             case "add":
                 $scope.displayTeacherForm = false;
-                $scope.addTeacherSuccess = false;
-                $scope.addTeacherFailure = false;
                 break;
             default:
         }

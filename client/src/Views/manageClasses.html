@@ -116,12 +116,12 @@
                                 <div class="col-sm-10">
                                     <p class="form-control-static" ng-show="viewCTeacher">{{teacherIdLookup[sectionV.teacher]}}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('teacher')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
                                     <div class="input-group" ng-hide="viewCTeacher">
-                                        <input required type="text" autocomplete="off" class="form-control" placeholder="{{teacherIdLookup[sectionV.teacher]}}" list="cteacher" name="cteacher" ng-model="cTeacher" ng-change="checkValidTeacher('edit')">
+                                        <input type="text" autocomplete="off" class="form-control" placeholder="{{teacherIdLookup[sectionV.teacher]}}" list="cteacher" name="cteacher" ng-model="cTeacher" ng-change="checkValidTeacher('edit')">
                                         <datalist id="cteacher">
-                                            <option ng-repeat="t in teachers | orderBy:'last_name'" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
+                                            <option ng-repeat="t in teachers | orderBy:'last_name'" value="{{t.first_name}} {{t.last_name}} ({{t.email}})"></option>
                                         </datalist>
                                         <div class="input-group-btn">
-                                            <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTeacherForm.$invalid || !editValidTeacher">
+                                            <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTeacherForm.$invalid || (!editValidTeacher && cTeacher != null)">
                                                 <i class="glyphicon glyphicon-ok green"></i>
                                             </button>
                                         </div>
@@ -262,7 +262,7 @@
             </div>
         </div>
     </div>
-    <div class="panel-wrapper" ng-if="displaySectionForm">
+    <div class="panel-wrapper" ng-show="displaySectionForm">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Add Class</h3>
@@ -279,7 +279,7 @@
                         <label class="control-label col-sm-2" for="cteacher2">Teacher:</label>
                         <div class="col-sm-10">
                             <div class="input-group col-xs-12">
-                                <input required id="roundBorder" type="text" autocomplete="off" class="form-control" placeholder="Search Teachers" list="cteacher2" name="cteacher2" ng-model="addTeacher" ng-change="checkValidTeacher('add')">
+                                <input id="roundBorder" type="text" autocomplete="off" class="form-control" placeholder="Search Teachers" list="cteacher2" name="cteacher2" ng-model="addTeacher" ng-change="checkValidTeacher('add')">
                                 <datalist id="cteacher2">
                                     <option ng-repeat="t in teachers | orderBy:'last_name'" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
                                 </datalist>
@@ -295,12 +295,12 @@
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="cperiod2">Period:</label>
                         <div class="col-sm-10">
-                            <select ng-model="newSectionPeriod" class="form-control" ng-options="x for x in periodArraysLookup[newSectionTerm.id]"></select>
+                            <select ng-model="newSectionPeriod" class="form-control" ng-options="x.periodName for x in periodArraysLookup[newSectionTerm.id]"></select>
                         </div>
                     </div>
                     <div class="form-group no-bottom-margin">
                         <div class="col-sm-offset-2 col-sm-10">
-                            <button ng-disabled="addSectionForm.$invalid || !addValidTeacher" type="submit" class="btn btn-success">Add</button>
+                            <button ng-disabled="addSectionForm.$invalid || (!addValidTeacher && addTeacher != null)" type="submit" class="btn btn-success">Add</button>
                         </div>
                     </div>
                 </form>
