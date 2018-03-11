@@ -63,7 +63,7 @@ class Section(models.Model):
     teacher is a foreign key to the User who teaches leads the section
     """
     title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    teacher = models.ForeignKey(SproutUser, on_delete=models.SET(get_sentinel_user))
+    teacher = models.ForeignKey(SproutUser, null=True, blank=True, on_delete=models.SET_NULL)
     term = models.ForeignKey(Term, on_delete=models.CASCADE,
                              help_text="Term this section takes place in")
     # Lookup the class schedule via term's TermSettings
