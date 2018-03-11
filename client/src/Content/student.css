@@ -269,11 +269,11 @@
 }
 
 .student-grades-progress-circle.progress-circle.warning .progress-circle-stroke {
-    stroke: rgba(240, 173, 78, 0.7);
+    stroke: rgba(240, 173, 78, 0.4);
 }
 
 .student-grades-progress-circle.progress-circle.danger .progress-circle-stroke, .student-grades-progress-circle .progress-circle.danger.warning .progress-circle-stroke {
-    stroke: rgba(201, 48, 44, 0.7);
+    stroke: rgba(201, 48, 44, 0.4);
 }
 
 #student-services-add-tip {

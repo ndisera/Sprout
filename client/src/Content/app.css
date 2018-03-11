@@ -908,7 +908,7 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
 }
 
 .progress-circle .progress-circle-stroke {
-    stroke: rgba(87, 188, 144, 0.7);
+    stroke: rgba(87, 188, 144, 0.4);
 }
 
 .progress-circle .progress-circle-background-border {
