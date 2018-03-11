@@ -178,44 +178,6 @@
                 </div>
             </div>
         </div>
-        <div class="panel-wrapper" ng-show="displayTeacherDeleteSearch">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">All Teachers</h3>
-                </div>
-                <div class="panel-body">
-                    <h4 class="centerText" ng-show="teachers.length === 0">No Teachers</h4>
-                    <div ng-hide="teachers.length === 0">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
-                        <br />
-                        <div class="table-responsive scrollableTableDiv table-remove">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Email</th>
-                                        <th class="buttonColumn"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter | orderBy:'last_name'" class="pointer" data-toggle="modal" data-target="#deleteTeacherModal">
-                                        <td>{{ teacher.first_name }}</td>
-                                        <td>{{ teacher.last_name }}</td>
-                                        <td>{{ teacher.email }}</td>
-                                        <td class="table-button-col">
-                                            <button class="btn btn-danger btn-xs" type="button">
-                                                <span class="glyphicon glyphicon-trash"></span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="modal fade" id="deleteTeacherModal" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">

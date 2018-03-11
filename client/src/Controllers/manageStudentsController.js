@@ -3,10 +3,7 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
 
     var studentTask = "view/edit";
     $scope.displayStudentViewSearch = true;
-    $scope.displayStudentDeleteSearch = false;
     $scope.displayStudentForm = false;
-    $scope.addStudentSuccess = false;
-    $scope.deleteStudentSuccess = false;
     $scope.studentD = {};
     $scope.newStudent = {};
     $scope.studentInfo = studentService.studentInfo;
@@ -31,15 +28,8 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
             case "view/edit":
                 $scope.displayStudentViewSearch = false;
                 break;
-            case "delete":
-                $scope.displayStudentDeleteSearch = false;
-                $scope.deleteStudentSuccess = false;
-                $scope.deleteStudentFailure = false;
-                break;
             case "add":
                 $scope.displayStudentForm = false;
-                $scope.addStudentSuccess = false;
-                $scope.addStudentFailure = false;
                 break;
             default:
         }
@@ -48,9 +38,6 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
         switch (task) {
             case "view/edit":
                 $scope.displayStudentViewSearch = true;
-                break;
-            case "delete":
-                $scope.displayStudentDeleteSearch = true;
                 break;
             case "add":
                 $scope.displayStudentForm = true;
@@ -84,14 +71,6 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
     };
 
     /**
-     * Hides the delete student search bar and displays their info with an option to delete.
-     */
-    $scope.displayDeleteStudent = function(student) {
-        $scope.studentD = student;
-        $scope.studentDeleteSearch = student.first_name + ' ' + student.last_name;
-    };
-
-    /**
      * Sets studentD
      * @param {student} student - student used to set.
      */
@@ -119,32 +98,12 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
     }
 
     /**
-     * Filter used for deleting students
-     * @param {student} student - student to be filtered.
-     */
-    $scope.deleteStudentFilter = function(student) {
-        if ($scope.studentDeleteSearch == null) {
-            return true;
-        }
-        var input = $scope.studentDeleteSearch.toUpperCase();
-        var fullname = student.first_name + " " + student.last_name;
-        if (student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
-            student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
-            fullname.toUpperCase().includes(input)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Deletes the selected student from the database.
      */
     $scope.deleteStudent = function() {
         var studentPromise = studentService.deleteStudent($scope.studentD.id);
         studentPromise.then(function success(data) {
             $scope.studentD = {};
-            //$scope.displayStudentDeleteSearch = true;
-            $scope.studentDeleteSearch = "";
         }, function error(response) {
             setErrorMessage(response);
             toastService.error("The server was unable to delete the student." + errorResponse());

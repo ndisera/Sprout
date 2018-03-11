@@ -10,7 +10,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.termSettings = _.indexBy(termsInfo.term_settings, "id");
     $scope.dailySchedules = _.indexBy(termsInfo.daily_schedules, "id");
     $scope.displaySectionViewSearch = true;
-    $scope.displaySectionDeleteSearch = false;
     $scope.displaySectionForm = false;
     $scope.displaySectionInfo = false;
     $scope.displayCEditInfo = false;
@@ -18,8 +17,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.viewCTeacher = true;
     $scope.viewCTerm = true;
     $scope.viewCPeriod = true;
-    $scope.addSectionSuccess = false;
-    $scope.deleteSectionSuccess = false;
     $scope.sectionsLookup = {};
     $scope.sectionV = {};
     $scope.sectionE = {};
@@ -134,11 +131,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             case "view/edit":
                 $scope.displaySectionViewSearch = false;
                 break;
-            case "delete":
-                $scope.displaySectionInfo = false;
-                $scope.displaySectionDeleteSearch = false;
-                $scope.deleteSectionSuccess = false;
-                break;
             case "add":
                 $scope.displaySectionForm = false;
                 $scope.addSectionSuccess = false;
@@ -150,9 +142,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         switch (task) {
             case "view/edit":
                 $scope.displaySectionViewSearch = true;
-                break;
-            case "delete":
-                $scope.displaySectionDeleteSearch = true;
                 break;
             case "add":
                 $scope.displaySectionForm = true;
@@ -378,18 +367,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     };
 
     /**
-     * Hides the delete section search bar and displays its info with an option to delete.
-     */
-    $scope.displayDeleteSection = function() {
-        if ($scope.sectionDeleteSearch.toUpperCase() in $scope.sectionsLookup) {
-            $scope.sectionD = $scope.sectionsLookup[$scope.sectionDeleteSearch.toUpperCase()];
-            $scope.displaySectionDeleteSearch = false;
-            $scope.displaySectionInfo = true;
-            $scope.clearSectionDeleteSearch();
-        }
-    };
-
-    /**
      * Deletes the selected teacher from the database.
      */
     $scope.deleteSection = function() {
@@ -405,8 +382,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             }
             var id = $scope.sectionD.id;
             $scope.sectionD = {};
-            $scope.sectionDeleteSearch = "";
-            $scope.deleteSectionSuccess = true;
             $scope.displaySectionInfo = false;
             // check to see if sectionV/E is this deleted section and change view accordingly
             if ($scope.sectionV.id === id) {
@@ -528,13 +503,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     };
 
     /**
-     * Clears the delete section search bar.
-     */
-    $scope.clearSectionDeleteSearch = function() {
-        $scope.sectionDeleteSearch = "";
-    };
-
-    /**
      * Updates the displayed error message.
      * @param {response} response - response containing data and error message.
      */
@@ -557,18 +525,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.viewSectionFilter = function(section) {
         if ($scope.sectionViewSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionViewSearch.toUpperCase()) ||
             section.title.toUpperCase().includes($scope.sectionViewSearch.toUpperCase())) {
-            return true;
-        }
-        return false; // otherwise it won't be within the results
-    };
-
-    /**
-     * Filter used for deleting sections.
-     * @param {section} section - section to be filtered.
-     */
-    $scope.deleteSectionFilter = function(section) {
-        if ($scope.sectionDeleteSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase()) ||
-            section.title.toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase())) {
             return true;
         }
         return false; // otherwise it won't be within the results
