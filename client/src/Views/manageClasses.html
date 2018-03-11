@@ -1,24 +1,21 @@
 <div ng-include="'html/manageTabs.html'"></div>
-<div class="tab-content">
-    <div id="manageclasses" class="tab-pane fade in active">
-        <h3 class="inlineHeading hidden-xs">Classes</h3>
         <div class="taskSelection btn-group hidden-xs">
             <button id="cViewButton" type="button" class="btn btn-primary active" ng-click="changeSectionTask('view/edit')">View/Edit</button>
             <button id="cAddButton" type="button" class="btn btn-primary" ng-click="changeSectionTask('add')">Add</button>
         </div>
-        <h3 class="hidden-sm hidden-md hidden-lg hidden-xl centerText">Classes</h3>
         <div class="btn-group hidden-sm hidden-md hidden-lg hidden-xl smBtnGroup">
             <button id="cViewButton2" type="button" class="btn btn-primary active" ng-click="changeSectionTask('view/edit')">View/Edit</button>
             <button id="cAddButton2" type="button" class="btn btn-primary" ng-click="changeSectionTask('add')">Add</button>
         </div>
-        <hr />
-        <div class="panel-wrapper" ng-show="displaySectionViewSearch">
+<div class="panel-wrapper manage-btn-group-spacer" ng-show="displaySectionViewSearch">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">All Classes</h3>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="sections.length === 0">No Classes</h4>
+            <div class="alert alert-info no-bottom-margin" ng-show="sections.length === 0">
+                <span><b>Tip:</b> It looks like you don't have any classes, click the "Add" button to create one.</span>
+            </div>
                     <div ng-hide="sections.length === 0">
                         <div class="row">
                             <div class="col-xs-12 col-sm-6 voffset2">
@@ -186,7 +183,9 @@
                     <h3 class="panel-title">Class Roster</h3>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="enrollmentsArray.length === 0">No Enrolled Students</h4>
+            <div class="alert alert-info no-bottom-margin" ng-show="enrollmentsArray.length === 0">
+                <span><b>Tip:</b> It looks like there are no students enrolled in this class. Click the "Enroll Students" box to add one.</span>
+            </div>
                     <div ng-hide="enrollmentsArray.length === 0">
                         <input autocomplete="off" autocapitalize="off" class="form-control" id="enrolledInput" type="text" placeholder="Filter Students" ng-model="enrolledInput">
                         <br>
@@ -228,7 +227,9 @@
                 </div>
                 <div id="collapseEnrollStudents" class="panel-collapse collapse">
                     <div class="panel-body">
-                        <h4 class="centerText" ng-show="unenrolledStudentsArray.length === 0">No Unenrolled Students</h4>
+                <div class="alert alert-info no-bottom-margin" ng-show="unenrolledStudentsArray.length === 0">
+                    <span><b>Info:</b> There are no unenrolled students!</span>
+                </div>
                         <div ng-hide="unenrolledStudentsArray.length === 0">
                             <input autocomplete="off" autocapitalize="off" class="form-control" id="unenrolledInput" type="text" placeholder="Filter Students" ng-model="unenrolledInput">
                             <br>
@@ -262,7 +263,7 @@
             </div>
         </div>
     </div>
-    <div class="panel-wrapper" ng-show="displaySectionForm">
+<div class="panel-wrapper manage-btn-group-spacer" ng-show="displaySectionForm">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Add Class</h3>

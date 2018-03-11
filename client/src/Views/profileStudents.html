@@ -1,6 +1,4 @@
 <div ng-include="'html/profileTabs.html'"></div>
-<h3 class="inlineHeading">My Students</h3>
-<hr>
 <div class="row">
     <div class="col-xs-12">
         <div class="panel-wrapper">
@@ -9,7 +7,9 @@
                     <h4 class="panel-title">All My Students</h4>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="students.length === 0">No Students</h4>
+                    <div class="alert alert-info no-bottom-margin" ng-if="students.length === 0">
+                        <span><b>Info:</b> It looks like you don't have any students assigned to you.</span>
+                    </div>
                     <div ng-show="students.length !== 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" name="studentSearch" list="studentSearch" ng-model="studentSearch.text">
                         <div class="table-responsive scrollableTableDiv table-select voffset3">

@@ -1,13 +1,9 @@
 <div ng-include="'html/settingsTabs.html'"></div>
-<div class="tab-content">
-    <div id="school" class="tab-pane fade in active">
-        <h3 class="inlineHeading hidden-xs">School Settings</h3>
-        <hr />
         <div class="row">
-            <div class="col-xs-12 col-sm-6 voffset2">
-                <div class="panel-wrapper">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+    <div class="col-xs-12 col-sm-6">
+        <div class="panel-wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading">
                             <h3 class="panel-title panel-title-with-btn">School Info</h3>
                             <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editSchool('allInfo')" ng-hide="editingAllInfo">
                                 Edit All
@@ -63,7 +59,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-6 voffset2">
+    <div class="col-xs-12 col-sm-6">
                 <div class="panel-wrapper">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -238,10 +234,10 @@
                     </h3>
                 </div>
                 <div id="collapseSchoolTerms" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <div class="table-fake" ng-if="terms.length === 0">
-                            <h4>No Terms</h4>
-                        </div>
+                <div class="panel-body">
+            <div class="alert alert-info no-bottom-margin" ng-if="terms.length === 0">
+                <span><b>Tip:</b> It looks like you haven't added a term yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
+                    </div>
                         <div ng-if="terms.length !== 0">
                             <div class="row">
                                 <div class="col-xs-12 voffset2">
@@ -260,97 +256,97 @@
                             </div>
                             <br />
                             <div class="table-responsive scrollableTableDiv table-select-default">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>School Schedule</th>
-                                            <th>Begins</th>
-                                            <th>Ends</th>
-                                            <th class="text-button-column"></th>
-                                            <th class="text-button-column"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>School Schedule</th>
+                                    <th>Begins</th>
+                                    <th>Ends</th>
+                                    <th class="text-button-column"></th>
+                                    <th class="text-button-column"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                         <tr class="pointer" id="term-row{{$index}}" ng-repeat="term in terms | filter:{ school_year: termSchoolYear.id } | orderBy:'start_date'" ng-click="showEdit($index, 'term');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
-                                            <td ng-hide="edit">{{ term.name }}</td>
-                                            <td ng-hide="edit">{{ term.schedule.name }}</td>
-                                            <td ng-hide="edit">{{ term.start_date }}</td>
-                                            <td ng-hide="edit">{{ term.end_date }}</td>
-                                            <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
-                                            <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTerms[term.id].name"></td>
-                                            <td ng-show="edit"><select ng-model="eTerms[term.id].schedule" ng-options="x.name for x in schedules" class="form-control"></select></td>
-                                            <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                            <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                            <td ng-show="edit">
-                                                <button class="btn btn-success" type="button" ng-click="updateTerm(term.id, $index); $event.stopPropagation();">
+                                    <td ng-hide="edit">{{ term.name }}</td>
+                                    <td ng-hide="edit">{{ term.schedule.name }}</td>
+                                    <td ng-hide="edit">{{ term.start_date }}</td>
+                                    <td ng-hide="edit">{{ term.end_date }}</td>
+                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTerms[term.id].name"></td>
+                                    <td ng-show="edit"><select ng-model="eTerms[term.id].schedule" ng-options="x.name for x in schedules" class="form-control"></select></td>
+                                    <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                    <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eTerms[term.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                    <td ng-show="edit">
+                                        <button class="btn btn-success" type="button" ng-click="updateTerm(term.id, $index); $event.stopPropagation();">
                                             Save
                                         </button>
-                                            </td>
-                                            <td ng-show="edit">
-                                                <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'term'); $event.stopPropagation();">
+                                    </td>
+                                    <td ng-show="edit">
+                                        <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'term'); $event.stopPropagation();">
                                             Cancel
                                         </button>
-                                            </td>
-                                            <td class="table-button-col" ng-hide="edit">
-                                                <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(term, 'term'); $event.stopPropagation();">
+                                    </td>
+                                    <td class="table-button-col" ng-hide="edit">
+                                        <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(term, 'term'); $event.stopPropagation();">
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                         </div>
-                        <div class="btn-manipulate-row">
-                            <button class="btn btn-success" ng-hide="displayTermForm" ng-click="displayTermForm = true">
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-success" ng-hide="displayTermForm" ng-click="displayTermForm = true">
                             <span class="glyphicon glyphicon-plus"></span>
                         </button>
-                        </div>
-                        <div class="panel-wrapper voffset3" ng-show="displayTermForm">
-                            <div class="panel panel-default no-bottom-margin">
+                    </div>
+                    <div class="panel-wrapper voffset3" ng-show="displayTermForm">
+                        <div class="panel panel-default no-bottom-margin">
                                 <div class="panel-heading pointer">
-                                    <h3 class="panel-title">Add Term</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <form class="form-horizontal" name="addTermForm" ng-submit="addTerm()">
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Name:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Term Name" ng-model="newTerm.name">
-                                            </div>
+                                <h3 class="panel-title">Add Term</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" name="addTermForm" ng-submit="addTerm()">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Name:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Term Name" ng-model="newTerm.name">
                                         </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">School Schedule:</label>
-                                            <div class="col-sm-10">
-                                                <select required ng-model="newTermSchoolSchedule" ng-options="x.name for x in schedules" class="form-control"></select>
-                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">School Schedule:</label>
+                                        <div class="col-sm-10">
+                                            <select required ng-model="newTermSchoolSchedule" ng-options="x.name for x in schedules" class="form-control"></select>
                                         </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Begins:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newTerm.start_date" view="year" min-view="date" format="YYYY-MM-DD">
-                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Begins:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newTerm.start_date" view="year" min-view="date" format="YYYY-MM-DD">
                                         </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Ends:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newTerm.end_date" view="year" min-view="date" format="YYYY-MM-DD">
-                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Ends:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newTerm.end_date" view="year" min-view="date" format="YYYY-MM-DD">
                                         </div>
-                                        <div class="form-group no-bottom-margin">
-                                            <div class="col-sm-offset-2 col-sm-10">
-                                                <button ng-disabled="addTermForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
-                                                <button type="button" class="btn btn-default" ng-click="displayTermForm = false">Cancel</button>
-                                            </div>
+                                    </div>
+                                    <div class="form-group no-bottom-margin">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button ng-disabled="addTermForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
+                                            <button type="button" class="btn btn-default" ng-click="displayTermForm = false">Cancel</button>
                                         </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
         <div class="panel-wrapper voffset4">
             <div class="panel panel-default">
@@ -361,10 +357,10 @@
                     </h3>
                 </div>
                 <div id="collapseHolidays" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <div class="table-fake" ng-if="holidays.length === 0">
-                            <h4>No Holidays</h4>
-                        </div>
+                <div class="panel-body">
+            <div class="alert alert-info no-bottom-margin" ng-if="holidays.length === 0">
+                <span><b>Tip:</b> It looks like you haven't added a holiday yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
+                    </div>
                         <div ng-if="holidays.length !== 0">
                             <div class="row">
                                 <div class="col-xs-12 voffset2">
@@ -383,89 +379,89 @@
                             </div>
                             <br />
                             <div class="table-responsive scrollableTableDiv table-select-default">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Begins</th>
-                                            <th>Ends</th>
-                                            <th class="text-button-column"></th>
-                                            <th class="text-button-column"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Begins</th>
+                                    <th>Ends</th>
+                                    <th class="text-button-column"></th>
+                                    <th class="text-button-column"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                         <tr class="pointer" id="holiday-row{{$index}}" ng-repeat="holiday in holidays | filter:{ school_year: holidaySchoolYear.id } | orderBy:'start_date'" ng-click="showEdit($index, 'holiday');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
-                                            <td ng-hide="edit">{{ holiday.name }}</td>
-                                            <td ng-hide="edit">{{ holiday.start_date }}</td>
-                                            <td ng-hide="edit">{{ holiday.end_date }}</td>
-                                            <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
-                                            </td>
-                                            <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eHolidays[holiday.id].name"></td>
-                                            <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                            <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                            <td ng-show="edit">
-                                                <button class="btn btn-success" type="button" ng-click="updateHoliday(holiday.id, $index); $event.stopPropagation();">
+                                    <td ng-hide="edit">{{ holiday.name }}</td>
+                                    <td ng-hide="edit">{{ holiday.start_date }}</td>
+                                    <td ng-hide="edit">{{ holiday.end_date }}</td>
+                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                    </td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eHolidays[holiday.id].name"></td>
+                                    <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                    <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eHolidays[holiday.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
+                                    <td ng-show="edit">
+                                        <button class="btn btn-success" type="button" ng-click="updateHoliday(holiday.id, $index); $event.stopPropagation();">
                                             Save
                                         </button>
-                                            </td>
-                                            <td ng-show="edit">
-                                                <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'holiday'); $event.stopPropagation();">
+                                    </td>
+                                    <td ng-show="edit">
+                                        <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'holiday'); $event.stopPropagation();">
                                             Cancel
                                         </button>
-                                            </td>
-                                            <td class="table-button-col" ng-hide="edit">
-                                                <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(holiday, 'holiday'); $event.stopPropagation();">
+                                    </td>
+                                    <td class="table-button-col" ng-hide="edit">
+                                        <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(holiday, 'holiday'); $event.stopPropagation();">
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                         </div>
-                        <div class="btn-manipulate-row">
-                            <button class="btn btn-success" ng-hide="displayHolidayForm" ng-click="displayHolidayForm = true">
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-success" ng-hide="displayHolidayForm" ng-click="displayHolidayForm = true">
                             <span class="glyphicon glyphicon-plus"></span>
                         </button>
-                        </div>
-                        <div class="panel-wrapper voffset3" ng-show="displayHolidayForm">
-                            <div class="panel panel-default no-bottom-margin">
+                    </div>
+                    <div class="panel-wrapper voffset3" ng-show="displayHolidayForm">
+                        <div class="panel panel-default no-bottom-margin">
                                 <div class="panel-heading pointer">
-                                    <h3 class="panel-title">Add Holiday</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <form class="form-horizontal" name="addHolidayForm" ng-submit="addHoliday()">
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Name:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Holiday/Break Name" ng-model="newHoliday.name">
-                                            </div>
+                                <h3 class="panel-title">Add Holiday</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" name="addHolidayForm" ng-submit="addHoliday()">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Name:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Holiday/Break Name" ng-model="newHoliday.name">
                                         </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Begins:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newHoliday.start_date" view="year" min-view="date" format="YYYY-MM-DD">
-                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Begins:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newHoliday.start_date" view="year" min-view="date" format="YYYY-MM-DD">
                                         </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Ends:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newHoliday.end_date" view="year" min-view="date" format="YYYY-MM-DD">
-                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Ends:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newHoliday.end_date" view="year" min-view="date" format="YYYY-MM-DD">
                                         </div>
-                                        <div class="form-group no-bottom-margin">
-                                            <div class="col-sm-offset-2 col-sm-10">
-                                                <button ng-disabled="addHolidayForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
-                                                <button type="button" class="btn btn-default" ng-click="displayHolidayForm = false">Cancel</button>
-                                            </div>
+                                    </div>
+                                    <div class="form-group no-bottom-margin">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button ng-disabled="addHolidayForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
+                                            <button type="button" class="btn btn-default" ng-click="displayHolidayForm = false">Cancel</button>
                                         </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
         <div class="panel-wrapper voffset4">
             <div class="panel panel-default">
@@ -476,93 +472,93 @@
                     </h3>
                 </div>
                 <div id="collapseTests" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <div class="table-fake" ng-if="tests.length === 0">
-                            <h4>No Tests</h4>
-                        </div>
-                        <div class="table-responsive scrollableTableDiv table-select-default" ng-if="tests.length !== 0">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Min Score</th>
-                                        <th>Max Score</th>
-                                        <th class="text-button-column"></th>
-                                        <th class="text-button-column"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="pointer" id="test-row{{$index}}" ng-repeat="test in tests | orderBy:'test_name'" ng-click="showEdit($index, 'test');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
-                                        <td ng-hide="edit">{{ test.test_name }}</td>
-                                        <td ng-hide="edit">{{ test.min_score }}</td>
-                                        <td ng-hide="edit">{{ test.max_score }}</td>
-                                        <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
-                                        </td>
-                                        <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTests[test.id].test_name"></td>
-                                        <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].min_score"></td>
-                                        <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].max_score"></td>
-                                        <td ng-show="edit">
-                                            <button class="btn btn-success" type="button" ng-click="updateTest(test.id, $index); $event.stopPropagation();">
+                <div class="panel-body">
+            <div class="alert alert-info no-bottom-margin" ng-if="tests.length === 0">
+                <span><b>Tip:</b> It looks like you haven't added a standardized test yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
+                    </div>
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="tests.length !== 0">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Min Score</th>
+                                    <th>Max Score</th>
+                                    <th class="text-button-column"></th>
+                                    <th class="text-button-column"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="pointer" id="test-row{{$index}}" ng-repeat="test in tests | orderBy:'test_name'" ng-click="showEdit($index, 'test');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
+                                    <td ng-hide="edit">{{ test.test_name }}</td>
+                                    <td ng-hide="edit">{{ test.min_score }}</td>
+                                    <td ng-hide="edit">{{ test.max_score }}</td>
+                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                    </td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTests[test.id].test_name"></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].min_score"></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].max_score"></td>
+                                    <td ng-show="edit">
+                                        <button class="btn btn-success" type="button" ng-click="updateTest(test.id, $index); $event.stopPropagation();">
                                             Save
                                         </button>
-                                        </td>
-                                        <td ng-show="edit">
-                                            <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'test'); $event.stopPropagation();">
+                                    </td>
+                                    <td ng-show="edit">
+                                        <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'test'); $event.stopPropagation();">
                                             Cancel
                                         </button>
-                                        </td>
-                                        <td class="table-button-col" ng-hide="edit">
-                                            <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(test, 'test'); $event.stopPropagation();">
+                                    </td>
+                                    <td class="table-button-col" ng-hide="edit">
+                                        <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(test, 'test'); $event.stopPropagation();">
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="btn-manipulate-row">
-                            <button class="btn btn-success" ng-hide="displayTestForm" ng-click="displayTestForm = true">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-success" ng-hide="displayTestForm" ng-click="displayTestForm = true">
                             <span class="glyphicon glyphicon-plus"></span>
                         </button>
-                        </div>
-                        <div class="panel-wrapper voffset3" ng-show="displayTestForm">
-                            <div class="panel panel-default no-bottom-margin">
+                    </div>
+                    <div class="panel-wrapper voffset3" ng-show="displayTestForm">
+                        <div class="panel panel-default no-bottom-margin">
                                 <div class="panel-heading pointer">
-                                    <h3 class="panel-title">Add Test</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <form class="form-horizontal" name="addTestForm" ng-submit="addTest()">
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Name:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Test Name" ng-model="newTest.test_name">
-                                            </div>
+                                <h3 class="panel-title">Add Test</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" name="addTestForm" ng-submit="addTest()">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Name:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Test Name" ng-model="newTest.test_name">
                                         </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Min Score:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Minimum Score" ng-model="newTest.min_score">
-                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Min Score:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Minimum Score" ng-model="newTest.min_score">
                                         </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Max Score:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Maximum Score" ng-model="newTest.max_score">
-                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Max Score:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Maximum Score" ng-model="newTest.max_score">
                                         </div>
-                                        <div class="form-group no-bottom-margin">
-                                            <div class="col-sm-offset-2 col-sm-10">
-                                                <button ng-disabled="addTestForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
-                                                <button type="button" class="btn btn-default" ng-click="displayTestForm = false">Cancel</button>
-                                            </div>
+                                    </div>
+                                    <div class="form-group no-bottom-margin">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button ng-disabled="addTestForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
+                                            <button type="button" class="btn btn-default" ng-click="displayTestForm = false">Cancel</button>
                                         </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
         <div class="panel-wrapper voffset4">
             <div class="panel panel-default">
@@ -573,93 +569,93 @@
                     </h3>
                 </div>
                 <div id="collapseSchedules" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <div class="table-fake" ng-if="schedules.length === 0">
-                            <h4>No School Schedule</h4>
-                        </div>
-                        <div class="table-responsive scrollableTableDiv table-select-default" ng-if="schedules.length !== 0">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Total Periods</th>
-                                        <th>Periods Per Day</th>
-                                        <th class="text-button-column"></th>
-                                        <th class="text-button-column"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="pointer" id="schedule-row{{$index}}" ng-repeat="schedule in schedules | orderBy:'name'" ng-click="showEdit($index, 'name');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
-                                        <td ng-hide="edit">{{ schedule.name }}</td>
-                                        <td ng-hide="edit">{{ schedule.total_periods }}</td>
-                                        <td ng-hide="edit">{{ schedule.periods_per_day }}</td>
-                                        <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
-                                        </td>
-                                        <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eSchedules[schedule.id].name"></td>
-                                        <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eSchedules[schedule.id].total_periods"></td>
-                                        <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eSchedules[schedule.id].periods_per_day"></td>
-                                        <td ng-show="edit">
-                                            <button class="btn btn-success" type="button" ng-click="updateSchedule(schedule.id, $index); $event.stopPropagation();">
+                <div class="panel-body">
+            <div class="alert alert-info no-bottom-margin" ng-if="schedules.length === 0">
+                <span><b>Tip:</b> It looks like you haven't added a school schedule yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
+                    </div>
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="schedules.length !== 0">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Total Periods</th>
+                                    <th>Periods Per Day</th>
+                                    <th class="text-button-column"></th>
+                                    <th class="text-button-column"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="pointer" id="schedule-row{{$index}}" ng-repeat="schedule in schedules | orderBy:'name'" ng-click="showEdit($index, 'name');" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false">
+                                    <td ng-hide="edit">{{ schedule.name }}</td>
+                                    <td ng-hide="edit">{{ schedule.total_periods }}</td>
+                                    <td ng-hide="edit">{{ schedule.periods_per_day }}</td>
+                                    <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                    </td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eSchedules[schedule.id].name"></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eSchedules[schedule.id].total_periods"></td>
+                                    <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eSchedules[schedule.id].periods_per_day"></td>
+                                    <td ng-show="edit">
+                                        <button class="btn btn-success" type="button" ng-click="updateSchedule(schedule.id, $index); $event.stopPropagation();">
                                             Save
                                         </button>
-                                        </td>
-                                        <td ng-show="edit">
-                                            <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'schedule'); $event.stopPropagation();">
+                                    </td>
+                                    <td ng-show="edit">
+                                        <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'schedule'); $event.stopPropagation();">
                                             Cancel
                                         </button>
-                                        </td>
-                                        <td class="table-button-col" ng-hide="edit">
-                                            <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(schedule, 'schedule'); $event.stopPropagation();">
+                                    </td>
+                                    <td class="table-button-col" ng-hide="edit">
+                                        <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(schedule, 'schedule'); $event.stopPropagation();">
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="btn-manipulate-row">
-                            <button class="btn btn-success" ng-hide="displayScheduleForm" ng-click="displayScheduleForm = true">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-success" ng-hide="displayScheduleForm" ng-click="displayScheduleForm = true">
                             <span class="glyphicon glyphicon-plus"></span>
                         </button>
-                        </div>
-                        <div class="panel-wrapper voffset3" ng-show="displayScheduleForm">
-                            <div class="panel panel-default no-bottom-margin">
+                    </div>
+                    <div class="panel-wrapper voffset3" ng-show="displayScheduleForm">
+                        <div class="panel panel-default no-bottom-margin">
                                 <div class="panel-heading pointer">
-                                    <h3 class="panel-title">Add Schedule</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <form class="form-horizontal" name="addScheduleForm" ng-submit="addSchedule()">
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Name:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Schedule Name" ng-model="newSchedule.name">
-                                            </div>
+                                <h3 class="panel-title">Add Schedule</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" name="addScheduleForm" ng-submit="addSchedule()">
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Name:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="text" class="form-control" placeholder="Enter Schedule Name" ng-model="newSchedule.name">
                                         </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Total Periods:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Number of Total Periods" ng-model="newSchedule.total_periods">
-                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Total Periods:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Number of Total Periods" ng-model="newSchedule.total_periods">
                                         </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-sm-2">Periods Per Day:</label>
-                                            <div class="col-sm-10">
-                                                <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Number of Periods Per Day" ng-model="newSchedule.periods_per_day">
-                                            </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2">Periods Per Day:</label>
+                                        <div class="col-sm-10">
+                                            <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Number of Periods Per Day" ng-model="newSchedule.periods_per_day">
                                         </div>
-                                        <div class="form-group no-bottom-margin">
-                                            <div class="col-sm-offset-2 col-sm-10">
-                                                <button ng-disabled="addScheduleForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
-                                                <button type="button" class="btn btn-default" ng-click="displayScheduleForm = false">Cancel</button>
-                                            </div>
+                                    </div>
+                                    <div class="form-group no-bottom-margin">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button ng-disabled="addScheduleForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
+                                            <button type="button" class="btn btn-default" ng-click="displayScheduleForm = false">Cancel</button>
                                         </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
         <div class="modal fade" id="deleteItemModal" role="dialog">
             <div class="modal-dialog">
@@ -708,7 +704,7 @@
                             <button type="submit" class="btn btn-danger" data-dismiss="modal" ng-click="deleteItem(itemId, itemType)">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
-                        </div>
+                    </div>
                     </div>
                 </div>
             </div>

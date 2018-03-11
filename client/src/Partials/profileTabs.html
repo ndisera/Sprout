@@ -1,12 +1,27 @@
 <div class="row">
     <div class="col-xs-12">
-        <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
-            <li ng-class="{ 'active': location.path() === '/profile/focus', }"><a href="/profile/focus">Focus</a></li>
-            <li ng-class="{ 'active': location.path() === '/profile/students', }"><a href="/profile/students">My Students</a></li>
-        </ul>
-        <ul class="nav nav-tabs hidden-xs">
-            <li ng-class="{ 'active': location.path() === '/profile/focus', }"><a href="/profile/focus">Focus</a></li>
-            <li ng-class="{ 'active': location.path() === '/profile/students', }"><a href="/profile/students">My Students</a></li>
-        </ul>
+        <div class="panel panel-default panel-tabs no-image">
+            <div class="panel-heading">
+                <!--<img src="img/example_kid.jpeg">-->
+                <!--<div class="panel-glyph">-->
+                    <!--<span class="glyphicon glyphicon-home"></span>-->
+                <!--</div>-->
+                <h2 class="panel-title">Home</h2>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
+                            <li ng-class="{ 'active': location.path() === '/profile/focus', }"><a href="/profile/focus">Focus</a></li>
+                            <li ng-class="{ 'active': location.path() === '/profile/students', }"><a href="/profile/students">My Students</a></li>
+                        </ul>
+                        <ul class="nav nav-tabs hidden-xs">
+                            <li ng-class="{ 'active': location.path() === '/profile/focus', }"><a href="/profile/focus">Focus</a></li>
+                            <li ng-class="{ 'active': location.path() === '/profile/students', }"><a href="/profile/students">My Students</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

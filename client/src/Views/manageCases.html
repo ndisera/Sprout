@@ -1,8 +1,4 @@
 <div ng-include="'html/manageTabs.html'"></div>
-<div class="tab-content">
-    <div id="managecases" class="tab-pane fade in active">
-        <h3>Case Managers</h3>
-        <hr />
         <div class="panel-wrapper">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -23,7 +19,9 @@
                     </div>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="caseManagersArray.length === 0">No Assigned Managers</h4>
+            <div class="alert alert-info no-bottom-margin" ng-show="caseManagersArray.length === 0">
+                <span><b>Tip:</b> It looks like you don't have any assigned managers. Go to the "Unassigned Managers" section to start assigning students.</span>
+            </div>
                     <div ng-hide="caseManagersArray.length === 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Assigned Managers" ng-model="caseManagerSearch">
                         </br>
@@ -70,8 +68,10 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <li class="list-group-item" ng-if="editCaseManagers">
-                                            <h4 class="centerText" ng-show="otherStudentsArray.length === 0">No Unassigned Students</h4>
+                                <li class="list-group-item manage-cases-list-group-item" ng-if="editCaseManagers">
+                                    <div class="alert alert-success no-bottom-margin" ng-show="otherStudentsArray.length === 0">
+                                        <span><b>Looks Good!</b> All other students are assigned.</span>
+                                    </div>
                                             <div ng-hide="otherStudentsArray.length === 0">
                                                 <input type="text" autocomplete="off" class="form-control" placeholder="Filter Unassigned Students" ng-model="caseStudentSearch[$index]">
                                                 </br>
@@ -115,7 +115,9 @@
                     <h3 class="panel-title">Unassigned Managers</h3>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="nonManagersArray.length === 0">No Unassigned Managers</h4>
+            <div class="alert alert-success no-bottom-margin" ng-show="nonManagersArray.length === 0">
+                <span><b>Looks Good!</b> All case managers have at least one student assigned to them.</span>
+            </div>
                     <div ng-hide="nonManagersArray.length === 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Unassigned Managers" ng-model="nonManagerSearch">
                         </br>
@@ -131,12 +133,14 @@
                                         </span>
                                         <button id="assignManagerButton{{$index}}" class="btn btn-success pull-right heading-btn">
                                             Assign
-                                        </button>
+                                    </button>
                                         <h5 class="no-bottom-margin hidden-sm hidden-md hidden-lg hidden-xl">({{manager.email}})</h5>
                                     </div>
                                     <div id="collapse-unassigned{{$index}}" class="panel-collapse collapse">
                                         <div class="panel-body" ng-if="toggleStudents[$index]">
-                                            <h4 class="centerText" ng-show="otherStudentsArray.length === 0">No Unassigned Students</h4>
+                                    <div class="alert alert-success no-bottom-margin" ng-show="otherStudentsArray.length === 0">
+                                        <span><b>Looks Good!</b> All other students are assigned.</span>
+                                    </div>
                                             <div ng-hide="otherStudentsArray.length === 0">
                                                 <input type="text" autocomplete="off" class="form-control" placeholder="Filter Unassigned Students" ng-model="studentSearch[$index]">
                                                 </br>

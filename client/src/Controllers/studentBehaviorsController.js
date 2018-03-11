@@ -78,12 +78,6 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
         return includedTerms;
     }
     
-    $scope.errorMessages = [];
-    if($scope.enrollments.length === 0) {
-        $scope.errorMessages.push("It looks like this student isn't registered for any classes.");
-    }
-
-
     /**
      * graph-related code
      */

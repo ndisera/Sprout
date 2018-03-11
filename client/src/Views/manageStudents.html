@@ -1,24 +1,21 @@
 <div ng-include="'html/manageTabs.html'"></div>
-<div class="tab-content">
-    <div id="managestudents" class="tab-pane fade in active">
-        <h3 class="inlineHeading hidden-xs">Students</h3>
         <div class="taskSelection btn-group hidden-xs">
             <button id="sViewButton" type="button" class="btn btn-primary active" ng-click="changeStudentTask('view/edit')">View/Edit</button>
             <button id="sAddButton" type="button" class="btn btn-primary" ng-click="changeStudentTask('add')">Add</button>
         </div>
-        <h3 class="hidden-sm hidden-md hidden-lg hidden-xl centerText">Students</h3>
         <div class="btn-group hidden-sm hidden-md hidden-lg hidden-xl smBtnGroup">
             <button id="sViewButton2" type="button" class="btn btn-primary active" ng-click="changeStudentTask('view/edit')">View/Edit</button>
             <button id="sAddButton2" type="button" class="btn btn-primary" ng-click="changeStudentTask('add')">Add</button>
         </div>
-        <hr />
-        <div class="panel-wrapper" ng-show="displayStudentViewSearch">
+<div class="panel-wrapper manage-btn-group-spacer" ng-show="displayStudentViewSearch">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">All Students</h3>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="studentInfo.students.length === 0">No Students</h4>
+            <div class="alert alert-info no-bottom-margin" ng-show="studentInfo.students.length === 0">
+                <span><b>Tip:</b> It looks like you don't have any students, click the "Add" button to create one.</span>
+            </div>
                     <div ng-hide="studentInfo.students.length === 0">
                         <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="studentsv" name="studentsv" ng-model="studentViewSearch">
                         </br>
@@ -54,7 +51,7 @@
                 </div>
             </div>
         </div>
-        <div class="panel-wrapper" ng-show="displayStudentForm">
+<div class="panel-wrapper manage-btn-group-spacer" ng-show="displayStudentForm">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Add Student</h3>
