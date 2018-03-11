@@ -1,4 +1,4 @@
-﻿@media (max-width: 768px) {
+@media (max-width: 768px) {
     .nav-tabs > li, .nav-pills > li {
         float: none;
         width: 110px;
@@ -194,24 +194,31 @@
     margin-top: 2px;
 }
 
-#student-ieps-select > .input-group-addon {
+#student-ieps-select .input-group-addon {
     width: unset;
 }
 
-#student-ieps-select > .input-group-btn {
+#student-ieps-select .input-group-btn {
     width: 100%;
 }
 
-#student-ieps-select > .input-group-btn > button {
+#student-ieps-select .input-group-btn > button {
     width: 100%;
 }
 
-#student-ieps-select > .input-group-btn > ul {
+#student-ieps-select .input-group-btn > ul {
     width: 100%;
 }
 
-#student-ieps-select > .input-group-btn > ul {
-    width: 100%;
+#student-ieps-select-manipulate {
+    display: inline-block;
+    float: right;
+    margin-top: -3px;
+}
+
+#student-ieps-select {
+    display: inline-block;
+    width: calc(100% - 50px);
 }
 
 #student-ieps-edit-form .form-group {
@@ -219,6 +226,9 @@
     margin-left: 0px;
 }
 
+.student-ieps-checkbox {
+    padding-top: 7px;
+}
 
 @media (max-width: 768px) {
     #student-overview-title {
@@ -237,8 +247,44 @@
         padding-left: 15px;
     }
 
+    #student-ieps-select {
+        width: 100%;
+    }
+
+    #student-ieps-select-manipulate {
+        display: block;
+        float: none;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
     .student-services-panel > .panel > .panel-heading.panel-heading-editing > .panel-heading-container {
         width: 100%;
     }
+}
+
+.student-grades-progress-circle {
+    width: 100%;
+    height: 150px;
+}
+
+.student-grades-progress-circle.progress-circle.warning .progress-circle-stroke {
+    stroke: rgba(240, 173, 78, 0.4);
+}
+
+.student-grades-progress-circle.progress-circle.danger .progress-circle-stroke, .student-grades-progress-circle .progress-circle.danger.warning .progress-circle-stroke {
+    stroke: rgba(201, 48, 44, 0.4);
+}
+
+#student-services-add-tip {
+    margin-top: 80px;
+}
+
+#student-services-add-btn {
+    margin-top: -3px;
+}
+
+#student-services-add-btn.btn-manipulate-row-bottom {
+    margin-top: 20px;
 }
 

@@ -34,7 +34,19 @@ app.controller("profileStudentsController", function ($scope, $location, data) {
 
 
     $scope.students = _.values(studentsLookup);
-    var sections = _.values($scope.sections);
+
+    // the sections array is what builds the caseload and class
+    // panels. add the caseload as a fake 'section' and then
+    // add all the sections.
+    var sections = [
+        {
+            title: 'Caseload',
+            students: caseManagerData.students,
+        },
+    ];
+    _.each($scope.sections, function(elem) {
+        sections.push(elem);
+    });
 
     // doing this so panels don't get pushed out of column by panels of varying height
     $scope.singleColumn = sections;

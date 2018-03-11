@@ -5,7 +5,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
     $scope.sections = [];
     $scope.selectedSection = {};
 
-
     if(termData.terms !== null && termData.terms !== undefined) {
         $scope.terms = termData.terms;
         _.each($scope.terms, function(elem) {
@@ -44,8 +43,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
     if($scope.selectedTerm === null) {
         $scope.selectedTerm = $scope.terms[0];
     }
-
-
 
     $scope.assignmentsGraph = {
         data: [],
@@ -103,17 +100,14 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
 
         sectionService.getAssignmentsForSection(section.id).then(
             function success(data) {
-
                 $scope.selectedSection = section;
 
                 if(data.assignments.length === 0) {
-                    $scope.noAssignments = true;
                     $scope.assignments = [];
                     $scope.upcomingAssignments = [];
                     $scope.missingAssignments = [];
                     return;
                 }
-                $scope.noAssignments = false;
                 $scope.assignments = _.sortBy(data.assignments, function(elem) { return moment(elem.due_date); });
 
                 // Save off the upcoming assignments, then remove them from our current assignments list
@@ -147,9 +141,9 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
 
                 studentService.getGradesForStudent($scope.student.id, gradesConfig).then(
                     function success(data) {
-
                         // reset relevant data
                         $scope.classGrade              = 0;
+                        $scope.classGradeString        = '0%';
                         $scope.completionGraph.data    = [0,0,0,];
                         $scope.assignmentsGraph.labels = [];
                         $scope.assignmentsGraph.data   = [];
@@ -206,8 +200,7 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
 
                         // calculate final class grade
                         $scope.classGrade /= $scope.assignments.length;
-                        $scope.classGrade = $scope.classGrade.toString().slice(0, _.indexOf($scope.classGrade.toString(), '.') + 3);
-
+                        $scope.classGradeText = $scope.classGrade.toString().slice(0, _.indexOf($scope.classGrade.toString(), '.') + 3) + '%';
                     },
                     function error(response) {
                         toastService.error('The server wasn\'t able to get the student\'s grades for this class.');
@@ -215,7 +208,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
                 );
             },
             function error(response) {
-                //TODO: notify user
                 toastService.error('The server wasn\'t able to get the assignments for this class.');
             }
         );
@@ -232,8 +224,5 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
         }
     };
 
-
-
     $scope.selectTerm($scope.selectedTerm);
-
 });

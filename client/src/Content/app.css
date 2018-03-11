@@ -865,11 +865,11 @@ ul.dropdown-menu > li > a:hover {
     font-size: 15px;
 }
 
-input.ng-invalid.ng-dirty, select.ng-invalid.ng-dirty, input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, input.ng-invalid.ng-dirty.ng-touched, select.ng-invalid.ng-dirty.ng-touched {
+input.ng-invalid.ng-dirty, select.ng-invalid.ng-dirty, input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, input.ng-invalid.ng-dirty.ng-touched, select.ng-invalid.ng-dirty.ng-touched, input.invalid {
     border-color: #d9534f;
 }
 
-input.ng-invalid:focus, select.ng-invalid:focus {
+input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
     border-color: #d9534f;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(217, 83, 79, .6);
 }
@@ -894,3 +894,28 @@ input.ng-invalid:focus, select.ng-invalid:focus {
     margin: 20px 0px;
     text-align: center;
 }
+
+.form-checkbox-container {
+    padding-top: 7px;
+}
+
+.progress-circle {
+    text-align: center;
+}
+
+.progress-circle .progress-circle-stroke {
+    transition: stroke 0.7s ease;
+}
+
+.progress-circle .progress-circle-stroke {
+    stroke: rgba(87, 188, 144, 0.4);
+}
+
+.progress-circle .progress-circle-background-border {
+    stroke: rgba(238, 238, 238, 0.8);
+}
+
+
+
+
+
