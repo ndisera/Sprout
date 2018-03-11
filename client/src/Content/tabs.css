@@ -91,6 +91,9 @@
         text-align: center;
     }
 
+    .panel.panel-tabs.no-image > .panel-heading > .panel-title {
+        margin: 0px;
+    }
 }
 
 
