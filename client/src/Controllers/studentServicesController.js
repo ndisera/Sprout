@@ -106,6 +106,9 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
         else if(service.fulfilled && service.fulfilled_description_temp !== service.fulfilled_description) {
             toSave.fulfilled_date        = moment().format('YYYY-MM-DD').toString();
             toSave.fulfilled_description = service.fulfilled_description_temp;
+            if(toSave.fulfilled_description === null || toSave.fulfilled_description === undefined || toSave.fulfilled_description.trim() === '') {
+                toSave.fulfilled_description = null;
+            }
             toSave.fulfilled_user        = userService.user.id;
         }
 
