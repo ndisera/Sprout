@@ -899,3 +899,23 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
     padding-top: 7px;
 }
 
+.progress-circle {
+    text-align: center;
+}
+
+.progress-circle .progress-circle-stroke {
+    transition: stroke 0.7s ease;
+}
+
+.progress-circle .progress-circle-stroke {
+    stroke: rgba(87, 188, 144, 0.7);
+}
+
+.progress-circle .progress-circle-background-border {
+    stroke: rgba(238, 238, 238, 0.8);
+}
+
+
+
+
+
