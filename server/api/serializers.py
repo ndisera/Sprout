@@ -387,11 +387,14 @@ class ServiceRequirementSerializer(DynamicModelSerializer):
         :return:
         """
         data = super(ServiceRequirementSerializer, self).validate(data)
-        fulfilled = data['fulfilled']
+        if 'fulfilled' in data:
+            fulfilled = data['fulfilled']
+        else:
+            fulfilled = self.instance.fulfilled
         if fulfilled:
             errors = {}
             for field in 'fulfilled_date', 'fulfilled_user', 'fulfilled_description':
-                if not field in self.get_initial():
+                if (not field in data) and getattr(self.instance, field, None) is None:
                     errors[field] = ['Required if this service is fulfilled']
             if len(errors) > 0:
                 raise serializers.ValidationError(errors)
