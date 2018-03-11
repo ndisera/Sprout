@@ -1,32 +1,34 @@
 <div ng-include="'html/studentTabs.html'"></div>
-<div class="voffset4">
-    <div id="student-ieps-select-manipulate">
-        <button class="btn btn-success btn-manipulate" type="button" ng-click="toggleAddIep(true)">
-            <span class="glyphicon glyphicon-plus"></span>
-        </button>
-    </div>
-    <div id="student-ieps-select" class="input-group">
-        <div class="full-width" ng-show="ieps.length > 0">
-            <span class="input-group-addon">IEP Goal</span>
-            <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedIep.title }} <span class="caret"></span></button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                    <li ng-repeat="entry in ieps" ng-click="selectIep(entry)" ng-class="{ 'active': entry.id === selectedIep.id, }">
-                        <a class="student-overview-assign-link">{{ entry.title }}  <span ng-if="entry.id === selectedIep.id" class="glyphicon glyphicon-ok"></span></a>
-                    </li>
-                </ul>
+<div class="row">
+    <div class="col-xs-12">
+        <div id="student-ieps-select-manipulate">
+            <button class="btn btn-success btn-manipulate" type="button" ng-click="toggleAddIep(true)">
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
+        </div>
+        <div id="student-ieps-select" class="input-group">
+            <div class="full-width" ng-show="ieps.length > 0">
+                <span class="input-group-addon">IEP Goal</span>
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedIep.title }} <span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li ng-repeat="entry in ieps" ng-click="selectIep(entry)" ng-class="{ 'active': entry.id === selectedIep.id, }">
+                            <a class="student-overview-assign-link">{{ entry.title }}  <span ng-if="entry.id === selectedIep.id" class="glyphicon glyphicon-ok"></span></a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </div>
-<div class="row voffset4" ng-if="ieps.length === 0 && !addingIep">
+<div class="row" ng-if="ieps.length === 0 && !addingIep">
     <div class="col-xs-12">
         <div class="alert alert-info" role="alert">
             <span><b>Tip:</b> It looks like you don't have any IEPs. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
         </div>
     </div>
 </div>
-<div class="voffset4" ng-repeat="iep in ieps" ng-if="iep.id === selectedIep.id" ng-cloak>
+<div ng-repeat="iep in ieps" ng-if="iep.id === selectedIep.id" ng-cloak>
     <!-- info -->
     <div class="row voffset3">
         <div class="col-xs-12">
@@ -339,7 +341,7 @@
     </div>
 </div>
 <!-- add iep -->
-<div class="row voffset4" ng-if="addingIep">
+<div class="row" ng-if="addingIep">
     <div class="col-xs-12">
         <div class="panel-wrapper">
             <div class="panel panel-default">
@@ -387,9 +389,9 @@
                         </div>
                     </form>
                     <!--<div class="col-xs-12 voffset3" ng-if="iepRangeValidation()">-->
-                        <!--<div class="alert alert-danger">-->
-                            <!--<span><b>Error:</b> You must define a highest and lowest score. Lowest must be a smaller value than highest.</span>-->
-                        <!--</div>-->
+                    <!--<div class="alert alert-danger">-->
+                    <!--<span><b>Error:</b> You must define a highest and lowest score. Lowest must be a smaller value than highest.</span>-->
+                    <!--</div>-->
                     <!--</div>-->
                 </div>
             </div>

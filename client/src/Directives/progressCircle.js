@@ -52,7 +52,6 @@ app.directive('progressCircle', function() {
             var innerCircle = snap.circle(center, center, radius);
             innerCircle.addClass('progress-circle-background-border');
             innerCircle.attr({
-                'fill': 'none',
                 'stroke-width': strokeWidth.toString() + 'px',
             });
 
@@ -61,7 +60,6 @@ app.directive('progressCircle', function() {
             outerCircle.addClass('progress-circle-stroke');
             outerCircle.transform('r-90,' + center.toString() + ',' + center.toString());
             outerCircle.attr({
-                'fill': 'none',
                 'stroke-dasharray': '0' + ', ' + circumference.toString(),
                 'stroke-width': strokeWidth.toString() + 'px',
             });
@@ -69,10 +67,6 @@ app.directive('progressCircle', function() {
 
             // write the progress text
             var text = snap.text(center, center, '');
-            text.attr({
-                'text-anchor': 'middle',
-                'alignment-baseline': 'middle',
-            });
 
             // observe both percent and text and change them as needed
             var percentObserver = attrs.$observe('percent', function(val) {

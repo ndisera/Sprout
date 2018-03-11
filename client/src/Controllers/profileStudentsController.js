@@ -38,12 +38,10 @@ app.controller("profileStudentsController", function ($scope, $location, data) {
     // the sections array is what builds the caseload and class
     // panels. add the caseload as a fake 'section' and then
     // add all the sections.
-    var sections = [
-        {
-            title: 'Caseload',
-            students: caseManagerData.students,
-        },
-    ];
+    var sections = [];
+    if(caseManagerData.students.length > 0) {
+        sections.push({ title: 'Caseload', students: caseManagerData.students, });
+    }
     _.each($scope.sections, function(elem) {
         sections.push(elem);
     });

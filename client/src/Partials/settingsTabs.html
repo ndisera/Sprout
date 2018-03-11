@@ -1,12 +1,23 @@
 <div class="row">
     <div class="col-xs-12">
-        <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
-            <li ng-class="{ 'active': location.path() === '/settings/user', }"><a href="/settings/user">User</a></li>
-            <li ng-class="{ 'active': location.path() === '/settings/school', }"><a href="/settings/school">School</a></li>
-        </ul>
-        <ul class="nav nav-tabs hidden-xs">
-            <li ng-class="{ 'active': location.path() === '/settings/user', }"><a href="/settings/user">User</a></li>
-            <li ng-class="{ 'active': location.path() === '/settings/school', }"><a href="/settings/school">School</a></li>
-        </ul>
+        <div class="panel panel-default panel-tabs no-image">
+            <div class="panel-heading">
+                <h2 class="panel-title">Settings</h2>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
+                            <li ng-class="{ 'active': location.path() === '/settings/user', }"><a href="/settings/user">User</a></li>
+                            <li ng-class="{ 'active': location.path() === '/settings/school', }"><a href="/settings/school">School</a></li>
+                        </ul>
+                        <ul class="nav nav-tabs hidden-xs">
+                            <li ng-class="{ 'active': location.path() === '/settings/user', }"><a href="/settings/user">User</a></li>
+                            <li ng-class="{ 'active': location.path() === '/settings/school', }"><a href="/settings/school">School</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

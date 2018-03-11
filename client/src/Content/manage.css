@@ -3,9 +3,9 @@
 }
 
 .taskSelection {
-    display: inline-block;
+    /*display: inline-block;*/
     float: right;
-    padding-top: 15px;
+    /*padding-top: 15px;*/
 }
 
 .deleteAlert {
@@ -87,3 +87,22 @@
 .panel-wrapper > .panel .table-responsive.manage-teachers-border-table > .table > tbody > tr:first-child > td {
     border-top: none;
 }
+
+.manage-btn-group-spacer {
+    margin-top: 50px;
+}
+
+.manage-cases-list-group-item {
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+    .manage-btn-group-spacer {
+        margin-top: 25px;
+    }
+}
+
+
+
+

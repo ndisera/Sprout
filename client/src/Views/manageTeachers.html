@@ -1,260 +1,257 @@
 <div ng-include="'html/manageTabs.html'"></div>
-<div class="tab-content">
-    <div id="manageteachers" class="tab-pane fade in active">
-        <h3 class="inlineHeading hidden-xs">Teachers</h3>
-        <div class="taskSelection btn-group hidden-xs">
-            <button id="tViewButton" type="button" class="btn btn-primary active" ng-click="changeTeacherTask('view/edit')">View/Edit</button>
-            <button id="tAddButton" type="button" class="btn btn-primary" ng-click="changeTeacherTask('add')">Add</button>
+<div class="taskSelection btn-group hidden-xs">
+    <button id="tViewButton" type="button" class="btn btn-primary active" ng-click="changeTeacherTask('view/edit')">View/Edit</button>
+    <button id="tAddButton" type="button" class="btn btn-primary" ng-click="changeTeacherTask('add')">Add</button>
+</div>
+<div class="btn-group hidden-sm hidden-md hidden-lg hidden-xl smBtnGroup">
+    <button id="tViewButton2" type="button" class="btn btn-primary active" ng-click="changeTeacherTask('view/edit')">View/Edit</button>
+    <button id="tAddButton2" type="button" class="btn btn-primary" ng-click="changeTeacherTask('add')">Add</button>
+</div>
+<div class="panel-wrapper manage-btn-group-spacer" ng-show="displayTeacherViewSearch">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">All Teachers</h3>
         </div>
-        <h3 class="hidden-sm hidden-md hidden-lg hidden-xl centerText">Teachers</h3>
-        <div class="btn-group hidden-sm hidden-md hidden-lg hidden-xl smBtnGroup">
-            <button id="tViewButton2" type="button" class="btn btn-primary active" ng-click="changeTeacherTask('view/edit')">View/Edit</button>
-            <button id="tAddButton2" type="button" class="btn btn-primary" ng-click="changeTeacherTask('add')">Add</button>
+        <div class="panel-body">
+            <div class="alert alert-info no-bottom-margin" ng-show="teachers.length === 0">
+                <span><b>Tip:</b> It looks like you don't have any teachers, click the "Add" button to create one.</span>
+            </div>
+            <div ng-hide="teachers.length === 0">
+                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch" ng-focus="clearTeacherViewSearch()">
+                <br />
+                <div class="table-responsive scrollableTableDiv table-select">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th class="buttonColumn"></th>
+                                <th class="buttonColumn"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter | orderBy:'last_name'" ng-click="viewTeacher(teacher)" class="pointer" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false" ng-class="{ 'active': teacher.pk === teacherV.pk, }">
+                                <td>{{ teacher.first_name }}</td>
+                                <td>{{ teacher.last_name }}</td>
+                                <td>{{ teacher.email }}</td>
+                                <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                <td class="buttonColumn table-button-col">
+                                    <button class="btn btn-danger btn-xs" type="button" ng-click="setTeacherD(teacher); $event.stopPropagation();">
+                                        <i class="glyphicon glyphicon-trash white"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <hr />
-        <div class="panel-wrapper" ng-show="displayTeacherViewSearch">
+    </div>
+</div>
+<div class="row" ng-show="displayTeacherViewSearch">
+    <div class="col-xs-12 col-sm-8" ng-show="displayTEditInfo">
+        <div class="panel-wrapper">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">All Teachers</h3>
+                    <h3 class="panel-title panel-title-with-btn">Teacher Info</h3>
+                    <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editTeacher('all')" ng-show="editingAll">
+                        Edit All
+                    </button>
+                    <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editTeacher('none')" ng-hide="editingAll">
+                        Stop Editing
+                    </button>
                 </div>
                 <div class="panel-body">
-                    <h4 class="centerText" ng-show="teachers.length === 0">No Teachers</h4>
-                    <div ng-hide="teachers.length === 0">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherv" name="teacherv" ng-model="teacherViewSearch" ng-focus="clearTeacherViewSearch()">
-                        <br />
-                        <div class="table-responsive scrollableTableDiv table-select">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Email</th>
-                                        <th class="buttonColumn"></th>
-                                        <th class="buttonColumn"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:viewTeacherFilter | orderBy:'last_name'" ng-click="viewTeacher(teacher)" class="pointer" ng-mouseover="hoverEdit = true" ng-mouseleave="hoverEdit = false" ng-class="{ 'active': teacher.pk === teacherV.pk, }">
-                                        <td>{{ teacher.first_name }}</td>
-                                        <td>{{ teacher.last_name }}</td>
-                                        <td>{{ teacher.email }}</td>
-                                        <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
-                                        <td class="buttonColumn table-button-col">
-                                            <button class="btn btn-danger btn-xs" type="button" ng-click="setTeacherD(teacher); $event.stopPropagation();">
-                                                <i class="glyphicon glyphicon-trash white"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row" ng-show="displayTeacherViewSearch">
-            <div class="col-xs-12 col-sm-8" ng-show="displayTEditInfo">
-                <div class="panel-wrapper">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title panel-title-with-btn">Teacher Info</h3>
-                            <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editTeacher('all')" ng-show="editingAll">
-                                Edit All
-                            </button>
-                            <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editTeacher('none')" ng-hide="editingAll">
-                                Stop Editing
-                            </button>
-                        </div>
-                        <div class="panel-body">
-                            <form class="form-horizontal" name="editTFirstNameForm" ng-submit="saveTEdit('firstname')">
-                                <div class="form-group">
-                                    <label class="control-label col-sm-2" for="tfirstname">First Name:</label>
-                                    <div class="col-sm-10">
-                                        <p class="form-control-static" ng-show="viewTFirstName">{{teacherV.first_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('firstname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                                        <div class="input-group" ng-hide="viewTFirstName">
-                                            <input required autocomplete="off" type="text" class="form-control" id="tfirstname" placeholder="{{teacherV.first_name}}" name="tfirstname" ng-model="tFirstName">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTFirstNameForm.$invalid">
-                                                    <i class="glyphicon glyphicon-ok green"></i>
-                                                </button>
-                                            </div>
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-default" type="button" ng-click="cancelTEdit('firstname')">
-                                                    <i class="glyphicon glyphicon-remove red"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                    <form class="form-horizontal" name="editTFirstNameForm" ng-submit="saveTEdit('firstname')">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="tfirstname">First Name:</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" ng-show="viewTFirstName">{{teacherV.first_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('firstname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                <div class="input-group" ng-hide="viewTFirstName">
+                                    <input required autocomplete="off" type="text" class="form-control" id="tfirstname" placeholder="{{teacherV.first_name}}" name="tfirstname" ng-model="tFirstName">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTFirstNameForm.$invalid">
+                                            <i class="glyphicon glyphicon-ok green"></i>
+                                        </button>
+                                    </div>
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default" type="button" ng-click="cancelTEdit('firstname')">
+                                            <i class="glyphicon glyphicon-remove red"></i>
+                                        </button>
                                     </div>
                                 </div>
-                            </form>
-                            <form class="form-horizontal" name="editTLastNameForm" ng-submit="saveTEdit('lastname')">
-                                <div class="form-group">
-                                    <label class="control-label col-sm-2" for="tlastname">Last Name:</label>
-                                    <div class="col-sm-10">
-                                        <p class="form-control-static" ng-show="viewTLastName">{{teacherV.last_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('lastname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                                        <div class="input-group" ng-hide="viewTLastName">
-                                            <input required autocomplete="off" type="text" class="form-control" id="tlastname" placeholder="{{teacherV.last_name}}" name="tlastname" ng-model="tLastName">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTLastNameForm.$invalid">
-                                                    <i class="glyphicon glyphicon-ok green"></i>
-                                                </button>
-                                            </div>
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-default" type="button" ng-click="cancelTEdit('lastname')">
-                                                    <i class="glyphicon glyphicon-remove red"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form class="form-horizontal" name="editTLastNameForm" ng-submit="saveTEdit('lastname')">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="tlastname">Last Name:</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" ng-show="viewTLastName">{{teacherV.last_name}}&nbsp;&nbsp;&nbsp;<span ng-click="editTeacher('lastname')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
+                                <div class="input-group" ng-hide="viewTLastName">
+                                    <input required autocomplete="off" type="text" class="form-control" id="tlastname" placeholder="{{teacherV.last_name}}" name="tlastname" ng-model="tLastName">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTLastNameForm.$invalid">
+                                            <i class="glyphicon glyphicon-ok green"></i>
+                                        </button>
+                                    </div>
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default" type="button" ng-click="cancelTEdit('lastname')">
+                                            <i class="glyphicon glyphicon-remove red"></i>
+                                        </button>
                                     </div>
                                 </div>
-                            </form>
-                            <form class="form-horizontal" name="tEmailForm">
-                                <div class="form-group">
-                                    <label class="control-label col-sm-2" for="temail">Email:</label>
-                                    <div class="col-sm-10">
-                                        <p class="form-control-static" ng-show="viewTEmail">{{teacherV.email}}</p>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-4" ng-show="displayTEditInfo">
-                <div class="panel-wrapper">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Classes Taught</h3>
-                        </div>
-                        <div class="panel-body" ng-show="sections.length === 0">
-                            <h4 class="centerText">No Classes</h4>
-                        </div>
-                        <div class="manage-teachers-border-table table-responsive" ng-hide="sections.length === 0">
-                            <table class="table">
-                                <tbody>
-                                    <tr ng-repeat="section in sections | orderBy:'title'">
-                                        <td>&nbsp;&nbsp;{{ section.title }}</td>
-                                        <td ng-if="section.schedule_position == null"></td>
-                                        <td ng-if="section.schedule_position != null">&nbsp;&nbsp;{{ currentTermPeriods[section.schedule_position] }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="panel-wrapper" ng-show="displayTeacherForm">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Add Teacher</h3>
-                </div>
-                <div class="panel-body">
-                    <form class="form-horizontal" name="addTeacherForm" ng-submit="addTeacher()">
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="tfirstname2">First Name:</label>
-                            <div class="col-sm-10">
-                                <input required autocomplete="off" type="text" class="form-control" id="tfirstname2" placeholder="Enter First Name" name="tfirstname2" ng-model="newTeacher.first_name">
                             </div>
                         </div>
+                    </form>
+                    <form class="form-horizontal" name="tEmailForm">
                         <div class="form-group">
-                            <label class="control-label col-sm-2" for="tlastname2">Last Name:</label>
+                            <label class="control-label col-sm-2" for="temail">Email:</label>
                             <div class="col-sm-10">
-                                <input required autocomplete="off" type="text" class="form-control" id="tlastname2" placeholder="Enter Last Name" name="tlastname2" ng-model="newTeacher.last_name">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-2" for="temail2">Email:</label>
-                            <div class="col-sm-10">
-                                <input required autocomplete="off" autocapitalize="off" type="email" class="form-control" id="temail2" placeholder="Enter Email" name="temail2" ng-model="newTeacher.email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
-                            </div>
-                        </div>
-                        <div class="form-group no-bottom-margin">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <button ng-disabled="addTeacherForm.$invalid" type="submit" class="btn btn-success">Add</button>
+                                <p class="form-control-static" ng-show="viewTEmail">{{teacherV.email}}</p>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="panel-wrapper" ng-show="displayTeacherDeleteSearch">
+    </div>
+    <div class="col-xs-12 col-sm-4" ng-show="displayTEditInfo">
+        <div class="panel-wrapper">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">All Teachers</h3>
+                    <h3 class="panel-title">Classes Taught</h3>
                 </div>
-                <div class="panel-body">
-                    <h4 class="centerText" ng-show="teachers.length === 0">No Teachers</h4>
-                    <div ng-hide="teachers.length === 0">
-                        <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
-                        <br />
-                        <div class="table-responsive scrollableTableDiv table-remove">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Email</th>
-                                        <th class="buttonColumn"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter | orderBy:'last_name'" class="pointer" data-toggle="modal" data-target="#deleteTeacherModal">
-                                        <td>{{ teacher.first_name }}</td>
-                                        <td>{{ teacher.last_name }}</td>
-                                        <td>{{ teacher.email }}</td>
-                                        <td class="table-button-col">
-                                            <button class="btn btn-danger btn-xs" type="button">
-                                                <span class="glyphicon glyphicon-trash"></span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="panel-body" ng-show="sections.length === 0">
+                    <div class="alert alert-info no-bottom-margin" ng-show="sections.length === 0">
+                        <span><b>Info:</b> It looks like this teacher doesn't have any classes</span>
                     </div>
+                </div>
+                <div class="manage-teachers-border-table table-responsive" ng-hide="sections.length === 0">
+                    <table class="table">
+                        <tbody>
+                            <tr ng-repeat="section in sections | orderBy:'title'">
+                                <td>&nbsp;&nbsp;{{ section.title }}</td>
+                                <td ng-if="section.schedule_position == null"></td>
+                                <td ng-if="section.schedule_position != null">&nbsp;&nbsp;{{ currentTermPeriods[section.schedule_position] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="deleteTeacherModal" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header grey modal-wrapper">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Are you sure you want to delete this teacher?</h4>
+    </div>
+</div>
+<div class="panel-wrapper manage-btn-group-spacer" ng-show="displayTeacherForm">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Add Teacher</h3>
+        </div>
+        <div class="panel-body">
+            <form class="form-horizontal" name="addTeacherForm" ng-submit="addTeacher()">
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="tfirstname2">First Name:</label>
+                    <div class="col-sm-10">
+                        <input required autocomplete="off" type="text" class="form-control" id="tfirstname2" placeholder="Enter First Name" name="tfirstname2" ng-model="newTeacher.first_name">
                     </div>
-                    <div class="modal-body">
-                        <form class="form-horizontal" name="deleteTeacherForm" ng-submit="deleteTeacher()">
-                            <div class="form-group">
-                                <label class="control-label col-sm-4" for="tfirstname3">First Name:</label>
-                                <div class="col-sm-8">
-                                    <p class="form-control-static" id="tfirstname3">{{teacherD.first_name}}</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-4" for="tlastname3">Last Name:</label>
-                                <div class="col-sm-8">
-                                    <p class="form-control-static" id="tlastname3">{{teacherD.last_name}}</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-4" for="temail3">Email:</label>
-                                <div class="col-sm-8">
-                                    <p class="form-control-static" id="temail3">{{teacherD.email}}</p>
-                                </div>
-                            </div>
-                        </form>
-                        <div class="alert alert-warning">
-                            <span><b>Warning:</b> This can't be undone.</span>
-                        </div>
-                        <div class="voffset4">
-                        </div>
-                        <div class="btn-manipulate-row">
-                            <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteTeacher()">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="tlastname2">Last Name:</label>
+                    <div class="col-sm-10">
+                        <input required autocomplete="off" type="text" class="form-control" id="tlastname2" placeholder="Enter Last Name" name="tlastname2" ng-model="newTeacher.last_name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="temail2">Email:</label>
+                    <div class="col-sm-10">
+                        <input required autocomplete="off" autocapitalize="off" type="email" class="form-control" id="temail2" placeholder="Enter Email" name="temail2" ng-model="newTeacher.email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$">
+                    </div>
+                </div>
+                <div class="form-group no-bottom-margin">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button ng-disabled="addTeacherForm.$invalid" type="submit" class="btn btn-success">Add</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="panel-wrapper" ng-show="displayTeacherDeleteSearch">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">All Teachers</h3>
+        </div>
+        <div class="panel-body">
+            <h4 class="centerText" ng-show="teachers.length === 0">No Teachers</h4>
+            <div ng-hide="teachers.length === 0">
+                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
+                <br />
+                <div class="table-responsive scrollableTableDiv table-remove">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th class="buttonColumn"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter | orderBy:'last_name'" class="pointer" data-toggle="modal" data-target="#deleteTeacherModal">
+                                <td>{{ teacher.first_name }}</td>
+                                <td>{{ teacher.last_name }}</td>
+                                <td>{{ teacher.email }}</td>
+                                <td class="table-button-col">
+                                    <button class="btn btn-danger btn-xs" type="button">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteTeacherModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header grey modal-wrapper">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Are you sure you want to delete this teacher?</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" name="deleteTeacherForm" ng-submit="deleteTeacher()">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="tfirstname3">First Name:</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static" id="tfirstname3">{{teacherD.first_name}}</p>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="tlastname3">Last Name:</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static" id="tlastname3">{{teacherD.last_name}}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="temail3">Email:</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static" id="temail3">{{teacherD.email}}</p>
+                        </div>
+                    </div>
+                </form>
+                <div class="alert alert-warning">
+                    <span><b>Warning:</b> This can't be undone.</span>
+                </div>
+                <div class="voffset4">
+                </div>
+                <div class="btn-manipulate-row">
+                    <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteTeacher()">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
                 </div>
             </div>
         </div>

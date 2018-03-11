@@ -59,6 +59,10 @@
     padding-right: 15px;
 }
 
+.form-horizontal > .form-group > #student-overview-edit-input-group > .dropdown-menu {
+    width: calc(100% - 15px);
+}
+
 #student-overview-select > .input-group-addon {
     width: unset;
 }
@@ -82,7 +86,6 @@
 #student-overview-no-classes > h4 {
     margin: 20px 0px;
 }
-
 
 .studentHeading {
     display: inline-block;
