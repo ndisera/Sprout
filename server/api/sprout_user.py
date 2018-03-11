@@ -16,10 +16,6 @@ class SproutUserManager(BaseUserManager):
         """
         if not email:
             raise ValueError('The given email must be set')
-        if extra_fields.get('first_name') is None:
-            raise ValueError('User must have a name')
-        if extra_fields.get('last_name') is None:
-            raise ValueError('User must have a name')
 
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
@@ -50,6 +46,10 @@ class SproutUser(AbstractBaseUser):
     Represent and store the account information of anyone who uses Sprout
     """
     email = models.EmailField(unique=True, blank=False)
+    is_superuser = models.BooleanField(default=False,
+                                       help_text="Whether this user should have all permissions")
+    is_staff = models.BooleanField(default=False,
+                                   help_text="Not used")
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = AbstractBaseUser.get_email_field_name()
