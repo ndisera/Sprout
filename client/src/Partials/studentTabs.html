@@ -1,15 +1,16 @@
 <div class="row">
     <div class="col-xs-12">
-        <div class="panel panel-default">
+        <div class="panel panel-default panel-tabs">
             <div class="panel-heading">
-                <h2 class="student-name-title"><span>{{ student.first_name }}</span> {{ student.last_name }}</h2>
+                <img src="img/example_kid.jpeg">
+                <h2 class="panel-title">
+                    <span>{{ student.first_name }}</span>
+                    <span> {{ student.last_name }}</span>
+                </h2>
             </div>
             <div class="panel-body">
                 <div class="row">
                     <div class="col-xs-12">
-                <!--<div id="student-overview-pic">-->
-                    <img src="img/example_kid.jpeg">
-                <!--</div>-->
                         <ul class="nav nav-pills hidden-sm hidden-md hidden-lg hidden-xl">
                             <li ng-class="{ 'active': location.path() === '/student/' + student.id, }"><a ng-href="/student/{{student.id}}">Overview</a></li>
                             <li ng-class="{ 'active': location.path() === '/student/' + student.id + '/tests', }"><a ng-href="/student/{{student.id}}/tests">Test Scores</a></li>

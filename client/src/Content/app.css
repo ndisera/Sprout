@@ -202,14 +202,6 @@ a {
     width: 100%;
 }
 
-.nav-tabs {
-    border-bottom: 2px solid #ddd;
-}
-
-.nav-tabs > li {
-    margin-bottom: -2px;
-}
-
 .nav-tabs > li > a {
     margin-right: 0px;
     border: none;
@@ -226,10 +218,6 @@ a {
     border: none;
     color: #57bc90;
     border-bottom: 3px solid #57bc90;
-}
-
-.nav-tabs > li, .nav-pills > li {
-        width: 110px;
 }
 
 .nav-tabs, .nav-pills {
@@ -365,7 +353,7 @@ a {
 }
 
 .no-bottom-margin {
-    margin-bottom: 0px;
+    margin-bottom: 0px !important;
 }
 
 .no-bottom-border {
@@ -905,14 +893,20 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
 
 .progress-circle .progress-circle-stroke {
     transition: stroke 0.7s ease;
-}
-
-.progress-circle .progress-circle-stroke {
+    fill: none;
     stroke: rgba(87, 188, 144, 0.4);
 }
 
 .progress-circle .progress-circle-background-border {
+    fill: none;
     stroke: rgba(238, 238, 238, 0.8);
+}
+
+.progress-circle text {
+    font-weight: 100;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-anchor: middle;
+    alignment-baseline: middle;
 }
 
 
