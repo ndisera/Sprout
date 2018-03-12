@@ -8,13 +8,13 @@
                 </div>
                 <div class="col-xs-5 button-container" ng-hide="editCaseManagers">
                     <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editCaseManagers = true">
-                        Manage Caseload
-                    </button>
+                                Manage Caseload
+                            </button>
                 </div>
                 <div class="col-xs-5 button-container" ng-show="editCaseManagers">
                     <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editCaseManagers = false">
-                        Stop
-                    </button>
+                                Stop
+                            </button>
                 </div>
             </div>
         </div>
@@ -30,15 +30,15 @@
                         <div class="panel panel-default">
                             <div class="panel-heading pointer no-bottom-border" data-toggle="collapse" data-target="#collapse-assigned{{$index}}" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
                                 <h4 class="panel-title panel-title-with-btn hidden-xs">
-                                    {{caseManager.first_name}} {{caseManager.last_name}} ({{caseManager.email}}) <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
-                                </h4>
+                                        {{caseManager.first_name}} {{caseManager.last_name}} ({{caseManager.email}}) <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
+                                        </h4>
                                 <span class="hidden-sm hidden-md hidden-lg hidden-xl">
-                                    {{caseManager.first_name}} {{caseManager.last_name}} <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
+                                            {{caseManager.first_name}} {{caseManager.last_name}} <span class="badge teal">{{caseStudents[caseManager.pk].length}}</span>
                                 </span>
                                 <span class="glyphicon glyphicon-chevron-right blackish"></span>
                                 <h5 class="no-bottom-margin hidden-sm hidden-md hidden-lg hidden-xl">
-                                    ({{caseManager.email}})
-                                </h5>
+                                            ({{caseManager.email}})
+                                        </h5>
                             </div>
                             <div id="collapse-assigned{{$index}}" class="panel-collapse collapse">
                                 <div class="table-responsive no-border" id="specialTable">
@@ -51,8 +51,8 @@
                                                 <td ng-if="editCaseManagers">
                                                     <div class="dropdown">
                                                         <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown" ng-click="toggleDropdowns($index)">Reassign
-                                                            <span class="caret"></span>
-                                                        </button>
+                                                                <span class="caret"></span>
+                                                            </button>
                                                         <ul class="dropdown-menu" ng-if="toggleManagers[$index]">
                                                             <li class="pointer" ng-repeat="manager in allManagersArray | orderBy:'last_name'" ng-if="caseManager.pk != manager.pk" ng-click="reassign(caseManager.pk, manager.pk, student)">
                                                                 <a>{{manager.first_name}} {{manager.last_name}}</a>
@@ -62,8 +62,8 @@
                                                 </td>
                                                 <td ng-if="editCaseManagers" class="buttonColumn table-button-col">
                                                     <button class="btn btn-danger btn-xs" type="button" ng-click="unassign(caseManager.pk, student)">
-                                                        <i class="glyphicon glyphicon-minus white"></i>
-                                                    </button></td>
+                                                            <i class="glyphicon glyphicon-minus white"></i>
+                                                        </button></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -92,8 +92,8 @@
                                                         <td>{{ student.student_id }}</td>
                                                         <td class="table-button-col">
                                                             <button class="btn btn-success btn-xs" type="button">
-                                                                <i class="glyphicon glyphicon-plus white"></i>
-                                                            </button>
+                                                                    <i class="glyphicon glyphicon-plus white"></i>
+                                                                </button>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -124,16 +124,17 @@
                 <div ng-repeat="manager in nonManagersArray | filter:nonManagerFilter | orderBy:'last_name'">
                     <div class="panel-wrapper">
                         <div class="panel panel-default">
-                            <div class="panel-heading hidden-xs pointer" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
-                                <h4 class="panel-title panel-title-with-btn">{{manager.first_name}} {{manager.last_name}} ({{manager.email}})</h4>
+                            <div class="panel-heading pointer no-bottom-border" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
+                                <h4 class="panel-title panel-title-with-btn hidden-xs">
+                                            {{manager.first_name}} {{manager.last_name}} ({{manager.email}})
+                                        </h4>
+                                <span class="hidden-sm hidden-md hidden-lg hidden-xl">
+                                            {{manager.first_name}} {{manager.last_name}}
+                                        </span>
                                 <button id="assignManagerButton{{$index}}" class="btn btn-success pull-right heading-btn">
-                                    Assign Students
-                                </button>
-                            </div>
-                            <div class="panel-heading hidden-sm hidden-md hidden-lg hidden-xl pointer" type="button" data-toggle="collapse" data-target="#collapse-unassigned{{$index}}" ng-click="toggleManagerAssign($index);togglePanelBodies($index)">
-                                {{manager.first_name}} {{manager.last_name}}
-                                <button id="assignManagerButton{{$index}}" class="btn btn-default pull-right heading-btn">Assign</button>
-                                <h5 class="no-bottom-margin">({{manager.email}})</h5>
+                                            Assign
+                                    </button>
+                                <h5 class="no-bottom-margin hidden-sm hidden-md hidden-lg hidden-xl">({{manager.email}})</h5>
                             </div>
                             <div id="collapse-unassigned{{$index}}" class="panel-collapse collapse">
                                 <div class="panel-body" ng-if="toggleStudents[$index]">
@@ -160,8 +161,8 @@
                                                         <td>{{ student.student_id }}</td>
                                                         <td class="table-button-col">
                                                             <button class="btn btn-success btn-xs" type="button">
-                                                                <i class="glyphicon glyphicon-plus white"></i>
-                                                            </button>
+                                                                    <i class="glyphicon glyphicon-plus white"></i>
+                                                                </button>
                                                         </td>
                                                     </tr>
                                                 </tbody>

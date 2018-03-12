@@ -38,8 +38,8 @@
                                 <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
                                 <td class="buttonColumn table-button-col">
                                     <button class="btn btn-danger btn-xs" type="button" ng-click="setTeacherD(teacher); $event.stopPropagation();">
-                                        <i class="glyphicon glyphicon-trash white"></i>
-                                    </button>
+                                                <i class="glyphicon glyphicon-trash white"></i>
+                                            </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -56,11 +56,11 @@
                 <div class="panel-heading">
                     <h3 class="panel-title panel-title-with-btn">Teacher Info</h3>
                     <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editTeacher('all')" ng-show="editingAll">
-                        Edit All
-                    </button>
+                                Edit All
+                            </button>
                     <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editTeacher('none')" ng-hide="editingAll">
-                        Stop Editing
-                    </button>
+                                Stop Editing
+                            </button>
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal" name="editTFirstNameForm" ng-submit="saveTEdit('firstname')">
@@ -72,13 +72,13 @@
                                     <input required autocomplete="off" type="text" class="form-control" id="tfirstname" placeholder="{{teacherV.first_name}}" name="tfirstname" ng-model="tFirstName">
                                     <div class="input-group-btn">
                                         <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTFirstNameForm.$invalid">
-                                            <i class="glyphicon glyphicon-ok green"></i>
-                                        </button>
+                                                    <i class="glyphicon glyphicon-ok green"></i>
+                                                </button>
                                     </div>
                                     <div class="input-group-btn">
                                         <button class="btn btn-default" type="button" ng-click="cancelTEdit('firstname')">
-                                            <i class="glyphicon glyphicon-remove red"></i>
-                                        </button>
+                                                    <i class="glyphicon glyphicon-remove red"></i>
+                                                </button>
                                     </div>
                                 </div>
                             </div>
@@ -93,13 +93,13 @@
                                     <input required autocomplete="off" type="text" class="form-control" id="tlastname" placeholder="{{teacherV.last_name}}" name="tlastname" ng-model="tLastName">
                                     <div class="input-group-btn">
                                         <button class="btn btn-default checkBtn" type="submit" ng-disabled="editTLastNameForm.$invalid">
-                                            <i class="glyphicon glyphicon-ok green"></i>
-                                        </button>
+                                                    <i class="glyphicon glyphicon-ok green"></i>
+                                                </button>
                                     </div>
                                     <div class="input-group-btn">
                                         <button class="btn btn-default" type="button" ng-click="cancelTEdit('lastname')">
-                                            <i class="glyphicon glyphicon-remove red"></i>
-                                        </button>
+                                                    <i class="glyphicon glyphicon-remove red"></i>
+                                                </button>
                                     </div>
                                 </div>
                             </div>
@@ -177,44 +177,6 @@
         </div>
     </div>
 </div>
-<div class="panel-wrapper" ng-show="displayTeacherDeleteSearch">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">All Teachers</h3>
-        </div>
-        <div class="panel-body">
-            <h4 class="centerText" ng-show="teachers.length === 0">No Teachers</h4>
-            <div ng-hide="teachers.length === 0">
-                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Teachers" list="teacherd" name="teacherd" ng-model="teacherDeleteSearch">
-                <br />
-                <div class="table-responsive scrollableTableDiv table-remove">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Email</th>
-                                <th class="buttonColumn"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="teacher in teachers | filter:deleteTeacherFilter | orderBy:'last_name'" class="pointer" data-toggle="modal" data-target="#deleteTeacherModal">
-                                <td>{{ teacher.first_name }}</td>
-                                <td>{{ teacher.last_name }}</td>
-                                <td>{{ teacher.email }}</td>
-                                <td class="table-button-col">
-                                    <button class="btn btn-danger btn-xs" type="button">
-                                        <span class="glyphicon glyphicon-trash"></span>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="modal fade" id="deleteTeacherModal" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -250,8 +212,8 @@
                 </div>
                 <div class="btn-manipulate-row">
                     <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteTeacher()">
-                        <span class="glyphicon glyphicon-trash"></span>
-                    </button>
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
                 </div>
             </div>
         </div>

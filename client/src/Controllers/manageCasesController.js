@@ -22,12 +22,12 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
     }
 
     $scope.toggleManagerAssign = function(index) {
-        if ($("#assignManagerButton" + index).text().trim() === "Assign Students") {
+        if ($("#assignManagerButton" + index).text().trim() === "Assign") {
             $("#assignManagerButton" + index).html('Stop');
             $("#assignManagerButton" + index).removeClass('btn-success');
             $("#assignManagerButton" + index).addClass('btn-danger');
         } else {
-            $("#assignManagerButton" + index).html('Assign Students')
+            $("#assignManagerButton" + index).html('Assign')
             $("#assignManagerButton" + index).removeClass('btn-danger');
             $("#assignManagerButton" + index).addClass('btn-success');
         }
@@ -256,7 +256,7 @@ app.controller("manageCasesController", function($scope, $rootScope, $location, 
         if (managerArray.length > 1) {
             for (var i = 0; i < managerArray.length; i++) {
                 if (managerArray[i].id === data.student.id) {
-                    managerArray.splice(i, i + 1);
+                    managerArray.splice(i, 1);
                     return;
                 }
             }
