@@ -873,11 +873,20 @@ class AuthVerifyView(generics.RetrieveAPIView):
 
         include_user = request.query_params.get('user', None)
         if include_user == 'true':
+            user = request.user
+            email = user.email
+            pk = user.id
+            try:
+                first_name = user.sproutuserprofile.first_name
+                last_name = user.sproutuserprofile.last_name
+            except SproutUserProfile.DoesNotExist:
+                first_name = 'Noname'
+                last_name = 'Noname'
             response['user'] = {
-                'email': request._user.email,
-                'first_name': request._user.sproutuserprofile.first_name,
-                'last_name': request._user.sproutuserprofile.last_name,
-                'pk': request._user.id,
+                'email': email,
+                'first_name': first_name,
+                'last_name': last_name,
+                'pk': pk,
             }
 
         return Response(data=response)
