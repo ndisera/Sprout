@@ -48,7 +48,7 @@
                                         <div class="col-sm-offset-2 col-sm-10">
                                             <span ng-if="!service.editing && service.fulfilled">
                                                 Marked fulfilled 
-                                                <span ng-if="service.teacher.first_name !== null && service.teacher.last_name !== null">
+                                                <span ng-if="service.teacher !== null && service.teacher !== undefined && service.teacher.first_name !== null && service.teacher.last_name !== null">
                                                     by {{ service.teacher.first_name }} {{ service.teacher.last_name }}
                                                 </span>
                                                 <span ng-if="service.fulfilled_date !== null">
