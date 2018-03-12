@@ -53,6 +53,16 @@
                             </div>
                         </div>
                     </div>
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-xs-12 col-sm-3">Photo:</label>
+                            <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9">
+                                <button type="button" class="btn btn-default full-width" data-toggle="modal" data-target="#imgModal">
+                                    Select New Photo
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -99,6 +109,50 @@
                     <div ng-if="sections.length === 0">
                         <h4 class="centerText">No Classes</h4>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<img src="data:image/png;base64,{{ toDisplay }}">
+<div class="modal fade" id="imgModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header grey modal-wrapper">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Select New Photo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="student-overview-picture-form" enctype="multipart/form-data">
+                    <input type="file" file-model="studentImage">
+                    <!--<button ngf-select ng-model="studentPicture" accept="image/*" class="btn btn-primary">Select Picture</button>-->
+                    <!--<div ngf-drop ng-model="studentPicture" ngf-pattern="image/*" class="student-overview-crop-area">-->
+                        <!--<img-crop image="studentPicture | ngfDataUrl" result-image="croppedStudentPicture" ng-init="croppedStudentPicture=''"></img-crop>-->
+                    <!--</div>-->
+                    <!--<div>-->
+                        <!--<img ng-src="{{ croppedStudentPicture }}" />-->
+                    <!--</div>-->
+                    <button ng-click="uploadStudentPicture(croppedStudentPicture)">Submit</button> 
+                </form>
+
+
+
+
+
+
+
+                <!--<div>Select an image file: <input type="file" id="fileInput" /></div>-->
+                <!--<div class="cropArea" style="height: 500px; width: 500px;">-->
+                    <!--<img-crop image="myImage" result-image="myCroppedImage"></img-crop>-->
+                <!--</div>-->
+                <!--<div>Cropped Image:</div>-->
+                <!--<div><img ng-src="{{myCroppedImage}}" /></div>-->
+                <!--<div class="voffset4">-->
+                <!--</div>-->
+                <div class="btn-manipulate-row">
+                    <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteSection()">
+                        <span class="far fa-save"></span>
+                    </button>
                 </div>
             </div>
         </div>

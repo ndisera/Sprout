@@ -4,8 +4,10 @@ var app = angular.module(
         'ngRoute',
         'chart.js',
         'ngAnimate',
+        'ngImgCrop',
         'datePicker',
         'ui.sortable',
+        'ngFileUpload',
     ]
 );
 
@@ -296,6 +298,29 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
+                },
+                studentPictureData: function($q, $http, $route) {
+                    var deferred = $q.defer();
+                    console.log('hmmm');
+                    $http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture').then(
+                        function success(response) {
+                            $http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture/' + response.data.profile_pictures[0].id).then(
+                                function success(response) {
+                                    console.log('yo');
+                                    deferred.resolve(response);
+                                },
+                                function error(response) {
+                                    console.log('yoyo');
+                                    deferred.resolve(response);
+                                },
+                            );
+                        },
+                        function error(response) {
+                            console.log('yoyoyo');
+                            deferred.resolve(response);
+                        },
+                    );
+                    return deferred.promise;
                 },
                 auth: function(userService) {
                     return userService.authVerify();

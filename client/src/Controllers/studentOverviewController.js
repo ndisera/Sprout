@@ -1,5 +1,138 @@
-app.controller("studentOverviewController", function ($scope, $location, $routeParams, toastService, studentService, termData, enrollmentData, userData, studentData) {
+app.controller("studentOverviewController", function ($scope, $location, $routeParams, $http, userService, studentPictureData, Upload, toastService, studentService, termData, enrollmentData, userData, studentData) {
     $scope.location = $location;
+
+    $scope.studentImage = null;
+
+    $scope.toDisplay = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
+
+    //console.log(decodeURIComponent(studentPictureData.data))
+
+
+                    //$http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture').then(
+                        //function success(data) {
+                            //$http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture/' + data.profile_pictures.id).then(
+                                //function success(data) {
+                                    //console.log('yo');
+                                    ////deferred.resolve(data);
+    //console.log(
+                                //},
+                                //function error(response) {
+                                    //console.log('yoyo');
+                                    ////deferred.resolve(response);
+                                //},
+                            //);
+                        //},
+                        //function error(response) {
+                            //console.log('yoyoyo');
+                            ////deferred.resolve(response);
+                        //},
+                    //);
+
+
+
+
+
+
+
+    $scope.uploadStudentPicture = function(image) {
+        //var form = $('#student-overview-picture-form')[0];
+
+        //console.log(form);
+        
+        console.log($scope.studentImage);
+
+        var data = new FormData();
+        data.append('file', $scope.studentImage);
+        //_.each($scope.studentImage, function(val, key) {
+            //data.append(key, data[key]);
+        //});
+
+        //console.log(image);
+
+        //var test = Upload.dataUrltoBlob(image, 'test.jpg');
+        //console.log(atob(image.split(',')[1]));
+
+        //data.append('file', image, 'thing.jpg');
+
+        //console.log(data);
+
+        $http({
+            method: 'POST',
+            url: 'https://localhost:8000/students/' + studentData.student.id + '/picture',
+            data: data,
+            transformRequest: angular.identity,
+            headers: {
+                'Content-Type': undefined,
+            }
+        }).then(
+                function success(data) {
+                    console.log('success');
+                    console.log(data);
+                },
+                function error(data) {
+                    console.log('success');
+                    console.log(data);
+
+                },
+            );
+
+
+
+        //$.ajax({
+            //type: 'POST',
+            //enctype: 'multipart/form-data',
+            //url: 'https://localhost:8000/students/' + studentData.student.id + '/picture',
+            //data: data,
+            //headers: {
+                //Authorization: 'JWT ' + userService.user.token,
+            //},
+            //processData: false,
+            //contentType: false,
+            //cache: false,
+            //success: function(data) {
+                //console.log('success');
+                //console.log(data);
+            //},
+            //error: function(data) {
+                //console.log('success');
+                //console.log(data);
+            //},
+        //});
+
+        //console.log(image);
+        //console.log(Upload.isFile(image));
+        //image = Upload.dataUrltoBlob(image);
+        //console.log(image2);
+        //console.log(Upload.isFile(image2));
+        //Upload.upload({
+            //url: 'https://localhost:8000/students/' + studentData.student.id + '/picture',
+            //file: image,
+            //data: {
+                //file: Upload.dataUrltoBlob(image),
+            //},
+            ////data: image,
+            ////headers: {
+                ////'Content-Type': 'multipart/form-data',
+            ////},
+            ////data: {
+                ////file: image,
+            ////},
+            ////data: image,
+            ////data: {
+                //////student: studentData.student.id,
+                ////files: image,
+            ////},
+        //}).then(
+            //function success(response) {
+                //console.log('success');
+                //console.log(response);
+            //},
+            //function error(response) {
+                //console.log('error');
+                //console.log(response);
+            //},
+        //);
+    };
 
     // set important scope variables
     $scope.student         = studentData.student;
@@ -240,3 +373,24 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
     };
 
 });
+
+
+
+app.directive('fileModel', ['$parse', function ($parse) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
+
+            element.bind('change', function(){
+                scope.$apply(function(){
+                    modelSetter(scope, element[0].files[0]);
+                });
+            });
+        }
+    };
+}]);
+
+
+
