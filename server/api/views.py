@@ -859,6 +859,9 @@ class AuthVerifyView(generics.RetrieveAPIView):
     authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
+    def get_serializer_class(self):
+        return SproutUserSerializer
+
     def get(self, request, format=None, **kwargs):
         """
         Authentication-required noop to see if authentication tokens are valid
@@ -874,20 +877,8 @@ class AuthVerifyView(generics.RetrieveAPIView):
         include_user = request.query_params.get('user', None)
         if include_user == 'true':
             user = request.user
-            email = user.email
-            pk = user.id
-            try:
-                first_name = user.sproutuserprofile.first_name
-                last_name = user.sproutuserprofile.last_name
-            except SproutUserProfile.DoesNotExist:
-                first_name = 'Noname'
-                last_name = 'Noname'
-            response['user'] = {
-                'email': email,
-                'first_name': first_name,
-                'last_name': last_name,
-                'pk': pk,
-            }
+            data = self.get_serializer().to_representation(user)
+            response['user'] = data
 
         return Response(data=response)
 
