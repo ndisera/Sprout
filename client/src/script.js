@@ -304,7 +304,8 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                     console.log('hmmm');
                     $http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture').then(
                         function success(response) {
-                            $http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture/' + response.data.profile_pictures[0].id).then(
+                            var config = { responseType: 'blob', };
+                            $http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture/' + response.data.profile_pictures[0].id, config).then(
                                 function success(response) {
                                     console.log('yo');
                                     deferred.resolve(response);

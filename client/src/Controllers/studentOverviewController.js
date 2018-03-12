@@ -5,6 +5,22 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
 
     $scope.toDisplay = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
+    //console.log(studentPictureData);
+
+    //var blob = new Blob(studentPictureData.data);
+    //console.log(blob);
+    //console.log(thing);
+
+
+
+    //$('#student-test-image-container').append( $('<img/>', { 'src': thing, }) );
+
+    $scope.$on('$includeContentLoaded', function(e) {
+        var imgUrl = URL.createObjectURL(studentPictureData.data);
+        $('#student-tabs-image').attr('src', imgUrl);
+        //window.URL.revokeObjectURL(imgUrl);
+    });
+
     //console.log(decodeURIComponent(studentPictureData.data))
 
 
