@@ -3,7 +3,7 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
 
     $scope.studentImage = null;
 
-    $scope.toDisplay = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
+    //$scope.toDisplay = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
     //console.log(studentPictureData);
 
@@ -14,10 +14,12 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
 
 
     //$('#student-test-image-container').append( $('<img/>', { 'src': thing, }) );
+    
+    $scope.toDisplay = 'data:image/png;base64,' + studentPictureData.data.image;
 
     $scope.$on('$includeContentLoaded', function(e) {
-        var imgUrl = URL.createObjectURL(studentPictureData.data);
-        $('#student-tabs-image').attr('src', imgUrl);
+        //var imgUrl = URL.createObjectURL(studentPictureData.data);
+        //$('#student-tabs-image').attr('src', imgUrl);
         //window.URL.revokeObjectURL(imgUrl);
     });
 
@@ -55,10 +57,10 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
 
         //console.log(form);
         
-        console.log($scope.studentImage);
+        //console.log($scope.studentImage);
 
-        var data = new FormData();
-        data.append('file', $scope.studentImage);
+        //var data = new FormData();
+        //data.append('file', $scope.studentImage);
         //_.each($scope.studentImage, function(val, key) {
             //data.append(key, data[key]);
         //});
@@ -71,15 +73,20 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
         //data.append('file', image, 'thing.jpg');
 
         //console.log(data);
+        //
+        
+        console.log(image);
 
         $http({
             method: 'POST',
             url: 'https://localhost:8000/students/' + studentData.student.id + '/picture',
-            data: data,
-            transformRequest: angular.identity,
-            headers: {
-                'Content-Type': undefined,
-            }
+            data: {
+                image: image,
+            },
+            //transformRequest: angular.identity,
+            //headers: {
+                //'Content-Type': undefined,
+            //}
         }).then(
                 function success(data) {
                     console.log('success');

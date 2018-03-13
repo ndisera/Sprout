@@ -125,14 +125,14 @@
             </div>
             <div class="modal-body">
                 <form id="student-overview-picture-form" enctype="multipart/form-data">
-                    <input type="file" file-model="studentImage">
-                    <!--<button ngf-select ng-model="studentPicture" accept="image/*" class="btn btn-primary">Select Picture</button>-->
-                    <!--<div ngf-drop ng-model="studentPicture" ngf-pattern="image/*" class="student-overview-crop-area">-->
-                        <!--<img-crop image="studentPicture | ngfDataUrl" result-image="croppedStudentPicture" ng-init="croppedStudentPicture=''"></img-crop>-->
-                    <!--</div>-->
-                    <!--<div>-->
-                        <!--<img ng-src="{{ croppedStudentPicture }}" />-->
-                    <!--</div>-->
+                    <!--<input type="file" file-model="studentImage">-->
+                    <button ngf-select ng-model="studentPicture" accept="image/*" class="btn btn-primary">Select Picture</button>
+                    <div ngf-drop ng-model="studentPicture" ngf-pattern="image/*" class="student-overview-crop-area">
+                        <img-crop image="studentPicture | ngfDataUrl" result-image="croppedStudentPicture" ng-init="croppedStudentPicture=''"></img-crop>
+                    </div>
+                    <div>
+                        <img ng-src="{{ croppedStudentPicture }}" />
+                    </div>
                     <button ng-click="uploadStudentPicture(croppedStudentPicture)">Submit</button> 
                 </form>
 
