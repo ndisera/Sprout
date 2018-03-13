@@ -98,8 +98,6 @@
     float: right;
     border: 4px dashed #ccc;
     border-radius: 4px;
-
-    /*margin: 0 auto;*/
     background-color: #ddd;
     transition: border-color 0.5s ease;
     transition: background-color 0.5s ease;
@@ -108,6 +106,15 @@
 #student-overview-crop-area.dragover {
     background-color: #b9dfd0;
     border-color: #57bc90;
+}
+
+#student-overview-crop-instructions {
+    position: relative;
+    width: 250px;
+    top: 80px;
+    left: 23px;
+    text-align: center;
+    color: #888;
 }
 
 #student-overview-image-crop {
@@ -138,6 +145,41 @@
 
 #student-overview-image-modal .btn-manipulate-row {
     margin-top: 15px;
+}
+
+@media (max-width: 650px) {
+    #student-overview-crop-area {
+        float: none;
+        margin: 0 auto;
+    }
+
+    #student-overview-image-modal .modal-body {
+        height: unset;
+    }
+
+    #student-overview-image-crop {
+        height: unset;
+        margin-right: 0px;
+        padding-top: 65px;
+        padding-bottom: 15px;
+    }
+
+    #student-overview-image-modal .btn-manipulate-row {
+        margin-top: -10px;
+    }
+}
+
+@media (max-width: 370px) {
+    #student-overview-crop-area {
+        height: 220px;
+        width: 220px;
+    }
+
+    #student-overview-crop-instructions {
+        width: 180px;
+        top: 35px;
+        left: 18px;
+    }
 }
 
 .studentHeading {
@@ -344,9 +386,6 @@
     margin-top: 20px;
 }
 
-@media (max-width: 550px) {
-
-}
 
 
 

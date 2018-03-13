@@ -57,7 +57,7 @@
                         <div class="form-group">
                             <label class="control-label col-xs-12 col-sm-3">Photo:</label>
                             <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9">
-                                <button type="button" class="btn btn-default full-width" data-toggle="modal" data-target="#student-overview-image-modal">
+                                <button type="button" class="btn btn-default full-width" ng-click="showModal()">
                                     Select New Photo
                                 </button>
                             </div>
@@ -114,8 +114,6 @@
         </div>
     </div>
 </div>
-<img id="student-test-image">
-<div id="student-test-image-container"></div>
 <div class="modal fade" id="student-overview-image-modal" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -124,38 +122,23 @@
                 <h4 class="modal-title">Select New Photo</h4>
             </div>
             <div class="modal-body">
-                <!--<form id="student-overview-picture-form">-->
-                    <!--<input type="file" file-model="studentImage">-->
-                    <!--<button ngf-select ng-model="studentPicture" accept="image/*" class="btn btn-primary pull-right">Select Picture</button>-->
-                    <div id="student-overview-crop-area" ngf-drop ngf-select ngf-select-disabled="newStudentImage !== null" ng-model="newStudentImage" ngf-pattern="image/*">
-                        <!--<img-crop image="newStudentImage | ngfDataUrl" result-image="croppedStudentPicture" result-image-size="100" ng-init="croppedStudentPicture=''"></img-crop>-->
-                        <img-crop image="newStudentImage | ngfDataUrl" result-image="newStudentImageCrop" result-image-size="100"></img-crop>
+                <div id="student-overview-crop-area" ngf-drop ngf-select ngf-select-disabled="newStudentImage !== null" ng-model="newStudentImage" ngf-pattern="image/*" ng-class="{ 'pointer': newStudentImage === null, }">
+                    <div id="student-overview-crop-instructions" ng-if="newStudentImage === null">
+                        <span class="far fa-image fa-5x"></span>
+                        <h4 class="hidden-xs">Drag and drop or click here to select an image</h4>
+                        <h4 class="visible-xs">Click here to select an image</h4>
+                        <!--<h4><span class="hidden-xs">Drag and drop or </span><span class="hidden-xs">c</span><span class="visible-xs">C</span>lick here to select an image</h4>-->
                     </div>
-                    <div id="student-overview-image-crop">
-                        <div>
-                            <img ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
-                            <h3>Preview</h3>
-                        </div>
+                    <img-crop image="newStudentImage | ngfDataUrl" result-image="newStudentImageCrop" result-image-size="100"></img-crop>
+                </div>
+                <div id="student-overview-image-crop">
+                    <div>
+                        <img ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
+                        <h3>Preview</h3>
                     </div>
-                    <!--<button ng-click="uploadStudentPicture(newStudentImageCrop)">Submit</button> -->
-                <!--</form>-->
-
-
-
-
-
-
-
-                <!--<div>Select an image file: <input type="file" id="fileInput" /></div>-->
-                <!--<div class="cropArea" style="height: 500px; width: 500px;">-->
-                    <!--<img-crop image="myImage" result-image="myCroppedImage"></img-crop>-->
-                <!--</div>-->
-                <!--<div>Cropped Image:</div>-->
-                <!--<div><img ng-src="{{myCroppedImage}}" /></div>-->
-                <!--<div class="voffset4">-->
-                <!--</div>-->
+                </div>
                 <div class="btn-manipulate-row">
-                    <button class="btn btn-success" data-dismiss="modal" ng-click="uploadStudentImage(newStudentImageCrop)">
+                    <button class="btn btn-success" ng-click="uploadStudentImage(newStudentImageCrop)">
                         <span class="far fa-save fa-lg"></span>
                     </button>
                 </div>

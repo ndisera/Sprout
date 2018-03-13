@@ -299,35 +299,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
-                studentPictureData: function($q, $http, $route) {
-                    var deferred = $q.defer();
-                    $http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture').then(
-                        function success(response) {
-                            deferred.resolve(response);
-                            //var config = { responseType: 'blob', };
-                            //if(response.data.profile_pictures.length > 0) {
-                                //$http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture/' + response.data.profile_pictures[0].id, config).then(
-                                    //function success(response) {
-                                        //console.log('yo');
-                                        //deferred.resolve(response);
-                                    //},
-                                    //function error(response) {
-                                        //console.log('yoyo');
-                                        //deferred.resolve(null);
-                                    //},
-                                //);
-                            //}
-                            //else {
-                                //deferred.resolve(null);
-                            //}
-                        },
-                        function error(response) {
-                            console.log('yoyoyo');
-                            deferred.resolve(null);
-                        },
-                    );
-                    return deferred.promise;
-                },
                 auth: function(userService) {
                     return userService.authVerify();
                 },
@@ -447,7 +418,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         .otherwise({ redirectTo: '/profile/focus' });
 })
 
-.run(function($rootScope, $location, toastService, userService) {
+.run(function($rootScope, $location, toastService, userService, studentService) {
 
     /**
      *  Used to determine where to make calls to the backend
@@ -493,10 +464,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         userService.authVerify();
     }
 
+    // set global toastr options
     toastr.options = {
         closeButton: true,
     };
 
+    // define colors to be used globally
     $rootScope.colors = [
         tinycolor('#57bc90'), // green
         tinycolor('#5ab9ea'), // light blue
@@ -508,5 +481,61 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         tinycolor('#333333'), // grey
     ];
 
+    // set chartjs default colors
     Chart.defaults.global.colors = _.map($rootScope.colors, function(elem) { return elem.toHexString(); });
+
+
+    /*** STUDENT PICTURE RELATED SETUP ***/
+
+    /**
+     * set global currently-being-viewed student to initial value.
+     * this is part of a system that prevents a student's picture
+     * from being downloaded constantly.
+     */
+    $rootScope.currentStudent = {
+        id: -1,
+        picture: null,
+    };
+
+    /**
+     * set up a listener on route change to go get the currently-being-viewed
+     * student's picture, but only if that's not the picture I already have
+     * stored in $root
+     */
+    $rootScope.$on('$routeChangeStart', function(event, next, current) {
+        // being very careful cause this will run on every page
+        if(next === null || next === undefined
+            || next.$$route === null || next.$$route === undefined
+            || next.$$route.originalPath === null || next.$$route.originalPath === undefined) {
+            return;
+        }
+
+        // going to a student page
+        if(next.$$route.originalPath.split('/')[1] === 'student') {
+
+            if(next.params === null || next.params === undefined
+                || next.params.id === null || next.params.id === undefined) {
+                return;
+            }
+
+            if($rootScope.currentStudent.id !== next.params.id || $rootScope.currentStudent.picture === null) {
+                studentService.getStudentPicture(next.params.id).then(
+                    function success(picture) {
+                        $rootScope.currentStudent.id = next.params.id;
+                        $rootScope.currentStudent.picture = picture;
+                    },
+                );
+            }
+        }
+    });
 });
+
+
+
+
+
+
+
+
+
+
