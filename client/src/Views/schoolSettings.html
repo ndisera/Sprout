@@ -238,10 +238,10 @@
                 <div class="alert alert-info no-bottom-margin" ng-if="terms.length === 0">
                     <span><b>Tip:</b> It looks like you haven't added a term yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
                 </div>
-                <div ng-if="terms.length !== 0">
+                <div>
                     <div class="row">
                         <div class="col-xs-12 voffset2">
-                            <div id="student-grades-select" class="input-group">
+                            <div class="input-group input-group-dropdown">
                                 <span class="input-group-addon">Year</span>
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ termSchoolYear.title }} <span class="caret"></span></button>
@@ -254,8 +254,8 @@
                             </div>
                         </div>
                     </div>
-                    <br />
-                    <div class="table-responsive scrollableTableDiv table-select-default">
+                    <br ng-if="terms.length !== 0"/>
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="terms.length !== 0">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -361,10 +361,10 @@
                 <div class="alert alert-info no-bottom-margin" ng-if="holidays.length === 0">
                     <span><b>Tip:</b> It looks like you haven't added a holiday yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
                 </div>
-                <div ng-if="holidays.length !== 0">
+                <div>
                     <div class="row">
                         <div class="col-xs-12 voffset2">
-                            <div id="student-grades-select" class="input-group">
+                            <div class="input-group input-group-dropdown">
                                 <span class="input-group-addon">Year</span>
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ holidaySchoolYear.title }} <span class="caret"></span></button>
@@ -377,8 +377,8 @@
                             </div>
                         </div>
                     </div>
-                    <br />
-                    <div class="table-responsive scrollableTableDiv table-select-default">
+                    <br ng-if="holidays.length !== 0"/>
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="holidays.length !== 0">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
