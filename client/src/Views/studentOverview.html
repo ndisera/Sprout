@@ -57,7 +57,7 @@
                         <div class="form-group">
                             <label class="control-label col-xs-12 col-sm-3">Photo:</label>
                             <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9">
-                                <button type="button" class="btn btn-default full-width" data-toggle="modal" data-target="#imgModal">
+                                <button type="button" class="btn btn-default full-width" data-toggle="modal" data-target="#student-overview-image-modal">
                                     Select New Photo
                                 </button>
                             </div>
@@ -116,7 +116,7 @@
 </div>
 <img id="student-test-image">
 <div id="student-test-image-container"></div>
-<div class="modal fade" id="imgModal" role="dialog">
+<div class="modal fade" id="student-overview-image-modal" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header grey modal-wrapper">
@@ -124,17 +124,21 @@
                 <h4 class="modal-title">Select New Photo</h4>
             </div>
             <div class="modal-body">
-                <form id="student-overview-picture-form" enctype="multipart/form-data">
+                <!--<form id="student-overview-picture-form">-->
                     <!--<input type="file" file-model="studentImage">-->
-                    <button ngf-select ng-model="studentPicture" accept="image/*" class="btn btn-primary">Select Picture</button>
-                    <div ngf-drop ng-model="studentPicture" ngf-pattern="image/*" class="student-overview-crop-area">
-                        <img-crop image="studentPicture | ngfDataUrl" result-image="croppedStudentPicture" ng-init="croppedStudentPicture=''"></img-crop>
+                    <!--<button ngf-select ng-model="studentPicture" accept="image/*" class="btn btn-primary pull-right">Select Picture</button>-->
+                    <div id="student-overview-crop-area" ngf-drop ngf-select ngf-select-disabled="newStudentImage !== null" ng-model="newStudentImage" ngf-pattern="image/*">
+                        <!--<img-crop image="newStudentImage | ngfDataUrl" result-image="croppedStudentPicture" result-image-size="100" ng-init="croppedStudentPicture=''"></img-crop>-->
+                        <img-crop image="newStudentImage | ngfDataUrl" result-image="newStudentImageCrop" result-image-size="100"></img-crop>
                     </div>
-                    <div class="student-overview-img-crop">
-                        <img ng-src="{{ croppedStudentPicture }}" />
+                    <div id="student-overview-image-crop">
+                        <div>
+                            <img ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
+                            <h3>Preview</h3>
+                        </div>
                     </div>
-                    <button ng-click="uploadStudentPicture(croppedStudentPicture)">Submit</button> 
-                </form>
+                    <!--<button ng-click="uploadStudentPicture(newStudentImageCrop)">Submit</button> -->
+                <!--</form>-->
 
 
 
@@ -151,8 +155,8 @@
                 <!--<div class="voffset4">-->
                 <!--</div>-->
                 <div class="btn-manipulate-row">
-                    <button class="btn btn-danger" data-dismiss="modal" ng-click="deleteSection()">
-                        <span class="far fa-save"></span>
+                    <button class="btn btn-success" data-dismiss="modal" ng-click="uploadStudentImage(newStudentImageCrop)">
+                        <span class="far fa-save fa-lg"></span>
                     </button>
                 </div>
             </div>

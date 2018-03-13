@@ -1,7 +1,8 @@
 app.controller("studentOverviewController", function ($scope, $location, $routeParams, $http, userService, studentPictureData, Upload, toastService, studentService, termData, enrollmentData, userData, studentData) {
     $scope.location = $location;
 
-    $scope.studentImage = null;
+    $scope.newStudentImage = null;
+    $scope.newStudentImageCrop = null;
 
     //$scope.toDisplay = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
 
@@ -15,9 +16,21 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
 
     //$('#student-test-image-container').append( $('<img/>', { 'src': thing, }) );
     
-    $scope.toDisplay = 'data:image/png;base64,' + studentPictureData.data.image;
+    if(studentPictureData !== null) {
+        console.log(studentPictureData);
+        var reader = new FileReader();
+        reader.readAsDataURL(studentPictureData.data);
+        reader.onloadend = function() {
+            console.log(reader.result);
+            $scope.toDisplay = reader.result;
+            $scope.$apply();
+        }
+
+        //$scope.toDisplay = 'data:image/png;base64,' + studentPictureData.data;
+    }
 
     $scope.$on('$includeContentLoaded', function(e) {
+        console.log($scope.toDisplay);
         //var imgUrl = URL.createObjectURL(studentPictureData.data);
         //$('#student-tabs-image').attr('src', imgUrl);
         //window.URL.revokeObjectURL(imgUrl);
@@ -81,7 +94,7 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
             method: 'POST',
             url: 'https://localhost:8000/students/' + studentData.student.id + '/picture',
             data: {
-                image: image,
+                file: image,
             },
             //transformRequest: angular.identity,
             //headers: {
