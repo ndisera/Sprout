@@ -102,11 +102,15 @@ class ProfilePictureViewSet(mixins.CreateModelMixin,
         if 'sproutuserprofile' in parents_query_dict:
             user_profile_id = parents_query_dict['sproutuserprofile']
             user_profile = SproutUserProfile.objects.get(id=user_profile_id)
+            if user_profile.picture is not None:
+                user_profile.picture.delete()
             user_profile.picture = self.instance
             user_profile.save()
         if 'student' in parents_query_dict:
             student_id = parents_query_dict['student']
             student = Student.objects.get(id=student_id)
+            if student.picture is not None:
+                student.picture.delete()
             student.picture = self.instance
             student.save()
 

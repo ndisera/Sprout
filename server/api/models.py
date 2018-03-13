@@ -6,12 +6,18 @@ from django.contrib.auth import get_user_model
 
 from sprout_user import SproutUser
 
+import os
 
 def get_sentinel_user():
     return get_user_model().objects.get_or_create(email='deleted_user',)[0]
 
 
 class ProfilePicture(models.Model):
+    """
+    ProfilePicture
+    Store a user or student's profile picture
+    This should never be referenced from more than one model!
+    """
     file = models.ImageField(upload_to='profile_pictures/', null=True, default='profile_pictures/default.png',
                              help_text="Base64 encoded image upload")
     upload_time = models.DateTimeField(auto_now=True)
@@ -21,6 +27,12 @@ class ProfilePicture(models.Model):
 
     def __str__(self):
         return self.__repr__()
+
+    def delete(self, **kwargs):
+        filename = self.file.name
+        super(ProfilePicture, self).delete(**kwargs)
+        os.remove(filename)
+        pass
 
 
 class SproutUserProfile(models.Model):
