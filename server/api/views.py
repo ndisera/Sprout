@@ -102,11 +102,15 @@ class ProfilePictureViewSet(mixins.CreateModelMixin,
         if 'sproutuserprofile' in parents_query_dict:
             user_profile_id = parents_query_dict['sproutuserprofile']
             user_profile = SproutUserProfile.objects.get(id=user_profile_id)
+            if user_profile.picture is not None:
+                user_profile.picture.delete()
             user_profile.picture = self.instance
             user_profile.save()
         if 'student' in parents_query_dict:
             student_id = parents_query_dict['student']
             student = Student.objects.get(id=student_id)
+            if student.picture is not None:
+                student.picture.delete()
             student.picture = self.instance
             student.save()
 
@@ -115,23 +119,6 @@ class ProfilePictureViewSet(mixins.CreateModelMixin,
     def perform_create(self, serializer):
         serializer.save()
         self.instance = serializer.instance
-
-    def retrieve(self, request, *args, **kwargs):
-        """
-        get the actual profile image data
-        """
-        queryset = self.get_queryset()
-        if len(queryset) == 0:
-            return HttpResponseNotFound()
-        if not len(queryset) == 1:
-            raise AssertionError('More than one profile picture found for ID')
-
-        picture = queryset[0]
-        file = picture.file.file
-
-        response = HttpResponse(file, content_type="image/png")
-
-        return response
 
 
 class StudentViewSet(NestedDynamicViewSet):
