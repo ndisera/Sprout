@@ -32,7 +32,9 @@
     "toastr": "^2.1.3",
     "tinycolor": "^1.4.1",
     "fontawesome": "^5.0.8",
-    "Snap.svg": "snap.svg#^0.5.1"
+    "Snap.svg": "snap.svg#^0.5.1",
+    "ng-file-upload": "^12.2.13",
+    "ng-img-crop": "ngImgCrop#^0.3.2"
   },
   "overrides": {
     "jquery-ui": {
