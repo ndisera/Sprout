@@ -116,23 +116,6 @@ class ProfilePictureViewSet(mixins.CreateModelMixin,
         serializer.save()
         self.instance = serializer.instance
 
-    def retrieve(self, request, *args, **kwargs):
-        """
-        get the actual profile image data
-        """
-        queryset = self.get_queryset()
-        if len(queryset) == 0:
-            return HttpResponseNotFound()
-        if not len(queryset) == 1:
-            raise AssertionError('More than one profile picture found for ID')
-
-        picture = queryset[0]
-        file = picture.file.file
-
-        response = HttpResponse(file, content_type="image/png")
-
-        return response
-
 
 class StudentViewSet(NestedDynamicViewSet):
     """
