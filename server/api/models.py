@@ -72,7 +72,14 @@ class Student(models.Model):
         return "{} {}".format(self.first_name, self.last_name)
 
     def __str__(self):
-        return self.__repr__();
+        return self.__repr__()
+
+    def save(self, **kwargs):
+        ret = super(Student, self).save(**kwargs)
+        # Delete all notifications associated with this student so they can be re-generated later
+        # in case relevant data changed
+        Notification.objects.filter(student=self).delete()
+        return ret
 
 
 class Section(models.Model):
