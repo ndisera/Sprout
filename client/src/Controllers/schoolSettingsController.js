@@ -51,10 +51,11 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
      */
     function initializeSchoolYears(field) {
         var currentDate = getCurrentDate();
-        var myDate = moment(currentDate, 'YYYY-MM-DD').toDate();
+        var myDate = moment(currentDate, "YYYY-MM-DD");
         var chosenDifference = 0;
-        _.each($scope.schoolYears, function(elem) {
-            var startDate = moment(elem.start_date, 'YYYY-MM-DD').toDate();
+        for (var i = 0; i < $scope.schoolYears.length; i++) {
+            var elem = $scope.schoolYears[i];
+            var startDate = moment(elem.start_date, "YYYY-MM-DD");
             // pick school year that contains current date, else school year with closest start date
             if (elem.start_date <= currentDate && elem.end_date >= currentDate) {
                 if (field === "term" || field === "all") $scope.termSchoolYear = elem;
@@ -65,7 +66,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 if (field === "term" || field === "all") $scope.termSchoolYear = elem;
                 if (field === "holiday" || field === "all") $scope.holidaySchoolYear = elem;
             }
-        });
+        }
     }
 
     /**
