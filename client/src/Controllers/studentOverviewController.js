@@ -65,7 +65,7 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
 
 
 
-    $scope.uploadStudentPicture = function(image) {
+    $scope.uploadStudentImage = function(image) {
         //var form = $('#student-overview-picture-form')[0];
 
         //console.log(form);

@@ -303,22 +303,23 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                     var deferred = $q.defer();
                     $http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture').then(
                         function success(response) {
-                            var config = { responseType: 'blob', };
-                            if(response.data.profile_pictures.length > 0) {
-                                $http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture/' + response.data.profile_pictures[0].id, config).then(
-                                    function success(response) {
-                                        console.log('yo');
-                                        deferred.resolve(response);
-                                    },
-                                    function error(response) {
-                                        console.log('yoyo');
-                                        deferred.resolve(null);
-                                    },
-                                );
-                            }
-                            else {
-                                deferred.resolve(null);
-                            }
+                            deferred.resolve(response);
+                            //var config = { responseType: 'blob', };
+                            //if(response.data.profile_pictures.length > 0) {
+                                //$http.get('https://localhost:8000/students/' + $route.current.params.id + '/picture/' + response.data.profile_pictures[0].id, config).then(
+                                    //function success(response) {
+                                        //console.log('yo');
+                                        //deferred.resolve(response);
+                                    //},
+                                    //function error(response) {
+                                        //console.log('yoyo');
+                                        //deferred.resolve(null);
+                                    //},
+                                //);
+                            //}
+                            //else {
+                                //deferred.resolve(null);
+                            //}
                         },
                         function error(response) {
                             console.log('yoyoyo');
