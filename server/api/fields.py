@@ -39,6 +39,11 @@ class Base64ImageField(serializers.ImageField):
 
         return super(Base64ImageField, self).to_internal_value(data)
 
+    def to_representation(self, value):
+        file = value.file
+        encoded_file = base64.b64encode(file.read())
+        return encoded_file
+
     @staticmethod
     def get_file_extension(file_name, decoded_file):
         extension = imghdr.what(file_name, decoded_file)
