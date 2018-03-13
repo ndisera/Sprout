@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils import timezone
 import django.db.utils
 from django.http.response import HttpResponseNotFound, HttpResponse
+from dry_rest_permissions.generics import DRYPermissions, DRYObjectPermissions
 from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
 from rest_framework import mixins, generics
 from rest_framework.permissions import IsAuthenticated
