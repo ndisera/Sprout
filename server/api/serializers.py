@@ -1,6 +1,7 @@
 from dynamic_rest.serializers import DynamicModelSerializer, WithDynamicModelSerializerMixin
 from dynamic_rest.fields import DynamicRelationField
 from api.models import *
+import api.fields
 from rest_framework import serializers
 from rest_auth.serializers import LoginSerializer, UserDetailsSerializer
 from rest_auth.registration.serializers import RegisterSerializer
@@ -8,7 +9,7 @@ from focus_category.category_calculator import CategoryCalculator
 
 
 class ProfilePictureSerializer(DynamicModelSerializer):
-    file = serializers.ImageField(max_length=None)
+    file = api.fields.Base64ImageField(max_length=None, use_url=True)
 
     class Meta:
         fields = '__all__'

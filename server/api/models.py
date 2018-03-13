@@ -12,8 +12,15 @@ def get_sentinel_user():
 
 
 class ProfilePicture(models.Model):
-    file = models.ImageField(upload_to='profile_pictures/', null=True, default='profile_pictures/default.png')
+    file = models.ImageField(upload_to='profile_pictures/', null=True, default='profile_pictures/default.png',
+                             help_text="Base64 encoded image upload")
     upload_time = models.DateTimeField(auto_now=True)
+
+    def __repr__(self):
+        return str(self.file)
+
+    def __str__(self):
+        return self.__repr__()
 
 
 class SproutUserProfile(models.Model):
