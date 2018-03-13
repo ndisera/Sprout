@@ -130,7 +130,7 @@
                     <div ngf-drop ng-model="studentPicture" ngf-pattern="image/*" class="student-overview-crop-area">
                         <img-crop image="studentPicture | ngfDataUrl" result-image="croppedStudentPicture" ng-init="croppedStudentPicture=''"></img-crop>
                     </div>
-                    <div>
+                    <div class="student-overview-img-crop">
                         <img ng-src="{{ croppedStudentPicture }}" />
                     </div>
                     <button ng-click="uploadStudentPicture(croppedStudentPicture)">Submit</button> 

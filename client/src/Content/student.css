@@ -94,6 +94,10 @@
     background-color: #ddd;
 }
 
+.student-overview-img-crop > img {
+    border-radius: 50%;
+}
+
 .studentHeading {
     display: inline-block;
 }
