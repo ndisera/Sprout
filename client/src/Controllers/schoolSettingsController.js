@@ -43,18 +43,27 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
 
     $scope.edit = false;
 
-    initializeSchoolYears();
+    initializeSchoolYears('all');
     setupLookups();
 
     /**
      * Initializes termSchoolYear and holidaySchoolYear to the current school year
      */
-    function initializeSchoolYears() {
+    function initializeSchoolYears(field) {
         var currentDate = getCurrentDate();
+        var myDate = moment(currentDate, 'YYYY-MM-DD').toDate();
+        var chosenDifference = 0;
         _.each($scope.schoolYears, function(elem) {
+            var startDate = moment(elem.start_date, 'YYYY-MM-DD').toDate();
+            // pick school year that contains current date, else school year with closest start date
             if (elem.start_date <= currentDate && elem.end_date >= currentDate) {
-                $scope.termSchoolYear = elem;
-                $scope.holidaySchoolYear = elem;
+                if (field === "term" || field === "all") $scope.termSchoolYear = elem;
+                if (field === "holiday" || field === "all") $scope.holidaySchoolYear = elem;
+                return;
+            } else if (startDate.diff(myDate) < chosenDifference || chosenDifference === 0) {
+                chosenDifference = startDate.diff(myDate);
+                if (field === "term" || field === "all") $scope.termSchoolYear = elem;
+                if (field === "holiday" || field === "all") $scope.holidaySchoolYear = elem;
             }
         });
     }
@@ -547,6 +556,14 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 }
                 // remove from edit lookup
                 delete $scope.eSchoolYears[yearId];
+
+                // need to also change school year dropdowns if chosen school year was delete
+                if ($scope.termSchoolYear.id === yearId) {
+                    initializeSchoolYears('term');
+                }
+                if ($scope.holidaySchoolYear.id === yearId) {
+                    initializeSchoolYears('holiday');
+                }
             },
             function error(response) {
                 setErrorMessage(response);
