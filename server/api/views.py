@@ -517,9 +517,9 @@ class BehaviorViewSet(NestedDynamicViewSet):
 
     def get_queryset(self, queryset=None):
         """
-        AttendanceRecords should only be visible:
+        Behaviors should only be visible:
             - If the user teaches the related section
-            - If the attendance record refers to a student the teacher has another relation to
+            - If the user is the student's case manager
         """
         user = self.request.user
         if queryset is None:
