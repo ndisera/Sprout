@@ -6,14 +6,33 @@ from django.contrib.auth import get_user_model
 
 from sprout_user import SproutUser
 
+import os
 
 def get_sentinel_user():
     return get_user_model().objects.get_or_create(email='deleted_user',)[0]
 
 
 class ProfilePicture(models.Model):
-    file = models.ImageField(upload_to='profile_pictures/', null=True, default='profile_pictures/default.png')
+    """
+    ProfilePicture
+    Store a user or student's profile picture
+    This should never be referenced from more than one model!
+    """
+    file = models.ImageField(upload_to='profile_pictures/', null=True, default='profile_pictures/default.png',
+                             help_text="Base64 encoded image upload")
     upload_time = models.DateTimeField(auto_now=True)
+
+    def __repr__(self):
+        return str(self.file)
+
+    def __str__(self):
+        return self.__repr__()
+
+    def delete(self, **kwargs):
+        filename = self.file.name
+        super(ProfilePicture, self).delete(**kwargs)
+        os.remove(filename)
+        pass
 
 
 class SproutUserProfile(models.Model):
@@ -53,7 +72,14 @@ class Student(models.Model):
         return "{} {}".format(self.first_name, self.last_name)
 
     def __str__(self):
-        return self.__repr__();
+        return self.__repr__()
+
+    def save(self, **kwargs):
+        ret = super(Student, self).save(**kwargs)
+        # Delete all notifications associated with this student so they can be re-generated later
+        # in case relevant data changed
+        Notification.objects.filter(student=self).delete()
+        return ret
 
 
 class Section(models.Model):

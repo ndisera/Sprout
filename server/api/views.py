@@ -13,7 +13,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.schemas import AutoSchema
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from api.models import *
@@ -90,52 +89,36 @@ class ProfilePictureViewSet(mixins.CreateModelMixin,
     delete:
     remove a specified profile picture
     """
-    # Relevant tutorial: http://blog.josephmisiti.com/how-to-upload-a-photo-to-django-using-ios
+    # Relevant tutorial: http://blog.mathocr.com/2017/06/25/store-base64-images-with-Django-REST-framework.html
     permission_classes = (IsAuthenticated,)
     serializer_class = ProfilePictureSerializer
-    parser_classes = (MultiPartParser, FormParser, )
     queryset = ProfilePicture.objects.all()
+    schema = AutoSchema()
 
     def create(self, request, *args, **kwargs):
         response = super(ProfilePictureViewSet, self).create(request, *args, **kwargs)
         parents_query_dict = self.get_parents_query_dict()
+
         if 'sproutuserprofile' in parents_query_dict:
             user_profile_id = parents_query_dict['sproutuserprofile']
-            user_profile = SproutUserProfile.objects.filter(id=user_profile_id)
-            # Double check: This should always be true because we are looking at the PK of SproutUserProfile
-            if not len(user_profile) == 1:
-                raise AssertionError("Found multiple user profiles with the ID {id}".format(id=user_profile_id))
-            user_profile = user_profile[0]
+            user_profile = SproutUserProfile.objects.get(id=user_profile_id)
+            if user_profile.picture is not None:
+                user_profile.picture.delete()
             user_profile.picture = self.instance
             user_profile.save()
         if 'student' in parents_query_dict:
             student_id = parents_query_dict['student']
-            student = Student.objects.filter(id=student_id)
-            student = student[0] # Queryset always returns a list even though we used the primary key
+            student = Student.objects.get(id=student_id)
+            if student.picture is not None:
+                student.picture.delete()
             student.picture = self.instance
             student.save()
+
         return response
 
     def perform_create(self, serializer):
         serializer.save()
         self.instance = serializer.instance
-
-    def retrieve(self, request, *args, **kwargs):
-        """
-        get the actual profile image data
-        """
-        queryset = self.get_queryset()
-        if len(queryset) == 0:
-            return HttpResponseNotFound()
-        if not len(queryset) == 1:
-            raise AssertionError('More than one profile picture found for ID')
-
-        picture = queryset[0]
-        file = picture.file.file
-
-        response = HttpResponse(file, content_type="image/jpeg")
-
-        return response
 
 
 class StudentViewSet(NestedDynamicViewSet):

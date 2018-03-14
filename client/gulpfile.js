@@ -51,6 +51,13 @@ const include_paths = [
     bower_path + 'angular-datepicker/dist/angular-datepicker.css',
     bower_path + 'angular-datepicker/dist/angular-datepicker.js',
 
+    // image upload and cropping
+    bower_path + 'ng-file-upload/ng-file-upload.min.js',
+    bower_path + 'ng-img-crop/compile/minified/ng-img-crop.css',
+    bower_path + 'ng-img-crop/compile/minified/ng-img-crop.js',
+
+    bower_path + 'ng-file-upload/ng-file-upload.js',
+
     // sortable
     bower_path + 'angular-ui-sortable/sortable.min.js',
 

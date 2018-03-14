@@ -195,8 +195,9 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                         });
                         iep.datapoints = _.sortBy(iep.datapoints, 'date');
 
-                        var backgroundColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.2).toRgbString();
                         var borderColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.7).toRgbString();
+                        var backgroundColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.2).toRgbString();
+                        var pointBackgroundColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.7).toRgbString();
 
                         iep.graph = {
                             labels: [],
@@ -224,9 +225,14 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                                 spanGaps: true,
                             },
                             datasetOverride: {
-                                backgroundColor: [backgroundColor, ],
-                                borderColor: [borderColor, ],
                             },
+                            colors: [
+                                {
+                                    borderColor: borderColor,
+                                    pointBackgroundColor: pointBackgroundColor,
+                                    backgroundColor: backgroundColor,
+                                },
+                            ],
                         };
 
                         if(iep.datapoints.length === 0) {
@@ -235,6 +241,8 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                         else {
                             iep.graph.show = true;
 
+                            iep.graph.data = [[], ];
+
                             // iterate through each date, setting data as necessary
                             // can take first and last because it's sorted
                             var iterDate = iep.datapoints[0].date.clone();
@@ -242,6 +250,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                             var j = 0;
                             for(var i = 0; i < dateDiff + 1; i++) {
                                 iep.graph.labels[i] = iterDate.format('MM/DD').toString();
+                                iep.graph.data[0][i] = null;
 
                                 if(iep.datapoints[j]) {
                                     var date = moment(iep.datapoints[j].date);
@@ -257,10 +266,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                                     }
 
                                     if(averageCount !== 0) {
-                                        iep.graph.data[i] = average / averageCount;
-                                    }
-                                    else {
-                                        iep.graph.data[i] = null;
+                                        iep.graph.data[0][i] = average / averageCount;
                                     }
                                 }
                                 iterDate.add(1, 'd');
