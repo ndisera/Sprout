@@ -39,6 +39,7 @@ html, body {
 
 body {
     position: absolute;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 a {
