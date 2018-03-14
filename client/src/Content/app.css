@@ -207,6 +207,7 @@ a {
     margin-right: 0px;
     border: none;
     border-bottom: 3px solid transparent;
+    font-weight: 500;
 }
 
 .nav > li > a:hover, .nav > li > a:focus {
