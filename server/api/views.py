@@ -990,6 +990,16 @@ class NotificationViewSet(NestedDynamicViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
 
+    def get_queryset(self, queryset=None):
+        user = self.request.user
+        queryset = super(NotificationViewSet, self).get_queryset()
+        if user.is_superuser:
+            # The superuser is allowed to view everything
+            return queryset
+        # A regular user may only view their own notifications
+        queryset = queryset.filter(user=user)
+        return queryset
+
     """ ensure variables show as correct type for docs """
     name_user = 'user'
     name_student = 'student'
