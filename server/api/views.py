@@ -889,7 +889,7 @@ class SproutUserViewSet(WithDynamicViewSetMixin,
     partial_update:
     change the particulars of a User in Sprout
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYObjectPermissions, )
     serializer_class = SproutUserSerializer
     def get_queryset(self, queryset=None):
         queryset = SproutUser.objects.all()

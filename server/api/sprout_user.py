@@ -58,3 +58,23 @@ class SproutUser(AbstractBaseUser):
 
     def __str__(self):
         return self.__getattribute__(AbstractBaseUser.get_email_field_name())
+
+    @staticmethod
+    def has_write_permission(request):
+        """
+        Block normal users from modifying/creating users
+        """
+        user = request.user
+        return user.is_superuser
+
+    def has_object_write_permission(self, request):
+        return SproutUser.has_write_permission(request)
+
+    def has_object_update_permission(self, request):
+        """
+        Block normal users from modifying users other than themselves
+        """
+        user = request.user
+        if self == user:
+            return True
+        return user.is_superuser

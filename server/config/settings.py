@@ -207,5 +207,8 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER' : 'api.serializers.SproutRegisterSerializer',
 }
 
+from dry_rest_permissions.generics import DRYPermissions
+REST_AUTH_REGISTER_PERMISSION_CLASSES = (DRYPermissions, )
+
 DEFAULT_MAX_CHARFIELD_LENGTH = 100
 DESCRIPTION_CHARFIELD_MAX_LENGTH = 1600

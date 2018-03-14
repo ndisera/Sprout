@@ -227,6 +227,10 @@ class SproutLoginSerializer(LoginSerializer):
 
 
 class SproutRegisterSerializer(RegisterSerializer):
+    class Meta:
+        fields = ('email', )
+        model = SproutUser
+
     username = None
     first_name = serializers.CharField(source='sproutuserprofile.first_name')
     last_name = serializers.CharField(source='sproutuserprofile.last_name')
@@ -275,9 +279,6 @@ class SproutRegisterSerializer(RegisterSerializer):
             to_return['password1'] = self.validated_data.get('password1', '')
         to_return['is_superuser'] = self.validated_data.get('is_superuser', False)
         return to_return
-
-    class Meta:
-        fields = ('email', )
 
 
 class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerializer):
