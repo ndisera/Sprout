@@ -1033,7 +1033,6 @@ class NotificationViewSet(NestedDynamicViewSet):
         :param request:
         :return:
         """
-        queryset = self.get_queryset()
 
         # Generate student birthday notifications for all students this user
         # should see
@@ -1082,7 +1081,7 @@ class NotificationViewSet(NestedDynamicViewSet):
                                                  date=str(birthdate.date()))
             # See if the notification already exists
             try:
-                queryset.get(category=category, student=student, user=user, date=birthdate)
+                Notification.objects.get(category=category, student=student, user=user, date=birthdate)
             except Notification.DoesNotExist:
                 # The notification did not exist. Make one!
                 Notification.objects.create(title=title,
