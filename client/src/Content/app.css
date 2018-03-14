@@ -34,11 +34,12 @@ html, body {
     height: 100%;
     width: 100%;
     padding: 0;
-    font-weight: 200;
+    font-weight: 400;
 }
 
 body {
     position: absolute;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 a {
@@ -206,6 +207,7 @@ a {
     margin-right: 0px;
     border: none;
     border-bottom: 3px solid transparent;
+    font-weight: 500;
 }
 
 .nav > li > a:hover, .nav > li > a:focus {
