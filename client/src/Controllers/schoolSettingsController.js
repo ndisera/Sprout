@@ -1,9 +1,10 @@
-app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, terms, tests, schools, schedules, termSettings, holidayService, testService, termService, schoolService, scheduleService) {
+app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, terms, tests, schools, schedules, termSettings, schoolYears, holidayService, testService, termService, schoolService, scheduleService, schoolYearService) {
     $scope.location = $location;
     $scope.holidays = holidays.holidays;
     $scope.tests = tests.standardized_tests;
     $scope.terms = terms.terms;
     $scope.schedules = schedules.daily_schedules;
+    $scope.schoolYears = schoolYears.school_years;
 
     // used for getting schedule name
     $scope.termSettingsLookup = _.indexBy(termSettings.term_settings, "id");
@@ -32,13 +33,68 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.newTest = {};
     $scope.newTerm = {};
     $scope.newSchedule = {};
+    $scope.newSchoolYear = {};
 
     $scope.displayTestForm = false;
     $scope.displayHolidayForm = false;
     $scope.displayTermForm = false;
     $scope.displayScheduleForm = false;
+    $scope.displaySchoolYearForm = false;
 
     $scope.edit = false;
+
+    initializeSchoolYears('all');
+    setupLookups();
+
+    /**
+     * Initializes termSchoolYear and holidaySchoolYear to the current school year
+     */
+    function initializeSchoolYears(field) {
+        var currentDate = getCurrentDate();
+        var myDate = moment(currentDate, "YYYY-MM-DD");
+        var chosenDifference = 0;
+        for (var i = 0; i < $scope.schoolYears.length; i++) {
+            var elem = $scope.schoolYears[i];
+            var startDate = moment(elem.start_date, "YYYY-MM-DD");
+            // pick school year that contains current date, else school year with closest start date
+            if (elem.start_date <= currentDate && elem.end_date >= currentDate) {
+                if (field === "term" || field === "all") $scope.termSchoolYear = elem;
+                if (field === "holiday" || field === "all") $scope.holidaySchoolYear = elem;
+                return;
+            } else if (startDate.diff(myDate) < chosenDifference || chosenDifference === 0) {
+                chosenDifference = startDate.diff(myDate);
+                if (field === "term" || field === "all") $scope.termSchoolYear = elem;
+                if (field === "holiday" || field === "all") $scope.holidaySchoolYear = elem;
+            }
+        }
+    }
+
+    /**
+     * Gets today's date
+     */
+    function getCurrentDate() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        today = yyyy + "-" + mm + '-' + dd;
+        return today;
+    }
+
+    /**
+     * Sets specified school year to selected year
+     * @param {object} year - the school year selected.
+     * @param {string} type - the type the school year is associated with.
+     */
+    $scope.selectSchoolYear = function(year, type) {
+        type === "term" ? $scope.termSchoolYear = year : $scope.holidaySchoolYear = year;
+    }
 
     /**
      * Converts all grade 0 to K
@@ -240,32 +296,25 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
      * Creates lookups containing edit values
      */
     function setupLookups() {
-        var tests = [];
-        var holidays = [];
-        var terms = [];
-        var schedules = [];
-        for (var i = 0; i < $scope.tests.length; i++) {
-            tests.push(Object.assign({}, $scope.tests[i]));
-        }
-        $scope.eTests = _.indexBy(tests, "id");
-
-        for (var i = 0; i < $scope.holidays.length; i++) {
-            holidays.push(Object.assign({}, $scope.holidays[i]));
-        }
-        $scope.eHolidays = _.indexBy(holidays, "id");
-
-        for (var i = 0; i < $scope.terms.length; i++) {
-            terms.push(Object.assign({}, $scope.terms[i]));
-        }
-        $scope.eTerms = _.indexBy(terms, "id");
-
-        for (var i = 0; i < $scope.schedules.length; i++) {
-            schedules.push(Object.assign({}, $scope.schedules[i]));
-        }
-        $scope.eSchedules = _.indexBy(schedules, "id");
+        $scope.eTests = setupLookup($scope.tests);
+        $scope.eHolidays = setupLookup($scope.holidays);
+        $scope.eTerms = setupLookup($scope.terms);
+        $scope.eSchedules = setupLookup($scope.schedules);
+        $scope.eSchoolYears = setupLookup($scope.schoolYears);
     }
 
-    setupLookups();
+    /**
+     * Creates a lookup (by id) of the input array
+     * @param {array} viewArray - array used to create lookup.
+     * @return {array} the array lookup.
+     */
+    function setupLookup(viewArray) {
+        var temp = [];
+        for (var i = 0; i < viewArray.length; i++) {
+            temp.push(Object.assign({}, viewArray[i]));
+        }
+        return _.indexBy(viewArray, "id");
+    }
 
     /**
      * Sets up properties of the item to display in the delete form
@@ -286,7 +335,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                     {
                         title: 'Ends',
                         value: item.end_date
-                    },
+                    }
                 ];
                 break;
             case "test":
@@ -338,6 +387,25 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                     }
                 ];
                 break;
+            case "schoolYear":
+                $scope.item = [{
+                        title: 'Name',
+                        value: item.title
+                    },
+                    {
+                        title: 'Begins',
+                        value: item.start_date
+                    },
+                    {
+                        title: 'Ends',
+                        value: item.end_date
+                    },
+                    {
+                        title: 'Number of Terms',
+                        value: item.num_terms
+                    }
+                ];
+                break;
         }
     }
 
@@ -371,6 +439,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 break;
             case "schedule":
                 deleteSchedule(id);
+                break;
+            case "schoolYear":
+                deleteSchoolYear(id);
                 break;
         }
     }
@@ -472,12 +543,43 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     };
 
     /**
+     * Deletes a school year
+     * @param {number} yearId - id of school year to be deleted.
+     */
+    function deleteSchoolYear(yearId) {
+        schoolYearService.deleteSchoolYear(yearId).then(
+            function success(response) {
+                // remove from display array
+                for (var i = 0; i < $scope.schoolYears.length; i++) {
+                    if ($scope.schoolYears[i].id === yearId) {
+                        $scope.schoolYears.splice(i, 1);
+                    }
+                }
+                // remove from edit lookup
+                delete $scope.eSchoolYears[yearId];
+
+                // need to also change school year dropdowns if chosen school year was delete
+                if ($scope.termSchoolYear.id === yearId) {
+                    initializeSchoolYears('term');
+                }
+                if ($scope.holidaySchoolYear.id === yearId) {
+                    initializeSchoolYears('holiday');
+                }
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save your edit." + errorResponse());
+            }
+        );
+    };
+
+    /**
      * Creates a new holiday
      */
     $scope.addHoliday = function() {
         $scope.newHoliday.start_date = moment($scope.newHoliday.start_date).format('YYYY-MM-DD').toString();
         $scope.newHoliday.end_date = moment($scope.newHoliday.end_date).format('YYYY-MM-DD').toString();
-        $scope.newHoliday.school_year = 1;
+        $scope.newHoliday.school_year = $scope.holidaySchoolYear.id;
         holidayService.addHoliday($scope.newHoliday).then(
             function success(response) {
                 // add to display array
@@ -501,7 +603,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.addTerm = function() {
         $scope.newTerm.start_date = moment($scope.newTerm.start_date).format('YYYY-MM-DD').toString();
         $scope.newTerm.end_date = moment($scope.newTerm.end_date).format('YYYY-MM-DD').toString();
-        $scope.newTerm.school_year = 1;
+        $scope.newTerm.school_year = $scope.termSchoolYear.id;
         //$scope.newTerm.settings = 1;
         // gets me the term settings object by using schedule id
         var settings = $scope.scheduleSettingsLookup[$scope.newTermSchoolSchedule.id];
@@ -567,7 +669,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.newSchedule = {};
 
                 // now add the corresponding term settings
-                var termObj = {schedule: response.daily_schedule.id};
+                var termObj = {
+                    schedule: response.daily_schedule.id
+                };
                 termService.addTermSetting(termObj).then(
                     function success(tResponse) {
                         // update my term settings lookup
@@ -589,17 +693,41 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     };
 
     /**
+     * Creates a new school year
+     */
+    $scope.addSchoolYear = function() {
+        $scope.newSchoolYear.start_date = moment($scope.newSchoolYear.start_date).format('YYYY-MM-DD').toString();
+        $scope.newSchoolYear.end_date = moment($scope.newSchoolYear.end_date).format('YYYY-MM-DD').toString();
+        schoolYearService.addSchoolYear($scope.newSchoolYear).then(
+            function success(response) {
+                // add to display array
+                $scope.schoolYears.push(response.school_year);
+                // add to edit lookup (should point to different object)
+                var copy = Object.assign({}, response.school_year);
+                $scope.eSchoolYears[copy.id] = copy;
+                $scope.displaySchoolYearForm = false;
+                $scope.newSchoolYear = {};
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save the new holiday." + errorResponse());
+            }
+        );
+    };
+
+    /**
      * Updates a holiday
      * @param {number} holidayId - id of holiday to be updated.
      */
     $scope.updateHoliday = function(holidayId, index) {
-        if (typeof $scope.eHolidays[holidayId].start_date !== 'string' && $scope.eHolidays[holidayId].start_date != null) {
-            $scope.eHolidays[holidayId].start_date = moment($scope.eHolidays[holidayId].start_date).format('YYYY-MM-DD').toString();
+        var eHoliday = $scope.eHolidays[holidayId];
+        if (typeof eHoliday.start_date !== 'string' && eHoliday.start_date != null) {
+            eHoliday.start_date = moment(eHoliday.start_date).format('YYYY-MM-DD').toString();
         }
-        if (typeof $scope.eHolidays[holidayId].end_date !== 'string' && $scope.eHolidays[holidayId].end_date != null) {
-            $scope.eHolidays[holidayId].end_date = moment($scope.eHolidays[holidayId].end_date).format('YYYY-MM-DD').toString();
+        if (typeof eHoliday.end_date !== 'string' && eHoliday.end_date != null) {
+            eHoliday.end_date = moment(eHoliday.end_date).format('YYYY-MM-DD').toString();
         }
-        var newHoliday = Object.assign({}, $scope.eHolidays[holidayId]);
+        var newHoliday = Object.assign({}, eHoliday);
         delete newHoliday.id;
         holidayService.updateHoliday(holidayId, newHoliday).then(
             function success(response) {
@@ -647,16 +775,17 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
      * @param {number} holidayId - id of term to be updated.
      */
     $scope.updateTerm = function(termId, index) {
-        if (typeof $scope.eTerms[termId].start_date !== 'string' && $scope.eTerms[termId].start_date != null) {
-            $scope.eTerms[termId].start_date = moment($scope.eTerms[termId].start_date).format('YYYY-MM-DD').toString();
+        var eTerm = $scope.eTerms[termId];
+        if (typeof eTerm.start_date !== 'string' && eTerm.start_date != null) {
+            eTerm.start_date = moment(eTerm.start_date).format('YYYY-MM-DD').toString();
         }
-        if (typeof $scope.eTerms[termId].end_date !== 'string' && $scope.eTerms[termId].end_date != null) {
-            $scope.eTerms[termId].end_date = moment($scope.eTerms[termId].end_date).format('YYYY-MM-DD').toString();
+        if (typeof eTerm.end_date !== 'string' && eTerm.end_date != null) {
+            eTerm.end_date = moment(eTerm.end_date).format('YYYY-MM-DD').toString();
         }
 
         // I need to set the setting now to match the schedule name flagboi
-        var settings = $scope.scheduleSettingsLookup[$scope.eTerms[termId].schedule.id];
-        $scope.eTerms[termId].settings = settings.id;
+        var settings = $scope.scheduleSettingsLookup[eTerm.schedule.id];
+        eTerm.settings = settings.id;
 
         var newTerm = Object.assign({}, $scope.eTerms[termId]);
         delete newTerm.id;
@@ -702,6 +831,37 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 }
                 $scope.schedulesLookup[response.daily_schedule.id] = response.daily_schedule;
                 $scope.removeEdit(index, 'schedule');
+            },
+            function error(response) {
+                setErrorMessage(response);
+                toastService.error("The server was unable to save your edit." + errorResponse());
+            }
+        );
+    };
+
+    /**
+     * Updates a school year
+     * @param {number} holidayId - id of school year to be updated.
+     */
+    $scope.updateSchoolYear = function(yearId, index) {
+        var eSchoolYear = $scope.eSchoolYears[yearId];
+        if (typeof eSchoolYear.start_date !== 'string' && eSchoolYear.start_date != null) {
+            eSchoolYear.start_date = moment(eSchoolYear.start_date).format('YYYY-MM-DD').toString();
+        }
+        if (typeof eSchoolYear.end_date !== 'string' && eSchoolYear.end_date != null) {
+            eSchoolYear.end_date = moment(eSchoolYear.end_date).format('YYYY-MM-DD').toString();
+        }
+        var newSchoolYear = Object.assign({}, eSchoolYear);
+        delete newSchoolYear.id;
+        schoolYearService.updateSchoolYear(yearId, newSchoolYear).then(
+            function success(response) {
+                // update $scope.holidays
+                for (var i = 0; i < $scope.schoolYears.length; i++) {
+                    if ($scope.schoolYears[i].id === yearId) {
+                        $scope.schoolYears[i] = response.school_year;
+                    }
+                }
+                $scope.removeEdit(index, 'schoolYear');
             },
             function error(response) {
                 setErrorMessage(response);

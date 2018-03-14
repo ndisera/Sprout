@@ -1,6 +1,9 @@
-app.controller("studentOverviewController", function ($scope, $location, $routeParams, toastService, studentService, termData, enrollmentData, userData, studentData) {
+app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, studentService, termData, enrollmentData, userData, studentData) {
     $scope.location = $location;
 
+    $scope.newStudentImage = null;
+    $scope.newStudentImageCrop = null;
+    
     // set important scope variables
     $scope.student         = studentData.student;
     $scope.enrollments     = [];
@@ -239,4 +242,36 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
         );
     };
 
+    /*** IMAGE RELATED ***/
+
+    $scope.uploadStudentImage = function(image) {
+        studentService.addStudentPicture($scope.student.id, { file: image, }).then(
+            function success(data) {
+                $rootScope.currentStudent.id = $scope.student.id;
+                $rootScope.currentStudent.picture = data.profile_picture.file;
+
+                $scope.closeModal();
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to save your image.');
+            },
+        );
+    };
+
+    $scope.showModal = function() {
+        if(!($('#student-overview-image-modal').data('bs.modal') || {}).isShown) {
+            $('#student-overview-image-modal').modal('toggle');
+            $scope.newStudentImage = null;
+            $scope.newStudentImageCrop = null;
+        }
+    };
+
+    $scope.closeModal = function() {
+        if(($('#student-overview-image-modal').data('bs.modal') || {}).isShown) {
+            $('#student-overview-image-modal').modal('toggle');
+        }
+    };
+
+
 });
+

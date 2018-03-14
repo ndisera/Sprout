@@ -593,7 +593,7 @@ ul.dropdown-menu > li > a:hover {
     padding-right: 0px;
     font-family: 'Glyphicons Halflings';
     font-size: 20px;
-} 
+}
 
 #toast-container > .toast-warning:before {
     content: "\e101";
@@ -909,7 +909,18 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
     alignment-baseline: middle;
 }
 
+.input-group-dropdown > .input-group-addon {
+    width: unset;
+}
 
+.input-group-dropdown > .input-group-btn {
+    width: 100%;
+}
 
+.input-group-dropdown > .input-group-btn > button {
+    width: 100%;
+}
 
-
+.input-group-dropdown > .input-group-btn > ul {
+    width: 100%;
+}
