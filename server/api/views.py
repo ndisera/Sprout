@@ -1044,11 +1044,25 @@ class NotificationViewSet(NestedDynamicViewSet):
             if now.month > student.birthdate.month or\
                 (now.month == student.birthdate.month and now.day > student.birthdate.day):
                 year += 1
-            birthdate = datetime.datetime(year=year,
-                                          month=student.birthdate.month,
-                                          day=student.birthdate.day,
-                                          hour=00,
-                                          )
+            try:
+                birthdate = datetime.datetime(year=year,
+                                              month=student.birthdate.month,
+                                              day=student.birthdate.day,
+                                              hour=00,
+                                              )
+            except ValueError:
+                # Check if the birthday was Feb 29. If so, a ValueError will be raised
+                # if this is not a leap year. Pop a notification for Feb 28.
+                if student.birthdate.month == 2 and student.birthdate.day == 29:
+                    birthdate = datetime.datetime(year=year,
+                                                  month=student.birthdate.month,
+                                                  day=student.birthdate.day - 1,
+                                                  hour=00,
+                                                  )
+                else:
+                    # Pass it up. Debug later.
+                    raise
+
             # I am not sure I actually want this, but Django whines if I don't
             birthdate = timezone.make_aware(birthdate, timezone.utc)
             title = birthday_title_template.format(first_name=student.first_name,
