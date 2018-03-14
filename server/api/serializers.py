@@ -291,7 +291,7 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
     class Meta(UserDetailsSerializer.Meta):
         fields = []
         fields.extend(UserDetailsSerializer.Meta.fields)
-        fields.extend(('first_name', 'last_name', 'is_active'))
+        fields.extend(('first_name', 'last_name', 'is_active', 'is_superuser'))
         if 'username' in fields:
             del fields[fields.index('username')]
 
