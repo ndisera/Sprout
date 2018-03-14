@@ -16,7 +16,7 @@
     cursor:pointer
 }
 
-.focusProgress, .focusCaution, .focusGraph {
+.focus-graph {
     height: 200px;
     margin-top: 15px;
 }
