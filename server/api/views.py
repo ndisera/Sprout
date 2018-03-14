@@ -514,7 +514,24 @@ class BehaviorViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = BehaviorSerializer
-    queryset = Behavior.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        AttendanceRecords should only be visible:
+            - If the user teaches the related section
+            - If the attendance record refers to a student the teacher has another relation to
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = Behavior.objects.all()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(enrollment__section__teacher=user)
+        # Filter for other related students (only case manager at this time)
+        related = Q(enrollment__student__case_manager=user)
+        queryset = queryset.filter(teaches | related)
+        return queryset
 
     """ define custom schema for documentation """
     schema = BehaviorViewSetSchema()
