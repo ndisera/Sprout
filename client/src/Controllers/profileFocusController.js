@@ -53,21 +53,19 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
         $scope.focusStudents = _.sortBy(focusData.focus_students, 'ordering');
     }
 
-    //TODO(gzuber): this shouldn't exist
-    function TEMPsetDefaultFocus(student) {
-        if(student.focus_category === "none") {
-            var today = moment();
-            var pastWeek = moment(today).subtract(2, 'w');
-            student.focus_category = "test__"
-                + pastWeek.format('YYYY-MM-DD').toString() + "__"
-                + today.format('YYYY-MM-DD').toString() + "__"
-                + testData.standardized_tests[0].id;
-        }
+    function defaultFocusCategory() {
+        var today = moment();
+        var pastWeek = moment(today).subtract(2, 'w');
+        return "behavior__"
+            + pastWeek.format('YYYY-MM-DD').toString() + "__"
+            + today.format('YYYY-MM-DD').toString();
     }
 
+    // set up for focus student must be done everytime new focus student is added to list
     function setUpFocusStudent(focusStudent) {
-        //TODO(gzuber): this shouldn't exist
-        TEMPsetDefaultFocus(focusStudent);
+        if(focusStudent.focus_category === null || focusStudent.focus_category === undefined || focusStudent.focus_category === '' || focusStudent.focus_category === 'none') {
+            focusStudent.focus_category = defaultFocusCategory();
+        }
 
         focusStudent.focus_graph = getStarterGraph();
         focusStudent.focus_graph.type = 'focus';
@@ -199,6 +197,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
 
     /*** FOCUS GRAPH HELPERS ***/
 
+    // updates 1 particular graph. makes backend calls to get graph-dependent info
     function updateFocusGraph(studentId, category, graph) {
         var splitString = category.split('__');
         var type = splitString[0];
@@ -570,6 +569,8 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
     };
 
     // this is called when the user selects a different focus category
+    // for now, makes the default date range span the past 2 weeks
+    // TODO(gzuber): I don't think I shouldn't set dates from here
     $scope.selectFocusCategory = function(focusStudent, category) {
         var toSave = copyFocusStudent(focusStudent);
 
