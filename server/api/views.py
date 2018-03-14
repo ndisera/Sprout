@@ -682,7 +682,24 @@ class StandardizedTestScoreViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = StandardizedTestScoreSerializer
-    queryset = StandardizedTestScore.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        Test Scores should only be visible:
+            - If the user teaches the student
+            - If the user is the student's case manager
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = StandardizedTestScore.objects.all()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the student
+        teaches = Q(student__enrollment__section__teacher=user)
+        # Filter for other related students (only case manager at this time)
+        related = Q(student__case_manager=user)
+        queryset = queryset.filter(teaches | related)
+        return queryset
 
     """ define custom schema for documentation """
     schema = StandardizedTestScoreViewSetSchema()
