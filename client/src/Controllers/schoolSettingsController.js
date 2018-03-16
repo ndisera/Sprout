@@ -5,6 +5,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.terms = terms.terms;
     $scope.schedules = schedules.daily_schedules;
     $scope.schoolYears = schoolYears.school_years;
+    $scope.schoolGradeEdit = false;
+    $scope.schoolInfoEdit = false;
 
     // used for getting schedule name
     $scope.termSettingsLookup = _.indexBy(termSettings.term_settings, "id");
@@ -26,8 +28,8 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     $scope.school = schools.school_settings[0];
     zeroToK($scope.school);
     $scope.gradeLevels = ["K", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    $scope.schoolMinGrade = $scope.school.grade_range_lower;
-    $scope.schoolMaxGrade = $scope.school.grade_range_upper;
+    // initialize school edit fields
+    $scope.tempSchool = Object.assign({}, $scope.school);
 
     $scope.newHoliday = {};
     $scope.newTest = {};
@@ -45,6 +47,20 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
 
     initializeSchoolYears('all');
     setupLookups();
+
+    /**
+     * Toggles school info edit
+     */
+    $scope.toggleInfoEdit = function() {
+        $scope.schoolInfoEdit = !$scope.schoolInfoEdit;
+    }
+
+    /**
+     * Toggles school grade range edit
+     */
+    $scope.toggleGradeEdit = function() {
+        $scope.schoolGradeEdit = !$scope.schoolGradeEdit;
+    }
 
     /**
      * Initializes termSchoolYear and holidaySchoolYear to the current school year
@@ -123,76 +139,6 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     }
 
     /**
-     * Makes a field editable.
-     * @param {string} field - the field to be edited.
-     */
-    $scope.editSchool = function(field) {
-        switch (field) {
-            case "name":
-                $scope.editSchoolName = true;
-                checkIfAllInfoSelected();
-                break;
-            case "location":
-                $scope.editSchoolLocation = true;
-                checkIfAllInfoSelected();
-                break;
-            case "minGrade":
-                $scope.editSchoolMinGrade = true;
-                checkIfAllRangeSelected();
-                break;
-            case "maxGrade":
-                $scope.editSchoolMaxGrade = true;
-                checkIfAllRangeSelected();
-                break;
-            case "allRange":
-                $scope.editSchoolMinGrade = true;
-                $scope.editSchoolMaxGrade = true;
-                $scope.editingAllRange = true;
-                break;
-            case "noRange":
-                $scope.editSchoolMinGrade = false;
-                $scope.editSchoolMaxGrade = false;
-                $scope.editingAllRange = false;
-                break;
-            case "allInfo":
-                $scope.editSchoolName = true;
-                $scope.editSchoolLocation = true;
-                $scope.editingAllInfo = true;
-                break;
-            case "noInfo":
-                $scope.editSchoolName = false;
-                $scope.editSchoolLocation = false;
-                $scope.editingAllInfo = false;
-                break;
-        }
-    };
-
-    /**
-     * Cancels a field edit.
-     * @param {string} field - the field being edited.
-     */
-    $scope.cancelSchoolEdit = function(field) {
-        switch (field) {
-            case "name":
-                $scope.editSchoolName = false;
-                $scope.schoolName = "";
-                break;
-            case "location":
-                $scope.editSchoolLocation = false;
-                $scope.schoolLocation = "";
-                break;
-            case "minGrade":
-                $scope.editSchoolMinGrade = false;
-                break;
-            case "maxGrade":
-                $scope.editSchoolMaxGrade = false;
-                break;
-        }
-        checkIfAllInfoSelected();
-        checkIfAllRangeSelected();
-    };
-
-    /**
      * Updates school with the newly edited field.
      * @param {string} field - the name of the field that the user is editing.
      */
@@ -200,19 +146,14 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         $scope.schoolE = Object.assign({}, $scope.school);
         switch (field) {
             // update field
-            case "name":
-                $scope.schoolE.school_name = $scope.schoolName;
+            case "schoolInfo":
+                $scope.schoolE.school_name = $scope.tempSchool.school_name;
+                $scope.schoolE.school_location = $scope.tempSchool.school_location;
                 break;
-            case "location":
-                $scope.schoolE.school_location = $scope.schoolLocation;
+            case "schoolGrade":
+                $scope.schoolE.grade_range_lower = $scope.tempSchool.grade_range_lower;
+                $scope.schoolE.grade_range_upper = $scope.tempSchool.grade_range_upper;
                 break;
-            case "minGrade":
-                $scope.schoolE.grade_range_lower = $scope.schoolMinGrade;
-                break;
-            case "maxGrade":
-                $scope.schoolE.grade_range_upper = $scope.schoolMaxGrade;
-                break;
-            default:
         }
         // save with schoolE
         kToZero($scope.schoolE);
@@ -222,75 +163,20 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.school = data.school_settings;
                 zeroToK($scope.school);
                 switch (field) {
-                    // set view after call returns
-                    case "name":
-                        $scope.editSchoolName = false;
-                        $scope.schoolName = "";
+                    case "schoolInfo":
+                        $scope.schoolInfoEdit = false;
                         break;
-                    case "location":
-                        $scope.editSchoolLocation = false;
-                        $scope.schoolLocation = "";
-                        break;
-                    case "minGrade":
-                        $scope.editSchoolMinGrade = false;
-                        $scope.schoolMinGrade = $scope.school.grade_range_lower;
-                        break;
-                    case "maxGrade":
-                        $scope.editSchoolMaxGrade = false;
-                        $scope.schoolMaxGrade = $scope.school.grade_range_upper;
+                    case "schoolGrade":
+                        $scope.schoolGradeEdit = false;
                         break;
                     default:
                 }
-                checkIfAllRangeSelected();
-                checkIfAllInfoSelected();
             },
             function error(response) {
                 setErrorMessage(response);
                 toastService.error("The server was unable to save your edit." + errorResponse());
             });
     };
-
-    /**
-     * Sets edit all info button according to what edit fields are ready to edit.
-     */
-    function checkIfAllInfoSelected() {
-        if ($scope.editSchoolName && $scope.editSchoolLocation) {
-            $scope.editingAllInfo = true;
-        } else if (!$scope.editSchoolName && !$scope.editSchoolLocation) {
-            $scope.editingAllInfo = false;
-        }
-    }
-
-    /**
-     * Sets edit all range button according to what edit fields are ready to edit.
-     */
-    function checkIfAllRangeSelected() {
-        if ($scope.editSchoolMinGrade && $scope.editSchoolMaxGrade) {
-            $scope.editingAllRange = true;
-        } else if (!$scope.editSchoolMinGrade && !$scope.editSchoolMaxGrade) {
-            $scope.editingAllRange = false;
-        }
-    }
-
-    /**
-     * Cancels row edit
-     * @param {number} index - row index.
-     * @param {string} type - type of item.
-     */
-    $scope.removeEdit = function(index, type) {
-        this.edit = false;
-        $("#" + type + "-row" + index).addClass('pointer');
-    }
-
-    /**
-     * Makes a row editable
-     * @param {number} index - row index.
-     * @param {string} type - type of item.
-     */
-    $scope.showEdit = function(index, type) {
-        this.edit = true;
-        $("#" + type + "-row" + index).removeClass('pointer');
-    }
 
     /**
      * Creates lookups containing edit values
