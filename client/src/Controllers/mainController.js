@@ -5,8 +5,21 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     $scope.studentInfo = studentService.studentInfo;
 
     $scope.sidebarExtended = false;
+
+    /**
+     * Toggles the sidebar
+     */
     $scope.extendSidebar = function() {
         $scope.sidebarExtended = !$scope.sidebarExtended;
+    };
+
+    /**
+     * Closes the sidebar
+     */
+    $scope.closeSidebar = function() {
+        if ($scope.sidebarExtended) {
+            $scope.sidebarExtended = false;
+        }
     };
 
     /**
@@ -79,7 +92,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
 
     $scope.sidebarLinkActive = function(link) {
         if(link.href === '/profile/students') {
-            if($location.path().split('/')[1] === 'student' || 
+            if($location.path().split('/')[1] === 'student' ||
                 ($location.path().split('/')[1] === link.href.split('/')[1] && $location.path().split('/')[2] === link.href.split('/')[2])) {
                 return true;
             }
