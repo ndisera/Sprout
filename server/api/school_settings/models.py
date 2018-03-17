@@ -88,3 +88,22 @@ class Holiday(models.Model):
 
     class Meta:
         unique_together = (('school_year', 'name', 'start_date', ),)
+
+
+class StandardizedTest(models.Model):
+    """
+    StandardizedTest
+    Represent a standardized test as enabled by the school
+    """
+    test_name = models.CharField(unique=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
+    min_score = models.IntegerField(verbose_name="Minimum possible score", blank=False)
+    max_score = models.IntegerField(verbose_name="Maximum possible score", blank=False)
+
+    class Meta:
+        ordering = ('test_name',)
+
+    def __repr__(self):
+        return str(self.test_name)
+
+    def __str__(self):
+        return self.__repr__()
