@@ -438,9 +438,12 @@ class EnrollmentViewSet(NestedDynamicViewSet):
             return queryset
         # Filter for the user teaches the section
         teaches = Q(section__teacher=user)
-        # Filter for other related students (only case manager at this time)
-        related = Q(student__case_manager=user)
-        queryset = queryset.filter(teaches | related)
+        # Filter for other related students:
+        # Case manager
+        manages = Q(student__case_manager=user)
+        # The teacher of another section in which the student is enrolled
+        other_teacher = Q(student__enrollment__section__teacher=user)
+        queryset = queryset.filter(teaches | manages | other_teacher).distinct()
         return queryset
 
     """ ensure variables show as correct type for docs """
