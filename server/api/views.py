@@ -340,6 +340,37 @@ class HolidayViewSet(NestedDynamicViewSet):
     ])
 
 
+class StandardizedTestViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "StandardizedTests" instances
+
+    list:
+    gets all the configured standardized tests in Sprout.
+
+    create:
+    inform Sprout about a new standardized test. requires a name and minimum and maximum score
+
+    retrieve:
+    gets the standardized test specified by the id path param.
+
+    update:
+    update the parameters of a recorded standardized test
+
+    partial_update:
+    update the parameters of a recorded standardized test specified by path param.
+    does not require all values.
+
+    delete:
+    delete a specified standardized test specified by the path param.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = StandardizedTestSerializer
+    queryset = StandardizedTest.objects.all()
+
+    """ define custom schema for documentation """
+    schema = AutoSchema()
+
+
 class SectionViewSetSchema(AutoSchema):
     """
     class that allows specification of more detailed schema for the
@@ -607,47 +638,6 @@ class AttendanceRecordViewSet(NestedDynamicViewSet):
     schema = AutoSchema(manual_fields=[
         enrollment_field,
     ])
-
-
-class StandardizedTestViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    StandardizedTestViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(StandardizedTestViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(StandardizedTestViewSet, path, method, link)
-
-
-class StandardizedTestViewSet(NestedDynamicViewSet):
-    """
-    allows interaction with the set of "StandardizedTests" instances
-
-    list:
-    gets all the configured standardized tests in Sprout.
-
-    create:
-    inform Sprout about a new standardized test. requires a name and minimum and maximum score
-
-    retrieve:
-    gets the standardized test specified by the id path param.
-
-    update:
-    update the parameters of a recorded standardized test
-
-    partial_update:
-    update the parameters of a recorded standardized test specified by path param.
-    does not require all values.
-
-    delete:
-    delete a specified standardized test specified by the path param.
-    """
-    permission_classes = (IsAuthenticated,)
-    serializer_class = StandardizedTestSerializer
-    queryset = StandardizedTest.objects.all()
-
-    """ define custom schema for documentation """
-    schema = StandardizedTestViewSetSchema()
 
 
 class StandardizedTestScoreViewSetSchema(AutoSchema):
