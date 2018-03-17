@@ -3,7 +3,33 @@ from django.db import models
 from django.conf import settings
 
 
-class SchoolSettings(models.Model):
+class AdminCreateMixin():
+    """
+    Define permissions such that anyone can view but only the admin can create/edit
+    """
+
+    class Meta:
+        abstract = True
+
+    @staticmethod
+    def has_write_permission(request):
+        user = request.user
+        if user.is_superuser:
+            return True
+        return False
+
+    def has_object_write_permission(self, request):
+        return AdminCreateMixin.has_write_permission(request)
+
+    @staticmethod
+    def has_read_permission(request):
+        return True
+
+    def has_object_read_permission(self, request):
+        return AdminCreateMixin.has_read_permission(request)
+
+
+class SchoolSettings(AdminCreateMixin, models.Model):
     """
     SchoolSettings
     Represent and save everything a school might want to customize
@@ -20,7 +46,13 @@ class SchoolSettings(models.Model):
     grade_range_upper = models.IntegerField(blank=False,
                                             help_text='Maximum school year (grade) this school supports')
 
-class SchoolYear(models.Model):
+    class Meta():
+        """
+        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        """
+        pass
+
+class SchoolYear(AdminCreateMixin, models.Model):
     title = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                        help_text="Human-readable name of the school year")
     start_date = models.DateField(blank=False, null=False,
@@ -30,8 +62,14 @@ class SchoolYear(models.Model):
     num_terms = models.IntegerField(blank=False,
                                     help_text="Number of terms in a school year")
 
+    class Meta():
+        """
+        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        """
+        ordering = ('start_date', )
 
-class DailySchedule(models.Model):
+
+class DailySchedule(AdminCreateMixin, models.Model):
     """
     DailySchedule
     Represent how many classes are in a day and how many different 'kinds' of day there are
@@ -43,8 +81,14 @@ class DailySchedule(models.Model):
     periods_per_day = models.FloatField(blank=False,
                                         help_text="Number of classes a student should visit per day")
 
+    class Meta():
+        """
+        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        """
+        pass
 
-class TermSettings(models.Model):
+
+class TermSettings(AdminCreateMixin, models.Model):
     """
     TermSettings
     Represent everything relevant to a Term, such as when classes start and end
@@ -54,8 +98,14 @@ class TermSettings(models.Model):
     schedule = models.ForeignKey(DailySchedule,
                                  help_text="Schedule used in this term")
 
+    class Meta():
+        """
+        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        """
+        pass
 
-class Term(models.Model):
+
+class Term(AdminCreateMixin, models.Model):
     """
     Term
     Represent a school term, such as a particular semester, quarter, etc.
@@ -71,8 +121,14 @@ class Term(models.Model):
     school_year = models.ForeignKey(SchoolYear, blank=False, on_delete=models.PROTECT,
                                     help_text="School year associated with this term")
 
+    class Meta():
+        """
+        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        """
+        ordering = ('start_date', )
 
-class Holiday(models.Model):
+
+class Holiday(AdminCreateMixin, models.Model):
     """
     Holiday
     Represent a time period when school is not in session but normally would be
@@ -88,9 +144,10 @@ class Holiday(models.Model):
 
     class Meta:
         unique_together = (('school_year', 'name', 'start_date', ),)
+        ordering = ('start_date', )
 
 
-class StandardizedTest(models.Model):
+class StandardizedTest(AdminCreateMixin, models.Model):
     """
     StandardizedTest
     Represent a standardized test as enabled by the school
