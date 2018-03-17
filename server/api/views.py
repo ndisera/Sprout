@@ -575,16 +575,6 @@ class AttendanceRecordViewSet(NestedDynamicViewSet):
     ])
 
 
-class StandardizedTestScoreViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    StandardizedTestScoreViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(StandardizedTestScoreViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(StandardizedTestScoreViewSet, path, method, link)
-
-
 class StandardizedTestScoreViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "StandardizedTestScore" instances
@@ -631,58 +621,30 @@ class StandardizedTestScoreViewSet(NestedDynamicViewSet):
         queryset = queryset.filter(teaches | related)
         return queryset
 
-    """ define custom schema for documentation """
-    schema = StandardizedTestScoreViewSetSchema()
-
     """ ensure variables show as correct type for docs """
     name_student = 'student'
     desc_student = 'ID of the graded student'
     name_standardized_test = 'standardized_test'
     desc_standardized_test = 'ID of the related standardized test'
-    create_fields = (
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=desc_student)),
 
-        coreapi.Field(
+    field_student = coreapi.Field(
+        name=name_student,
+        required=True,
+        location="form",
+        description=desc_student,
+        schema=coreschema.Integer(title=desc_student))
+
+    field_standardized_test = coreapi.Field(
             name=name_standardized_test,
             required=True,
             location="form",
             description=desc_standardized_test,
-            schema=coreschema.Integer(title=desc_standardized_test)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=desc_student)),
+            schema=coreschema.Integer(title=desc_standardized_test))
 
-        coreapi.Field(
-            name=name_standardized_test,
-            required=True,
-            location="form",
-            description=desc_standardized_test,
-            schema=coreschema.Integer(title=desc_standardized_test)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_student,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=desc_student)),
-
-        coreapi.Field(
-            name=name_standardized_test,
-            required=True,
-            location="form",
-            description=desc_standardized_test,
-            schema=coreschema.Integer(title=desc_standardized_test)),
-    )
+    schema = AutoSchema(manual_fields=[
+        field_student,
+        field_standardized_test,
+    ])
 
 
 class AssignmentViewSetSchema(AutoSchema):
