@@ -1057,17 +1057,6 @@ class FocusStudentViewSet(NestedDynamicViewSet):
     ])
 
 
-class IEPGoalViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    HolidayViewSetSchema class in the coreapi documentation.
-    """
-
-    def get_link(self, path, method, base_url):
-        link = super(IEPGoalViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(IEPGoalViewSet, path, method, link)
-
-
 class IEPGoalViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Student" instances
@@ -1075,9 +1064,6 @@ class IEPGoalViewSet(NestedDynamicViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = IEPGoalSerializer
     queryset = IEPGoal.objects.all()
-
-    # define custom schema for documentation
-    schema = IEPGoalViewSetSchema()
 
     # ensure variables show as correct types for docs
     student_name = 'student'
@@ -1090,15 +1076,9 @@ class IEPGoalViewSet(NestedDynamicViewSet):
         description=student_desc,
         schema=coreschema.Integer(title=student_name))
 
-    create_fields = (
+    schema = AutoSchema(manual_fields=[
         student_field,
-    )
-    update_fields = (
-        student_field,
-    )
-    partial_update_fields = (
-        student_field,
-    )
+    ])
 
 
 class IEPGoalDatapointViewSetSchema(AutoSchema):
