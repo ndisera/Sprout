@@ -332,15 +332,6 @@ class StandardizedTestViewSet(NestedDynamicViewSet):
     schema = AutoSchema()
 
 
-class SectionViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    SectionViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(SectionViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(SectionViewSet, path, method, link)
-
 class SectionViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Section" instances
@@ -370,35 +361,20 @@ class SectionViewSet(NestedDynamicViewSet):
     serializer_class = SectionSerializer
     queryset = Section.objects.all()
 
-    """ define custom schema for documentation """
-    schema = SectionViewSetSchema()
 
     """ ensure variables show as correct types for docs """
     name_teacher = 'teacher'
     desc_teacher = "ID of the teacher of the section."
-    create_fields = (
-        coreapi.Field(
-            name=name_teacher, 
-            required=True,
-            location="form", 
-            description=desc_teacher,
-            schema=coreschema.Integer(title=name_teacher)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_teacher, 
-            required=True,
-            location="form", 
-            description=desc_teacher,
-            schema=coreschema.Integer(title=name_teacher)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_teacher, 
-            location="form", 
-            description=desc_teacher,
-            schema=coreschema.Integer(title=name_teacher)),
-    )
+    field_teacher = coreapi.Field(
+        name=name_teacher,
+        required=True,
+        location="form",
+        description=desc_teacher,
+        schema=coreschema.Integer(title=name_teacher))
+
+    schema = AutoSchema(manual_fields=[
+        field_teacher,
+    ])
 
 
 class EnrollmentViewSet(NestedDynamicViewSet):
