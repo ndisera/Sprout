@@ -27,14 +27,14 @@
                             </div>
                         </div>
                         <div class="form-group no-bottom-margin">
-                            <div class="col-sm-offset-3 col-sm-9">
-                                <div ng-if="schoolInfoEdit">
+                            <div class="col-xs-12">
+                                <div class="btn-manipulate-row" ng-if="schoolInfoEdit">
                                     <button class="btn btn-success" type="submit" ng-disabled="schoolInfoForm.$invalid">
-                                            <span>Save</span>
-                                        </button>
-                                    <button class="btn btn-danger" type="button" ng-click="toggleInfoEdit()">
-                                            <span>Cancel</span>
-                                        </button>
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    </button>
+                                    <button class="btn btn-default" type="button" ng-click="toggleInfoEdit()">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -75,14 +75,14 @@
                             </div>
                         </div>
                         <div class="form-group no-bottom-margin">
-                            <div class="col-sm-offset-3 col-sm-9">
-                                <div ng-if="schoolGradeEdit">
+                            <div class="col-xs-12">
+                                <div class="btn-manipulate-row" ng-if="schoolGradeEdit">
                                     <button class="btn btn-success" type="submit" ng-disabled="schoolGradeForm.$invalid">
-                                            <span>Save</span>
-                                        </button>
-                                    <button class="btn btn-danger" type="button" ng-click="toggleGradeEdit()">
-                                            <span>Cancel</span>
-                                        </button>
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    </button>
+                                    <button class="btn btn-default" type="button" ng-click="toggleGradeEdit()">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -101,9 +101,9 @@
     <div class="panel panel-default">
         <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapseSchoolYears" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
             <h3 class="panel-title">
-                        School Years
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                    </h3>
+                School Years
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </h3>
         </div>
         <div id="collapseSchoolYears" class="panel-collapse collapse">
             <div class="panel-body">
@@ -136,29 +136,29 @@
                                 <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eSchoolYears[schoolYear.id].num_terms"></td>
                                 <td ng-show="edit">
                                     <button class="btn btn-success" type="button" ng-click="updateSchoolYear(schoolYear.id, $index); $event.stopPropagation();">
-                                            Save
-                                        </button>
+                                        Save
+                                    </button>
                                 </td>
                                 <td ng-show="edit">
                                     <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'schoolYear'); $event.stopPropagation();">
-                                            Cancel
-                                        </button>
+                                        Cancel
+                                    </button>
                                 </td>
                                 <td class="table-button-col" ng-hide="edit">
                                     <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(schoolYear, 'schoolYear'); $event.stopPropagation();">
-                                            <span class="glyphicon glyphicon-trash"></span>
-                                        </button>
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="btn-manipulate-row">
+                <div class="btn-manipulate-row voffset2">
                     <button class="btn btn-success" ng-hide="displaySchoolYearForm" ng-click="displaySchoolYearForm = true">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </button>
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
                 </div>
-                <div class="panel-wrapper voffset3" ng-show="displaySchoolYearForm">
+                <div class="panel-wrapper voffset3 add-panel-spacer" ng-show="displaySchoolYearForm">
                     <div class="panel panel-default no-bottom-margin">
                         <div class="panel-heading pointer">
                             <h3 class="panel-title">Add School Year</h3>
@@ -190,9 +190,15 @@
                                     </div>
                                 </div>
                                 <div class="form-group no-bottom-margin">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button ng-disabled="addSchoolYearForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
-                                        <button type="button" class="btn btn-default" ng-click="displaySchoolYearForm = false">Cancel</button>
+                                    <div class="col-xs-12">
+                                        <div class="btn-manipulate-row">
+                                            <button ng-disabled="addSchoolYearForm.$invalid" type="submit" class="btn btn-success">
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default" ng-click="displaySchoolYearForm = false">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -207,9 +213,9 @@
     <div class="panel panel-default">
         <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapseSchoolTerms" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
             <h3 class="panel-title">
-                        School Terms
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                    </h3>
+                School Terms
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </h3>
         </div>
         <div id="collapseSchoolTerms" class="panel-collapse collapse">
             <div class="panel-body">
@@ -276,12 +282,12 @@
                         </table>
                     </div>
                 </div>
-                <div class="btn-manipulate-row">
+                <div class="btn-manipulate-row voffset2">
                     <button class="btn btn-success" ng-hide="displayTermForm" ng-click="displayTermForm = true">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </button>
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
                 </div>
-                <div class="panel-wrapper voffset3" ng-show="displayTermForm">
+                <div class="panel-wrapper voffset3 add-panel-spacer" ng-show="displayTermForm">
                     <div class="panel panel-default no-bottom-margin">
                         <div class="panel-heading pointer">
                             <h3 class="panel-title">Add Term</h3>
@@ -313,9 +319,15 @@
                                     </div>
                                 </div>
                                 <div class="form-group no-bottom-margin">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button ng-disabled="addTermForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
-                                        <button type="button" class="btn btn-default" ng-click="displayTermForm = false">Cancel</button>
+                                    <div class="col-xs-12">
+                                        <div class="btn-manipulate-row">
+                                            <button ng-disabled="addTermForm.$invalid" type="submit" class="btn btn-success">
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default" ng-click="displayTermForm = false">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -330,9 +342,9 @@
     <div class="panel panel-default">
         <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapseHolidays" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
             <h3 class="panel-title">
-                        Holidays and Breaks
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                    </h3>
+                Holidays and Breaks
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </h3>
         </div>
         <div id="collapseHolidays" class="panel-collapse collapse">
             <div class="panel-body">
@@ -397,12 +409,12 @@
                         </table>
                     </div>
                 </div>
-                <div class="btn-manipulate-row">
+                <div class="btn-manipulate-row voffset2">
                     <button class="btn btn-success" ng-hide="displayHolidayForm" ng-click="displayHolidayForm = true">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </button>
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
                 </div>
-                <div class="panel-wrapper voffset3" ng-show="displayHolidayForm">
+                <div class="panel-wrapper voffset3 add-panel-spacer" ng-show="displayHolidayForm">
                     <div class="panel panel-default no-bottom-margin">
                         <div class="panel-heading pointer">
                             <h3 class="panel-title">Add Holiday</h3>
@@ -428,9 +440,15 @@
                                     </div>
                                 </div>
                                 <div class="form-group no-bottom-margin">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button ng-disabled="addHolidayForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
-                                        <button type="button" class="btn btn-default" ng-click="displayHolidayForm = false">Cancel</button>
+                                    <div class="col-xs-12">
+                                        <div class="btn-manipulate-row">
+                                            <button ng-disabled="addHolidayForm.$invalid" type="submit" class="btn btn-success">
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default" ng-click="displayHolidayForm = false">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -445,9 +463,9 @@
     <div class="panel panel-default">
         <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapseTests" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
             <h3 class="panel-title">
-                        School Standardized Tests
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                    </h3>
+                School Standardized Tests
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </h3>
         </div>
         <div id="collapseTests" class="panel-collapse collapse">
             <div class="panel-body">
@@ -477,29 +495,29 @@
                                 <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].max_score"></td>
                                 <td ng-show="edit">
                                     <button class="btn btn-success" type="button" ng-click="updateTest(test.id, $index); $event.stopPropagation();">
-                                            Save
-                                        </button>
+                                        Save
+                                    </button>
                                 </td>
                                 <td ng-show="edit">
                                     <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'test'); $event.stopPropagation();">
-                                            Cancel
-                                        </button>
+                                        Cancel
+                                    </button>
                                 </td>
                                 <td class="table-button-col" ng-hide="edit">
                                     <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(test, 'test'); $event.stopPropagation();">
-                                            <span class="glyphicon glyphicon-trash"></span>
-                                        </button>
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="btn-manipulate-row">
+                <div class="btn-manipulate-row voffset2">
                     <button class="btn btn-success" ng-hide="displayTestForm" ng-click="displayTestForm = true">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </button>
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
                 </div>
-                <div class="panel-wrapper voffset3" ng-show="displayTestForm">
+                <div class="panel-wrapper voffset3 add-panel-spacer" ng-show="displayTestForm">
                     <div class="panel panel-default no-bottom-margin">
                         <div class="panel-heading pointer">
                             <h3 class="panel-title">Add Test</h3>
@@ -525,9 +543,15 @@
                                     </div>
                                 </div>
                                 <div class="form-group no-bottom-margin">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button ng-disabled="addTestForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
-                                        <button type="button" class="btn btn-default" ng-click="displayTestForm = false">Cancel</button>
+                                    <div class="col-xs-12">
+                                        <div class="btn-manipulate-row">
+                                            <button ng-disabled="addTestForm.$invalid" type="submit" class="btn btn-success">
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default" ng-click="displayTestForm = false">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -542,9 +566,9 @@
     <div class="panel panel-default">
         <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapseSchedules" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
             <h3 class="panel-title">
-                        School Schedule
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                    </h3>
+                School Schedule
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </h3>
         </div>
         <div id="collapseSchedules" class="panel-collapse collapse">
             <div class="panel-body">
@@ -574,29 +598,29 @@
                                 <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eSchedules[schedule.id].periods_per_day"></td>
                                 <td ng-show="edit">
                                     <button class="btn btn-success" type="button" ng-click="updateSchedule(schedule.id, $index); $event.stopPropagation();">
-                                            Save
-                                        </button>
+                                        Save
+                                    </button>
                                 </td>
                                 <td ng-show="edit">
                                     <button class="btn btn-default" type="button" ng-click="removeEdit($index, 'schedule'); $event.stopPropagation();">
-                                            Cancel
-                                        </button>
+                                        Cancel
+                                    </button>
                                 </td>
                                 <td class="table-button-col" ng-hide="edit">
                                     <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="setItem(schedule, 'schedule'); $event.stopPropagation();">
-                                            <span class="glyphicon glyphicon-trash"></span>
-                                        </button>
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="btn-manipulate-row">
+                <div class="btn-manipulate-row voffset2">
                     <button class="btn btn-success" ng-hide="displayScheduleForm" ng-click="displayScheduleForm = true">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </button>
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
                 </div>
-                <div class="panel-wrapper voffset3" ng-show="displayScheduleForm">
+                <div class="panel-wrapper voffset3 add-panel-spacer" ng-show="displayScheduleForm">
                     <div class="panel panel-default no-bottom-margin">
                         <div class="panel-heading pointer">
                             <h3 class="panel-title">Add Schedule</h3>
@@ -622,9 +646,15 @@
                                     </div>
                                 </div>
                                 <div class="form-group no-bottom-margin">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button ng-disabled="addScheduleForm.$invalid" type="submit" class="btn btn-success">Add</button>&nbsp;
-                                        <button type="button" class="btn btn-default" ng-click="displayScheduleForm = false">Cancel</button>
+                                    <div class="col-xs-12">
+                                        <div class="btn-manipulate-row">
+                                            <button ng-disabled="addScheduleForm.$invalid" type="submit" class="btn btn-success">
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default" ng-click="displayScheduleForm = false">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -680,8 +710,8 @@
                 </div>
                 <div class="btn-manipulate-row">
                     <button type="submit" class="btn btn-danger" data-dismiss="modal" ng-click="deleteItem(itemId, itemType)">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
                 </div>
             </div>
         </div>

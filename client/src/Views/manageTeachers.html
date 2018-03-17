@@ -83,14 +83,14 @@
                             </div>
                         </div>
                         <div class="form-group no-bottom-margin">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <div ng-if="teacherEdit">
+                            <div class="col-xs-12">
+                                <div class="btn-manipulate-row" ng-if="teacherEdit">
                                     <button class="btn btn-success" type="submit" ng-disabled="editTeacherForm.$invalid">
-                                            <span>Save</span>
-                                        </button>
-                                    <button class="btn btn-danger" type="button" ng-click="toggleTeacherEdit()">
-                                            <span>Cancel</span>
-                                        </button>
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    </button>
+                                    <button class="btn btn-default" type="button" ng-click="toggleTeacherEdit()">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
                                 </div>
                             </div>
                         </div>

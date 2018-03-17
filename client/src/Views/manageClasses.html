@@ -19,16 +19,16 @@
             <div ng-hide="sections.length === 0">
                 <div class="row">
                     <div class="col-xs-12 col-sm-6 voffset2">
-                        <div id="student-grades-select" class="input-group">
+                        <div class="select-full-width input-group">
                             <span class="input-group-addon">Term</span>
                             <div class="input-group-btn">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ viewSectionTerm.name }} <span class="caret"></span></button>
                                 <ul class="dropdown-menu dropdown-menu-right">
                                     <li ng-repeat="term in terms" ng-click="selectTerm(term)">
-                                        <a class="student-overview-assign-link">{{ term.name }}  <span ng-if="term.name === viewSectionTerm.name" class="glyphicon glyphicon-ok"></span></a>
+                                        <a>{{ term.name }}  <span ng-if="term.name === viewSectionTerm.name" class="glyphicon glyphicon-ok"></span></a>
                                     </li>
                                     <li ng-click="selectTerm({name: 'All Terms'})">
-                                        <a class="student-overview-assign-link">All Terms  <span ng-if="viewSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
+                                        <a>All Terms  <span ng-if="viewSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
                                     </li>
                                 </ul>
                             </div>
@@ -122,13 +122,13 @@
                             </div>
                         </div>
                         <div class="form-group no-bottom-margin">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <div ng-if="sectionEdit">
+                            <div class="col-xs-12">
+                                <div class="btn-manipulate-row" ng-if="sectionEdit">
                                     <button class="btn btn-success" type="submit" ng-disabled="editSectionForm.$invalid">
-                                        <span>Save</span>
+                                        <span class="glyphicon glyphicon-ok"></span>
                                     </button>
-                                    <button class="btn btn-danger" type="button" ng-click="toggleSectionEdit()">
-                                        <span>Cancel</span>
+                                    <button class="btn btn-default" type="button" ng-click="toggleSectionEdit()">
+                                        <span class="glyphicon glyphicon-remove"></span>
                                     </button>
                                 </div>
                             </div>

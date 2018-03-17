@@ -1,86 +1,107 @@
 <div ng-include="'html/studentTabs.html'"></div>
 <div class="row">
     <div class="col-xs-12 col-sm-6">
-        <div class="panel-wrapper">
+        <div class="select-full-width input-group">
+            <span class="input-group-addon">Case Manager</span>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle full-width" data-toggle="dropdown">
+                    {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)" ng-class="{ 'active': entry.pk === caseManager.pk, }">
+                        <a class="student-overview-assign-link">
+                            {{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.pk === caseManager.pk" class="glyphicon glyphicon-ok"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-wrapper voffset3">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title panel-title-with-btn">Student Info</h3>
-                    <button id="student-overview-edit-all-btn" class="btn btn-primary pull-right" type="button" ng-click="beginEditStudent('all')" ng-hide="editingAll">
-                        Edit All
-                    </button>
-                    <button id="student-overview-edit-all-btn" class="btn btn-danger pull-right" type="button" ng-click="endEditStudent('all')" ng-show="editingAll">
-                        Stop Editing
-                    </button>
+                    <h3 class="panel-title">Student Info</h3>
+                    <!--<button id="student-overview-edit-all-btn" class="btn btn-primary pull-right" type="button" ng-click="beginEditStudent('all')" ng-hide="editingAll">-->
+                    <!--Edit All-->
+                    <!--</button>-->
+                    <!--<button id="student-overview-edit-all-btn" class="btn btn-danger pull-right" type="button" ng-click="endEditStudent('all')" ng-show="editingAll">-->
+                    <!--Stop Editing-->
+                    <!--</button>-->
                 </div>
                 <div class="panel-body">
-                    <div ng-repeat="property in studentProperties">
-                        <form class="form-horizontal" name="editStudentForm{{$index}}" ng-submit="saveStudent(property);">
-                            <div class="form-group">
-                                <label class="control-label col-xs-12 col-sm-3">{{ property.title }}:</label>
-                                <p class="form-control-static col-xs-12 col-sm-9" ng-show="!property.editable">
-                                {{ property.value }} &nbsp;&nbsp;&nbsp;
-                                <span ng-click="beginEditStudent(property)" class="glyphicon glyphicon-pencil pencilEdit"></span>
-                                </p>
-                                <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9" ng-show="property.editable">
-                                    <input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required auto-focus>
-                                    <input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default" type="submit" ng-disabled="editStudentForm{{$index}}.editStudentFormInput{{$index}}.$invalid">
-                                            <span class="glyphicon glyphicon-ok green"></span>
-                                        </button>
-                                        <button class="btn btn-default" type="button" ng-click="endEditStudent(property)">
-                                            <span class="glyphicon glyphicon-remove red"></span>
-                                        </button>
-                                    </div>
+                    <form class="form-horizontal" name="editStudentForm" ng-submit="saveStudent()">
+                        <div class="form-group" ng-repeat="property in studentProperties">
+                            <label class="control-label col-xs-12 col-sm-3">{{ property.title }}:</label>
+                            <div class="col-sm-9">
+                                <div ng-if="!editing">
+                                    <p class="form-control-static" ng-if="!editing">{{ property.value }}</p>
+                                </div>
+                                <div ng-if="editing">
+                                    <input class="form-control" ng-if="editing && property.key !== 'birthdate'" type="text" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                    <input class="form-control" ng-if="editing && property.key === 'birthdate'" type="text" date-time name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                    <div class="form-horizontal">
-                        <div class="form-group">
-                            <label class="control-label col-xs-12 col-sm-3">Case Manager:</label>
-                            <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9">
-                                <button type="button" class="btn btn-default dropdown-toggle full-width" data-toggle="dropdown">
-                                    {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)" ng-class="{ 'active': entry.pk === caseManager.pk, }">
-                                        <a class="student-overview-assign-link">
-                                            {{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.pk === caseManager.pk" class="glyphicon glyphicon-ok"></span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <!--<div class="col-sm-9">-->
+                                <!--<div ng-if="!editing">-->
+                                    <!--<span class="form-control-static">{{ property.value }}</span>-->
+                                <!--</div>-->
+                                <!--<div ng-if="editing">-->
+                                    <!--<input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>-->
+                                    <!--<input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                            <!--<p class="form-control-static col-xs-12 col-sm-9" ng-show="!property.editable">-->
+                            <!--{{ property.value }} &nbsp;&nbsp;&nbsp;-->
+                            <!--<span ng-click="beginEditStudent(property)" class="glyphicon glyphicon-pencil pencilEdit"></span>-->
+                            <!--</p>-->
+                            <!--<div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9" ng-show="property.editable">-->
+                            <!--<input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required auto-focus>-->
+                            <!--<input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>-->
+                            <!--<div class="input-group-btn">-->
+                            <!--<button class="btn btn-default" type="submit" ng-disabled="editStudentForm{{$index}}.editStudentFormInput{{$index}}.$invalid">-->
+                            <!--<span class="glyphicon glyphicon-ok green"></span>-->
+                            <!--</button>-->
+                            <!--<button class="btn btn-default" type="button" ng-click="endEditStudent(property)">-->
+                            <!--<span class="glyphicon glyphicon-remove red"></span>-->
+                            <!--</button>-->
+                            <!--</div>-->
+                            <!--</div>-->
                         </div>
-                    </div>
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <label class="control-label col-xs-12 col-sm-3">Photo:</label>
-                            <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9">
-                                <button type="button" class="btn btn-default full-width" ng-click="showModal()">
-                                    Select New Photo
-                                </button>
+                        <div class="form-group no-bottom-margin">
+                            <div class="col-xs-12">
+                                <div class="btn-manipulate-row" ng-if="editing">
+                                    <button class="btn btn-success" type="submit" ng-disabled="editStudentForm.$invalid">
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    </button>
+                                    <button class="btn btn-default" type="button" ng-click="toggleEdit(false)">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </form>
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-primary" ng-if="!editing" ng-click="toggleEdit(true)">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-xs-12 col-sm-6">
-        <div class="panel-wrapper">
+        <div class="panel-wrapper manipulate-panel-spacer">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Class Schedule</h3>
                 </div>
                 <div class="panel-body">
-                    <div id="student-overview-select" class="input-group">
+                    <div class="select-full-width input-group">
                         <span class="input-group-addon">Term</span>
                         <div class="input-group-btn">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTerm.name }} <span class="caret"></span></button>
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li ng-repeat="entry in terms" ng-click="selectTerm(entry)" ng-class="{ 'active': entry.id === selectedTerm.id, }">
-                                    <a class="student-overview-assign-link">{{ entry.name }}  <span ng-if="entry.id === selectedTerm.id" class="glyphicon glyphicon-ok"></span></a>
+                                    <a>{{ entry.name }}  <span ng-if="entry.id === selectedTerm.id" class="glyphicon glyphicon-ok"></span></a>
                                 </li>
                             </ul>
                         </div>
@@ -112,6 +133,33 @@
                 </div>
             </div>
         </div>
+        <div class="panel-wrapper voffset3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Student Photo</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div id="student-overview-image-preview">
+                                <img class="student-image" ng-if="$root.currentStudent.picture === null" src="img/default_profile_pic.png">
+                                <img class="student-image" ng-if="$root.currentStudent.picture !== null" ng-src="data:image/png;base64,{{ $root.currentStudent.picture }}">
+                            </div>
+                        </div>
+                        <div class="col-sm-7">
+                            <div id="student-overview-image-btns">
+                                <button type="button" class="btn btn-default full-width voffset3" ng-click="showModal()">
+                                    Select New Photo
+                                </button>
+                                <button type="button" class="btn btn-danger full-width voffset3">
+                                    Delete Photo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="modal fade" id="student-overview-image-modal" role="dialog">
@@ -127,13 +175,12 @@
                         <span class="far fa-image fa-5x"></span>
                         <h4 class="hidden-xs">Drag and drop or click here to select an image</h4>
                         <h4 class="visible-xs">Click here to select an image</h4>
-                        <!--<h4><span class="hidden-xs">Drag and drop or </span><span class="hidden-xs">c</span><span class="visible-xs">C</span>lick here to select an image</h4>-->
                     </div>
                     <img-crop image="newStudentImage | ngfDataUrl" result-image="newStudentImageCrop" result-image-size="100"></img-crop>
                 </div>
                 <div id="student-overview-image-crop">
                     <div>
-                        <img ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
+                        <img class="student-image" ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
                         <h3>Preview</h3>
                     </div>
                 </div>
