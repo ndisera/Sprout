@@ -650,16 +650,6 @@ class StandardizedTestScoreViewSet(NestedDynamicViewSet):
     ])
 
 
-class AssignmentViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    AssignmentViewSetSchema class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(AssignmentViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(AssignmentViewSet, path, method, link)
-
-
 class AssignmentViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Assignment" instances
@@ -688,35 +678,19 @@ class AssignmentViewSet(NestedDynamicViewSet):
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
 
-    """ define custom schema for documentation """
-    schema = AssignmentViewSetSchema()
-
     """ ensure variables show as correct type for docs """
     name_section = 'section'
     desc_section = 'ID of the section to which this assignment belongs'
-    create_fields = (
-        coreapi.Field(
-            name=name_section,
-            required=True,
-            location="form",
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_section,
-            required=True,
-            location="form",
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_section,
-            location="form",
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
+    field_section = coreapi.Field(
+        name=name_section,
+        required=True,
+        location="form",
+        description=desc_section,
+        schema=coreschema.Integer(title=name_section))
+
+    schema = AutoSchema(manual_fields=[
+        field_section,
+    ])
 
 
 class GradeViewSet(NestedDynamicViewSet):
