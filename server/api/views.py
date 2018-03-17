@@ -678,6 +678,27 @@ class AssignmentViewSet(NestedDynamicViewSet):
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
 
+    def get_queryset(self, queryset=None):
+        """
+        AttendanceRecords should only be visible:
+            - If the user teaches the related section
+            - If the attendance record refers to a student the teacher has another relation to
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(AssignmentViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(section__teacher=user)
+        # Filter for other related students:
+        # Case manager
+        manages = Q(section__enrollment__student__case_manager=user)
+        # The teacher of another section in which the student is enrolled
+        other_teacher = Q(section__enrollment__student__enrollment__section__teacher=user)
+        queryset = queryset.filter(teaches | manages | other_teacher)
+        return queryset
+
     """ ensure variables show as correct type for docs """
     name_section = 'section'
     desc_section = 'ID of the section to which this assignment belongs'
