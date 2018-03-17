@@ -3,7 +3,7 @@ from django.db import models
 from django.conf import settings
 
 
-class AdminCreateMixin():
+class AdminWriteMixin():
     """
     Define permissions such that anyone can view but only the admin can create/edit
     """
@@ -19,17 +19,17 @@ class AdminCreateMixin():
         return False
 
     def has_object_write_permission(self, request):
-        return AdminCreateMixin.has_write_permission(request)
+        return AdminWriteMixin.has_write_permission(request)
 
     @staticmethod
     def has_read_permission(request):
         return True
 
     def has_object_read_permission(self, request):
-        return AdminCreateMixin.has_read_permission(request)
+        return AdminWriteMixin.has_read_permission(request)
 
 
-class SchoolSettings(AdminCreateMixin, models.Model):
+class SchoolSettings(AdminWriteMixin, models.Model):
     """
     SchoolSettings
     Represent and save everything a school might want to customize
@@ -48,11 +48,11 @@ class SchoolSettings(AdminCreateMixin, models.Model):
 
     class Meta():
         """
-        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        Need to get rid of the AdminWriteMixin's metaclass so we are not abstract
         """
         pass
 
-class SchoolYear(AdminCreateMixin, models.Model):
+class SchoolYear(AdminWriteMixin, models.Model):
     title = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                        help_text="Human-readable name of the school year")
     start_date = models.DateField(blank=False, null=False,
@@ -64,12 +64,12 @@ class SchoolYear(AdminCreateMixin, models.Model):
 
     class Meta():
         """
-        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        Need to get rid of the AdminWriteMixin's metaclass so we are not abstract
         """
         ordering = ('start_date', )
 
 
-class DailySchedule(AdminCreateMixin, models.Model):
+class DailySchedule(AdminWriteMixin, models.Model):
     """
     DailySchedule
     Represent how many classes are in a day and how many different 'kinds' of day there are
@@ -83,12 +83,12 @@ class DailySchedule(AdminCreateMixin, models.Model):
 
     class Meta():
         """
-        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        Need to get rid of the AdminWriteMixin's metaclass so we are not abstract
         """
         pass
 
 
-class TermSettings(AdminCreateMixin, models.Model):
+class TermSettings(AdminWriteMixin, models.Model):
     """
     TermSettings
     Represent everything relevant to a Term, such as when classes start and end
@@ -100,12 +100,12 @@ class TermSettings(AdminCreateMixin, models.Model):
 
     class Meta():
         """
-        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        Need to get rid of the AdminWriteMixin's metaclass so we are not abstract
         """
         pass
 
 
-class Term(AdminCreateMixin, models.Model):
+class Term(AdminWriteMixin, models.Model):
     """
     Term
     Represent a school term, such as a particular semester, quarter, etc.
@@ -123,12 +123,12 @@ class Term(AdminCreateMixin, models.Model):
 
     class Meta():
         """
-        Need to get rid of the AdminCreateMixin's metaclass so we are not abstract
+        Need to get rid of the AdminWriteMixin's metaclass so we are not abstract
         """
         ordering = ('start_date', )
 
 
-class Holiday(AdminCreateMixin, models.Model):
+class Holiday(AdminWriteMixin, models.Model):
     """
     Holiday
     Represent a time period when school is not in session but normally would be
@@ -147,7 +147,7 @@ class Holiday(AdminCreateMixin, models.Model):
         ordering = ('start_date', )
 
 
-class StandardizedTest(AdminCreateMixin, models.Model):
+class StandardizedTest(AdminWriteMixin, models.Model):
     """
     StandardizedTest
     Represent a standardized test as enabled by the school
