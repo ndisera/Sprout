@@ -13,10 +13,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.displaySectionForm = false;
     $scope.displaySectionInfo = false;
     $scope.displayCEditInfo = false;
-    $scope.viewCTitle = true;
-    $scope.viewCTeacher = true;
-    $scope.viewCTerm = true;
-    $scope.viewCPeriod = true;
+    $scope.sectionEdit = false;
     $scope.sectionsLookup = {};
     $scope.sectionV = {};
     $scope.sectionE = {};
@@ -36,6 +33,22 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.viewSectionTerm = {
         name: "All Terms"
     };
+
+    /**
+     * Toggles the section edit
+     */
+    $scope.toggleSectionEdit = function() {
+        $scope.sectionEdit = !$scope.sectionEdit;
+    }
+
+    /**
+     * Sets cTerm to selected term
+     * @param {string} term - the selected display term.
+     */
+    $scope.setTerm = function(term) {
+        $scope.cTerm = term;
+        $scope.cPeriod = $scope.periodArraysLookup[$scope.cTerm.id][$scope.cPeriod.period - 1];
+    }
 
     /**
      * Sets cPeriod to selected period
@@ -112,7 +125,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Make sure teacher text is an actual teacher.
      * @param {string} task - the type of task selected.
      */
-    $scope.checkValidTeacher = function(task) {
+    $scope.checkValidTeacher = function(task, teacher) {
+        $scope.cTeacher = teacher;
         switch (task) {
             case "add":
                 if ($scope.addTeacher != null) {
@@ -188,12 +202,11 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         $scope.sectionE = Object.assign({}, $scope.sectionV);
         $scope.displayCEditInfo = true;
         // make sure edit is still not displayed when switching
-        $scope.viewCTitle = true;
-        $scope.viewCTeacher = true;
-        $scope.viewCTerm = true;
+        $scope.sectionEdit = false;
         $scope.cTerm = $scope.termsLookup[section.term];
         $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[section.term].id][section.schedule_position - 1];
-        $scope.viewCPeriod = true;
+        // initialize
+        $scope.cTeacher = $scope.teacherIdLookup[$scope.sectionV.teacher];
         // set enrolledStudents and unenrolledStudents
         $('#enrolledInput').val('');
         $('#unenrolledInput').val('');
@@ -201,106 +214,16 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     };
 
     /**
-     * Turns the displayed teacher field into an editable input.
-     * @param {string} field - the name of the field that the user is editing.
-     */
-    $scope.editSection = function(field) {
-        switch (field) {
-            case "title":
-                $scope.viewCTitle = false;
-                checkIfAllSelected();
-                break;
-            case "teacher":
-                $scope.viewCTeacher = false;
-                checkIfAllSelected();
-                break;
-            case "term":
-                $scope.viewCTerm = false;
-                checkIfAllSelected();
-                break;
-            case "period":
-                $scope.viewCPeriod = false;
-                checkIfAllSelected();
-                break;
-            case "none":
-                $scope.viewCTitle = true;
-                $scope.viewCTeacher = true;
-                $scope.viewCTerm = true;
-                $scope.viewCPeriod = true;
-                $scope.editingAll = true;
-                break;
-            case "all":
-                $scope.viewCTitle = false;
-                $scope.viewCTeacher = false;
-                $scope.viewCTerm = false;
-                $scope.viewCPeriod = false;
-                $scope.editingAll = false;
-                break;
-            default:
-        }
-    };
-
-    /**
-     * Sets edit all button according to what edit fields are ready to edit.
-     */
-    function checkIfAllSelected() {
-        if ($scope.viewCTitle && $scope.viewCTeacher && $scope.viewCTerm && $scope.viewCPeriod) {
-            $scope.editingAll = true;
-        } else if (!$scope.viewCTitle && !$scope.viewCTeacher && !$scope.viewCTerm && !$scope.viewCPeriod) {
-            $scope.editingAll = false;
-        }
-    }
-
-    /**
-     * Restored the previous display of the selected section field and hides the editable input box.
-     * @param {string} field - the name of the field that the user is editing.
-     */
-    $scope.cancelCEdit = function(field) {
-        switch (field) {
-            case "title":
-                $scope.viewCTitle = true;
-                $scope.cTitle = "";
-                break;
-            case "teacher":
-                $scope.viewCTeacher = true;
-                $scope.cTeacher = "";
-                break;
-            case "term":
-                $scope.viewCTerm = true;
-                break;
-            case "period":
-                $scope.viewCPeriod = true;
-                break;
-            default:
-        }
-        checkIfAllSelected()
-    };
-
-    /**
      * Updates the selected section with the newly edited field.
-     * @param {string} field - the name of the field that the user is editing.
      */
-    $scope.saveCEdit = function(field) {
-        switch (field) {
-            // update field
-            case "title":
-                $scope.sectionE.title = $scope.cTitle;
-                break;
-            case "teacher":
-                if ($scope.cTeacher != null) {
-                    $scope.sectionE.teacher = $scope.teachersLookup[$scope.cTeacher.toUpperCase()];
-                } else {
-                    $scope.sectionE.teacher = null;
-                }
-                break;
-            case "term":
-                $scope.sectionE.term = $scope.cTerm.id;
-                break;
-            case "period":
-                $scope.sectionE.schedule_position = $scope.cPeriod.period;
-                break;
-            default:
+    $scope.saveCEdit = function() {
+        if ($scope.cTeacher != null) {
+            $scope.sectionE.teacher = $scope.teachersLookup[$scope.cTeacher.toUpperCase()];
+        } else {
+            $scope.sectionE.teacher = null;
         }
+        $scope.sectionE.term = $scope.cTerm.id;
+        $scope.sectionE.schedule_position = $scope.cPeriod.period;
         // save with sectionE
         var tempSection = Object.assign({}, $scope.sectionE);
         delete tempSection.id;
@@ -308,6 +231,9 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         sectionPromise.then(function success(data) {
             // save previous title in case it was changed
             var tempTitle = $scope.sectionV.title.toUpperCase();
+            if ($scope.sectionE.title !== $scope.sectionV.title) {
+                delete $scope.sectionsLookup[tempTitle];
+            }
             // set sectionV to sectionE to reflect update
             $scope.sectionV = Object.assign({}, $scope.sectionE);
             // then have to update sections and lookup
@@ -318,28 +244,10 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     $scope.sectionsLookup[upper] = Object.assign({}, $scope.sectionE);
                 }
             }
-            switch (field) {
-                // set view after call returns
-                case "title":
-                    // need to delete that lookup property
-                    delete $scope.sectionsLookup[tempTitle];
-                    $scope.viewCTitle = true;
-                    $scope.cTitle = "";
-                    break;
-                case "teacher":
-                    $scope.viewCTeacher = true;
-                    $scope.cTeacher = "";
-                    break;
-                case "term":
-                    $scope.viewCTerm = true;
-                    $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].id][$scope.sectionE.schedule_position - 1];
-                    break;
-                case "period":
-                    $scope.viewCPeriod = true;
-                    break;
-                default:
-            }
-            checkIfAllSelected();
+            // do I actually have to do this?
+            $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].id][$scope.sectionE.schedule_position - 1];
+            //$scope.cTeacher = $scope.teacherIdLookup[$scope.sectionV.teacher];
+            $scope.sectionEdit = false;
         }, function error(response) {
             setErrorMessage(response);
             toastService.error("The server was unable to save your edit." + errorResponse());

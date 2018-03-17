@@ -7,8 +7,8 @@
                     <div class="row">
                         <div class="table-container">
                             <div class="table-cell">
-                                <span class="glyphicon glyphicon-ok-sign glyphicon-big-button" ng-if="service.fulfilled" ng-click="markFulfilled(service, false)"></span>
-                                <span class="glyphicon glyphicon-remove-sign glyphicon-big-button" ng-if="!service.fulfilled" ng-click="markFulfilled(service, true)"></span>
+                                <span class="glyphicon glyphicon-ok-sign glyphicon-big-button" ng-if="service.fulfilled" ng-click="markFulfilled(service, false)" ng-class="{ 'student-services-glyph-fix': service.editing, }"></span>
+                                <span class="glyphicon glyphicon-remove-sign glyphicon-big-button" ng-if="!service.fulfilled" ng-click="markFulfilled(service, true)" ng-class="{ 'student-services-glyph-fix-remove': service.editing, }"></span>
                             </div>
                             <div class="table-cell full-width">
                                 <form class="form-horizontal" name="editServiceForm{{$index}}" ng-submit="saveService(service)">
@@ -61,13 +61,16 @@
                                         </div>
                                     </div>
                                     <div class="form-group no-bottom-margin">
-                                        <div class="col-sm-offset-2 col-sm-10">
-                                            <div ng-if="service.editing">
-                                                <button class="btn btn-success" type="submit" ng-disabled="editServiceForm{{$index}}.$invalid">
-                                                    <span>Save</span>
+                                        <div class="col-xs-12">
+                                            <div class="btn-manipulate-row student-services-btn-row-fix" ng-if="service.editing">
+                                                <button class="btn btn-danger delete-left" type="button" ng-if="service.editing" ng-click="deleteService(service)">
+                                                    <span class="glyphicon glyphicon-trash"></span>
                                                 </button>
-                                                <button class="btn btn-danger" ng-click="toggleEditService(service)">
-                                                    <span>Cancel</span>
+                                                <button class="btn btn-success" type="submit" ng-disabled="editServiceForm{{$index}}.$invalid">
+                                                    <span class="glyphicon glyphicon-ok"></span>
+                                                </button>
+                                                <button class="btn btn-default" type="button" ng-click="toggleEditService(service)">
+                                                    <span class="glyphicon glyphicon-remove"></span>
                                                 </button>
                                             </div>
                                         </div>
@@ -79,9 +82,6 @@
                     <div class="btn-manipulate-row">
                         <button class="btn btn-primary" ng-if="!service.editing" ng-click="toggleEditService(service)">
                             <span class="glyphicon glyphicon-pencil"></span>
-                        </button>
-                        <button class="btn btn-danger" ng-if="service.editing" ng-click="deleteService(service)">
-                            <span class="glyphicon glyphicon-trash"></span>
                         </button>
                     </div>
                 </div>
@@ -129,14 +129,16 @@
                                         <input type="text" class="form-control" name="addStudentFulfilledDescription" ng-model="newService.fulfilled_description" placeholder="How is this service requirement fulfilled?">
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button class="btn btn-success" type="submit" ng-disabled="addServiceForm.$invalid">
-                                            <span>Add</span>
-                                        </button>
-                                        <button class="btn btn-danger" ng-click="toggleAdd()">
-                                            <span>Cancel</span>
-                                        </button>
+                                <div class="form-group no-bottom-margin">
+                                    <div class="col-xs-12">
+                                        <div class="btn-manipulate-row">
+                                            <button class="btn btn-success" type="submit"  ng-disabled="addServiceForm.$invalid">
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            </button>
+                                            <button class="btn btn-default" type="button" ng-click="toggleAdd()">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -147,8 +149,8 @@
         </div>
     </div>
 </div>
-<div id="student-services-add-tip" class="row" ng-if="services.length === 0 && !adding">
-    <div class="col-xs-12">
+<div class="row" ng-if="services.length === 0 && !adding">
+    <div class="col-xs-12 voffset3">
         <div class="alert alert-info" role="alert">
             <span><b>Tip:</b> It looks like you don't have any Services. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
         </div>

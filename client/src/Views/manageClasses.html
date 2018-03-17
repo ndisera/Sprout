@@ -19,16 +19,16 @@
             <div ng-hide="sections.length === 0">
                 <div class="row">
                     <div class="col-xs-12 col-sm-6 voffset2">
-                        <div id="student-grades-select" class="input-group">
+                        <div class="select-full-width input-group">
                             <span class="input-group-addon">Term</span>
                             <div class="input-group-btn">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ viewSectionTerm.name }} <span class="caret"></span></button>
                                 <ul class="dropdown-menu dropdown-menu-right">
                                     <li ng-repeat="term in terms" ng-click="selectTerm(term)">
-                                        <a class="student-overview-assign-link">{{ term.name }}  <span ng-if="term.name === viewSectionTerm.name" class="glyphicon glyphicon-ok"></span></a>
+                                        <a>{{ term.name }}  <span ng-if="term.name === viewSectionTerm.name" class="glyphicon glyphicon-ok"></span></a>
                                     </li>
                                     <li ng-click="selectTerm({name: 'All Terms'})">
-                                        <a class="student-overview-assign-link">All Terms  <span ng-if="viewSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
+                                        <a>All Terms  <span ng-if="viewSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
                                     </li>
                                 </ul>
                             </div>
@@ -73,189 +73,164 @@
         </div>
     </div>
 </div>
-<div ng-show="displayCEditInfo && displaySectionViewSearch">
-    <div class="panel-wrapper">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title panel-title-with-btn">Class Info</h3>
-                <button class="btn btn-primary pull-right heading-btn" type="button" ng-click="editSection('all')" ng-show="editingAll">
-                            Edit All
-                        </button>
-                <button class="btn btn-danger pull-right heading-btn" type="button" ng-click="editSection('none')" ng-hide="editingAll">
-                            Stop Editing
-                        </button>
-            </div>
-            <div class="panel-body">
-                <form class="form-horizontal" name="editCTitleForm" ng-submit="saveCEdit('title')">
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="ctitle">Title:</label>
-                        <div class="col-sm-10">
-                            <p class="form-control-static" ng-show="viewCTitle">{{sectionV.title}}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('title')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                            <div class="input-group" ng-hide="viewCTitle">
-                                <input required autocomplete="off" type="text" class="form-control" id="ctitle" placeholder="{{sectionV.title}}" name="ctitle" ng-model="cTitle">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTitleForm.$invalid">
-                                                <i class="glyphicon glyphicon-ok green"></i>
-                                            </button>
-                                </div>
-                                <div class="input-group-btn">
-                                    <button class="btn btn-default" type="button" ng-click="cancelCEdit('title')">
-                                                <i class="glyphicon glyphicon-remove red"></i>
-                                            </button>
+<div class="row" ng-show="displayCEditInfo && displaySectionViewSearch">
+    <div class="col-xs-12 voffset3">
+        <div class="panel-wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Class Info</h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" name="editSectionForm" ng-submit="saveCEdit()">
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="ctitle">Title:</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" ng-if="!sectionEdit">{{sectionV.title}}</p>
+                                <div ng-if="sectionEdit">
+                                    <input required autocomplete="off" type="text" class="form-control" id="ctitle" name="ctitle" ng-model="sectionE.title">
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-                <form class="form-horizontal" name="editCTeacherForm" ng-submit="saveCEdit('teacher')">
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="cteacher">Teacher:</label>
-                        <div class="col-sm-10">
-                            <p class="form-control-static" ng-show="viewCTeacher">{{teacherIdLookup[sectionV.teacher]}}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('teacher')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                            <div class="input-group" ng-hide="viewCTeacher">
-                                <input type="text" autocomplete="off" class="form-control" placeholder="{{teacherIdLookup[sectionV.teacher]}}" list="cteacher" name="cteacher" ng-model="cTeacher" ng-change="checkValidTeacher('edit')">
-                                <datalist id="cteacher">
-                                            <option ng-repeat="t in teachers | orderBy:'last_name'" value="{{t.first_name}} {{t.last_name}} ({{t.email}})"></option>
-                                        </datalist>
-                                <div class="input-group-btn">
-                                    <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTeacherForm.$invalid || (!editValidTeacher && cTeacher != null)">
-                                                <i class="glyphicon glyphicon-ok green"></i>
-                                            </button>
-                                </div>
-                                <div class="input-group-btn">
-                                    <button class="btn btn-default" type="button" ng-click="cancelCEdit('teacher')">
-                                                <i class="glyphicon glyphicon-remove red"></i>
-                                            </button>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="cteacher">Teacher:</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" ng-if="!sectionEdit">{{teacherIdLookup[sectionV.teacher]}}</p>
+                                <div ng-if="sectionEdit">
+                                    <input type="text" autocomplete="off" class="form-control" list="cteacher" name="cteacher" ng-model="cTeacher" ng-change="checkValidTeacher('edit', cTeacher)">
+                                    <datalist id="cteacher">
+                                    <option ng-repeat="t in teachers | orderBy:'last_name'" value="{{t.first_name}} {{t.last_name}} ({{t.email}})"></option>
+                                </datalist>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-                <form class="form-horizontal" name="editCTermForm" ng-submit="saveCEdit('term')">
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="cterm">Term:</label>
-                        <div class="col-sm-10">
-                            <p class="form-control-static" ng-show="viewCTerm">{{termsLookup[sectionV.term].name}}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('term')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                            <div class="input-group" ng-hide="viewCTerm">
-                                <select required ng-model="cTerm" ng-options="x.name for x in terms" class="form-control"></select>
-                                <div class="input-group-btn">
-                                    <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCTermForm.$invalid">
-                                                <i class="glyphicon glyphicon-ok green"></i>
-                                            </button>
-                                </div>
-                                <div class="input-group-btn">
-                                    <button class="btn btn-default" type="button" ng-click="cancelCEdit('term')">
-                                                <i class="glyphicon glyphicon-remove red"></i>
-                                            </button>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="cterm">Term:</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" ng-if="!sectionEdit">{{termsLookup[sectionV.term].name}}</p>
+                                <div ng-if="sectionEdit">
+                                    <select required ng-model="cTerm" ng-change="setTerm(cTerm)" ng-options="x.name for x in terms" class="form-control"></select>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
-                <form class="form-horizontal" name="editCPeriodForm" ng-submit="saveCEdit('period')" ng-if="sectionV.schedule_position != null">
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="cperiod">Period:</label>
-                        <div class="col-sm-10">
-                            <p class="form-control-static" ng-if="viewCPeriod">{{ periodArraysLookup[termsLookup[sectionV.term].id][sectionV.schedule_position - 1].periodName }}&nbsp;&nbsp;&nbsp;<span ng-click="editSection('period')" class="glyphicon glyphicon-pencil pencilEdit"></span></p>
-                            <div class="input-group" ng-if="!viewCPeriod">
-                                <select id="cperiod" ng-model="cPeriod" ng-change="setPeriod(cPeriod)" class="form-control" ng-options="x.periodName for x in periodArraysLookup[termsLookup[sectionV.term].id]"></select>
-                                <div class="input-group-btn">
-                                    <button class="btn btn-default checkBtn" type="submit" ng-disabled="editCPeriodForm.$invalid">
-                                                <i class="glyphicon glyphicon-ok green"></i>
-                                            </button>
-                                </div>
-                                <div class="input-group-btn">
-                                    <button class="btn btn-default" type="button" ng-click="cancelCEdit('period')">
-                                                <i class="glyphicon glyphicon-remove red"></i>
-                                            </button>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="cperiod">Period:</label>
+                            <div class="col-sm-10">
+                                <p class="form-control-static" ng-if="!sectionEdit">{{ periodArraysLookup[termsLookup[sectionV.term].id][sectionV.schedule_position - 1].periodName }}</p>
+                                <div ng-if="sectionEdit">
+                                    <select id="cperiod" ng-model="cPeriod" ng-change="setPeriod(cPeriod)" class="form-control" ng-options="x.periodName for x in periodArraysLookup[cTerm.id]"></select>
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group no-bottom-margin">
+                            <div class="col-xs-12">
+                                <div class="btn-manipulate-row" ng-if="sectionEdit">
+                                    <button class="btn btn-success" type="submit" ng-disabled="editSectionForm.$invalid">
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    </button>
+                                    <button class="btn btn-default" type="button" ng-click="toggleSectionEdit()">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-primary" ng-if="!sectionEdit" ng-click="toggleSectionEdit()">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="panel-wrapper" ng-show="displayCEditInfo && displaySectionViewSearch">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Class Roster</h3>
-        </div>
-        <div class="panel-body">
-            <div class="alert alert-info no-bottom-margin" ng-show="enrollmentsArray.length === 0">
-                <span><b>Tip:</b> It looks like there are no students enrolled in this class. Click the "Enroll Students" box to add one.</span>
-            </div>
-            <div ng-hide="enrollmentsArray.length === 0">
-                <input autocomplete="off" autocapitalize="off" class="form-control" id="enrolledInput" type="text" placeholder="Filter Students" ng-model="enrolledInput">
-                <br>
-                <div class="table-responsive scrollableTableDiv table-remove">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Student ID</th>
-                                <th class="buttonColumn"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="enrolledStudents">
-                            <tr ng-repeat="enrollment in enrollmentsArray | filter:enrolledStudentFilter | classRosterSort:enrolledStudents" ng-click="unenrollStudent(enrollment.id)">
-                                <td>{{ enrolledStudents[enrollment.student].first_name }}</td>
-                                <td>{{ enrolledStudents[enrollment.student].last_name }}</td>
-                                <td>{{ enrolledStudents[enrollment.student].student_id }}</td>
-                                <td class="buttonColumn table-button-col">
-                                    <button class="btn btn-danger btn-xs" type="button">
-                                                <i class="glyphicon glyphicon-minus white"></i>
-                                            </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div class="panel-wrapper" ng-show="displayCEditInfo && displaySectionViewSearch">
-    <div class="panel panel-default">
-        <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapseEnrollStudents" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
-            <h3 class="panel-title">
+<div class="row" ng-show="displayCEditInfo && displaySectionViewSearch">
+    <div class="col-xs-12 voffset3">
+        <div class="panel-wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Class Roster</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-info no-bottom-margin" ng-show="enrollmentsArray.length === 0">
+                        <span><b>Tip:</b> It looks like there are no students enrolled in this class. Click the "Enroll Students" box to add one.</span>
+                    </div>
+                    <div ng-hide="enrollmentsArray.length === 0">
+                        <input autocomplete="off" autocapitalize="off" class="form-control" id="enrolledInput" type="text" placeholder="Filter Students" ng-model="enrolledInput">
+                        <br>
+                        <div class="table-responsive scrollableTableDiv table-remove">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Student ID</th>
+                                        <th class="buttonColumn"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="enrolledStudents">
+                                    <tr ng-repeat="enrollment in enrollmentsArray | filter:enrolledStudentFilter | classRosterSort:enrolledStudents" ng-click="unenrollStudent(enrollment.id)">
+                                        <td>{{ enrolledStudents[enrollment.student].first_name }}</td>
+                                        <td>{{ enrolledStudents[enrollment.student].last_name }}</td>
+                                        <td>{{ enrolledStudents[enrollment.student].student_id }}</td>
+                                        <td class="buttonColumn table-button-col">
+                                            <button class="btn btn-danger btn-xs" type="button">
+                                        <i class="glyphicon glyphicon-minus white"></i>
+                                    </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" ng-show="displayCEditInfo && displaySectionViewSearch">
+    <div class="col-xs-12 voffset3">
+        <div class="panel-wrapper">
+            <div class="panel panel-default">
+                <div class="panel-heading pointer" data-toggle="collapse" data-target="#collapseEnrollStudents" onclick="$(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right')">
+                    <h3 class="panel-title">
                         Enroll Students
                         <span class="glyphicon glyphicon-chevron-right"></span>
                     </h3>
-        </div>
-        <div id="collapseEnrollStudents" class="panel-collapse collapse">
-            <div class="panel-body">
-                <div class="alert alert-info no-bottom-margin" ng-show="unenrolledStudentsArray.length === 0">
-                    <span><b>Info:</b> There are no unenrolled students!</span>
                 </div>
-                <div ng-hide="unenrolledStudentsArray.length === 0">
-                    <input autocomplete="off" autocapitalize="off" class="form-control" id="unenrolledInput" type="text" placeholder="Filter Students" ng-model="unenrolledInput">
-                    <br>
-                    <div class="table-responsive scrollableTableDiv table-add">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
-                                    <th>Student ID</th>
-                                    <th class="buttonColumn"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="unenrolledStudents">
-                                <tr ng-repeat="student in unenrolledStudentsArray | filter:unenrolledStudentFilter | orderBy:'last_name'" ng-click="enrollStudent(student.id)">
-                                    <td>{{ student.first_name }}</td>
-                                    <td>{{ student.last_name }}</td>
-                                    <td>{{ student.student_id }}</td>
-                                    <td class="buttonColumn table-button-col">
-                                        <button class="btn btn-success btn-xs" type="button">
+                <div id="collapseEnrollStudents" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="alert alert-info no-bottom-margin" ng-show="unenrolledStudentsArray.length === 0">
+                            <span><b>Info:</b> There are no unenrolled students!</span>
+                        </div>
+                        <div ng-hide="unenrolledStudentsArray.length === 0">
+                            <input autocomplete="off" autocapitalize="off" class="form-control" id="unenrolledInput" type="text" placeholder="Filter Students" ng-model="unenrolledInput">
+                            <br>
+                            <div class="table-responsive scrollableTableDiv table-add">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Student ID</th>
+                                            <th class="buttonColumn"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="unenrolledStudents">
+                                        <tr ng-repeat="student in unenrolledStudentsArray | filter:unenrolledStudentFilter | orderBy:'last_name'" ng-click="enrollStudent(student.id)">
+                                            <td>{{ student.first_name }}</td>
+                                            <td>{{ student.last_name }}</td>
+                                            <td>{{ student.student_id }}</td>
+                                            <td class="buttonColumn table-button-col">
+                                                <button class="btn btn-success btn-xs" type="button">
                                                     <i class="glyphicon glyphicon-plus white"></i>
                                                 </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -299,8 +274,12 @@
                     </div>
                 </div>
                 <div class="form-group no-bottom-margin">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <button ng-disabled="addSectionForm.$invalid || (!addValidTeacher && addTeacher != null)" type="submit" class="btn btn-success">Add</button>
+                    <div class="col-xs-12">
+                        <div class="btn-manipulate-row">
+                            <button ng-disabled="addSectionForm.$invalid || (!addValidTeacher && addTeacher != null)" type="submit" class="btn btn-success">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>

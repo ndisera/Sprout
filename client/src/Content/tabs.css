@@ -19,12 +19,7 @@
 .panel.panel-tabs > .panel-heading > img, .panel.panel-tabs > .panel-heading > .panel-glyph {
     display: inline-block;
     float: left;
-    height: 100px;
-    width: 100px;
     margin-top: -60px;
-    border: 4px solid #fff;
-    border-radius: 50%;
-    background-color: #fff;
 }
 
 .panel.panel-tabs > .panel-heading > .panel-glyph > .glyphicon {
@@ -46,7 +41,7 @@
 }
 
 .panel.panel-tabs > .panel-heading > .panel-title > span:first-child {
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .panel.panel-tabs > .panel-body {
@@ -58,10 +53,43 @@
 
 .panel.panel-tabs .nav-tabs {
     border: none;
+    text-align: center;
 }
 
 .panel.panel-tabs .nav-pills {
     margin-top: 15px;
+    text-align: center;
+}
+
+.panel.panel-tabs .nav-tabs li {
+    cursor: pointer;
+}
+    
+.panel.panel-tabs .nav-pills > li {
+    float: none;
+    display: inline-block;
+    *display: inline; [> ie7 fix <]
+    zoom: 1; [> hasLayout ie7 trigger <]
+    cursor: pointer;
+}
+
+.panel.panel-tabs .nav-tabs > li > a {
+    margin-right: 0px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 500;
+}
+
+.panel.panel-tabs .nav > li > a:hover, .panel.panel-tabs .nav > li > a:focus {
+    background: none;
+    color: #5ab9ea;
+    border-bottom: 3px solid #5ab9ea;
+}
+
+.panel.panel-tabs .nav-tabs > li.active > a, .panel.panel-tabs .nav-tabs > li.active > a:hover, .panel.panel-tabs .nav-tabs > li.active > a:focus {
+    border: none;
+    color: #57bc90;
+    border-bottom: 3px solid #57bc90;
 }
 
 .panel.panel-tabs .nav-tabs > li:first-child > a {
@@ -69,8 +97,12 @@
 }
 
 @media (max-width: 768px) {
+    .panel.panel-tabs {
+        -webkit-box-shadow: none;
+        box-shadow: none;
+    }
+
     .panel.panel-tabs > .panel-heading {
-        border: 1px solid #082c44;
         border-radius: 4px;
     }
 
@@ -93,5 +125,33 @@
 
     .panel.panel-tabs.no-image > .panel-heading > .panel-title {
         margin: 0px;
+    }
+
+    .panel.panel-tabs .nav-tabs > li {
+        margin-bottom: -2px;
+    }
+
+    .panel.panel-tabs .nav-tabs > li > a {
+        margin-right: 0px;
+        border: none;
+        border-bottom: 3px solid transparent;
+    }
+
+    .panel.panel-tabs .nav-pills > li > a {
+        border-bottom: 3px solid transparent;
+    }
+
+    .panel.panel-tabs .nav-pills > li.active > a:hover, .panel.panel-tabs .nav-pills > li.active > a:focus {
+        border-bottom: 3px solid transparent;
+    }
+
+    .panel.panel-tabs .nav > li > a:hover, .panel.panel-tabs .nav > li > a:focus {
+        background: #EEE;
+        color: #5ab9ea;
+    }
+
+    .panel.panel-tabs .nav-pills > li.active > a, .panel.panel-tabs .nav-pills > li.active > a:hover, .panel.panel-tabs .nav-pills > li.active > a:focus {
+        color: #EEE;
+        background-color: #57bc90;
     }
 }
