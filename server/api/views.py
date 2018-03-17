@@ -753,9 +753,12 @@ class GradeViewSet(NestedDynamicViewSet):
             return queryset
         # A teacher may view grades for assignments in their taught section
         teaches = Q(assignment__section__teacher=user)
-        # Or all grades of students for whom they are case managers
+        # Filter for other related students:
+        # Case manager
         manages = Q(student__case_manager=user)
-        queryset = queryset.filter(teaches | manages)
+        # The teacher of another section in which the student is enrolled
+        other_teacher = Q(student__enrollment__section__teacher=user)
+        queryset = queryset.filter(teaches | manages | other_teacher).distinct()
         return queryset
 
     """ ensure variables show as correct type for docs """
