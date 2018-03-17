@@ -2,11 +2,11 @@
 <div class="row">
     <div class="col-xs-12">
         <div id="student-ieps-select-manipulate">
-            <button class="btn btn-success btn-manipulate" type="button" ng-click="toggleAddIep(true)">
+            <button class="btn btn-success btn-manipulate" type="button" ng-click="toggleAddIep(true)" ng-disabled="addingIep">
                 <span class="glyphicon glyphicon-plus"></span>
             </button>
         </div>
-        <div id="student-ieps-select" class="select-full-width input-group" ng-show="ieps.length > 0">
+        <div id="student-ieps-select" class="select-full-width input-group" ng-show="ieps.length > 0" ng-class="{ 'adding': addingIep, }">
             <span class="input-group-addon">IEP Goal</span>
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedIep.title }} <span class="caret"></span></button>

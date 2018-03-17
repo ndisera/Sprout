@@ -274,8 +274,12 @@
                     </div>
                 </div>
                 <div class="form-group no-bottom-margin">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <button ng-disabled="addSectionForm.$invalid || (!addValidTeacher && addTeacher != null)" type="submit" class="btn btn-success">Add</button>
+                    <div class="col-xs-12">
+                        <div class="btn-manipulate-row">
+                            <button ng-disabled="addSectionForm.$invalid || (!addValidTeacher && addTeacher != null)" type="submit" class="btn btn-success">
+                                <span class="glyphicon glyphicon-ok"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>
