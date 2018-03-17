@@ -183,21 +183,11 @@ class StudentViewSet(NestedDynamicViewSet):
     pass
 
 
-class SchoolSettingsSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    SchoolSettingsViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(SchoolSettingsSetSchema, self).get_link(path, method, base_url)
-        return set_link(SchoolSettingsViewSet, path, method, link)
-
-
 class SchoolSettingsViewSet(NestedDynamicViewSet):
     """
     allows interaction with the "SchoolSettings" instance
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = SchoolSettingsSerializer
 
     # Build the 'singleton' object if it doesn't exist
@@ -213,14 +203,14 @@ class SchoolSettingsViewSet(NestedDynamicViewSet):
     queryset = SchoolSettings.objects.all()
 
     """ define custom schema for documentation """
-    schema = SchoolSettingsSetSchema()
+    schema = AutoSchema()
 
 
 class SchoolYearViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "SchoolYear" instance
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = SchoolYearSerializer
     queryset = SchoolYear.objects.all()
 
@@ -228,33 +218,23 @@ class SchoolYearViewSet(NestedDynamicViewSet):
     schema = AutoSchema()
 
 
-class DailyScheduleSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    DailyScheduleViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(DailyScheduleSetSchema, self).get_link(path, method, base_url)
-        return set_link(DailyScheduleViewSet, path, method, link)
-
-
 class DailyScheduleViewSet(NestedDynamicViewSet):
     """
     allows interaction with the "DailySchedule" instance
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = DailyScheduleSerializer
     queryset = DailySchedule.objects.all()
 
     """ define custom schema for documentation """
-    schema = DailyScheduleSetSchema()
+    schema = AutoSchema()
 
 
 class TermSettingsViewSet(NestedDynamicViewSet):
     """
-    allows interaction with the set of "Term" instances
+    allows interaction with the set of "TermSettings" instances
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = TermSettingsSerializer
     queryset = TermSettings.objects.all()
 
@@ -274,26 +254,13 @@ class TermSettingsViewSet(NestedDynamicViewSet):
         ])
 
 
-class TermViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    BehaviorViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(TermViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(TermViewSet, path, method, link)
-
-
 class TermViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Term" instances
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = TermSerializer
     queryset = Term.objects.all()
-
-    """ define custom schema for documentation """
-    schema = TermViewSetSchema()
 
     """ ensure variables show as correct types for docs """
     name_term_settings = 'settings'
@@ -305,22 +272,16 @@ class TermViewSet(NestedDynamicViewSet):
                                         description=desc_term_settings,
                                         schema=coreschema.Integer(title=name_term_settings)),
 
-    create_fields = (
-        term_settings_field
-    )
-    update_fields = (
-        term_settings_field
-    )
-    partial_update_fields = (
-        term_settings_field
-    )
+    schema = AutoSchema(manual_fields=[
+        term_settings_field,
+    ])
 
 
 class HolidayViewSet(NestedDynamicViewSet):
     """
-    allows interaction with the set of "Student" instances
+    allows interaction with the set of "Holiday" instances
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = HolidaySerializer
     queryset = Holiday.objects.all()
 
@@ -363,7 +324,7 @@ class StandardizedTestViewSet(NestedDynamicViewSet):
     delete:
     delete a specified standardized test specified by the path param.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = StandardizedTestSerializer
     queryset = StandardizedTest.objects.all()
 
