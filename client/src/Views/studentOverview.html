@@ -20,12 +20,6 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Student Info</h3>
-                    <!--<button id="student-overview-edit-all-btn" class="btn btn-primary pull-right" type="button" ng-click="beginEditStudent('all')" ng-hide="editingAll">-->
-                    <!--Edit All-->
-                    <!--</button>-->
-                    <!--<button id="student-overview-edit-all-btn" class="btn btn-danger pull-right" type="button" ng-click="endEditStudent('all')" ng-show="editingAll">-->
-                    <!--Stop Editing-->
-                    <!--</button>-->
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal" name="editStudentForm" ng-submit="saveStudent()">
@@ -40,31 +34,6 @@
                                     <input class="form-control" ng-if="editing && property.key === 'birthdate'" type="text" date-time name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
                                 </div>
                             </div>
-                            <!--<div class="col-sm-9">-->
-                                <!--<div ng-if="!editing">-->
-                                    <!--<span class="form-control-static">{{ property.value }}</span>-->
-                                <!--</div>-->
-                                <!--<div ng-if="editing">-->
-                                    <!--<input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>-->
-                                    <!--<input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                            <!--<p class="form-control-static col-xs-12 col-sm-9" ng-show="!property.editable">-->
-                            <!--{{ property.value }} &nbsp;&nbsp;&nbsp;-->
-                            <!--<span ng-click="beginEditStudent(property)" class="glyphicon glyphicon-pencil pencilEdit"></span>-->
-                            <!--</p>-->
-                            <!--<div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9" ng-show="property.editable">-->
-                            <!--<input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required auto-focus>-->
-                            <!--<input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>-->
-                            <!--<div class="input-group-btn">-->
-                            <!--<button class="btn btn-default" type="submit" ng-disabled="editStudentForm{{$index}}.editStudentFormInput{{$index}}.$invalid">-->
-                            <!--<span class="glyphicon glyphicon-ok green"></span>-->
-                            <!--</button>-->
-                            <!--<button class="btn btn-default" type="button" ng-click="endEditStudent(property)">-->
-                            <!--<span class="glyphicon glyphicon-remove red"></span>-->
-                            <!--</button>-->
-                            <!--</div>-->
-                            <!--</div>-->
                         </div>
                         <div class="form-group no-bottom-margin">
                             <div class="col-xs-12">
@@ -149,10 +118,10 @@
                         <div class="col-sm-7">
                             <div id="student-overview-image-btns">
                                 <button type="button" class="btn btn-default full-width voffset3" ng-click="showModal()">
-                                    Select New Photo
+                                    <span>Select New Photo</span>
                                 </button>
-                                <button type="button" class="btn btn-danger full-width voffset3">
-                                    Delete Photo
+                                <button type="button" class="btn btn-danger full-width voffset3" ng-click="deleteStudentImage()" ng-disabled="$root.currentStudent.picture === null">
+                                    <span>Delete Photo</span>
                                 </button>
                             </div>
                         </div>
@@ -186,7 +155,7 @@
                 </div>
                 <div class="btn-manipulate-row">
                     <button class="btn btn-success" ng-click="uploadStudentImage(newStudentImageCrop)">
-                        <span class="far fa-save fa-lg"></span>
+                        <span class="glyphicon glyphicon-ok"></span>
                     </button>
                 </div>
             </div>

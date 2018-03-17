@@ -199,12 +199,33 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
                 $rootScope.currentStudent.id = $scope.student.id;
                 $rootScope.currentStudent.picture = data.profile_picture.file;
 
+                $scope.student.picture = data.profile_picture.id;
+
                 $scope.closeModal();
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save your image.');
             },
         );
+    };
+
+    $scope.deleteStudentImage = function() {
+        if($scope.student.picture === null) {
+            return;
+        }
+
+        studentService.deleteStudentPicture($scope.student.id, $scope.student.picture).then(
+            function success(data) {
+                $rootScope.currentStudent.id = $scope.student.id;
+                $rootScope.currentStudent.picture = null;
+
+                $scope.student.picture = null;
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to delete your image.');
+            },
+        );
+
     };
 
     $scope.showModal = function() {
