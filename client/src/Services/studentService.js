@@ -219,6 +219,25 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
+     * Delete picture from student profile 
+     * @param {number} studentId - ID of the student
+     * @param {picture} pictureId - the ID of the picture
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function deleteStudentPicture(studentId, pictureId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/picture/' + pictureId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
      * Get grades for a specific student
      * @param {number} studentId - ID of the student
      * @param {object} config - config object for query parameters (see queryService)
@@ -619,6 +638,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         deleteStudent: deleteStudent,
         getStudentPicture: getStudentPicture,
         addStudentPicture: addStudentPicture,
+        deleteStudentPicture: deleteStudentPicture,
         getGradesForStudent: getGradesForStudent,
         getServicesForStudent: getServicesForStudent,
         getServiceForStudent: getServiceForStudent,
@@ -631,12 +651,10 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         updateIepForStudent: updateIepForStudent,
         deleteIepForStudent: deleteIepForStudent,
         getIepDatasForStudent: getIepDatasForStudent,
-        //getIepDataForStudent: getIepDataForStudent,
         addIepDataForStudent: addIepDataForStudent,
         updateIepDataForStudent: updateIepDataForStudent,
         deleteIepDataForStudent: deleteIepDataForStudent,
         getIepNotesForStudent: getIepNotesForStudent,
-        //getIepNoteForStudent: getIepNoteForStudent,
         addIepNoteForStudent: addIepNoteForStudent,
         updateIepNoteForStudent: updateIepNoteForStudent,
         deleteIepNoteForStudent: deleteIepNoteForStudent,

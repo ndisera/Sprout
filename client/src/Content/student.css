@@ -1,96 +1,33 @@
-@media (max-width: 768px) {
-    .nav-tabs > li, .nav-pills > li {
-        float: none;
-        width: 110px;
-        display: inline-block;
-        *display: inline; /* ie7 fix */
-        zoom: 1; /* hasLayout ie7 trigger */
-    }
-
-    .student-mobile-spacer {
-        margin-top: 15px;
-    }
-}
-
-.student-name-title {
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
-
-#student-overview-pic > img {
+.student-image {
+    height: 100px;
+    width: 100px;
+    background-color: #ddd;
+    border: 4px solid #fff;
     border-radius: 50%;
-    width: 100%;
-    max-width: 150px;
-    margin-left: auto;
-    margin-right: auto;
+    -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
 }
 
-#student-overview-title {
-    font-weight: 200;
-    margin-top: 60px;
-    overflow-wrap: break-word;
+#student-overview-image-preview {
+    text-align: right;
 }
 
-#student-overview-assign-dropdown {
-    width: 50px;
-    float: right !important;
+#student-overview-image-preview > img {
+    margin: 0 auto;
 }
 
-.student-overview-assign-link {
-    cursor: pointer;
+#student-overview-image-btns {
+    text-align: left;
 }
 
-
-.student-overview-edit-label {
-    min-width: 94px;
-}
-
-.student-tests-graph {
-    height: 300px;
-}
-
-#student-overview-edit-all-btn {
-    margin-top: -5px;
-    margin-right: -10px;
-    font-size: 11px;
-}
-
-#student-overview-edit-input-group {
-    padding-right: 15px;
-}
-
-.form-horizontal > .form-group > #student-overview-edit-input-group > .dropdown-menu {
-    width: calc(100% - 15px);
-}
-
-#student-overview-select > .input-group-addon {
-    width: unset;
-}
-
-#student-overview-select > .input-group-btn {
-    width: 100%;
-}
-
-#student-overview-select > .input-group-btn > button {
-    width: 100%;
-}
-
-#student-overview-select > .input-group-btn > ul {
-    width: 100%;
-}
-
-#student-overview-no-classes {
-    border: 1px solid #DDD;
-}
-
-#student-overview-no-classes > h4 {
-    margin: 20px 0px;
+#student-overview-image-btns > button {
+    margin: 10px auto 0px auto;
+    max-width: 200px;
 }
 
 #student-overview-image-modal .modal-body {
     height: 350px;
 }
-
 
 #student-overview-crop-area {
     width: 300px;
@@ -131,11 +68,6 @@
 
 #student-overview-image-crop > div > img {
     margin-top: -45px;
-    background-color: #ddd;
-    border: 4px solid #fff;
-    border-radius: 50%;
-    -webkit-box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
-    box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
 }
 
 #student-overview-image-crop > div > h3 {
@@ -184,48 +116,14 @@
     }
 }
 
-.studentHeading {
-    display: inline-block;
-}
-
-.studentReassign {
-    display: inline-block;
-    float: right;
-    padding-top: 15px;
-}
-
-.pointer {
-    cursor: pointer;
-}
-
-#student-grades-select > .input-group-addon {
-    width: unset;
-}
-
-#student-grades-select > .input-group-btn {
-    width: 100%;
-}
-
-#student-grades-select > .input-group-btn > button {
-    width: 100%;
-}
-
-#student-grades-select > .input-group-btn > ul {
-    width: 100%;
+.student-tests-graph {
+    height: 300px;
 }
 
 .student-grades-box-content {
     text-align: center;
     margin-top: 20px;
     margin-bottom: 20px;
-}
-
-.student-behaviors-no-input-classes {
-    border: 1px solid #DDD;
-}
-
-.student-behaviors-no-input-classes > h4 {
-    margin: 20px 0px;
 }
 
 .student-behaviors-graph {
@@ -270,6 +168,14 @@
     margin-right: -9px;
 }
 
+.student-services-glyph-fix {
+    margin-top: -5px;
+}
+
+.student-services-glyph-fix-remove {
+    margin-top: -6px;
+}
+
 .student-ieps-spacer {
     margin-top: 20px;
 }
@@ -294,22 +200,6 @@
     margin-top: 2px;
 }
 
-#student-ieps-select .input-group-addon {
-    width: unset;
-}
-
-#student-ieps-select .input-group-btn {
-    width: 100%;
-}
-
-#student-ieps-select .input-group-btn > button {
-    width: 100%;
-}
-
-#student-ieps-select .input-group-btn > ul {
-    width: 100%;
-}
-
 #student-ieps-select-manipulate {
     display: inline-block;
     float: right;
@@ -331,20 +221,18 @@
 }
 
 @media (max-width: 768px) {
-    #student-overview-title {
-        margin-top: 15px;
+
+    #student-overview-image-preview {
         text-align: center;
     }
 
-    #student-overview-assign-dropdown {
-        margin-top: 15px;
-        margin-left: auto;
-        margin-right: auto;
-        float: none !important;
+    #student-overview-image-btns {
+        text-align: center;
     }
 
-    #student-overview-edit-input-group {
-        padding-left: 15px;
+    #student-overview-image-btns > button {
+        display: block;
+        margin: 8px auto 0px auto;
     }
 
     #student-ieps-select {
@@ -356,10 +244,6 @@
         float: none;
         text-align: center;
         margin-bottom: 20px;
-    }
-
-    .student-services-panel > .panel > .panel-heading.panel-heading-editing > .panel-heading-container {
-        width: 100%;
     }
 }
 
@@ -376,9 +260,9 @@
     stroke: rgba(201, 48, 44, 0.4);
 }
 
-#student-services-add-tip {
-    margin-top: 80px;
-}
+/*#student-services-add-tip {*/
+    /*margin-top: 80px;*/
+/*}*/
 
 #student-services-add-btn {
     margin-top: -3px;
@@ -387,9 +271,4 @@
 #student-services-add-btn.btn-manipulate-row-bottom {
     margin-top: 20px;
 }
-
-
-
-
-
 

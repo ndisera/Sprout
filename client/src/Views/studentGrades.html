@@ -11,20 +11,20 @@
 <div ng-if="sections.length > 0">
     <div class="row">
         <div class="col-sm-6">
-            <div id="student-grades-select" class="input-group">
+            <div class="select-full-width input-group">
                 <span class="input-group-addon">Term</span>
                 <div class="input-group-btn">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTerm.name }} <span class="caret"></span></button>
                     <ul class="dropdown-menu dropdown-menu-right">
                         <li ng-repeat="entry in terms" ng-click="selectTerm(entry)" ng-class="{ 'active': entry.id === selectedTerm.id, }">
-                            <a class="student-overview-assign-link">{{ entry.name }}  <span ng-if="entry.id === selectedTerm.id" class="glyphicon glyphicon-ok"></span></a>
+                            <a>{{ entry.name }}  <span ng-if="entry.id === selectedTerm.id" class="glyphicon glyphicon-ok"></span></a>
                         </li>
                     </ul>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 student-mobile-spacer">
-            <div id="student-grades-select" class="input-group">
+            <div class="select-full-width input-group">
                 <span class="input-group-addon">Class</span>
                 <div class="input-group-btn">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ng-class="{ 'disabled': selectedSection === null, }">
@@ -33,7 +33,7 @@
                         <span class="caret"></span></button>
                     <ul class="dropdown-menu dropdown-menu-right">
                         <li ng-repeat="entry in sections | filter: { term: selectedTerm.id, }" ng-click="selectSection(entry)" ng-class="{ 'active': entry.id === selectedSection.id, }">
-                            <a class="student-overview-assign-link">{{ entry.title }}  <span ng-if="entry.id === selectedSection.id" class="glyphicon glyphicon-ok"></span></a>
+                            <a>{{ entry.title }}  <span ng-if="entry.id === selectedSection.id" class="glyphicon glyphicon-ok"></span></a>
                         </li>
                     </ul>
                 </div>
