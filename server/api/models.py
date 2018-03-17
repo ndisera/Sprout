@@ -120,6 +120,12 @@ class Enrollment(models.Model):
         unique_together = (('section', 'student'),)
         ordering = ('section',)
 
+    def __repr__(self):
+        return "{student} in {section}".format(student=repr(self.student), section=repr(self.section))
+
+    def __str__(self):
+        return self.__repr__()
+
     def delete(self, using=None, keep_parents=False):
         """
         Cleanup notifications between this enrollment's section's teacher
