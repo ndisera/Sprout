@@ -471,15 +471,6 @@ class EnrollmentViewSet(NestedDynamicViewSet):
     ])
 
 
-class BehaviorViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    BehaviorViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(BehaviorViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(BehaviorViewSet, path, method, link)
-
 class BehaviorViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Behavior" instances
@@ -527,35 +518,19 @@ class BehaviorViewSet(NestedDynamicViewSet):
         queryset = queryset.filter(teaches | related)
         return queryset
 
-    """ define custom schema for documentation """
-    schema = BehaviorViewSetSchema()
-
     """ ensure variables show as correct type for docs """
     name_enrollment = 'enrollment'
     desc_enrollment = 'ID of the enrollment (student and section)'
-    create_fields = (
-        coreapi.Field(
+    field_enrollment = coreapi.Field(
             name=name_enrollment,
             required=True,
-            location="form", 
+            location="form",
             description=desc_enrollment,
-            schema=coreschema.Integer(title=name_enrollment)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_enrollment,
-            required=True,
-            location="form", 
-            description=desc_enrollment,
-            schema=coreschema.Integer(title=name_enrollment)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_enrollment,
-            location="form", 
-            description=desc_enrollment,
-            schema=coreschema.Integer(title=name_enrollment)),
-    )
+            schema=coreschema.Integer(title=name_enrollment))
+
+    schema = AutoSchema(manual_fields=[
+        field_enrollment,
+    ])
 
 
 class AttendanceRecordViewSet(NestedDynamicViewSet):
