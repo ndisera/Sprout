@@ -361,6 +361,26 @@ class SectionViewSet(NestedDynamicViewSet):
     serializer_class = SectionSerializer
     queryset = Section.objects.all()
 
+    def get_queryset(self, queryset=None):
+        """
+        Sections should only be visible:
+            - If the user teaches the section
+            - If the teacher has a relationship to a student enrolled in the section
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(SectionViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(teacher=user)
+        # Filter for other related students:
+        # Case manager
+        manages = Q(enrollment__student__case_manager=user)
+        # The teacher of another section in which the student is enrolled
+        other_teacher = Q(enrollment__student__enrollment__section__teacher=user)
+        queryset = queryset.filter(teaches | manages | other_teacher).distinct()
+        return queryset
 
     """ ensure variables show as correct types for docs """
     name_teacher = 'teacher'
