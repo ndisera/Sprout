@@ -270,7 +270,7 @@ class TermViewSet(NestedDynamicViewSet):
                                         required=True,
                                         location="form",
                                         description=desc_term_settings,
-                                        schema=coreschema.Integer(title=name_term_settings)),
+                                        schema=coreschema.Integer(title=name_term_settings))
 
     schema = AutoSchema(manual_fields=[
         term_settings_field,
