@@ -128,6 +128,7 @@ class StudentViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = StudentSerializer
+    queryset = Student.objects.all()
 
     def get_queryset(self, queryset=None):
         """
@@ -139,7 +140,7 @@ class StudentViewSet(NestedDynamicViewSet):
         """
         user = self.request.user
         if queryset is None:
-            queryset = Student.objects.all()
+            queryset = super(StudentViewSet, self).get_queryset()
         if user.is_superuser:
             # The superuser can see everything
             return queryset
@@ -434,6 +435,7 @@ class EnrollmentViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = EnrollmentSerializer
+    queryset = Enrollment.objects.all()
 
     def get_queryset(self, queryset=None):
         """
@@ -443,7 +445,7 @@ class EnrollmentViewSet(NestedDynamicViewSet):
         """
         user = self.request.user
         if queryset is None:
-            queryset = Enrollment.objects.all()
+            queryset = super(EnrollmentViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
         # Filter for the user teaches the section
@@ -514,6 +516,7 @@ class BehaviorViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = BehaviorSerializer
+    queryset = Behavior.objects.all()
 
     def get_queryset(self, queryset=None):
         """
@@ -523,7 +526,7 @@ class BehaviorViewSet(NestedDynamicViewSet):
         """
         user = self.request.user
         if queryset is None:
-            queryset = Behavior.objects.all()
+            queryset = super(BehaviorViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
         # Filter for the user teaches the section
@@ -570,6 +573,7 @@ class AttendanceRecordViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = AttendanceRecordSerializer
+    queryset = AttendanceRecord.objects.all()
 
     def get_queryset(self, queryset=None):
         """
@@ -579,7 +583,7 @@ class AttendanceRecordViewSet(NestedDynamicViewSet):
         """
         user = self.request.user
         if queryset is None:
-            queryset = AttendanceRecord.objects.all()
+            queryset = super(AttendanceRecordViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
         # Filter for the user teaches the section
@@ -682,6 +686,7 @@ class StandardizedTestScoreViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = StandardizedTestScoreSerializer
+    queryset = StandardizedTestScore.objects.all()
 
     def get_queryset(self, queryset=None):
         """
@@ -691,7 +696,7 @@ class StandardizedTestScoreViewSet(NestedDynamicViewSet):
         """
         user = self.request.user
         if queryset is None:
-            queryset = StandardizedTestScore.objects.all()
+            queryset = super(StandardizedTestScoreViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
         # Filter for the user teaches the student
@@ -850,11 +855,12 @@ class GradeViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = GradeSerializer
+    queryset = Grade.objects.all()
 
     def get_queryset(self, queryset=None):
         user = self.request.user
         if queryset is None:
-            queryset = Grade.objects.all()
+            queryset = super(GradeViewSet, self).get_queryset()
         if user.is_superuser:
             # The superuser is allowed to view everything
             return queryset
@@ -943,8 +949,10 @@ class SproutUserViewSet(WithDynamicViewSetMixin,
     """
     permission_classes = (IsAuthenticated, DRYObjectPermissions, )
     serializer_class = SproutUserSerializer
+    queryset = SproutUser.objects.all()
+
     def get_queryset(self, queryset=None):
-        queryset = SproutUser.objects.all()
+        queryset = super(SproutUserViewSet, self).get_queryset()
         # Get rid of the "deleted_user" user
         queryset = queryset.exclude(email='deleted_user')
         return queryset
