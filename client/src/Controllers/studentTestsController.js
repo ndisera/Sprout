@@ -49,8 +49,8 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     }
     else {
         // default to the past 4 months
-        $scope[graphStartDateKey] = moment();
-        $scope[graphEndDateKey] = moment().subtract(4, 'M');
+        $scope[graphStartDateKey] = moment().subtract(3, 'M');
+        $scope[graphEndDateKey] = moment();
     }
 
     // prepare tests
