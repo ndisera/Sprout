@@ -62,6 +62,27 @@ class DailyScheduleSerializer(DynamicModelSerializer):
         model = DailySchedule
         fields = '__all__'
 
+    def validate(self, data):
+        validated_data = super(DailyScheduleSerializer, self).validate(data)
+        errors = {}
+
+        if 'total_periods' in validated_data:
+            total_periods = validated_data['total_periods']
+        else:
+            total_periods = self.instance.total_periods
+
+        if 'periods_per_day' in validated_data:
+            periods_per_day = validated_data['periods_per_day']
+        else:
+            periods_per_day = self.instance.periods_per_day
+
+        if periods_per_day > total_periods:
+            errors['periods_per_day'] = 'Cannot have more periods per day than total periods'
+
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+
+        return validated_data
 
 class TermSettingsSerializer(DynamicModelSerializer):
     schedule = DynamicRelationField('DailyScheduleSerializer')
