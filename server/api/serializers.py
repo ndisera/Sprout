@@ -146,6 +146,28 @@ class StandardizedTestSerializer(DynamicModelSerializer):
         model = StandardizedTest
         fields = ('id', 'test_name', 'min_score', 'max_score',)
 
+    def validate(self, data):
+        validated_data = super(StandardizedTestSerializer, self).validate(data)
+        errors = {}
+
+        if 'min_score' in validated_data:
+            min_score = validated_data['min_score']
+        else:
+            min_score = self.instance.min_score
+
+        if 'max_score' in validated_data:
+            max_score = validated_data['max_score']
+        else:
+            max_score = self.instance.max_score
+
+        if max_score < min_score:
+            errors['max_score'] = 'Max score cannot be less than the min score'
+
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+
+        return validated_data
+
 
 class StandardizedTestScoreSerializer(DynamicModelSerializer):
     class Meta:
