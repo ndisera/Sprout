@@ -84,7 +84,7 @@
                             </a>
                         </div>
                         <div class="col-xs-3 visible-xs">
-                            <button id="sidebar-hamburger-btn" type="button" ng-click="clearSearch(); extendSidebar();">
+                            <button id="sidebar-hamburger-btn" type="button" ng-click="clearSearch(); toggleSidebar(false);">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </button>
                         </div>
@@ -92,7 +92,7 @@
                     <div class="row voffset4">
                         <div class="col-xs-12 no-padding">
                             <ul class="list-group" ng-cloak>
-                                <li ng-repeat="link in sidebarLinks" ng-click="sidebarLinkClick(link); closeSidebar();" class="list-group-item" ng-class="{ 'active': sidebarLinkActive(link), }">
+                                <li ng-repeat="link in sidebarLinks" ng-click="sidebarLinkClick(link);" class="list-group-item" ng-class="{ 'active': sidebarLinkActive(link), }">
                                     <a ng-href="{{ link.href }}">
                                         <span class="glyphicon glyphicon-{{ link.glyph }}"></span>
                                         {{ link.title }}
@@ -107,7 +107,7 @@
             <div id="topbar">
                 <div class="container-fluid">
                     <div class="row visible-xs">
-                        <button id="topbar-hamburger-btn" type="button" ng-click="clearSearch(); extendSidebar();">
+                        <button id="topbar-hamburger-btn" type="button" ng-click="clearSearch(); toggleSidebar(true);">
                             <span class="glyphicon glyphicon-menu-hamburger"></span>
                         </button>
                         <a id="topbar-logo" href="/profile" class="navbar-left" ng-click="clearSearch()">
