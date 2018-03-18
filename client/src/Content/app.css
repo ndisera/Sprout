@@ -483,13 +483,20 @@ a {
     width: 100%;
 }
 
+.dropdown-toggle {
+    white-space: normal;
+}
+
 ul.dropdown-menu {
     max-height: 167px;
     overflow: auto;
 }
 
 ul.dropdown-menu > li > a {
+    padding: 3px 10px;
     cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 ul.dropdown-menu > li > a:hover {

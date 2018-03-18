@@ -13,12 +13,13 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         if(ieps.iep_goals !== null && ieps.iep_goals !== undefined) {
             $scope.ieps = ieps.iep_goals;
             _.each($scope.ieps, function(elem) {
-                elem.editing = false;
-                elem.addingData = false;
-                elem.addingNote = false;
-                elem.due_date = moment(elem.due_date);
-                elem.due_date_temp = moment(elem.due_date);
-                elem.title_temp = elem.title;
+                elem.editing                  = false;
+                elem.addingData               = false;
+                elem.addingNote               = false;
+                elem.due_date                 = moment(elem.due_date);
+                elem.due_date_temp            = moment(elem.due_date);
+                elem.title_temp               = elem.title;
+                elem.quantitative_target_temp = elem.quantitative_target;
                 resetNewData(elem);
                 resetNewNote(elem);
             });
@@ -44,8 +45,9 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             due_date: moment().add(1, 'y'),
             quantitative: 'No',
             quantitative_category: null,
-            quantitative_range_low: null,
-            quantitative_range_upper: null,
+            quantitative_range_low: 0,
+            quantitative_range_upper: 100,
+            quantitative_target: null,
             title: 'New IEP',
             student: $scope.student.id,
         };
@@ -79,6 +81,15 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             var low = parseInt($scope.newIep.quantitative_range_low);
             var upper = parseInt($scope.newIep.quantitative_range_upper);
             if(low === NaN || upper === NaN || low >= upper) {
+                return true;
+            }
+
+            if($scope.newIep.quantitative_target === null || $scope.newIep.quantitative_target === undefined || $scope.newIep.quantitative_target === '') {
+                return false;
+            }
+
+            var target = parseInt($scope.newIep.quantitative_target);
+            if(target < low || target > upper) {
                 return true;
             }
         }
@@ -131,8 +142,9 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
     $scope.toggleEditIep = function(iep, value) {
         iep.editing = value;
         if(!iep.editing) {
-            iep.title_temp = iep.title;
-            iep.due_date_temp = iep.due_date;
+            iep.title_temp               = iep.title;
+            iep.due_date_temp            = iep.due_date;
+            iep.quantitative_target_temp = iep.quantitative_target;
         }
     };
 
@@ -181,7 +193,11 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
     };
 
     $scope.updateIep = function(iep) {
-        studentService.getIepDatasForStudent($scope.student.id, iep.id).then(
+        var config = {
+            sort: ['date', ],
+        };
+
+        studentService.getIepDatasForStudent($scope.student.id, iep.id, config).then(
             function success(data) {
                 if(data !== null && data !== undefined) {
                     if(data.iep_goal_datapoints !== null && data.iep_goal_datapoints !== undefined) {
@@ -196,13 +212,13 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                         iep.datapoints = _.sortBy(iep.datapoints, 'date');
 
                         var borderColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.7).toRgbString();
-                        var backgroundColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.2).toRgbString();
                         var pointBackgroundColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.7).toRgbString();
+                        var backgroundColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.2).toRgbString();
 
                         iep.graph = {
                             labels: [],
-                            series: ['Progress', ],
-                            data: [],
+                            series: ['Progress', 'Goal', ],
+                            data: [[], [], ],
                             options: {
                                 elements: {
                                     line: {
@@ -223,14 +239,28 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                                     ],
                                 },
                                 spanGaps: true,
+                                legend: {
+                                    display: false,
+                                }
                             },
-                            datasetOverride: {
-                            },
+                            datasetOverride: [
+                                {
+                                },
+                                {
+                                    fill: false,
+                                    borderDash: [ 10, 5, ],
+                                },
+                            ],
                             colors: [
                                 {
                                     borderColor: borderColor,
                                     pointBackgroundColor: pointBackgroundColor,
                                     backgroundColor: backgroundColor,
+                                },
+                                {
+                                    borderColor: $rootScope.colors[0].setAlpha(1).toRgbString(),
+                                    pointBackgroundColor: $rootScope.colors[0].setAlpha(0.7).toRgbString(),
+                                    backgroundColor: $rootScope.colors[0].setAlpha(0.2).toRgbString(),
                                 },
                             ],
                         };
@@ -241,7 +271,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                         else {
                             iep.graph.show = true;
 
-                            iep.graph.data = [[], ];
+                            //iep.graph.data = [[], ];
 
                             // iterate through each date, setting data as necessary
                             // can take first and last because it's sorted
@@ -251,6 +281,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                             for(var i = 0; i < dateDiff + 1; i++) {
                                 iep.graph.labels[i] = iterDate.format('MM/DD').toString();
                                 iep.graph.data[0][i] = null;
+                                iep.graph.data[1][i] = null;
 
                                 if(iep.datapoints[j]) {
                                     var date = moment(iep.datapoints[j].date);
@@ -271,6 +302,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                                 }
                                 iterDate.add(1, 'd');
                             }
+                            updateIepTarget(iep);
                         }
                     }
                 }
@@ -300,6 +332,12 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         );
     }
 
+    function updateIepTarget(iep) {
+        iep.graph.data[1][0] = iep.quantitative_target;
+        iep.graph.data[1][iep.graph.data[1].length - 1] = iep.quantitative_target;
+        iep.graph.options.legend.display = (iep.quantitative_target !== null);
+    }
+
     function copyData(data) {
         return {
             goal: data.goal,
@@ -325,6 +363,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             quantitative: iep.quantitative,
             quantitative_range_low: iep.quantitative_range_low,
             quantitative_range_upper: iep.quantitative_range_upper,
+            quantitative_target: iep.quantitative_target,
             quantitative_category: iep.quantitative_category,
         };
     }
@@ -462,6 +501,9 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         if(toSave.quantitative === 'Yes') {
             toSave.quantitative = true;
             toSave.quantitative_category = 'none';
+            if(toSave.quantitative_target === undefined || toSave.quantitative_target === '') {
+                toSave.quantitative_target = null;
+            }
         }
         else {
             toSave.quantitative = false;
@@ -478,6 +520,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                 newIep.due_date = moment(newIep.due_date);
                 newIep.due_date_temp = moment(newIep.due_date);
                 newIep.title_temp = newIep.title;
+                newIep.quantitative_target_temp = newIep.quantitative_target;
                 resetNewData(newIep);
                 resetNewNote(newIep);
                 
@@ -488,6 +531,8 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                 }
 
                 $scope.selectIep(newIep);
+
+                //$scope.updateIep(newIep);
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to create the new IEP.');
@@ -499,19 +544,27 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
     $scope.saveIep = function(iep) {
         var toSave = copyIep(iep);
 
-        toSave.title = iep.title_temp;
-        toSave.due_date = iep.due_date_temp.format('YYYY-MM-DD').toString();
+        toSave.title               = iep.title_temp;
+        toSave.due_date            = iep.due_date_temp.format('YYYY-MM-DD').toString();
+        toSave.quantitative_target = iep.quantitative_target_temp;
+        if(toSave.quantitative_target === undefined || toSave.quantitative_target === '') {
+            toSave.quantitative_target = null;
+        }
 
         studentService.updateIepForStudent($scope.student.id, iep.id, toSave).then(
             function success(data) {
-                iep.title = data.iep_goal.title;
-                iep.title_temp = data.iep_goal.title;
-                iep.due_date = moment(data.iep_goal.due_date);
-                iep.due_date_temp = moment(data.iep_goal.due_date);
+                iep.title                    = data.iep_goal.title;
+                iep.title_temp               = data.iep_goal.title;
+                iep.due_date                 = moment(data.iep_goal.due_date);
+                iep.due_date_temp            = moment(data.iep_goal.due_date);
+                iep.quantitative_target      = data.iep_goal.quantitative_target;
+                iep.quantitative_target_temp = data.iep_goal.quantitative_target;
 
                 if(iep.editing) {
                     $scope.toggleEditIep(iep, false);
                 }
+
+                updateIepTarget(iep);
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the measurement.');
