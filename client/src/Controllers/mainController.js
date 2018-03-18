@@ -132,12 +132,26 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
      * Navigates to student's page if name in navigation search bar is valid.
      */
     $scope.tryNavigateToStudent = function() {
-        if ($scope.studentName.toUpperCase() in $scope.studentInfo.studentsLookup) {
-            $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentName.toUpperCase()].id);
-            $scope.clearSearch();
+        if($('#topbar select.polyfilling').length === 0) {
+            if ($scope.studentName.toUpperCase() in $scope.studentInfo.studentsLookup) {
+                $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentName.toUpperCase()].id);
+                $scope.clearSearch();
+            }
+            else {
+                //TODO: notify the user in some way
+            }
         }
+        // for safari datalist alternative
         else {
-            //TODO: notify the user in some way
+            var searchText = $('#topbar select.polyfilling').find(':selected').text().trim().toUpperCase();
+            if(searchText in $scope.studentInfo.studentsLookup) {
+                $scope.clearSearch();
+                $('#topbar select.polyfilling').find(':selected').removeAttr('selected');
+                $location.path('/student/' + $scope.studentInfo.studentsLookup[searchText].id);
+            }
+            else {
+                //TODO: notify the user in some way
+            }
         }
     };
 

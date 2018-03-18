@@ -98,8 +98,8 @@
                                 <div ng-if="sectionEdit">
                                     <input type="text" autocomplete="off" class="form-control" list="cteacher" name="cteacher" ng-model="cTeacher" ng-change="checkValidTeacher('edit', cTeacher)">
                                     <datalist id="cteacher">
-                                    <option ng-repeat="t in teachers | orderBy:'last_name'" value="{{t.first_name}} {{t.last_name}} ({{t.email}})"></option>
-                                </datalist>
+                                        <option ng-repeat="t in teachers | orderBy:'last_name'" pk="{{ t.pk }}" value="{{t.first_name}} {{t.last_name}} ({{t.email}})"></option>
+                                    </datalist>
                                 </div>
                             </div>
                         </div>
@@ -256,7 +256,7 @@
                         <div class="input-group col-xs-12">
                             <input id="roundBorder" type="text" autocomplete="off" class="form-control" placeholder="Search Teachers" list="cteacher2" name="cteacher2" ng-model="addTeacher" ng-change="checkValidTeacher('add')">
                             <datalist id="cteacher2">
-                                    <option ng-repeat="t in teachers | orderBy:'last_name'" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
+                                <option ng-repeat="t in teachers | orderBy:'last_name'" pk="{{ t.pk }}" value="{{t.first_name}} {{t.last_name}} ({{t.email}})">
                                 </datalist>
                         </div>
                     </div>

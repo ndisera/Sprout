@@ -1,4 +1,4 @@
-.student-image {
+.student-frame {
     height: 100px;
     width: 100px;
     background-color: #ddd;
@@ -8,19 +8,28 @@
     box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
 }
 
+.student-image {
+    height: 100px;
+    width: 100px;
+    /* account for border of frame */
+    margin-top: -5px;
+    margin-left: -5px;
+}
+
 #student-overview-image-preview {
     text-align: right;
 }
 
-#student-overview-image-preview > img {
+#student-overview-image-preview > .picture-frame {
     margin: 0 auto;
+    display: inline-block;
 }
 
-#student-overview-image-btns {
+#student-overview-image-btns > div {
     text-align: left;
 }
 
-#student-overview-image-btns > button {
+#student-overview-image-btns > div > button {
     margin: 10px auto 0px auto;
     max-width: 200px;
 }
@@ -66,7 +75,7 @@
     border-radius: 4px;
 }
 
-#student-overview-image-crop > div > img {
+#student-overview-image-crop > div > .picture-frame {
     margin-top: -45px;
 }
 
@@ -230,7 +239,7 @@
         text-align: center;
     }
 
-    #student-overview-image-btns > button {
+    #student-overview-image-btns > div > button {
         display: block;
         margin: 8px auto 0px auto;
     }
@@ -259,10 +268,6 @@
 .student-grades-progress-circle.progress-circle.danger .progress-circle-stroke, .student-grades-progress-circle .progress-circle.danger.warning .progress-circle-stroke {
     stroke: rgba(201, 48, 44, 0.4);
 }
-
-/*#student-services-add-tip {*/
-    /*margin-top: 80px;*/
-/*}*/
 
 #student-services-add-btn {
     margin-top: -3px;
