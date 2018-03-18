@@ -81,12 +81,12 @@
                             <div class="alert alert-info" ng-if="test.scores.length === 0 && !test.adding" role="alert">
                                 <span><b>Tip:</b> It looks like you don't have any scores. Click the <span class="glyphicon glyphicon-plus"></span> button to add one.</span>
                             </div>
-                            <div class="panel panel-default student-tests-panel-info">
+                            <div class="panel panel-default student-tests-panel-info" ng-if="test.scores.length > 0">
                                 <div class="panel-body">
                                     <p class="panel-title">Displaying Scores From {{ graphStartDate.format('YYYY-MM-DD').toString() }} To {{ graphEndDate.format('YYYY-MM-DD').toString() }}</p>
                                 </div>
                             </div>
-                            <div class="table-responsive table-select student-tests-scrollable" ng-show="test.scores.length !== 0">
+                            <div class="table-responsive table-select student-tests-scrollable" ng-show="test.scores.length > 0">
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>

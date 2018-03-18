@@ -273,7 +273,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
                     updateGraph(test);
                 }
                 else {
-                    toastService.success('Your test score was added successfully. In order to see it, change the date range to include' + data.standardized_test_score.date + '.');
+                    toastService.success('Your test score was added successfully. In order to see it, change the date range to include ' + data.standardized_test_score.date + '.');
                 }
 
                 if(test.adding) {
