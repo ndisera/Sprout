@@ -2,21 +2,24 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     $scope.location = $location;
 
     $scope.student = studentData.student;
-    $scope.tests = testData.standardized_tests;
+    $scope.tests   = [];
+    $scope.terms   = [];
 
     var graphStartDateKey = 'graphStartDate';
     var graphEndDateKey = 'graphEndDate';
 
-    if(termData.terms !== null && termData.terms !== undefined) {
+    if(testData !== null && testData !== undefined) {
+        $scope.tests = testData.standardized_tests;
+    }
+
+    if(termData !== null && termData !== undefined && termData.terms !== null && termData.terms !== undefined) {
         $scope.terms = termData.terms;
         _.each($scope.terms, function(elem) {
             elem.start_date = moment(elem.start_date);
             elem.end_date   = moment(elem.end_date);
         });
         // sort so most current first
-        $scope.terms       = _.sortBy($scope.terms, function(elem) { return -elem.start_date; });
-        termsLookup        = _.indexBy($scope.terms, 'id');
-        termSettingsLookup = _.indexBy(termData.term_settings, 'id');
+        $scope.terms = _.sortBy($scope.terms, function(elem) { return -elem.start_date; });
     }
 
     // find biggest current term
@@ -39,19 +42,15 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
         }
     });
 
-    // if we're between terms (over break)
-    if($scope.selectedTerm === null) {
-        $scope.selectedTerm = $scope.terms[0];
-    }
-
     // set default date range to range of current term
     if($scope.selectedTerm !== null) {
         $scope[graphStartDateKey] = $scope.selectedTerm.start_date.clone();
         $scope[graphEndDateKey] = $scope.selectedTerm.end_date.clone();
     }
     else {
-        $scope[graphStartDateKey] = moment().startOf('year');
-        $scope[graphEndDateKey] = moment().startOf('year').add(6, 'M');
+        // default to the past 4 months
+        $scope[graphStartDateKey] = moment();
+        $scope[graphEndDateKey] = moment().subtract(4, 'M');
     }
 
     // prepare tests
@@ -85,12 +84,6 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
                             },
                         }
                     ],
-                    //xAxes: [{
-                    //ticks: {
-                    ////specify more space around each label
-                    //autoSkipPadding: 20
-                    //},
-                    //}],
                 },
                 layout: {
                     padding: {
@@ -141,12 +134,8 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
 
                 test.graph.data   = [];
                 test.graph.labels = [];
-                test.graph.totals = [];
-                test.graph.counts = [];
                 test.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
                 test.graph.labels.push(_.times(dateDiff + 1, _.constant(null)));
-                test.graph.totals.push(_.times(dateDiff + 1, _.constant(0)));
-                test.graph.counts.push(_.times(dateDiff + 1, _.constant(0)));
 
                 // iterate through each date, setting data as necessary
                 var iterDate = $scope.graphStartDate.clone();
@@ -170,12 +159,9 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
                             // have to access at index '0' because of chartjs series
                             test.graph.data[0][i] = average / count;
                         }
-                        test.graph.totals[0][i] = average;
-                        test.graph.counts[0][i] = count;
                     }
                     iterDate.add(1, 'd');
                 }
-                console.log(test);
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to get the requested test scores.');
@@ -323,20 +309,6 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
 
         updateGraphs();
     };
-
-    /**
-     * called when input datepicker is changed
-     * updates the input date and all relevant scores
-     *
-     * @param {string} varName - name of picker that was changed
-     * @param {newDate} newDate - new date that was selected
-     *
-     * @return {void}
-     */
-    //$scope.inputDateChange = function (varName, newDate) {
-    //$scope.inputDate = newDate;
-    //updateGraphs();
-    //};
 
     updateGraphs();
 });
