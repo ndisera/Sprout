@@ -220,18 +220,19 @@
         <div id="collapseSchoolTerms" class="panel-collapse collapse">
             <div class="panel-body">
                 <div class="alert alert-info no-bottom-margin" ng-if="terms.length === 0">
-                    <span><b>Tip:</b> It looks like you haven't added a term yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
+                    <span><b>Tip:</b> It looks like you haven't added a term yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.
+                    <span ng-if="schoolYears.length === 0"> A school year is required to add a term.</span></span>
                 </div>
                 <div>
-                    <div class="row">
+                    <div class="row" ng-if="schoolYears.length !== 0">
                         <div class="col-xs-12 voffset2">
                             <div class="input-group input-group-dropdown">
                                 <span class="input-group-addon">Year</span>
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ termSchoolYear.title }} <span class="caret"></span></button>
                                     <ul class="dropdown-menu dropdown-menu-right">
-                                        <li ng-repeat="schoolYear in schoolYears" ng-click="selectSchoolYear(schoolYear, 'term')">
-                                            <a class="student-overview-assign-link">{{ schoolYear.title }}  <span ng-if="schoolYear.title === termSchoolYear.title" class="glyphicon glyphicon-ok"></span></a>
+                                        <li ng-repeat="schoolYear in schoolYears" ng-click="selectSchoolYear(schoolYear, 'term')" ng-class="{ 'active': schoolYear.id === termSchoolYear.id, }">
+                                            <a class="student-overview-assign-link">{{ schoolYear.title }}  <span ng-if="schoolYear.id === termSchoolYear.id" class="glyphicon glyphicon-ok"></span></a>
                                         </li>
                                     </ul>
                                 </div>
@@ -283,7 +284,7 @@
                     </div>
                 </div>
                 <div class="btn-manipulate-row voffset2">
-                    <button class="btn btn-success" ng-hide="displayTermForm" ng-click="displayTermForm = true">
+                    <button class="btn btn-success" ng-hide="displayTermForm" ng-click="displayTermForm = true" ng-disabled="termSchoolYear == null">
                         <span class="glyphicon glyphicon-plus"></span>
                     </button>
                 </div>
@@ -349,18 +350,19 @@
         <div id="collapseHolidays" class="panel-collapse collapse">
             <div class="panel-body">
                 <div class="alert alert-info no-bottom-margin" ng-if="holidays.length === 0">
-                    <span><b>Tip:</b> It looks like you haven't added a holiday yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
+                    <span><b>Tip:</b> It looks like you haven't added a holiday yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.
+                    <span ng-if="schoolYears.length === 0"> A school year is required to add a holiday.</span></span>
                 </div>
                 <div>
-                    <div class="row">
+                    <div class="row" ng-if="schoolYears.length !== 0">
                         <div class="col-xs-12 voffset2">
                             <div class="input-group input-group-dropdown">
                                 <span class="input-group-addon">Year</span>
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ holidaySchoolYear.title }} <span class="caret"></span></button>
                                     <ul class="dropdown-menu dropdown-menu-right">
-                                        <li ng-repeat="schoolYear in schoolYears" ng-click="selectSchoolYear(schoolYear, 'holiday')">
-                                            <a class="student-overview-assign-link">{{ schoolYear.title }}  <span ng-if="schoolYear.title === holidaySchoolYear.title" class="glyphicon glyphicon-ok"></span></a>
+                                        <li ng-repeat="schoolYear in schoolYears" ng-click="selectSchoolYear(schoolYear, 'holiday')" ng-class="{ 'active': schoolYear.id === termSchoolYear.id, }">
+                                            <a class="student-overview-assign-link">{{ schoolYear.title }}  <span ng-if="schoolYear.id === holidaySchoolYear.id" class="glyphicon glyphicon-ok"></span></a>
                                         </li>
                                     </ul>
                                 </div>
@@ -410,7 +412,7 @@
                     </div>
                 </div>
                 <div class="btn-manipulate-row voffset2">
-                    <button class="btn btn-success" ng-hide="displayHolidayForm" ng-click="displayHolidayForm = true">
+                    <button class="btn btn-success" ng-hide="displayHolidayForm" ng-click="displayHolidayForm = true" ng-disabled="holidaySchoolYear == null">
                         <span class="glyphicon glyphicon-plus"></span>
                     </button>
                 </div>

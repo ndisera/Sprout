@@ -126,7 +126,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * @param {string} task - the type of task selected.
      */
     $scope.checkValidTeacher = function(task, teacher) {
-        $scope.cTeacher = teacher;
         switch (task) {
             case "add":
                 if($('#cteacher2 select.polyfilling').length === 0) {
@@ -140,6 +139,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 }
                 break;
             case "edit":
+                $scope.cTeacher = teacher;
                 if($('#cteacher select.polyfilling').length === 0) {
                     if ($scope.cTeacher != null) {
                         $scope.editValidTeacher = _.has($scope.teachersLookup, $scope.cTeacher.toUpperCase());
@@ -296,7 +296,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
 
         $scope.newSection.term = $scope.newSectionTerm.id;
         if ($scope.newSectionPeriod != null) {
-            $scope.newSection.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.newSection.term].id].indexOf($scope.newSectionPeriod.periodName);
+            $scope.newSection.schedule_position = $scope.newSectionPeriod.period;
         }
         var sectionPromise = sectionService.addSection($scope.newSection);
         sectionPromise.then(function success(data) {
