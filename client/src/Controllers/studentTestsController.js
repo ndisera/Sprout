@@ -1,15 +1,304 @@
-app.controller("studentTestsController", function ($scope, $rootScope, $location, $routeParams, testService, studentData) {
+app.controller("studentTestsController", function ($scope, $rootScope, $location, $routeParams, toastService, testService, studentData, testData, termData) {
     $scope.location = $location;
 
     $scope.student = studentData.student;
-    $scope.testGraphs = {};
-    $scope.testGraphTitles = {};
+    $scope.tests = testData.standardized_tests;
 
     var graphStartDateKey = 'graphStartDate';
     var graphEndDateKey = 'graphEndDate';
 
-    $scope[graphStartDateKey] = moment().startOf('year');
-    $scope[graphEndDateKey] = moment().startOf('year').add(6, 'M');
+    if(termData.terms !== null && termData.terms !== undefined) {
+        $scope.terms = termData.terms;
+        _.each($scope.terms, function(elem) {
+            elem.start_date = moment(elem.start_date);
+            elem.end_date   = moment(elem.end_date);
+        });
+        // sort so most current first
+        $scope.terms       = _.sortBy($scope.terms, function(elem) { return -elem.start_date; });
+        termsLookup        = _.indexBy($scope.terms, 'id');
+        termSettingsLookup = _.indexBy(termData.term_settings, 'id');
+    }
+
+    // find biggest current term
+    $scope.selectedTerm = null;
+    _.each($scope.terms, function(elem) {
+        if(moment() > elem.start_date && moment() < elem.end_date) {
+            // I have found a candidate
+            // but we want the biggest current term
+            if($scope.selectedTerm === null) {
+                $scope.selectedTerm = elem;
+            }
+            else {
+                // take the bigger one
+                var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
+                var newDelta = elem.end_date - elem.start_date;
+                if(newDelta > curDelta) {
+                    $scope.selectedTerm = elem;
+                }
+            }
+        }
+    });
+
+    // if we're between terms (over break)
+    if($scope.selectedTerm === null) {
+        $scope.selectedTerm = $scope.terms[0];
+    }
+
+    // set default date range to range of current term
+    if($scope.selectedTerm !== null) {
+        $scope[graphStartDateKey] = $scope.selectedTerm.start_date.clone();
+        $scope[graphEndDateKey] = $scope.selectedTerm.end_date.clone();
+    }
+    else {
+        $scope[graphStartDateKey] = moment().startOf('year');
+        $scope[graphEndDateKey] = moment().startOf('year').add(6, 'M');
+    }
+
+    // prepare tests
+    _.each($scope.tests, function(elem) {
+        elem.editing = false;
+        resetNewScore(elem);
+
+        var borderColor = $rootScope.colors[(elem.id - 1) % $rootScope.colors.length].setAlpha(0.7).toRgbString();
+        var backgroundColor = $rootScope.colors[(elem.id - 1) % $rootScope.colors.length].setAlpha(0.2).toRgbString();
+        var pointBackgroundColor = $rootScope.colors[(elem.id - 1) % $rootScope.colors.length].setAlpha(0.7).toRgbString();
+        elem.graph = {
+            data: [],
+            labels: [],
+            series: [ elem.test_name, ],
+            options: {
+                elements: {
+                    line: {
+                        tension: 0.2,
+                    },
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                spanGaps: true, 
+                scales: {
+                    yAxes: [
+                        {
+                            display: true,
+                            ticks: {
+                                min: elem.min_score,
+                                max: elem.max_score,
+                            },
+                        }
+                    ],
+                    //xAxes: [{
+                    //ticks: {
+                    ////specify more space around each label
+                    //autoSkipPadding: 20
+                    //},
+                    //}],
+                },
+                layout: {
+                    padding: {
+                        left: 10,
+                        top: 5,
+                    }
+                },
+                legend: {
+                    display: false
+                },
+            },
+            colors: [
+                {
+                    borderColor: borderColor,
+                    pointBackgroundColor: pointBackgroundColor,
+                    backgroundColor: backgroundColor,
+                },
+            ],
+        };
+    });
+
+    /**
+     * Update one test's graph
+     */
+    function updateGraph(test) {
+        var config = {
+            filter: [
+                { name: 'student', val: $scope.student.id, },
+                { name: 'standardized_test', val: test.id, },
+                { name: 'date.range', val: $scope.graphStartDate.format('YYYY-MM-DD').toString(), },
+                { name: 'date.range', val: $scope.graphEndDate.format('YYYY-MM-DD').toString(), },
+            ],
+            sort: ['date', ],
+        };
+
+        testService.getTestScores(config).then(
+            function success(data) {
+                test.scores = data.standardized_test_scores;
+
+                // prepare scores
+                _.each(test.scores, function(elem) {
+                    elem.editing = false;
+                    elem.date    = moment(elem.date);
+                    resetScore(elem);
+                });
+                
+                var dateDiff = $scope.graphEndDate.diff($scope.graphStartDate, 'd');
+
+                test.graph.data   = [];
+                test.graph.labels = [];
+                test.graph.totals = [];
+                test.graph.counts = [];
+                test.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                test.graph.labels.push(_.times(dateDiff + 1, _.constant(null)));
+                test.graph.totals.push(_.times(dateDiff + 1, _.constant(0)));
+                test.graph.counts.push(_.times(dateDiff + 1, _.constant(0)));
+
+                // iterate through each date, setting data as necessary
+                var iterDate = $scope.graphStartDate.clone();
+                var j = 0;
+                for(var i = 0; i < dateDiff + 1; i++) {
+                    test.graph.labels[i] = iterDate.format('MM/DD').toString();
+
+                    if(test.scores[j]) {
+                        var testDate = moment(test.scores[j].date);
+                        var average = 0;
+                        var count = 0;
+                        while(testDate.diff(iterDate, 'd') === 0) {
+                            average += test.scores[j].score;
+                            count++;
+
+                            j++;
+                            if(j >= test.scores.length) { break; }
+                            testDate = moment(test.scores[j].date);
+                        }
+                        if(count > 0) {
+                            // have to access at index '0' because of chartjs series
+                            test.graph.data[0][i] = average / count;
+                        }
+                        test.graph.totals[0][i] = average;
+                        test.graph.counts[0][i] = count;
+                    }
+                    iterDate.add(1, 'd');
+                }
+                console.log(test);
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to get the requested test scores.');
+            },
+        );
+
+    }
+
+    /**
+     * Updates the graphs on the page
+     */
+    function updateGraphs() {
+        _.each($scope.tests, function(elem) {
+            updateGraph(elem);
+        });
+    }
+
+    function copyScore(score) {
+        return {
+            id: score.id,
+            standardized_test: score.standardized_test,
+            student: score.student,
+            date: moment(score.date),
+            score: score.score,
+        };
+    }
+
+    function resetNewScore(test) {
+        test.newScore = {
+            date: moment(),
+            score: test.min_score,
+        };
+    }
+
+    function resetScore(score) {
+        score.date_temp  = score.date.clone();
+        score.score_temp = score.score;
+    }
+
+    $scope.toggleEditTest = function(test, value) {
+        test.editing = value;
+        if(!value) {
+            $scope.toggleAddScore(test, false);
+        }
+    };
+
+    $scope.toggleAddScore = function(test, value) {
+        test.adding = value;
+    };
+
+    $scope.toggleEditScore = function(score, value) {
+        score.editing = value;
+        if(!value) {
+            resetScore(score);
+        };
+    };
+
+    $scope.scoreValidation = function(test, score) {
+        if(score.score < test.min_score || score.score > test.max_score) {
+            return true;
+        }
+        return false;
+    };
+
+    $scope.scoreEditValidation = function(test, score) {
+        if(score.score_temp < test.min_score || score.score_temp > test.max_score) {
+            return true;
+        }
+        return false;
+    };
+
+    $scope.saveScore = function(test, score) {
+        var newScore = copyScore(score);
+
+        newScore.date  = score.date_temp.format('YYYY-MM-DD').toString();
+        newScore.score = score.score_temp;
+
+        testService.updateTestScore(score.id, newScore).then(
+            function success(data) {
+                updateGraph(test);
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to save the test score.');
+            },
+        );
+    };
+
+    $scope.deleteScore = function(test, score) {
+        testService.deleteTestScore(score.id).then(
+            function success(data) {
+                updateGraph(test);
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to delete the test score.');
+            },
+        );
+    };
+
+    $scope.addScore = function(test) {
+        var newScore = copyScore(test.newScore);
+
+        newScore.date              = newScore.date.format('YYYY-MM-DD').toString();
+        newScore.student           = $scope.student.id;
+        newScore.standardized_test = test.id;
+
+        testService.addTestScore(newScore).then(
+            function success(data) {
+                if(test.newScore.date > $scope.graphStartDate && test.newScore.date < $scope.graphEndDate) {
+                    updateGraph(test);
+                }
+                else {
+                    toastService.success('Your test score was added successfully. In order to see it, change the date range to include' + data.standardized_test_score.date + '.');
+                }
+
+                if(test.adding) {
+                    $scope.toggleAddScore(test, false);
+                }
+            },
+            function error(response) {
+
+            },
+        );
+    };
 
     /**
      * called when start or end daterange picker changed
@@ -36,159 +325,6 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     };
 
     /**
-     * Updates the graphs on the page
-     */
-    function updateGraphs() {
-
-        //Start by getting all of the tests, and mapping test IDs to indexes and names
-        var testConfig = {
-            //This gets all of the tests, not the test scores themselves
-        };
-
-        testService.getTests(testConfig).then(
-          function success(testInfoData) {
-              console.log(testInfoData);
-
-              //set up lookups for info
-              var testIdToInfo = {}; //name, max, min
-
-              _.each(testInfoData.standardized_tests, function (testElem) {
-                  //map the id to test info
-                  testIdToInfo[testElem.id] = {
-                      name: testElem.test_name,
-                      min: testElem.min_score,
-                      max: testElem.max_score
-                  };
-              });
-
-
-              var testScoresConfig = {
-                  filter: [
-                      //get the student's test scores and start populating the graphs,
-                      {name: 'student', val: $scope.student.id},
-                      {name: 'date.range', val: $scope.graphStartDate.format('YYYY-MM-DD').toString(),},
-                      {name: 'date.range', val: $scope.graphEndDate.format('YYYY-MM-DD').toString(),},
-                  ]
-              };
-
-              testService.getTestScores(testScoresConfig).then(
-                function success(studentTestScoresRaw) {
-                    // console.log(studentTestScoresRaw);
-
-                    var studentTestScores = _.sortBy(studentTestScoresRaw.standardized_test_scores, 'date');
-
-                    // console.log(testIdToInfo);
-
-                    //two passes for now: could be optimized to 1 pass if we wanted to
-                    var testIdToIndex = {};
-                    var counter = 0; //counter for test id -> index
-                    var startDate = moment($scope[graphStartDateKey]);
-                    var endDate = moment($scope[graphEndDateKey]);
-                    var dateDiff = endDate.diff(startDate, 'd');
-
-                    _.each(studentTestScores, function (scoreElem) {
-                        //Initialize the graphs if they aren't already made.
-                        if (!(_.has(testIdToIndex, scoreElem.standardized_test))) {
-                            //store the ID -> index pair
-                            testIdToIndex[scoreElem.standardized_test] = counter;
-
-                            //save the title of the test
-                            $scope.testGraphTitles[counter] = testIdToInfo[scoreElem.standardized_test].name;
-
-                            //create a new graph data object
-                            $scope.testGraphs[counter] = {
-                                data: [],
-                                labels: [],
-                                options: {
-                                    elements: {
-                                        line: {
-                                            fill: false,
-                                            tension: 0.2,
-                                        },
-                                    },
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    spanGaps: true, //skip values of null or NaN
-
-                                    scales: {
-                                        yAxes: [{
-                                            display: true,
-                                            ticks: {
-                                                //this will change based on the test
-                                                min: testIdToInfo[scoreElem.standardized_test].min,
-                                                max: testIdToInfo[scoreElem.standardized_test].max,
-                                            },
-                                        }],
-                                        xAxes: [{
-                                            ticks: {
-                                                //specify more space around each label
-                                                autoSkipPadding: 20
-                                            },
-                                        }],
-                                    },
-
-                                    layout: {
-                                        padding: {
-                                            left: 10,
-                                            top: 5,
-                                        }
-                                    },
-
-                                    legend: {
-                                          display: false
-                                    },
-                                },
-                                //colors: [
-                                    //"rgba(255,99,132,0.7)",
-                                    //"rgba(255,159,64,0.7)",
-                                    //"rgba(255,205,86,0.7)",
-                                    //"rgba(75,192,192,0.7)",
-                                    //"rgba(54,162,235,0.7)",
-                                    //"rgba(153,102,255,0.7)",
-                                    //"rgba(201,203,207,0.7)",
-                                //],
-                            };
-
-
-                            //since there's only one series per chart, we just initialize the structure without looping
-
-                            //initialize the array
-                            $scope.testGraphs[counter].data = [];
-                            $scope.testGraphs[counter].data.push(_.times(dateDiff + 1, _.constant(null)));
-
-                            //make a labels array in order to display our data
-                            $scope.testGraphs[counter].labels = [];
-                            $scope.testGraphs[counter].labels.push(_.times(dateDiff + 1, _.constant(null)));
-
-                            counter++;
-                        }
-
-                        //for each score, calculate the number of days since the start date
-                        var currentDate = moment(scoreElem.date);
-                        var dateIndex = currentDate.diff(startDate, 'd');
-
-                        //use the test ID to put it into the right graph
-                        $scope.testGraphs[testIdToIndex[scoreElem.standardized_test]].data[0][dateIndex] = scoreElem.score;
-                    });
-
-                    //put in all labels
-                    _.each($scope.testGraphs, function (graphElem) {
-                        var iterDate = $scope.graphStartDate.clone();
-                        for (var i = 0; i < dateDiff + 1; i++) {
-                            graphElem.labels[i] = iterDate.format('MM/DD').toString();
-                            iterDate.add(1, 'd');
-                        }
-
-                        // console.log("Test graphs:");
-                        console.log(graphElem);
-                    })
-                }
-              )
-          }
-        )
-    }
-
-    /**
      * called when input datepicker is changed
      * updates the input date and all relevant scores
      *
@@ -197,10 +333,10 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
      *
      * @return {void}
      */
-    $scope.inputDateChange = function (varName, newDate) {
-        $scope.inputDate = newDate;
-        updateGraphs();
-    };
+    //$scope.inputDateChange = function (varName, newDate) {
+    //$scope.inputDate = newDate;
+    //updateGraphs();
+    //};
 
     updateGraphs();
 });
