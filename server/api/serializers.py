@@ -62,6 +62,27 @@ class DailyScheduleSerializer(DynamicModelSerializer):
         model = DailySchedule
         fields = '__all__'
 
+    def validate(self, data):
+        validated_data = super(DailyScheduleSerializer, self).validate(data)
+        errors = {}
+
+        if 'total_periods' in validated_data:
+            total_periods = validated_data['total_periods']
+        else:
+            total_periods = self.instance.total_periods
+
+        if 'periods_per_day' in validated_data:
+            periods_per_day = validated_data['periods_per_day']
+        else:
+            periods_per_day = self.instance.periods_per_day
+
+        if periods_per_day > total_periods:
+            errors['periods_per_day'] = 'Cannot have more periods per day than total periods'
+
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+
+        return validated_data
 
 class TermSettingsSerializer(DynamicModelSerializer):
     schedule = DynamicRelationField('DailyScheduleSerializer')
@@ -145,6 +166,28 @@ class StandardizedTestSerializer(DynamicModelSerializer):
     class Meta:
         model = StandardizedTest
         fields = ('id', 'test_name', 'min_score', 'max_score',)
+
+    def validate(self, data):
+        validated_data = super(StandardizedTestSerializer, self).validate(data)
+        errors = {}
+
+        if 'min_score' in validated_data:
+            min_score = validated_data['min_score']
+        else:
+            min_score = self.instance.min_score
+
+        if 'max_score' in validated_data:
+            max_score = validated_data['max_score']
+        else:
+            max_score = self.instance.max_score
+
+        if max_score < min_score:
+            errors['max_score'] = 'Max score cannot be less than the min score'
+
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+
+        return validated_data
 
 
 class StandardizedTestScoreSerializer(DynamicModelSerializer):
