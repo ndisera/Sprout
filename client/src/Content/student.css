@@ -16,6 +16,14 @@
     margin-left: -5px;
 }
 
+.student-tiny-col {
+    width: 17%;
+}
+
+.student-min-col {
+    width: 1px;
+}
+
 #student-overview-image-preview {
     text-align: right;
 }

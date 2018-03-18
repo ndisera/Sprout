@@ -127,6 +127,24 @@ app.factory("testService", function ($rootScope, $http, $q, queryService) {
                 deferred.reject(response);
             });
             return deferred.promise;
-        }
+        },
+
+        /**
+         * Delete standardized test score
+         * @param {number} scoreId - the score id
+         * @return {promise} promise that will resolve with data or reject with response code.
+         */
+        deleteTestScore: function(scoreId) {
+            var deferred = $q.defer();
+            $http({
+                method: 'DELETE',
+                url: 'https://' + $rootScope.backend + '/standardized_test_scores/' + scoreId,
+            }).then(function success(response) {
+                deferred.resolve(response.data);
+            }, function error(response) {
+                deferred.reject(response);
+            });
+            return deferred.promise;
+        },
     };
 });
