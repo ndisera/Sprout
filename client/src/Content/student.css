@@ -254,6 +254,10 @@
         text-align: center;
         margin-bottom: 20px;
     }
+
+    .student-mobile-spacer {
+        margin-top: 15px;
+    }
 }
 
 .student-grades-progress-circle {

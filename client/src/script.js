@@ -453,7 +453,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         $location.path('/login').replace();
 
         // notify user
-        toastService.error('There was a fatal error with the server. Please log back in.');
+        toastService.error('There was an error with the server. Please log back in.');
     });
 
     /**
