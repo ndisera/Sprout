@@ -242,7 +242,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         }
 
         $scope.sectionE.term = $scope.cTerm.id;
-        if($scope.cPeriod !== null && $scope.cPeriof !== undefined) {
+        // added to prevent error in console
+        if($scope.cPeriod !== null && $scope.cPeriod !== undefined) {
             $scope.sectionE.schedule_position = $scope.cPeriod.period;
         }
         else {
