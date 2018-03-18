@@ -2,85 +2,20 @@ app.controller("userSettingsController", function($scope, $rootScope, $location,
     $scope.location = $location;
 
     $scope.user = userService.user;
-    $scope.viewUFirstName = true;
-    $scope.viewULastName = true;
-    $scope.viewUEmail = true;
-    $scope.editingAll = true;
+    $scope.userE = Object.assign({}, $scope.user);
+    $scope.userEdit = false;
 
     /**
-     * Turns the displayed user field into an editable input.
-     * @param {string} field - the name of the field that the user is editing.
+     * Toggles user edit
      */
-    $scope.editUser = function(field) {
-        switch (field) {
-            case "firstname":
-                $scope.viewUFirstName = false;
-                checkIfAllSelected();
-                break;
-            case "lastname":
-                $scope.viewULastName = false;
-                checkIfAllSelected();
-                break;
-            case "none":
-                $scope.viewUFirstName = true;
-                $scope.viewULastName = true;
-                $scope.editingAll = true;
-                break;
-            case "all":
-                $scope.viewUFirstName = false;
-                $scope.viewULastName = false;
-                $scope.editingAll = false;
-                break;
-            default:
-        }
+    $scope.toggleUserEdit = function() {
+        $scope.userEdit = !$scope.userEdit;
     };
-
-    /**
-     * Restored the previous display of the selected user field and hides the editable input box.
-     * @param {string} field - the name of the field that the user is editing.
-     */
-    $scope.cancelUEdit = function(field) {
-        switch (field) {
-            case "firstname":
-                $scope.viewUFirstName = true;
-                $scope.uFirstName = "";
-                break;
-            case "lastname":
-                $scope.viewULastName = true;
-                $scope.uLastName = "";
-                break;
-            default:
-        }
-        checkIfAllSelected();
-    };
-
-    /**
-     * Sets edit all button according to what edit fields are ready to edit.
-     */
-    function checkIfAllSelected() {
-        if ($scope.viewUFirstName && $scope.viewULastName) {
-            $scope.editingAll = true;
-        } else if (!$scope.viewUFirstName && !$scope.viewULastName) {
-            $scope.editingAll = false;
-        }
-    }
 
     /**
      * Updates the selected user with the newly edited field.
-     * @param {string} field - the name of the field that the user is editing.
      */
-    $scope.saveUEdit = function(field) {
-        $scope.userE = Object.assign({}, $scope.user);
-        switch (field) {
-            // update field
-            case "firstname":
-                $scope.userE.firstName = $scope.uFirstName;
-                break;
-            case "lastname":
-                $scope.userE.lastName = $scope.uLastName;
-                break;
-            default:
-        }
+    $scope.saveUEdit = function() {
         // save with userE
         var tempUser = Object.assign({}, $scope.userE);
         var token = tempUser.token;
@@ -94,19 +29,7 @@ app.controller("userSettingsController", function($scope, $rootScope, $location,
         userPromise.then(function success(data) {
             // set user to userE to reflect update
             $scope.user = Object.assign({}, $scope.userE);
-            switch (field) {
-                // set view after call returns
-                case "firstname":
-                    $scope.viewUFirstName = true;
-                    $scope.uFirstName = "";
-                    break;
-                case "lastname":
-                    $scope.viewULastName = true;
-                    $scope.uLastName = "";
-                    break;
-                default:
-            }
-            checkIfAllSelected();
+            $scope.userEdit = false;
         }, function error(response) {
             setErrorMessage(response);
             toastService.error("The server was unable to save your edit." + errorResponse());

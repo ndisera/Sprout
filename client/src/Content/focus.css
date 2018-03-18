@@ -16,7 +16,7 @@
     cursor:pointer
 }
 
-.focusProgress, .focusCaution, .focusGraph {
+.focus-graph {
     height: 200px;
     margin-top: 15px;
 }
@@ -56,10 +56,6 @@
 .focus-student-row .panel > .panel-heading.panel-heading-link:hover {
     cursor: move;
     background-color: #e7e7e7;
-}
-
-.focus-top-button {
-    margin-top: 15px;
 }
 
 .focus-delete-group {

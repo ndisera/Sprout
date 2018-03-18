@@ -1,6 +1,9 @@
-app.controller("studentOverviewController", function ($scope, $location, $routeParams, toastService, studentService, termData, enrollmentData, userData, studentData) {
+app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, studentService, termData, enrollmentData, userData, studentData) {
     $scope.location = $location;
 
+    $scope.newStudentImage = null;
+    $scope.newStudentImageCrop = null;
+    
     // set important scope variables
     $scope.student         = studentData.student;
     $scope.enrollments     = [];
@@ -74,133 +77,82 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
     $scope.teachers = _.indexBy(userData.sprout_users, 'pk');
 
     // define structure for editing student fields
-    $scope.editingAll = false;
+    $scope.editing = false;
     $scope.studentProperties = {
         first_name: {
             key: 'first_name',
             title: 'First Name',
             value: $scope.student.first_name,
             curValue: $scope.student.first_name,
-            editable: false,
         },
         last_name: {
             key: 'last_name',
             title: 'Last Name',
             value: $scope.student.last_name,
             curValue: $scope.student.last_name,
-            editable: false,
         },
         student_id: {
             key: 'student_id',
             title: 'Student ID',
             value: $scope.student.student_id,
             curValue: $scope.student.student_id,
-            editable: false,
         },
         birthdate: {
             key: 'birthdate',
             title: 'Birthday',
             value: moment($scope.student.birthdate).format('YYYY-MM-DD'),
             curValue: moment($scope.student.birthdate).format('YYYY-MM-DD'),
-            editable: false,
         },
     };
 
+    // toggles whether or not you're editing the student
+    $scope.toggleEdit = function(value) {
+        $scope.editing = value;
 
-    /**
-     * Determines whether all fields are being edited or not edited and updates
-     * the editingAll variable.
-     */
-    function updateEditingAll() {
-        if(_.every($scope.studentProperties, function(val) { return !val.editable; })) {
-            $scope.editingAll = false;
-        }
-
-        if(_.every($scope.studentProperties, function(val) { return val.editable; })) {
-            $scope.editingAll = true;
-        }
-    }
-
-    /**
-     * Begins editing a student property. Makes all properties editable
-     * if 'all' is passed in.
-     *
-     * @param {object|string} property - student property or the string 'all'
-     */
-    $scope.beginEditStudent = function(property) {
-        if(property === 'all') {
-            $scope.editingAll = true;
-            _.each($scope.studentProperties, function(value) {
-                value.editable = true;
+        if(!value) {
+            _.each($scope.studentProperties, function(value, key) {
+                if(value.key === 'birthdate') {
+                    value.curValue = moment(value.value);
+                }
+                else {
+                    value.curValue = value.value;
+                }
             });
-        }
-        else {
-            property.editable = true;
-            updateEditingAll();
         }
     };
-
-
-    /**
-     * Ends editing a student property. Makes all properties not-editable
-     * if 'all' is passed in.
-     *
-     * @param {object|string} property - student property or the string 'all'
-     */
-    $scope.endEditStudent = function(property) {
-        if(property === 'all') {
-            $scope.editingAll = false;
-            _.each($scope.studentProperties, function(value) {
-                value.curValue = value.value;
-                value.editable = false;
-            });
-        }
-        else {
-            property.curValue = property.value;
-            property.editable = false;
-            updateEditingAll();
-        }
-    }
-
 
     /**
      * Saves a student. Only saves the property that was confirmed.
      *
      * @param {object} property - property from studentProperties to save.
      */
-    $scope.saveStudent = function(property) {
+    $scope.saveStudent = function() {
         var newStudent = {};
         _.each($scope.studentProperties, function(value, key) {
-            newStudent[key] = value.value;
+            newStudent[key] = value.curValue;
         });
 
-        if(property.key === 'birthdate') {
-            newStudent[property.key] = moment(property.curValue).format('YYYY-MM-DD').toString();
-        }
-        else {
-            newStudent[property.key] = property.curValue;
-        }
+        newStudent.birthdate = moment(newStudent.birthdate).format('YYYY-MM-DD').toString();
 
         studentService.updateStudent($scope.student.id, newStudent).then(
             function success(data) {
                 _.each($scope.studentProperties, function(value, key) {
                     if(value.key === 'birthdate') {
                         value.value = moment(data.student[key]).format('YYYY-MM-DD');
+                        value.curValue = moment(data.student[key]).format('YYYY-MM-DD');
                     }
                     else {
                         value.value = data.student[key];
+                        value.curValue = data.student[key];
                     }
                 });
                 $scope.student = data.student;
-                $scope.studentProperties[property.key].editable = false;
-                updateEditingAll();
+
+                if($scope.editing) {
+                    $scope.toggleEdit(false);
+                }
             },
             function error(response) {
-                _.each($scope.studentProperties, function(value) {
-                    value.curValue = value.value;
-                    value.editable = false;
-                });
-                $scope.editingAll = false;
                 // notify the user
                 toastService.error('The server wasn\'t able to update the student\'s information.');
             }
@@ -239,4 +191,57 @@ app.controller("studentOverviewController", function ($scope, $location, $routeP
         );
     };
 
+    /*** IMAGE RELATED ***/
+
+    $scope.uploadStudentImage = function(image) {
+        studentService.addStudentPicture($scope.student.id, { file: image, }).then(
+            function success(data) {
+                $rootScope.currentStudent.id = $scope.student.id;
+                $rootScope.currentStudent.picture = data.profile_picture.file;
+
+                $scope.student.picture = data.profile_picture.id;
+
+                $scope.closeModal();
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to save your image.');
+            },
+        );
+    };
+
+    $scope.deleteStudentImage = function() {
+        if($scope.student.picture === null) {
+            return;
+        }
+
+        studentService.deleteStudentPicture($scope.student.id, $scope.student.picture).then(
+            function success(data) {
+                $rootScope.currentStudent.id = $scope.student.id;
+                $rootScope.currentStudent.picture = null;
+
+                $scope.student.picture = null;
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to delete your image.');
+            },
+        );
+
+    };
+
+    $scope.showModal = function() {
+        if(!($('#student-overview-image-modal').data('bs.modal') || {}).isShown) {
+            $('#student-overview-image-modal').modal('toggle');
+            $scope.newStudentImage = null;
+            $scope.newStudentImageCrop = null;
+        }
+    };
+
+    $scope.closeModal = function() {
+        if(($('#student-overview-image-modal').data('bs.modal') || {}).isShown) {
+            $('#student-overview-image-modal').modal('toggle');
+        }
+    };
+
+
 });
+

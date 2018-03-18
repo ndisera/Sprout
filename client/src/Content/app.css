@@ -34,11 +34,12 @@ html, body {
     height: 100%;
     width: 100%;
     padding: 0;
-    font-weight: 200;
+    font-weight: 400;
 }
 
 body {
     position: absolute;
+    font-family: 'Source Sans Pro', sans-serif;
 }
 
 a {
@@ -50,8 +51,9 @@ a {
     width: 100%;
     height: 100vh;
     top: 0;
-    display: none;
+    /*display: none;*/
     z-index: 199;
+    visibility: hidden;
 }
 
 #sidebar {
@@ -141,6 +143,14 @@ a {
     padding: 4px 12px;
 }
 
+#topbar select.polyfilling {
+    top: 30px;
+    left: 0px;
+    border-radius: 0px;
+    min-width: unset;
+    width: 100%;
+}
+
 #topbar .btn-group {
     margin-top: -2px;
 }
@@ -200,44 +210,6 @@ a {
 .bottom-spacer {
     height: 200px;
     width: 100%;
-}
-
-.nav-tabs {
-    border-bottom: 2px solid #ddd;
-}
-
-.nav-tabs > li {
-    margin-bottom: -2px;
-}
-
-.nav-tabs > li > a {
-    margin-right: 0px;
-    border: none;
-    border-bottom: 3px solid transparent;
-}
-
-.nav > li > a:hover, .nav > li > a:focus {
-    background: none;
-    color: #5ab9ea;
-    border-bottom: 3px solid #5ab9ea;
-}
-
-.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
-    border: none;
-    color: #57bc90;
-    border-bottom: 3px solid #57bc90;
-}
-
-.nav-tabs > li, .nav-pills > li {
-        width: 110px;
-}
-
-.nav-tabs, .nav-pills {
-    text-align: center;
-}
-
-.nav-tabs li, .nav-pills li {
-    cursor: pointer;
 }
 
 .btn-group > button.btn {
@@ -365,7 +337,7 @@ a {
 }
 
 .no-bottom-margin {
-    margin-bottom: 0px;
+    margin-bottom: 0px !important;
 }
 
 .no-bottom-border {
@@ -495,9 +467,29 @@ a {
     cursor: pointer;
 }
 
+.select-full-width > .input-group-addon {
+    width: unset;
+}
+
+.select-full-width > .input-group-btn {
+    width: 100%;
+}
+
+.select-full-width > .input-group-btn > button {
+    width: 100%;
+}
+
+.select-full-width > .input-group-btn > ul {
+    width: 100%;
+}
+
 ul.dropdown-menu {
     max-height: 167px;
     overflow: auto;
+}
+
+ul.dropdown-menu > li > a {
+    cursor: pointer;
 }
 
 ul.dropdown-menu > li > a:hover {
@@ -605,7 +597,7 @@ ul.dropdown-menu > li > a:hover {
     padding-right: 0px;
     font-family: 'Glyphicons Halflings';
     font-size: 20px;
-} 
+}
 
 #toast-container > .toast-warning:before {
     content: "\e101";
@@ -683,7 +675,32 @@ ul.dropdown-menu > li > a:hover {
     }
 
     #sidebar {
-        display: none;
+        opacity: 0;
+        left: -100px;
+        transition: left 0.2s ease, opacity 0.1s ease;
+    }
+
+    #sidebar.sidebar-extended {
+        opacity: 1;
+        left: 0px;
+        width: 95%;
+        max-width: 300px;
+        z-index: 200;
+    }
+
+    .background-container {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .background-container.sidebar-extended {
+        visibility: visible;
+        opacity: 1;
+        background-color: rgba(0, 0, 0, 0.75);
+    }
+
+    #sidebar.sidebar-extended .list-group-item > a {
+        padding: 10px 10px;
     }
 
     #topbar {
@@ -704,49 +721,10 @@ ul.dropdown-menu > li > a:hover {
         margin-top: 95px;
     }
 
-    #sidebar.sidebar-extended {
-        display: block;
-        width: 95%;
-        max-width: 300px;
-        z-index: 200;
+    .manipulate-panel-spacer {
+        margin-top: 15px;
     }
 
-    .sidebar-extended.background-container {
-        display: block;
-        background-color: rgba(0, 0, 0, 0.75);
-    }
-
-    #sidebar.sidebar-extended .list-group-item > a {
-        padding: 10px 10px;
-    }
-
-    .nav-tabs > li {
-        margin-bottom: -2px;
-    }
-
-    .nav-tabs > li > a {
-        margin-right: 0px;
-        border: none;
-        border-bottom: 3px solid transparent;
-    }
-
-    .nav-pills > li > a {
-        border-bottom: 3px solid transparent;
-    }
-
-    .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-        border-bottom: 3px solid transparent;
-    }
-
-    .nav > li > a:hover, .nav > li > a:focus {
-        background: #EEE;
-        color: #5ab9ea;
-    }
-
-    .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-        color: #EEE;
-        background-color: #57bc90;
-    }
 }
 
 .no-border {
@@ -838,7 +816,6 @@ ul.dropdown-menu > li > a:hover {
 
 .btn-manipulate-row {
     float: right !important;
-    margin-top: 15px;
     margin-bottom: -34px;
 }
 
@@ -848,21 +825,37 @@ ul.dropdown-menu > li > a:hover {
     margin-bottom: 0px;
 }
 
+form .btn-manipulate-row {
+    margin-bottom: -33px;
+}
+
 .btn-manipulate-row-bottom {
     float: right !important;
     margin-top: 20px;
     margin-right: 15px;
 }
 
-.btn-manipulate-row > button, .btn.btn-manipulate {
+.btn-manipulate-row button, .btn.btn-manipulate {
     border-radius: 50%;
     width: 40px;
     height: 40px;
     padding: 0px;
 }
 
-.btn-manipulate-row > button > span.glyphicon, .btn.btn-manipulate > span.glyphicon {
+.btn-manipulate-row button > span.glyphicon, .btn.btn-manipulate > span.glyphicon {
     font-size: 15px;
+}
+
+.btn-manipulate-row button.btn-default > span.glyphicon, .btn.btn-manipulate.btn-default > span.glyphicon {
+    color: #333;
+}
+
+.btn-manipulate-row button.delete-left {
+    margin-right: 20px;
+}
+
+.add-panel-spacer {
+    margin-bottom: 15px;
 }
 
 input.ng-invalid.ng-dirty, select.ng-invalid.ng-dirty, input.ng-invalid.ng-touched, select.ng-invalid.ng-touched, input.ng-invalid.ng-dirty.ng-touched, select.ng-invalid.ng-dirty.ng-touched, input.invalid {
@@ -876,6 +869,7 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
 
 .table > tbody > tr > td.table-button-col {
     padding: 0px;
+    text-align: center;
 }
 
 .table-button-col > button {
@@ -899,3 +893,45 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
     padding-top: 7px;
 }
 
+.progress-circle {
+    text-align: center;
+}
+
+.progress-circle .progress-circle-stroke {
+    transition: stroke 0.7s ease;
+    fill: none;
+    stroke: rgba(87, 188, 144, 0.4);
+}
+
+.progress-circle .progress-circle-background-border {
+    fill: none;
+    stroke: rgba(238, 238, 238, 0.8);
+}
+
+.progress-circle text {
+    font-weight: 100;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-anchor: middle;
+    alignment-baseline: middle;
+}
+
+.input-group-dropdown > .input-group-addon {
+    width: unset;
+}
+
+.input-group-dropdown > .input-group-btn {
+    width: 100%;
+}
+
+.input-group-dropdown > .input-group-btn > button {
+    width: 100%;
+}
+
+.input-group-dropdown > .input-group-btn > ul {
+    width: 100%;
+}
+
+.picture-frame {
+    display: inline-block;
+    overflow: hidden;
+}

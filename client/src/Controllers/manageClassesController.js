@@ -10,16 +10,10 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.termSettings = _.indexBy(termsInfo.term_settings, "id");
     $scope.dailySchedules = _.indexBy(termsInfo.daily_schedules, "id");
     $scope.displaySectionViewSearch = true;
-    $scope.displaySectionDeleteSearch = false;
     $scope.displaySectionForm = false;
     $scope.displaySectionInfo = false;
     $scope.displayCEditInfo = false;
-    $scope.viewCTitle = true;
-    $scope.viewCTeacher = true;
-    $scope.viewCTerm = true;
-    $scope.viewCPeriod = true;
-    $scope.addSectionSuccess = false;
-    $scope.deleteSectionSuccess = false;
+    $scope.sectionEdit = false;
     $scope.sectionsLookup = {};
     $scope.sectionV = {};
     $scope.sectionE = {};
@@ -36,8 +30,25 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.addValidTeacher = false;
     $scope.editValidTeacher = false;
     $scope.editingAll = true;
-    $scope.viewSectionTerm = {name: "All Terms"};
-    $scope.deleteSectionTerm = {name: "All Terms"};
+    $scope.viewSectionTerm = {
+        name: "All Terms"
+    };
+
+    /**
+     * Toggles the section edit
+     */
+    $scope.toggleSectionEdit = function() {
+        $scope.sectionEdit = !$scope.sectionEdit;
+    }
+
+    /**
+     * Sets cTerm to selected term
+     * @param {string} term - the selected display term.
+     */
+    $scope.setTerm = function(term) {
+        $scope.cTerm = term;
+        $scope.cPeriod = $scope.periodArraysLookup[$scope.cTerm.id][$scope.cPeriod.period - 1];
+    }
 
     /**
      * Sets cPeriod to selected period
@@ -50,10 +61,9 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     /**
      * Sets term variables to selected term
      * @param {object} term - the term selected.
-     * @param {string} operation - the type of operation.
      */
-    $scope.selectTerm = function(term, operation) {
-        operation === "view" ? $scope.viewSectionTerm = term : $scope.deleteSectionTerm = term;
+    $scope.selectTerm = function(term) {
+        $scope.viewSectionTerm = term;
     }
 
     /**
@@ -97,7 +107,13 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     day++;
                     period = 1;
                 }
-                noDays ? periodsForDisplay.push("Period " + period) : periodsForDisplay.push("Day " + day + " Period " + period);
+                noDays ? periodsForDisplay.push({
+                    period: j + 1,
+                    periodName: "Period " + period
+                }) : periodsForDisplay.push({
+                    period: j + 1,
+                    periodName: "Day " + day + " Period " + period
+                });
             }
             $scope.periodArraysLookup[$scope.terms[i].id] = periodsForDisplay;
         }
@@ -109,16 +125,29 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Make sure teacher text is an actual teacher.
      * @param {string} task - the type of task selected.
      */
-    $scope.checkValidTeacher = function(task) {
+    $scope.checkValidTeacher = function(task, teacher) {
+        $scope.cTeacher = teacher;
         switch (task) {
             case "add":
-                if ($scope.addTeacher != null) {
-                    $scope.addValidTeacher = _.has($scope.teachersLookup, $scope.addTeacher.toUpperCase());
+                if($('#cteacher2 select.polyfilling').length === 0) {
+                    if ($scope.addTeacher != null) {
+                        $scope.addValidTeacher = _.has($scope.teachersLookup, $scope.addTeacher.toUpperCase());
+                    }
+                }
+                else {
+                    var pk = parseInt($('#cteacher2 select.polyfilling').find(':selected').attr('pk'));
+                    $scope.addValidTeacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }) !== null;
                 }
                 break;
             case "edit":
-                if ($scope.cTeacher != null) {
-                    $scope.editValidTeacher = _.has($scope.teachersLookup, $scope.cTeacher.toUpperCase());
+                if($('#cteacher select.polyfilling').length === 0) {
+                    if ($scope.cTeacher != null) {
+                        $scope.editValidTeacher = _.has($scope.teachersLookup, $scope.cTeacher.toUpperCase());
+                    }
+                }
+                else {
+                    var pk = parseInt($('#cteacher select.polyfilling').find(':selected').attr('pk'));
+                    $scope.editValidTeacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }) !== null;
                 }
                 break;
             default:
@@ -134,14 +163,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             case "view/edit":
                 $scope.displaySectionViewSearch = false;
                 break;
-            case "delete":
-                $scope.displaySectionInfo = false;
-                $scope.displaySectionDeleteSearch = false;
-                $scope.deleteSectionSuccess = false;
-                break;
             case "add":
                 $scope.displaySectionForm = false;
-                $scope.addSectionSuccess = false;
                 break;
             default:
         }
@@ -150,9 +173,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         switch (task) {
             case "view/edit":
                 $scope.displaySectionViewSearch = true;
-                break;
-            case "delete":
-                $scope.displaySectionDeleteSearch = true;
                 break;
             case "add":
                 $scope.displaySectionForm = true;
@@ -194,12 +214,11 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         $scope.sectionE = Object.assign({}, $scope.sectionV);
         $scope.displayCEditInfo = true;
         // make sure edit is still not displayed when switching
-        $scope.viewCTitle = true;
-        $scope.viewCTeacher = true;
-        $scope.viewCTerm = true;
+        $scope.sectionEdit = false;
         $scope.cTerm = $scope.termsLookup[section.term];
-        $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[section.term].id][section.schedule_position];
-        $scope.viewCPeriod = true;
+        $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[section.term].id][section.schedule_position - 1];
+        // initialize
+        $scope.cTeacher = $scope.teacherIdLookup[$scope.sectionV.teacher];
         // set enrolledStudents and unenrolledStudents
         $('#enrolledInput').val('');
         $('#unenrolledInput').val('');
@@ -207,113 +226,39 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     };
 
     /**
-     * Turns the displayed teacher field into an editable input.
-     * @param {string} field - the name of the field that the user is editing.
-     */
-    $scope.editSection = function(field) {
-        switch (field) {
-            case "title":
-                $scope.viewCTitle = false;
-                checkIfAllSelected()
-                break;
-            case "teacher":
-                $scope.viewCTeacher = false;
-                checkIfAllSelected()
-                break;
-            case "term":
-                $scope.viewCTerm = false;
-                checkIfAllSelected()
-                break;
-            case "period":
-                $scope.viewCPeriod = false;
-                checkIfAllSelected()
-                break;
-            case "none":
-                $scope.viewCTitle = true;
-                $scope.viewCTeacher = true;
-                $scope.viewCTerm = true;
-                $scope.viewCPeriod = true;
-                $scope.editingAll = true;
-                break;
-            case "all":
-                $scope.viewCTitle = false;
-                $scope.viewCTeacher = false;
-                $scope.viewCTerm = false;
-                $scope.viewCPeriod = false;
-                $scope.editingAll = false;
-                break;
-            default:
-        }
-    };
-
-    /**
-     * Sets edit all button according to what edit fields are ready to edit.
-     */
-    function checkIfAllSelected() {
-        if ($scope.viewCTitle && $scope.viewCTeacher && $scope.viewCTerm && $scope.viewCPeriod) {
-            $scope.editingAll = true;
-        } else if (!$scope.viewCTitle && !$scope.viewCTeacher && !$scope.viewCTerm && !$scope.viewCPeriod) {
-            $scope.editingAll = false;
-        }
-    }
-
-    /**
-     * Restored the previous display of the selected section field and hides the editable input box.
-     * @param {string} field - the name of the field that the user is editing.
-     */
-    $scope.cancelCEdit = function(field) {
-        switch (field) {
-            case "title":
-                $scope.viewCTitle = true;
-                $scope.cTitle = "";
-                break;
-            case "teacher":
-                $scope.viewCTeacher = true;
-                $scope.cTeacher = "";
-                break;
-            case "term":
-                $scope.viewCTerm = true;
-                break;
-            case "period":
-                $scope.viewCPeriod = true;
-                break;
-            default:
-        }
-        checkIfAllSelected()
-    };
-
-    /**
      * Updates the selected section with the newly edited field.
-     * @param {string} field - the name of the field that the user is editing.
      */
-    $scope.saveCEdit = function(field) {
-        switch (field) {
-            // update field
-            case "title":
-                $scope.sectionE.title = $scope.cTitle;
-                break;
-            case "teacher":
+    $scope.saveCEdit = function() {
+        if($('#cteacher select.polyfilling').length === 0) {
+            if ($scope.cTeacher != null) {
                 $scope.sectionE.teacher = $scope.teachersLookup[$scope.cTeacher.toUpperCase()];
-                break;
-            case "term":
-                $scope.sectionE.term = $scope.cTerm.id;
-                break;
-            case "period":
-                $scope.sectionE.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].id].indexOf($scope.cPeriod);
-                break;
-            default:
+            } else {
+                $scope.sectionE.teacher = null;
+            }
+        }
+        else {
+            var pk = parseInt($('#cteacher select.polyfilling').find(':selected').attr('pk'));
+            $scope.sectionE.teacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }).pk;
+        }
+
+        $scope.sectionE.term = $scope.cTerm.id;
+        // added to prevent error in console
+        if($scope.cPeriod !== null && $scope.cPeriod !== undefined) {
+            $scope.sectionE.schedule_position = $scope.cPeriod.period;
+        }
+        else {
+            $scope.sectionE.schedule_position = null;
         }
         // save with sectionE
         var tempSection = Object.assign({}, $scope.sectionE);
         delete tempSection.id;
         var sectionPromise = sectionService.updateSection($scope.sectionE.id, tempSection);
         sectionPromise.then(function success(data) {
-            // need to see if same section is currently selected for delete and update if so
-            if ($scope.sectionE.id === $scope.sectionD.id) {
-                $scope.sectionD = Object.assign({}, $scope.sectionE);
-            }
             // save previous title in case it was changed
             var tempTitle = $scope.sectionV.title.toUpperCase();
+            if ($scope.sectionE.title !== $scope.sectionV.title) {
+                delete $scope.sectionsLookup[tempTitle];
+            }
             // set sectionV to sectionE to reflect update
             $scope.sectionV = Object.assign({}, $scope.sectionE);
             // then have to update sections and lookup
@@ -324,27 +269,10 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     $scope.sectionsLookup[upper] = Object.assign({}, $scope.sectionE);
                 }
             }
-            switch (field) {
-                // set view after call returns
-                case "title":
-                    // need to delete that lookup property
-                    delete $scope.sectionsLookup[tempTitle];
-                    $scope.viewCTitle = true;
-                    $scope.cTitle = "";
-                    break;
-                case "teacher":
-                    $scope.viewCTeacher = true;
-                    $scope.cTeacher = "";
-                    break;
-                case "term":
-                    $scope.viewCTerm = true;
-                    break;
-                case "period":
-                    $scope.viewCPeriod = true;
-                    break;
-                default:
-            }
-            checkIfAllSelected();
+            // do I actually have to do this?
+            $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].id][$scope.sectionE.schedule_position - 1];
+            //$scope.cTeacher = $scope.teacherIdLookup[$scope.sectionV.teacher];
+            $scope.sectionEdit = false;
         }, function error(response) {
             setErrorMessage(response);
             toastService.error("The server was unable to save your edit." + errorResponse());
@@ -355,10 +283,20 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Creates and adds a new section.
      */
     $scope.addSection = function() {
-        $scope.newSection.teacher = $scope.teachersLookup[$scope.addTeacher.toUpperCase()];
+
+        if($('#cteacher2 select.polyfilling').length === 0) {
+            if ($scope.addTeacher != null && $scope.addTeacher !== "") {
+                $scope.newSection.teacher = $scope.teachersLookup[$scope.addTeacher.toUpperCase()];
+            }
+        }
+        else {
+            var pk = parseInt($('#cteacher2 select.polyfilling').find(':selected').attr('pk'));
+            $scope.newSection.teacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }).pk;
+        }
+
         $scope.newSection.term = $scope.newSectionTerm.id;
         if ($scope.newSectionPeriod != null) {
-            $scope.newSection.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.newSection.term].id].indexOf($scope.newSectionPeriod);
+            $scope.newSection.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.newSection.term].id].indexOf($scope.newSectionPeriod.periodName);
         }
         var sectionPromise = sectionService.addSection($scope.newSection);
         sectionPromise.then(function success(data) {
@@ -371,6 +309,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             $scope.sections.push(data.section);
             var lookupName = data.section.title;
             $scope.sectionsLookup[lookupName.toUpperCase()] = data.section;
+            $scope.addSectionForm.$setPristine();
         }, function error(response) {
             setErrorMessage(response);
             toastService.error("The server was unable to add the class." + errorResponse());
@@ -378,24 +317,12 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     };
 
     /**
-     * Hides the delete section search bar and displays its info with an option to delete.
-     */
-    $scope.displayDeleteSection = function() {
-        if ($scope.sectionDeleteSearch.toUpperCase() in $scope.sectionsLookup) {
-            $scope.sectionD = $scope.sectionsLookup[$scope.sectionDeleteSearch.toUpperCase()];
-            $scope.displaySectionDeleteSearch = false;
-            $scope.displaySectionInfo = true;
-            $scope.clearSectionDeleteSearch();
-        }
-    };
-
-    /**
-     * Deletes the selected teacher from the database.
+     * Deletes the selected section from the database.
      */
     $scope.deleteSection = function() {
         var sectionPromise = sectionService.deleteSection($scope.sectionD.id);
         sectionPromise.then(function success(data) {
-            // remove teacher from teachers and teachersLookup
+            // remove section from sections and sectionsLookup
             for (var i = 0; i < $scope.sections.length; i++) {
                 if ($scope.sections[i].id === $scope.sectionD.id) {
                     $scope.sections.splice(i, 1);
@@ -405,8 +332,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             }
             var id = $scope.sectionD.id;
             $scope.sectionD = {};
-            $scope.sectionDeleteSearch = "";
-            $scope.deleteSectionSuccess = true;
             $scope.displaySectionInfo = false;
             // check to see if sectionV/E is this deleted section and change view accordingly
             if ($scope.sectionV.id === id) {
@@ -528,13 +453,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     };
 
     /**
-     * Clears the delete section search bar.
-     */
-    $scope.clearSectionDeleteSearch = function() {
-        $scope.sectionDeleteSearch = "";
-    };
-
-    /**
      * Updates the displayed error message.
      * @param {response} response - response containing data and error message.
      */
@@ -555,20 +473,9 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * @param {section} section - section to be filtered.
      */
     $scope.viewSectionFilter = function(section) {
-        if ($scope.sectionViewSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionViewSearch.toUpperCase()) ||
-            section.title.toUpperCase().includes($scope.sectionViewSearch.toUpperCase())) {
-            return true;
-        }
-        return false; // otherwise it won't be within the results
-    };
-
-    /**
-     * Filter used for deleting sections.
-     * @param {section} section - section to be filtered.
-     */
-    $scope.deleteSectionFilter = function(section) {
-        if ($scope.sectionDeleteSearch == null || $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase()) ||
-            section.title.toUpperCase().includes($scope.sectionDeleteSearch.toUpperCase())) {
+        if ($scope.sectionViewSearch == null || (section.teacher != null && $scope.teacherIdLookup[section.teacher].toUpperCase().includes($scope.sectionViewSearch.toUpperCase())) ||
+            section.title.toUpperCase().includes($scope.sectionViewSearch.toUpperCase()) ||
+            $scope.periodArraysLookup[$scope.termsLookup[section.term].id][section.schedule_position - 1].periodName.toUpperCase().includes($scope.sectionViewSearch.toUpperCase())) {
             return true;
         }
         return false; // otherwise it won't be within the results
@@ -630,7 +537,7 @@ app.filter('classRosterSort', function() {
         // an enrollments lookup by student id would be nice
         var itemsLookup = _.indexBy(items, 'student');
         var sortedEnrollments = [];
-        for (var i = 0; i < sortedStudents.length; i++){
+        for (var i = 0; i < sortedStudents.length; i++) {
             sortedEnrollments.push(itemsLookup[sortedStudents[i].id]);
         }
         return sortedEnrollments;

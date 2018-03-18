@@ -4,8 +4,10 @@ var app = angular.module(
         'ngRoute',
         'chart.js',
         'ngAnimate',
+        'ngImgCrop',
         'datePicker',
         'ui.sortable',
+        'ngFileUpload',
     ]
 );
 
@@ -145,7 +147,10 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 termSettings: function(termService) {
                     return termService.getTermSettings();
-                }
+                },
+                schoolYears: function(schoolYearService) {
+                    return schoolYearService.getSchoolYears();
+                },
             },
         })
 
@@ -211,7 +216,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                                 filter: [ { name: 'case_manager', val: userService.user.id, }, ],
                             };
                             deferreds.push(studentService.getStudents(studentConfig));
-                            
+
                             $q.all(deferreds)
                                 .then(function(data) {
                                     deferred.resolve(data);
@@ -307,20 +312,15 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
-
-                // I'm thinking this will be gotten from inside of the tests controller, not here
-                // testData: function(testService, $route) {
-                //     return testService.getTests(); //we want them all...
-                // },
-
-                // data: function(enrollmentService, $route) {
-                //     return enrollmentService.getStudentEnrollments(
-                //       {
-                //           include: ['section.*', 'student.*'],
-                //           filter: [{ name: 'student', val: $route.current.params.id, },],
-                //       }
-                //     );
-                // },
+                testData: function(testService, $route) {
+                    return testService.getTests();
+                },
+                termData: function(termService) {
+                    var config = {
+                        include: ['settings.*', 'settings.schedule.*', ],
+                    };
+                    return termService.getTerms(config);
+                },
                 auth: function(userService) {
                     return userService.authVerify();
                 },
@@ -413,7 +413,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         .otherwise({ redirectTo: '/profile/focus' });
 })
 
-.run(function($rootScope, $location, toastService, userService) {
+.run(function($rootScope, $location, toastService, userService, studentService) {
 
     /**
      *  Used to determine where to make calls to the backend
@@ -448,7 +448,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         $location.path('/login').replace();
 
         // notify user
-        toastService.error('There was a fatal error with the server. Please log back in.');
+        toastService.error('There was an error with the server. Please log back in.');
     });
 
     /**
@@ -459,10 +459,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         userService.authVerify();
     }
 
+    // set global toastr options
     toastr.options = {
         closeButton: true,
     };
 
+    // define colors to be used globally
     $rootScope.colors = [
         tinycolor('#57bc90'), // green
         tinycolor('#5ab9ea'), // light blue
@@ -474,5 +476,61 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         tinycolor('#333333'), // grey
     ];
 
+    // set chartjs default colors
     Chart.defaults.global.colors = _.map($rootScope.colors, function(elem) { return elem.toHexString(); });
+
+
+    /*** STUDENT PICTURE RELATED SETUP ***/
+
+    /**
+     * set global currently-being-viewed student to initial value.
+     * this is part of a system that prevents a student's picture
+     * from being downloaded constantly.
+     */
+    $rootScope.currentStudent = {
+        id: -1,
+        picture: null,
+    };
+
+    /**
+     * set up a listener on route change to go get the currently-being-viewed
+     * student's picture, but only if that's not the picture I already have
+     * stored in $root
+     */
+    $rootScope.$on('$routeChangeStart', function(event, next, current) {
+        // being very careful cause this will run on every page
+        if(next === null || next === undefined
+            || next.$$route === null || next.$$route === undefined
+            || next.$$route.originalPath === null || next.$$route.originalPath === undefined) {
+            return;
+        }
+
+        // going to a student page
+        if(next.$$route.originalPath.split('/')[1] === 'student') {
+
+            if(next.params === null || next.params === undefined
+                || next.params.id === null || next.params.id === undefined) {
+                return;
+            }
+
+            if($rootScope.currentStudent.id !== next.params.id || $rootScope.currentStudent.picture === null) {
+                studentService.getStudentPicture(next.params.id).then(
+                    function success(picture) {
+                        $rootScope.currentStudent.id = next.params.id;
+                        $rootScope.currentStudent.picture = picture;
+                    },
+                );
+            }
+        }
+    });
 });
+
+
+
+
+
+
+
+
+
+

@@ -78,12 +78,6 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
         return includedTerms;
     }
     
-    $scope.errorMessages = [];
-    if($scope.enrollments.length === 0) {
-        $scope.errorMessages.push("It looks like this student isn't registered for any classes.");
-    }
-
-
     /**
      * graph-related code
      */
@@ -196,6 +190,9 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
             $scope.$broadcast('pickerUpdate', graphStartDateKey, { maxDate: $scope[graphEndDateKey] });
         }
 
+        $scope.activeEffortLegendItem = null;
+        $scope.activeBehaviorLegendItem = null;
+
         updateGraph();
     };
 
@@ -241,15 +238,13 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                     });
                 });
 
+                $scope.sharedGraph.options.legend.display = true;
                 if(hasSection === false) {
                     $scope.sharedGraph.series = ["", ];
                     $scope.sectionToDataIndex = {};
                     $scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
                     $scope.effortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
                     $scope.sharedGraph.options.legend.display = false;
-                }
-                else {
-                    $scope.sharedGraph.options.legend.display = true;
                 }
 
                 // iterate through each date, setting data as necessary

@@ -173,6 +173,71 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
+     * Get a student's profile picture, if there is one.
+     * @param {number} studentId - ID of the student
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with the base64 encoded image string OR null,
+     *                   or reject with response
+     */
+    function getStudentPicture(studentId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/picture' + query,
+        }).then(function success(response) {
+            if(response.data.profile_pictures.length > 0 && response.data.profile_pictures[0].file !== undefined) {
+                deferred.resolve(response.data.profile_pictures[0].file);
+            }
+            else {
+                deferred.resolve(null);
+            }
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Add picture to student profile 
+     * @param {number} studentId - ID of the student
+     * @param {picture} picture - the picture object. ex: { 'file': 'base64_encoded_string', }
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function addStudentPicture(studentId, picture) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/picture',
+            data: picture,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Delete picture from student profile 
+     * @param {number} studentId - ID of the student
+     * @param {picture} pictureId - the ID of the picture
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function deleteStudentPicture(studentId, pictureId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/picture/' + pictureId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
      * Get grades for a specific student
      * @param {number} studentId - ID of the student
      * @param {object} config - config object for query parameters (see queryService)
@@ -571,6 +636,9 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         updateStudent: updateStudent,
         updateStudents: updateStudents,
         deleteStudent: deleteStudent,
+        getStudentPicture: getStudentPicture,
+        addStudentPicture: addStudentPicture,
+        deleteStudentPicture: deleteStudentPicture,
         getGradesForStudent: getGradesForStudent,
         getServicesForStudent: getServicesForStudent,
         getServiceForStudent: getServiceForStudent,
@@ -583,12 +651,10 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         updateIepForStudent: updateIepForStudent,
         deleteIepForStudent: deleteIepForStudent,
         getIepDatasForStudent: getIepDatasForStudent,
-        //getIepDataForStudent: getIepDataForStudent,
         addIepDataForStudent: addIepDataForStudent,
         updateIepDataForStudent: updateIepDataForStudent,
         deleteIepDataForStudent: deleteIepDataForStudent,
         getIepNotesForStudent: getIepNotesForStudent,
-        //getIepNoteForStudent: getIepNoteForStudent,
         addIepNoteForStudent: addIepNoteForStudent,
         updateIepNoteForStudent: updateIepNoteForStudent,
         deleteIepNoteForStudent: deleteIepNoteForStudent,

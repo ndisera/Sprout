@@ -1,119 +1,170 @@
 <div ng-include="'html/studentTabs.html'"></div>
-<div class="tab-content">
-    <div id="overview" class="tab-pane fade in active voffset3">
-        <div class="row">
-            <div class="col-xs-12 col-sm-3">
-                <div id="student-overview-pic">
-                    <img class="img-responsive" src="img/example_kid.jpeg">
+<div class="row">
+    <div class="col-xs-12 col-sm-6">
+        <div class="select-full-width input-group">
+            <span class="input-group-addon">Case Manager</span>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle full-width" data-toggle="dropdown">
+                    {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)" ng-class="{ 'active': entry.pk === caseManager.pk, }">
+                        <a class="student-overview-assign-link">
+                            {{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.pk === caseManager.pk" class="glyphicon glyphicon-ok"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-wrapper voffset3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Student Info</h3>
                 </div>
-            </div>
-            <div class="col-xs-12 col-sm-5 center-block">
-                <h2 id="student-overview-title"><b>{{ student.first_name }}</b> {{ student.last_name }}</h2>
-            </div>
-            <div class="col-xs-12 col-sm-4">
-                <div id="student-overview-assign-dropdown" class="input-group pull-right">
-                    <span class="input-group-addon">Assigned To</span>
-                    <div class="input-group-btn">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                            {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span>
+                <div class="panel-body">
+                    <form class="form-horizontal" name="editStudentForm" ng-submit="saveStudent()">
+                        <div class="form-group" ng-repeat="property in studentProperties">
+                            <label class="control-label col-xs-12 col-sm-3">{{ property.title }}:</label>
+                            <div class="col-sm-9">
+                                <div ng-if="!editing">
+                                    <p class="form-control-static" ng-if="!editing">{{ property.value }}</p>
+                                </div>
+                                <div ng-if="editing">
+                                    <input class="form-control" ng-if="editing && property.key !== 'birthdate'" type="text" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                    <input class="form-control" ng-if="editing && property.key === 'birthdate'" type="text" date-time name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group no-bottom-margin">
+                            <div class="col-xs-12">
+                                <div class="btn-manipulate-row" ng-if="editing">
+                                    <button class="btn btn-success" type="submit" ng-disabled="editStudentForm.$invalid">
+                                        <span class="glyphicon glyphicon-ok"></span>
+                                    </button>
+                                    <button class="btn btn-default" type="button" ng-click="toggleEdit(false)">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-primary" ng-if="!editing" ng-click="toggleEdit(true)">
+                            <span class="glyphicon glyphicon-pencil"></span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-right">
-                            <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)" ng-class="{ 'active': entry.pk === caseManager.pk, }">
-                                <a class="student-overview-assign-link">
-                                    {{ entry.first_name }} {{ entry.last_name }}  <span ng-if="entry.pk === caseManager.pk" class="glyphicon glyphicon-ok"></span>
-                                </a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
         </div>
-        <hr />
-        <div class="row">
-            <div class="col-xs-12 col-sm-6">
-                <div class="panel-wrapper">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title panel-title-with-btn">Student Info</h3>
-                            <button id="student-overview-edit-all-btn" class="btn btn-primary pull-right" type="button" ng-click="beginEditStudent('all')" ng-hide="editingAll">
-                                Edit All
-                            </button>
-                            <button id="student-overview-edit-all-btn" class="btn btn-danger pull-right" type="button" ng-click="endEditStudent('all')" ng-show="editingAll">
-                                Stop Editing
-                            </button>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+        <div class="panel-wrapper manipulate-panel-spacer">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Class Schedule</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="select-full-width input-group">
+                        <span class="input-group-addon">Term</span>
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTerm.name }} <span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li ng-repeat="entry in terms" ng-click="selectTerm(entry)" ng-class="{ 'active': entry.id === selectedTerm.id, }">
+                                    <a>{{ entry.name }}  <span ng-if="entry.id === selectedTerm.id" class="glyphicon glyphicon-ok"></span></a>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="panel-body">
-                            <div ng-repeat="property in studentProperties">
-                                <form class="form-horizontal" name="editStudentForm{{$index}}" ng-submit="saveStudent(property);">
-                                    <div class="form-group">
-                                        <label class="control-label col-xs-12 col-sm-3">{{ property.title }}:</label>
-                                        <p class="form-control-static col-xs-12 col-sm-9" ng-show="!property.editable">
-                                        {{ property.value }} &nbsp;&nbsp;&nbsp;
-                                        <span ng-click="beginEditStudent(property)" class="glyphicon glyphicon-pencil pencilEdit"></span>
-                                        </p>
-                                        <div id="student-overview-edit-input-group" class="input-group col-xs-12 col-sm-9" ng-show="property.editable">
-                                            <input ng-if="property.key !== 'birthdate'" type="text" class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required auto-focus>
-                                            <input ng-if="property.key === 'birthdate'" type="text" date-time class="form-control" name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-default" type="submit" ng-disabled="editStudentForm{{$index}}.editStudentFormInput{{$index}}.$invalid">
-                                                    <span class="glyphicon glyphicon-ok green"></span>
-                                                </button>
-                                                <button class="btn btn-default" type="button" ng-click="endEditStudent(property)">
-                                                    <span class="glyphicon glyphicon-remove red"></span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                    </div>
+                    <div class="alert alert-info no-bottom-margin voffset3" ng-if="termSections.length === 0">
+                        <span><b>Info:</b> It looks like this student isn't enrolled in any classes for this term.</span>
+                    </div>
+                    <div class="table-responsive voffset3" ng-show="termSections.length > 0">
+                        <table ng-if="sections.length > 0" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Period</th>
+                                    <th>Class Name</th>
+                                    <th>Teacher</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="section in sections | filter:{ term: selectedTerm.id, }">
+                                    <td>{{ section.period }}</td>
+                                    <td>{{ section.title }}</td>
+                                    <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div ng-if="sections.length === 0">
+                        <h4 class="centerText">No Classes</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-wrapper voffset3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Student Photo</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div id="student-overview-image-preview">
+                                <div class="picture-frame student-frame">
+                                    <img class="student-image" ng-if="$root.currentStudent.picture === null" src="img/default_profile_pic.png">
+                                    <img class="student-image" ng-if="$root.currentStudent.picture !== null" ng-src="data:image/png;base64,{{ $root.currentStudent.picture }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-7">
+                            <div id="student-overview-image-btns">
+                                <div>
+                                    <button type="button" class="btn btn-default full-width voffset3" ng-click="showModal()">
+                                        <span>Select New Photo</span>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-danger full-width voffset3" ng-click="deleteStudentImage()" ng-disabled="$root.currentStudent.picture === null">
+                                        <span>Delete Photo</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-6">
-                <div class="panel-wrapper">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Class Schedule</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div id="student-overview-select" class="input-group">
-                                <span class="input-group-addon">Term</span>
-                                <div class="input-group-btn">
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTerm.name }} <span class="caret"></span></button>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li ng-repeat="entry in terms" ng-click="selectTerm(entry)" ng-class="{ 'active': entry.id === selectedTerm.id, }">
-                                            <a class="student-overview-assign-link">{{ entry.name }}  <span ng-if="entry.id === selectedTerm.id" class="glyphicon glyphicon-ok"></span></a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div id="student-overview-no-classes" class="voffset3" ng-show="termSections.length === 0">
-                                <h4 class="centerText">No Classes</h4>
-                            </div>
-                            <div class="table-responsive voffset3" ng-show="termSections.length > 0">
-                                <table ng-if="sections.length > 0" class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Period</th>
-                                            <th>Class Name</th>
-                                            <th>Teacher</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr ng-repeat="section in sections | filter:{ term: selectedTerm.id, }">
-                                            <td>{{ section.period }}</td>
-                                            <td>{{ section.title }}</td>
-                                            <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div ng-if="sections.length === 0">
-                                <h4 class="centerText">No Classes</h4>
-                            </div>
-                        </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="student-overview-image-modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header grey modal-wrapper">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Select New Photo</h4>
+            </div>
+            <div class="modal-body">
+                <div id="student-overview-crop-area" ngf-drop ngf-select ngf-select-disabled="newStudentImage !== null" ng-model="newStudentImage" ngf-pattern="image/*" ng-class="{ 'pointer': newStudentImage === null, }">
+                    <div id="student-overview-crop-instructions" ng-if="newStudentImage === null">
+                        <span class="far fa-image fa-5x"></span>
+                        <h4 class="hidden-xs">Drag and drop or click here to select an image</h4>
+                        <h4 class="visible-xs">Click here to select an image</h4>
                     </div>
+                    <img-crop image="newStudentImage | ngfDataUrl" result-image="newStudentImageCrop" result-image-size="100"></img-crop>
+                </div>
+                <div id="student-overview-image-crop">
+                    <div>
+                        <div class="picture-frame student-frame">
+                            <img class="student-image" ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
+                        </div>
+                        <h3>Preview</h3>
+                    </div>
+                </div>
+                <div class="btn-manipulate-row">
+                    <button class="btn btn-success" ng-click="uploadStudentImage(newStudentImageCrop)">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </button>
                 </div>
             </div>
         </div>

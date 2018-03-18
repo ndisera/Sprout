@@ -1,13 +1,11 @@
 <div ng-include="'html/profileTabs.html'"></div>
 <div class="row">
     <div class="col-xs-12">
-        <h3 class="inlineHeading">Focus Students</h3>
         <button ng-if="!editing" ng-click="toggleEdit()" class="btn btn-primary pull-right focus-top-button" type="button">Choose Students</button>
         <button ng-if="editing" ng-click="toggleEdit()" class="btn btn-danger pull-right focus-top-button" type="button">Stop</button>
     </div>
 </div>
-<hr>
-<div class="row" ng-if="focusStudents.length === 0 && !editing">
+<div class="row voffset3" ng-if="focusStudents.length === 0 && !editing">
     <div class="col-xs-12">
         <div class="alert alert-info no-bottom-margin" role="alert">
             <span><b>Tip:</b> It looks like you don't have any Focus Students. Click the "Choose Students" button to select one.</span>
@@ -43,29 +41,27 @@
                                             </span>
                                             <div class="input-group-btn">
                                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                                    {{ focusGraphs[focusStudent.student].focus.displayName }} <span class="caret"></span>
+                                                    {{ focusStudent.focus_graph.category.displayName }} <span class="caret"></span>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-right">
-                                                    <li ng-repeat="entry in focusCategories" ng-click="selectFocusCategory(focusStudent, entry)" ng-class="{ 'active': entry.displayName === focusGraphs[focusStudent.student].focus.displayName, }">
+                                                    <li ng-repeat="entry in focusCategories" ng-click="selectFocusCategory(focusStudent, entry)" ng-class="{ 'active': entry.uniqueId === focusStudent.focus_graph.category.uniqueId, }">
                                                         <a class="focus-student-assign-link">
                                                             <span>{{ entry.displayName }}  </span>
-                                                            <span ng-if="entry.displayName === focusGraphs[focusStudent.student].focus.displayName" class="glyphicon glyphicon-ok"></span>
+                                                            <span ng-if="entry.uniqueId === focusStudent.focus_graph.category.uniqueId" class="glyphicon glyphicon-ok"></span>
                                                         </a>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
-                                        <!-- temp for the demo -->
-                                        <a ng-href="/student/{{ focusStudent.student }}/tests">
-                                            <div class="col-sm-12 focusGraph">
-                                                <canvas id="focus_graph" class="chart chart-line"
-                                                                         chart-data="focusGraphs[focusStudent.student]['focus'].data"
-                                                                         chart-series="focusGraphs[focusStudent.student]['focus'].series"
-                                                                         chart-labels="focusGraphs[focusStudent.student]['focus'].labels"
-                                                                         chart-options="focusGraphs[focusStudent.student]['focus'].options"
-                                                                         chart-dataset-override="focusGraphs[focusStudent.student]['focus'].datasetOverride"
-                                                                         chart-colors="focusGraphs[focusStudent.student]['focus'].colors"
-                                                                         chart-click="onClick">
+                                        <a ng-href="/student/{{ focusStudent.student }}{{ focusStudent.focus_graph.category.href }}">
+                                            <div class="col-sm-12 focus-graph">
+                                                <canvas class="chart chart-line"
+                                                        chart-data="focusStudent.focus_graph.data"
+                                                        chart-series="focusStudent.focus_graph.series"
+                                                        chart-labels="focusStudent.focus_graph.labels"
+                                                        chart-options="focusStudent.focus_graph.options"
+                                                        chart-dataset-override="focusStudent.focus_graph.datasetOverride"
+                                                        chart-colors="graphColors.focus">
                                                 </canvas>
                                             </div>
                                         </a>
@@ -79,19 +75,18 @@
                                                 </div>
                                             </span>
                                             <div class="input-group-btn fake-btn">
-                                                <span class="input-group-text">{{ focusGraphs[focusStudent.student].progress.displayName }}</span>
+                                                <span class="input-group-text">{{ focusStudent.progress_graph.category.displayName }}</span>
                                             </div>
                                         </div>
-                                        <a ng-href="/student/{{ focusStudent.student }}/tests">
-                                            <div class="col-sm-12 focusProgress">
-                                                <canvas id="focus_progress_graph" class="chart chart-line"
-                                                                                  chart-data="focusGraphs[focusStudent.student]['progress'].data"
-                                                                                  chart-series="focusGraphs[focusStudent.student]['progress'].series"
-                                                                                  chart-labels="focusGraphs[focusStudent.student]['progress'].labels"
-                                                                                  chart-options="focusGraphs[focusStudent.student]['progress'].options"
-                                                                                  chart-dataset-override="focusGraphs[focusStudent.student]['progress'].datasetOverride"
-                                                                                  chart-colors="focusGraphs[focusStudent.student]['progress'].colors"
-                                                                                  chart-click="onClick">
+                                        <a ng-href="/student/{{ focusStudent.student }}{{ focusStudent.progress_graph.category.href }}">
+                                            <div class="col-sm-12 focus-graph">
+                                                <canvas class="chart chart-line"
+                                                        chart-data="focusStudent.progress_graph.data"
+                                                        chart-series="focusStudent.progress_graph.series"
+                                                        chart-labels="focusStudent.progress_graph.labels"
+                                                        chart-options="focusStudent.progress_graph.options"
+                                                        chart-dataset-override="focusStudent.progress_graph.datasetOverride"
+                                                        chart-colors="graphColors.progress">
                                                 </canvas>
                                             </div>
                                         </a>
@@ -105,19 +100,18 @@
                                                 </div>
                                             </span>
                                             <div class="input-group-btn fake-btn">
-                                                <span class="input-group-text">{{ focusGraphs[focusStudent.student].caution.displayName }}</span>
+                                                <span class="input-group-text">{{ focusStudent.caution_graph.category.displayName }}</span>
                                             </div>
                                         </div>
-                                        <a ng-href="/student/{{ focusStudent.student }}/tests">
-                                            <div class="col-sm-12 focusCaution">
-                                                <canvas id="focus_caution_graph" class="chart chart-line"
-                                                                                 chart-data="focusGraphs[focusStudent.student]['caution'].data"
-                                                                                 chart-series="focusGraphs[focusStudent.student]['caution'].series"
-                                                                                 chart-labels="focusGraphs[focusStudent.student]['caution'].labels"
-                                                                                 chart-options="focusGraphs[focusStudent.student]['caution'].options"
-                                                                                 chart-dataset-override="focusGraphs[focusStudent.student]['caution'].datasetOverride"
-                                                                                 chart-colors="focusGraphs[focusStudent.student]['caution'].colors"
-                                                                                 chart-click="onClick">
+                                        <a ng-href="/student/{{ focusStudent.student }}{{ focusStudent.caution_graph.category.href }}">
+                                            <div class="col-sm-12 focus-graph">
+                                                <canvas class="chart chart-line"
+                                                        chart-data="focusStudent.caution_graph.data"
+                                                        chart-series="focusStudent.caution_graph.series"
+                                                        chart-labels="focusStudent.caution_graph.labels"
+                                                        chart-options="focusStudent.caution_graph.options"
+                                                        chart-dataset-override="focusStudent.caution_graph.datasetOverride"
+                                                        chart-colors="graphColors.caution">
                                                 </canvas>
                                             </div>
                                         </a>
