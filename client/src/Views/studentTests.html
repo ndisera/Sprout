@@ -1,12 +1,12 @@
 <div ng-include="'html/studentTabs.html'"></div>
-<div class="row voffset4" ng-repeat="error in errorMessages">
+<div class="row" ng-if="tests.length === 0">
     <div class="col-xs-12">
-        <div class="alert alert-danger no-bottom-margin" role="alert">
-            <span><b>Error:</b> {{ error }}</span>
+        <div class="alert alert-info" role="alert">
+            <span><b>Tip:</b> It looks like you school hasn't created any standardized tests yet. Speak to your admin about adding one.</span>
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row" ng-show="tests.length > 0">
     <div class="col-xs-12">
         <div class="row">
             <div class="col-xs-12 col-sm-6">
