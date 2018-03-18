@@ -9,17 +9,8 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     /**
      * Toggles the sidebar
      */
-    $scope.extendSidebar = function() {
-        $scope.sidebarExtended = !$scope.sidebarExtended;
-    };
-
-    /**
-     * Closes the sidebar
-     */
-    $scope.closeSidebar = function() {
-        if ($scope.sidebarExtended) {
-            $scope.sidebarExtended = false;
-        }
+    $scope.toggleSidebar = function(value) {
+        $scope.sidebarExtended = value;
     };
 
     /**
@@ -111,7 +102,8 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     };
 
     $scope.sidebarLinkClick = function(link) {
-       link.click();
+        link.click();
+        $scope.toggleSidebar(false);
     };
 
     $rootScope.$on('user:auth', function(event, data) {

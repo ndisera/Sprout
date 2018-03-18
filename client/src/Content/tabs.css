@@ -116,7 +116,7 @@
         border: none;
     }
 
-    .panel.panel-tabs > .panel-heading > img {
+    .panel.panel-tabs > .panel-heading > .picture-frame {
         display: block;
         float: none;
         margin-left: auto;
