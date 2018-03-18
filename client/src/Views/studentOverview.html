@@ -111,18 +111,24 @@
                     <div class="row">
                         <div class="col-sm-5">
                             <div id="student-overview-image-preview">
-                                <img class="student-image" ng-if="$root.currentStudent.picture === null" src="img/default_profile_pic.png">
-                                <img class="student-image" ng-if="$root.currentStudent.picture !== null" ng-src="data:image/png;base64,{{ $root.currentStudent.picture }}">
+                                <div class="picture-frame student-frame">
+                                    <img class="student-image" ng-if="$root.currentStudent.picture === null" src="img/default_profile_pic.png">
+                                    <img class="student-image" ng-if="$root.currentStudent.picture !== null" ng-src="data:image/png;base64,{{ $root.currentStudent.picture }}">
+                                </div>
                             </div>
                         </div>
                         <div class="col-sm-7">
                             <div id="student-overview-image-btns">
-                                <button type="button" class="btn btn-default full-width voffset3" ng-click="showModal()">
-                                    <span>Select New Photo</span>
-                                </button>
-                                <button type="button" class="btn btn-danger full-width voffset3" ng-click="deleteStudentImage()" ng-disabled="$root.currentStudent.picture === null">
-                                    <span>Delete Photo</span>
-                                </button>
+                                <div>
+                                    <button type="button" class="btn btn-default full-width voffset3" ng-click="showModal()">
+                                        <span>Select New Photo</span>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-danger full-width voffset3" ng-click="deleteStudentImage()" ng-disabled="$root.currentStudent.picture === null">
+                                        <span>Delete Photo</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -149,7 +155,9 @@
                 </div>
                 <div id="student-overview-image-crop">
                     <div>
-                        <img class="student-image" ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
+                        <div class="picture-frame student-frame">
+                            <img class="student-image" ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
+                        </div>
                         <h3>Preview</h3>
                     </div>
                 </div>

@@ -45,6 +45,7 @@
         <script src="includes/snap.svg-min.js"></script>
         <script src="includes/ng-file-upload.min.js"></script>
         <script src="includes/ng-img-crop.js"></script>
+        <script src="includes/datalist-polyfill.min.js"></script>
         <!-- @endif -->
         <!-- @ifdef DEBUG -->
         <script src="includes/jquery.js"></script>
@@ -67,6 +68,7 @@
         <script src="includes/snap.svg.js"></script>
         <script src="includes/ng-file-upload.js"></script>
         <script src="includes/ng-img-crop.js"></script>
+        <script src="includes/datalist-polyfill.js"></script>
         <!-- @endif -->
     </head>
     <body ng-app="app">
@@ -125,7 +127,9 @@
                                 <div class="input-group">
                                     <input type="text" autocomplete="off" class="form-control" placeholder="Search Students" list="student" name="student" ng-model="studentName">
                                     <datalist id="student">
-                                        <option ng-repeat="s in studentInfo.students" value="{{s.first_name}} {{s.last_name}}">
+                                        <!--<select>-->
+                                            <option ng-repeat="s in studentInfo.students" value="{{s.first_name}} {{s.last_name}}">{{ s.first_name}} {{ s.last_name }}
+                                        <!--</select>-->
                                     </datalist>
                                     <div class="input-group-btn">
                                         <button class="btn btn-default" type="submit">

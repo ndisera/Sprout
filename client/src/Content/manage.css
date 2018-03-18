@@ -97,6 +97,16 @@
     border-top: 1px solid #ddd;
 }
 
+#cteacher select.polyfilling {
+    z-index: 80;
+}
+
+#cteacher2 select.polyfilling {
+    top: 34px;
+    left: 0px;
+    z-index: 80;
+}
+
 @media (max-width: 768px) {
     .manage-btn-group-spacer {
         margin-top: 25px;

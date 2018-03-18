@@ -85,6 +85,8 @@ const include_paths = [
     bower_path + 'tinycolor/tinycolor.js',
     bower_path + 'Snap.svg/dist/snap.svg-min.js',
     bower_path + 'Snap.svg/dist/snap.svg.js',
+    bower_path + 'datalist-polyfill/datalist-polyfill.min.js',
+    bower_path + 'datalist-polyfill/datalist-polyfill.js',
 ];
 
 const paths = {
