@@ -24,10 +24,10 @@
                             <div class="input-group-btn">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ viewSectionTerm.name }} <span class="caret"></span></button>
                                 <ul class="dropdown-menu dropdown-menu-right">
-                                    <li ng-repeat="term in terms" ng-click="selectTerm(term)">
-                                        <a>{{ term.name }}  <span ng-if="term.name === viewSectionTerm.name" class="glyphicon glyphicon-ok"></span></a>
+                                    <li ng-repeat="term in terms" ng-click="selectTerm(term)" ng-class="{ 'active': term.id === viewSectionTerm.id }">
+                                        <a>{{ term.name }}  <span ng-if="term.id === viewSectionTerm.id" class="glyphicon glyphicon-ok"></span></a>
                                     </li>
-                                    <li ng-click="selectTerm({name: 'All Terms'})">
+                                    <li ng-click="selectTerm({name: 'All Terms'})" ng-class="{ 'active': viewSectionTerm.name === 'All Terms' }">
                                         <a>All Terms  <span ng-if="viewSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
                                     </li>
                                 </ul>

@@ -53,14 +53,34 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
      */
     $scope.toggleInfoEdit = function() {
         $scope.schoolInfoEdit = !$scope.schoolInfoEdit;
-    }
+    };
 
     /**
      * Toggles school grade range edit
      */
     $scope.toggleGradeEdit = function() {
         $scope.schoolGradeEdit = !$scope.schoolGradeEdit;
-    }
+    };
+
+    /**
+     * Cancels row edit
+     * @param {number} index - row index.
+     * @param {string} type - type of item.
+     */
+    $scope.removeEdit = function(index, type) {
+        this.edit = false;
+        $("#" + type + "-row" + index).addClass('pointer');
+    };
+
+    /**
+     * Makes a row editable
+     * @param {number} index - row index.
+     * @param {string} type - type of item.
+     */
+    $scope.showEdit = function(index, type) {
+        this.edit = true;
+        $("#" + type + "-row" + index).removeClass('pointer');
+    };
 
     /**
      * Initializes termSchoolYear and holidaySchoolYear to the current school year
@@ -110,7 +130,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
      */
     $scope.selectSchoolYear = function(year, type) {
         type === "term" ? $scope.termSchoolYear = year : $scope.holidaySchoolYear = year;
-    }
+    };
 
     /**
      * Converts all grade 0 to K
@@ -330,7 +350,7 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 deleteSchoolYear(id);
                 break;
         }
-    }
+    };
 
     /**
      * Deletes a holiday
@@ -444,11 +464,17 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 // remove from edit lookup
                 delete $scope.eSchoolYears[yearId];
 
+                if ($scope.schoolYears.length === 0) {
+                    $scope.termSchoolYear = null;
+                    $scope.holidaySchoolYear = null;
+                    return;
+                }
+
                 // need to also change school year dropdowns if chosen school year was delete
-                if ($scope.termSchoolYear.id === yearId) {
+                if ($scope.termSchoolYear != null && $scope.termSchoolYear.id === yearId) {
                     initializeSchoolYears('term');
                 }
-                if ($scope.holidaySchoolYear.id === yearId) {
+                if ($scope.termSchoolYear != null && $scope.holidaySchoolYear.id === yearId) {
                     initializeSchoolYears('holiday');
                 }
             },
@@ -593,10 +619,14 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.eSchoolYears[copy.id] = copy;
                 $scope.displaySchoolYearForm = false;
                 $scope.newSchoolYear = {};
+                // select this school year to display in dropdowns if it is the only one
+                if ($scope.schoolYears.length === 1) {
+                    initializeSchoolYears('all');
+                }
             },
             function error(response) {
                 setErrorMessage(response);
-                toastService.error("The server was unable to save the new holiday." + errorResponse());
+                toastService.error("The server was unable to save the new school year." + errorResponse());
             }
         );
     };
@@ -782,5 +812,4 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         }
         return message;
     }
-
 });
