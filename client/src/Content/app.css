@@ -789,6 +789,38 @@ ul.dropdown-menu > li > a:hover {
     border-color: #33805e;
 }
 
+.btn-success > span.glyphicon-plus {
+    margin-left: 1px;
+    margin-top: 3px;
+}
+
+.btn-success > i.glyphicon-plus {
+    margin-left: 1px;
+    margin-top: 2px;
+}
+
+.btn-danger > span.glyphicon-trash {
+    margin-top: 3px;
+    margin-right: 2.25px;
+}
+
+.btn-danger > i.glyphicon-trash {
+    margin-top: 2px;
+}
+
+.btn-success > span.glyphicon-ok {
+    margin-top: 2px;
+    margin-right: 1px;
+}
+
+.btn-primary > span.glyphicon-pencil {
+    margin-top: 1px;
+}
+
+.btn-default > span.glyphicon-remove {
+    margin-top: 3px;
+}
+
 .btn-glyphicon > span.glyphicon {
     margin-right: 5px;
 }

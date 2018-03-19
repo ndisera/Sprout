@@ -219,10 +219,6 @@
         </div>
         <div id="collapseSchoolTerms" class="panel-collapse collapse">
             <div class="panel-body">
-                <div class="alert alert-info no-bottom-margin" ng-if="terms.length === 0">
-                    <span><b>Tip:</b> It looks like you haven't added a term yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.
-                    <span ng-if="schoolYears.length === 0"> A school year is required to add a term.</span></span>
-                </div>
                 <div>
                     <div class="row" ng-if="schoolYears.length !== 0">
                         <div class="col-xs-12 voffset2">
@@ -239,8 +235,14 @@
                             </div>
                         </div>
                     </div>
-                    <br ng-if="terms.length !== 0"/>
-                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="terms.length !== 0">
+                    <div class="alert alert-info no-bottom-margin voffset2" ng-if="schoolYears.length > 0 && termYears.length === 0">
+                        <span><b>Info:</b> It looks like there aren't any terms for this school year. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
+                    </div>
+                    <div class="alert alert-info no-bottom-margin voffset2" ng-if="schoolYears.length === 0">
+                        <span><b>Info:</b> It looks like there are no school years in the system, and a term cannot be added without one.</span>
+                    </div>
+                    <br ng-if="termYears.length !== 0"/>
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="termYears.length !== 0">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
@@ -349,10 +351,6 @@
         </div>
         <div id="collapseHolidays" class="panel-collapse collapse">
             <div class="panel-body">
-                <div class="alert alert-info no-bottom-margin" ng-if="holidays.length === 0">
-                    <span><b>Tip:</b> It looks like you haven't added a holiday yet. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.
-                    <span ng-if="schoolYears.length === 0"> A school year is required to add a holiday.</span></span>
-                </div>
                 <div>
                     <div class="row" ng-if="schoolYears.length !== 0">
                         <div class="col-xs-12 voffset2">
@@ -361,7 +359,7 @@
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ holidaySchoolYear.title }} <span class="caret"></span></button>
                                     <ul class="dropdown-menu dropdown-menu-right">
-                                        <li ng-repeat="schoolYear in schoolYears" ng-click="selectSchoolYear(schoolYear, 'holiday')" ng-class="{ 'active': schoolYear.id === termSchoolYear.id, }">
+                                        <li ng-repeat="schoolYear in schoolYears" ng-click="selectSchoolYear(schoolYear, 'holiday')" ng-class="{ 'active': schoolYear.id === holidaySchoolYear.id, }">
                                             <a class="student-overview-assign-link">{{ schoolYear.title }}  <span ng-if="schoolYear.id === holidaySchoolYear.id" class="glyphicon glyphicon-ok"></span></a>
                                         </li>
                                     </ul>
@@ -369,8 +367,14 @@
                             </div>
                         </div>
                     </div>
-                    <br ng-if="holidays.length !== 0"/>
-                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="holidays.length !== 0">
+                    <div class="alert alert-info no-bottom-margin voffset2" ng-if="schoolYears.length > 0 && holidayYears.length === 0">
+                        <span><b>Info:</b> It looks like there aren't any holidays for this school year. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
+                    </div>
+                    <div class="alert alert-info no-bottom-margin voffset2" ng-if="schoolYears.length === 0">
+                        <span><b>Info:</b> It looks like there are no school years in the system, and a holiday cannot be added without one.</span>
+                    </div>
+                    <br ng-if="holidayYears.length !== 0"/>
+                    <div class="table-responsive scrollableTableDiv table-select-default" ng-if="holidayYears.length !== 0">
                         <table class="table table-hover">
                             <thead>
                                 <tr>

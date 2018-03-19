@@ -179,30 +179,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 break;
             default:
         }
-        // remove or set active property
-        setActiveButton(task);
     };
-
-    /**
-     * Leaves the most recently selected button active and removes the active class from the other buttons
-     * @param {string} task - the type of task selected.
-     */
-    function setActiveButton(task) {
-        if (task === 'view/edit') {
-            document.getElementById('cViewButton').classList.add('active');
-            document.getElementById('cViewButton2').classList.add('active');
-        } else {
-            document.getElementById('cViewButton').classList.remove('active');
-            document.getElementById('cViewButton2').classList.remove('active');
-        }
-        if (task === 'add') {
-            document.getElementById('cAddButton').classList.add('active');
-            document.getElementById('cAddButton2').classList.add('active');
-        } else {
-            document.getElementById('cAddButton').classList.remove('active');
-            document.getElementById('cAddButton2').classList.remove('active');
-        }
-    }
 
     /**
      * Displays section info.

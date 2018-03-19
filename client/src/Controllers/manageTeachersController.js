@@ -135,8 +135,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
                 break;
             default:
         }
-        // remove or set active property
-        setActiveButton(task);
     };
 
     /**
@@ -267,27 +265,6 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             $scope.displayTEditInfo = false;
         }
     };
-
-    /**
-     * Leaves the most recently selected button active and removes the active class from the other buttons
-     * @param {string} task - the type of task selected.
-     */
-    function setActiveButton(task) {
-        if (task === 'view/edit') {
-            document.getElementById('tViewButton').classList.add('active');
-            document.getElementById('tViewButton2').classList.add('active');
-        } else {
-            document.getElementById('tViewButton').classList.remove('active');
-            document.getElementById('tViewButton2').classList.remove('active');
-        }
-        if (task === 'add') {
-            document.getElementById('tAddButton').classList.add('active');
-            document.getElementById('tAddButton2').classList.add('active');
-        } else {
-            document.getElementById('tAddButton').classList.remove('active');
-            document.getElementById('tAddButton2').classList.remove('active');
-        }
-    }
 
     /**
      * Updates the displayed error message.
