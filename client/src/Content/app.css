@@ -51,7 +51,6 @@ a {
     width: 100%;
     height: 100vh;
     top: 0;
-    /*display: none;*/
     z-index: 199;
     visibility: hidden;
 }
@@ -117,8 +116,14 @@ a {
 #sidebar .badge {
     margin-left: 5px;
     background-color: #c9302c;
+    font-weight: 100;
 }
 
+#topbar .badge {
+    top: -6px;
+    background-color: #c9302c;
+    font-weight: 100;
+}
 
 #topbar {
     position: fixed;
@@ -156,13 +161,18 @@ a {
 }
 
 #topbar .btn-group > .btn {
-    padding: 4px 12px;
+    padding: 4px 0px 4px 12px;
     border: none;
     background: none;
 }
 
+#topbar .btn-group > .btn > .badge {
+    left: -9px;
+}
+
 #topbar .btn-group > .btn > span.glyphicon {
-    color: #57bc90;
+    color: #5ab9ea;
+    font-size: 20px;
 }
 
 #topbar .topbar-user {
@@ -176,6 +186,7 @@ a {
     border: none;
     padding-left: 22px;
     padding-top: 13px;
+    padding-right: 25px;
 }
 
 #topbar-hamburger-btn > span {
@@ -338,6 +349,10 @@ a {
 
 .no-bottom-margin {
     margin-bottom: 0px !important;
+}
+
+.no-top-margin {
+    margin-top: 0px !important;
 }
 
 .no-bottom-border {
@@ -676,7 +691,11 @@ ul.dropdown-menu > li > a:hover {
     color: #33805e;
 }
 
-@media (max-width: 768px) {
+.glyph-right-spacer {
+    margin-right: 5px;
+}
+
+@media (max-width: 767px) {
     #main {
         margin-left: 0px;
     }
@@ -718,6 +737,14 @@ ul.dropdown-menu > li > a:hover {
 
     #topbar .btn-group {
         margin-top: 7px;
+    }
+
+    #topbar .btn-group > .btn.notifications-none {
+        padding: 4px 19px;
+    }
+
+    #topbar .btn-group > .btn {
+        padding: 4px 12px;
     }
 
     #topbar .btn-group > .btn > span.glyphicon {

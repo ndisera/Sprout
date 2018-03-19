@@ -429,7 +429,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
     userService.notificationData = {
         relevantItems: [],
         relevantOffset: {
-            value: 14,
+            value: 35,
             unit: 'd',
         }
     };

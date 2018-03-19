@@ -2,15 +2,84 @@
     margin: 3px 0px 0px 0px;
 }
 
+#background-container-notifications {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    z-index: 101;
+    visibility: hidden;
+}
+
+#notifications-container {
+    z-index: 3;
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    width: 330px;
+    background-color: #0b3c5d;
+    border-radius: 4px;
+    padding: 15px;
+    -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
+    -moz-box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
+}
+
+#notifications-container.ng-hide-remove {
+    transition: top 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    top: 60px;
+    opacity: 0;
+}
+
+#notifications-container.ng-hide-remove.ng-hide-remove-active {
+    top: 50px;
+    opacity: 1;
+}
+
+#notifications-caret {
+    top: -14px;
+    right: 29px;
+    position: absolute;
+    color: #0b3c5d;
+    font-size: 20px;
+}
+
+#notifications-caret.notifications-none {
+    right: 5px;
+}
+
+#notifications-drawer {
+    position: relative;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+#notifications-dismiss-all {
+    margin-bottom: 15px;
+}
+
+#notifications-drawer > .panel-wrapper > .notifications-panel {
+    margin: 10px 0px 0px 0px;
+}
+
+#notifications-drawer > .panel-wrapper:first-child > .notifications-panel {
+    margin: 0px;
+}
+
 .notifications-panel {
     -webkit-box-shadow: 0px 0px 13px -2px rgba(119,119,119,0.57);
     -moz-box-shadow: 0px 0px 13px -2px rgba(119,119,119,0.57);
     box-shadow: 0px 0px 13px -2px rgba(119,119,119,0.57);
     background-color: #F7F7F7;
+    margin: 5px 0px 0px 0px;
 }
 
 .notifications-panel:hover {
     cursor: pointer;
+}
+
+.notifications-panel .panel-body {
+    position: relative;
 }
 
 .notifications-content {
@@ -47,10 +116,86 @@
     vertical-align: middle;
 }
 
-@media (max-width: 768px) {
-    .notifications-remove-icon {
-        right: 22px;
+#notifications-container #notifications-drawer .panel-wrapper.notifications-none > .panel.notifications-panel {
+    margin-top: 0px;
+}
+
+@media (max-width: 767px) {
+    #notifications-container {
+        z-index: 102;
+        position: fixed;
+        height: 100vh;
+        width: 80vw;
+        top: 0px;
+        right: 0px;
+        overflow-y: auto;
+        max-width: 400px;
+        border-radius: 0px;
+    }
+
+    #notifications-caret {
+        display: none;
+    }
+
+    #notifications-drawer {
+        max-height: unset;
+    }
+
+    #background-container-notifications {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    #background-container-notifications.notifications-extended {
+        visibility: visible;
         opacity: 1;
+        background-color: rgba(0, 0, 0, 0.75);
+    }
+
+    #notifications-container.ng-hide-remove {
+        transition: right 0.2s ease-in-out, opacity 0.1s ease-in-out;
+        top: 0px;
+        right: -100px;
+        opacity: 0;
+    }
+
+    #notifications-container.ng-hide-remove.ng-hide-remove-active {
+        top: 0px;
+        right: 0px;
+        opacity: 1;
+    }
+
+    #notifications-close > .glyphicon {
+        font-size: 25px;
+        padding: 6px 12px;
+        color: #fff;
+    }
+
+    #notifications-close > button {
+        background-color: #0b3c5d;
+        border-color: #0b3c5d;
+    }
+
+    #notifications-close > button > .glyphicon {
+        font-size: 20px;
+    }
+
+    #notifications-drawer > .panel-wrapper > .notifications-panel {
+        margin: 15px 0px 0px 0px;
+    }
+
+    #notifications-dismiss-all {
+        margin-top: 15px;
+        margin-bottom: 5px;
+    }
+
+    .notifications-remove-icon {
+        right: 8px;
+        opacity: 1;
+    }
+
+    .panel-wrapper.notifications-none {
+        margin-top: 15px;
     }
 }
 

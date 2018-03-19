@@ -114,7 +114,10 @@
     margin-bottom: 15px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
+    .manage-btn-group-spacer {
+        margin-top: 25px;
+    }
 
     .manage-add {
         display: block;
