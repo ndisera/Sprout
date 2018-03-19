@@ -198,6 +198,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
     };
 
     $scope.notificationNavigate = function(notification) {
+        $scope.toggleNotifications(false);
         $location.path('/student/' + notification.student + notification.partial_link);
     };
 
