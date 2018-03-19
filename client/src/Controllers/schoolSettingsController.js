@@ -83,6 +83,26 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     };
 
     /**
+     * Sets the field's chosens school year.
+     * @param {string} field - the field the school year is being used for.
+     * @param {object} elem - the school year object.
+     */
+    function setFromSchoolYear(field, elem) {
+        if (field === "term" || field === "all") {
+            $scope.termSchoolYear = elem;
+            $scope.termYears = _.filter($scope.terms, function(term) {
+                return term.school_year === elem.id
+            });
+        }
+        if (field === "holiday" || field === "all") {
+            $scope.holidaySchoolYear = elem;
+            $scope.holidayYears = _.filter($scope.holidays, function(holiday) {
+                return holiday.school_year === elem.id
+            });
+        }
+    }
+
+    /**
      * Initializes termSchoolYear and holidaySchoolYear to the current school year
      */
     function initializeSchoolYears(field) {
@@ -94,13 +114,11 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
             var startDate = moment(elem.start_date, "YYYY-MM-DD");
             // pick school year that contains current date, else school year with closest start date
             if (elem.start_date <= currentDate && elem.end_date >= currentDate) {
-                if (field === "term" || field === "all") $scope.termSchoolYear = elem;
-                if (field === "holiday" || field === "all") $scope.holidaySchoolYear = elem;
+                setFromSchoolYear(field, elem);
                 return;
             } else if (startDate.diff(myDate) < chosenDifference || chosenDifference === 0) {
                 chosenDifference = startDate.diff(myDate);
-                if (field === "term" || field === "all") $scope.termSchoolYear = elem;
-                if (field === "holiday" || field === "all") $scope.holidaySchoolYear = elem;
+                setFromSchoolYear(field, elem);
             }
         }
     }
@@ -129,7 +147,17 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
      * @param {string} type - the type the school year is associated with.
      */
     $scope.selectSchoolYear = function(year, type) {
-        type === "term" ? $scope.termSchoolYear = year : $scope.holidaySchoolYear = year;
+        if (type === "term") {
+            $scope.termSchoolYear = year;
+            $scope.termYears = _.filter($scope.terms, function(elem) {
+                return elem.school_year === year.id
+            });
+        } else if (type === "holiday") {
+            $scope.holidaySchoolYear = year;
+            $scope.holidayYears = _.filter($scope.holidays, function(elem) {
+                return elem.school_year === year.id
+            });
+        }
     };
 
     /**
@@ -360,13 +388,18 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
         holidayService.deleteHoliday(holidayId).then(
             function success(response) {
                 // remove from display array
+                var holiday = {};
                 for (var i = 0; i < $scope.holidays.length; i++) {
                     if ($scope.holidays[i].id === holidayId) {
+                        holiday = Object.assign({}, $scope.holidays[i]);
                         $scope.holidays.splice(i, 1);
                     }
                 }
                 // remove from edit lookup
                 delete $scope.eHolidays[holidayId];
+                $scope.holidayYears = _.filter($scope.holidays, function(elem) {
+                    return elem.school_year === holiday.school_year;
+                });
             },
             function error(response) {
                 setErrorMessage(response);
@@ -382,15 +415,20 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
     function deleteTerm(termId) {
         termService.deleteTerm(termId).then(
             function success(response) {
+                var term = {};
                 // remove from display array
                 for (var i = 0; i < $scope.terms.length; i++) {
                     if ($scope.terms[i].id === termId) {
+                        term = Object.assign({}, $scope.terms[i]);
                         $scope.terms.splice(i, 1);
                     }
                 }
                 delete $scope.termsLookup[termId];
                 // remove from edit lookup
                 delete $scope.eTerms[termId];
+                $scope.termYears = _.filter($scope.terms, function(elem) {
+                    return elem.school_year === term.school_year;
+                });
             },
             function error(response) {
                 setErrorMessage(response);
@@ -466,7 +504,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
 
                 if ($scope.schoolYears.length === 0) {
                     $scope.termSchoolYear = null;
+                    $scope.termYears = [];
                     $scope.holidaySchoolYear = null;
+                    $scope.holidayYears = [];
                     return;
                 }
 
@@ -501,6 +541,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.eHolidays[copy.id] = copy;
                 $scope.displayHolidayForm = false;
                 $scope.newHoliday = {};
+                $scope.holidayYears = _.filter($scope.holidays, function(holiday) {
+                    return holiday.school_year === response.holiday.school_year;
+                });
             },
             function error(response) {
                 setErrorMessage(response);
@@ -536,6 +579,9 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                 $scope.displayTermForm = false;
                 $scope.newTerm = {};
                 $scope.newTermSchoolSchedule = "";
+                $scope.termYears = _.filter($scope.terms, function(elem) {
+                    return elem.school_year === response.term.school_year;
+                });
             },
             function error(response) {
                 setErrorMessage(response);
