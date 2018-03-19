@@ -259,7 +259,7 @@
     padding-top: 7px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 
     #student-overview-image-preview {
         text-align: center;

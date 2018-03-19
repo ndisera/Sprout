@@ -107,7 +107,7 @@
     z-index: 80;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .manage-btn-group-spacer {
         margin-top: 25px;
     }
