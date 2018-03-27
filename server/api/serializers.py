@@ -270,11 +270,16 @@ class SproutLoginSerializer(LoginSerializer):
 
 
 class SproutRegisterSerializer(RegisterSerializer):
+    class Meta:
+        fields = ('email', )
+        model = SproutUser
+
     username = None
     first_name = serializers.CharField(source='sproutuserprofile.first_name')
     last_name = serializers.CharField(source='sproutuserprofile.last_name')
     password1 = serializers.CharField(write_only=True, required=False)
     password2 = serializers.CharField(write_only=True, required=False)
+    is_superuser = serializers.BooleanField(default=False)
 
     def custom_signup(self, request, user):
         profile_data = self.validated_data.pop('sproutuserprofile', {})
@@ -287,6 +292,7 @@ class SproutRegisterSerializer(RegisterSerializer):
     def to_representation(self, instance):
         representation = super(SproutRegisterSerializer, self).to_representation(instance)
         representation['active'] = instance.is_active
+        representation['is_superuser'] = instance.is_superuser
         user_profile = {'first_name' : instance.sproutuserprofile.first_name,
                         'last_name' : instance.sproutuserprofile.last_name,
                         }
@@ -314,10 +320,8 @@ class SproutRegisterSerializer(RegisterSerializer):
         }
         if 'password1' in self.validated_data:
             to_return['password1'] = self.validated_data.get('password1', '')
+        to_return['is_superuser'] = self.validated_data.get('is_superuser', False)
         return to_return
-
-    class Meta:
-        fields = ('email', )
 
 
 class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerializer):
@@ -327,7 +331,7 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
     class Meta(UserDetailsSerializer.Meta):
         fields = []
         fields.extend(UserDetailsSerializer.Meta.fields)
-        fields.extend(('first_name', 'last_name', 'is_active'))
+        fields.extend(('first_name', 'last_name', 'is_active', 'is_superuser'))
         if 'username' in fields:
             del fields[fields.index('username')]
 

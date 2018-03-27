@@ -39,6 +39,12 @@ popd # End Haraka setup
 python manage.py makemigrations
 python manage.py migrate
 
+# Create initial superuser
+echo ""
+echo "Please enter credentials for the initial superuser"
+echo "(Ctrl-C to skip)"
+python manage.py createsuperuser
+
 # FRONTEND SETUP
 # install the node dependencies
 cd "${SCRIPT_PATH}"/../client

@@ -120,6 +120,12 @@ class Enrollment(models.Model):
         unique_together = (('section', 'student'),)
         ordering = ('section',)
 
+    def __repr__(self):
+        return "{student} in {section}".format(student=repr(self.student), section=repr(self.section))
+
+    def __str__(self):
+        return self.__repr__()
+
     def delete(self, using=None, keep_parents=False):
         """
         Cleanup notifications between this enrollment's section's teacher
@@ -166,24 +172,6 @@ class AttendanceRecord(models.Model):
 
     class Meta:
         unique_together = [('enrollment', 'date'),]
-
-class StandardizedTest(models.Model):
-    """
-    StandardizedTest
-    Represent a standardized test as enabled by the school
-    """
-    test_name = models.CharField(unique=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    min_score = models.IntegerField(verbose_name="Minimum possible score", blank=False)
-    max_score = models.IntegerField(verbose_name="Maximum possible score", blank=False)
-
-    class Meta:
-        ordering = ('id',)
-
-    def __repr__(self):
-        return str(self.test_name)
-
-    def __str__(self):
-        return self.__repr__();
 
 
 class StandardizedTestScore(models.Model):

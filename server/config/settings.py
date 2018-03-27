@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount', # Not actually needed/wanted, but required to work around a bug in django-rest-auth
     'rest_auth.registration',
     # End requirements for token-based authentication
+    # Permissions
+    'dry_rest_permissions',
+    # End Permissions
     'api',
     'rest_framework_swagger',
     'corsheaders',
@@ -203,6 +206,9 @@ REST_AUTH_SERIALIZERS = {
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER' : 'api.serializers.SproutRegisterSerializer',
 }
+
+from dry_rest_permissions.generics import DRYPermissions
+REST_AUTH_REGISTER_PERMISSION_CLASSES = (DRYPermissions, )
 
 DEFAULT_MAX_CHARFIELD_LENGTH = 100
 DESCRIPTION_CHARFIELD_MAX_LENGTH = 1600
