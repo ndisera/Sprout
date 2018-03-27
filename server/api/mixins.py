@@ -1,6 +1,7 @@
 
+from django.db import models
 
-class AdminWriteMixin():
+class AdminWriteMixin(models.Model):
     """
     Define permissions such that anyone can view but only the admin can create/edit
     """
