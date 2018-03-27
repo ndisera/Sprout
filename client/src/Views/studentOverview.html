@@ -64,7 +64,7 @@
                     <h3 class="panel-title">Class Schedule</h3>
                 </div>
                 <div class="panel-body">
-                    <div class="select-full-width input-group">
+                    <div class="select-full-width input-group" ng-show="terms.length > 0">
                         <span class="input-group-addon">Term</span>
                         <div class="input-group-btn">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTerm.name }} <span class="caret"></span></button>
@@ -75,10 +75,13 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="alert alert-info no-bottom-margin voffset3" ng-if="termSections.length === 0">
+                    <div class="alert alert-info no-bottom-margin" ng-if="terms.length === 0">
+                        <span><b>Info:</b> It looks like this school doesn't have any terms yet. Speak to your admin to add one.</span>
+                    </div>
+                    <div class="alert alert-info no-bottom-margin voffset3" ng-if="terms.length > 0 && termSections.length === 0">
                         <span><b>Info:</b> It looks like this student isn't enrolled in any classes for this term.</span>
                     </div>
-                    <div class="table-responsive voffset3" ng-show="termSections.length > 0">
+                    <div class="table-responsive voffset3" ng-show="terms.length > 0 && termSections.length > 0">
                         <table ng-if="sections.length > 0" class="table">
                             <thead>
                                 <tr>
@@ -96,9 +99,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <div ng-if="sections.length === 0">
-                        <h4 class="centerText">No Classes</h4>
-                    </div>
                 </div>
             </div>
         </div>
@@ -111,18 +111,24 @@
                     <div class="row">
                         <div class="col-sm-5">
                             <div id="student-overview-image-preview">
-                                <img class="student-image" ng-if="$root.currentStudent.picture === null" src="img/default_profile_pic.png">
-                                <img class="student-image" ng-if="$root.currentStudent.picture !== null" ng-src="data:image/png;base64,{{ $root.currentStudent.picture }}">
+                                <div class="picture-frame student-frame">
+                                    <img class="student-image" ng-if="$root.currentStudent.picture === null" src="img/default_profile_pic.png">
+                                    <img class="student-image" ng-if="$root.currentStudent.picture !== null" ng-src="data:image/png;base64,{{ $root.currentStudent.picture }}">
+                                </div>
                             </div>
                         </div>
                         <div class="col-sm-7">
                             <div id="student-overview-image-btns">
-                                <button type="button" class="btn btn-default full-width voffset3" ng-click="showModal()">
-                                    <span>Select New Photo</span>
-                                </button>
-                                <button type="button" class="btn btn-danger full-width voffset3" ng-click="deleteStudentImage()" ng-disabled="$root.currentStudent.picture === null">
-                                    <span>Delete Photo</span>
-                                </button>
+                                <div>
+                                    <button type="button" class="btn btn-default full-width voffset3" ng-click="showModal()">
+                                        <span>Select New Photo</span>
+                                    </button>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-danger full-width voffset3" ng-click="deleteStudentImage()" ng-disabled="$root.currentStudent.picture === null">
+                                        <span>Delete Photo</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -149,7 +155,9 @@
                 </div>
                 <div id="student-overview-image-crop">
                     <div>
-                        <img class="student-image" ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
+                        <div class="picture-frame student-frame">
+                            <img class="student-image" ng-src="{{ newStudentImageCrop }}" ng-class="{ 'active': newStudentImageCrop !== null, }"/>
+                        </div>
                         <h3>Preview</h3>
                     </div>
                 </div>

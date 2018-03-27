@@ -126,16 +126,28 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * @param {string} task - the type of task selected.
      */
     $scope.checkValidTeacher = function(task, teacher) {
-        $scope.cTeacher = teacher;
         switch (task) {
             case "add":
-                if ($scope.addTeacher != null) {
-                    $scope.addValidTeacher = _.has($scope.teachersLookup, $scope.addTeacher.toUpperCase());
+                if($('#cteacher2 select.polyfilling').length === 0) {
+                    if ($scope.addTeacher != null) {
+                        $scope.addValidTeacher = _.has($scope.teachersLookup, $scope.addTeacher.toUpperCase());
+                    }
+                }
+                else {
+                    var pk = parseInt($('#cteacher2 select.polyfilling').find(':selected').attr('pk'));
+                    $scope.addValidTeacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }) !== null;
                 }
                 break;
             case "edit":
-                if ($scope.cTeacher != null) {
-                    $scope.editValidTeacher = _.has($scope.teachersLookup, $scope.cTeacher.toUpperCase());
+                $scope.cTeacher = teacher;
+                if($('#cteacher select.polyfilling').length === 0) {
+                    if ($scope.cTeacher != null) {
+                        $scope.editValidTeacher = _.has($scope.teachersLookup, $scope.cTeacher.toUpperCase());
+                    }
+                }
+                else {
+                    var pk = parseInt($('#cteacher select.polyfilling').find(':selected').attr('pk'));
+                    $scope.editValidTeacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }) !== null;
                 }
                 break;
             default:
@@ -167,30 +179,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                 break;
             default:
         }
-        // remove or set active property
-        setActiveButton(task);
     };
-
-    /**
-     * Leaves the most recently selected button active and removes the active class from the other buttons
-     * @param {string} task - the type of task selected.
-     */
-    function setActiveButton(task) {
-        if (task === 'view/edit') {
-            document.getElementById('cViewButton').classList.add('active');
-            document.getElementById('cViewButton2').classList.add('active');
-        } else {
-            document.getElementById('cViewButton').classList.remove('active');
-            document.getElementById('cViewButton2').classList.remove('active');
-        }
-        if (task === 'add') {
-            document.getElementById('cAddButton').classList.add('active');
-            document.getElementById('cAddButton2').classList.add('active');
-        } else {
-            document.getElementById('cAddButton').classList.remove('active');
-            document.getElementById('cAddButton2').classList.remove('active');
-        }
-    }
 
     /**
      * Displays section info.
@@ -217,13 +206,26 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Updates the selected section with the newly edited field.
      */
     $scope.saveCEdit = function() {
-        if ($scope.cTeacher != null) {
-            $scope.sectionE.teacher = $scope.teachersLookup[$scope.cTeacher.toUpperCase()];
-        } else {
-            $scope.sectionE.teacher = null;
+        if($('#cteacher select.polyfilling').length === 0) {
+            if ($scope.cTeacher != null) {
+                $scope.sectionE.teacher = $scope.teachersLookup[$scope.cTeacher.toUpperCase()];
+            } else {
+                $scope.sectionE.teacher = null;
+            }
         }
+        else {
+            var pk = parseInt($('#cteacher select.polyfilling').find(':selected').attr('pk'));
+            $scope.sectionE.teacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }).pk;
+        }
+
         $scope.sectionE.term = $scope.cTerm.id;
-        $scope.sectionE.schedule_position = $scope.cPeriod.period;
+        // added to prevent error in console
+        if($scope.cPeriod !== null && $scope.cPeriod !== undefined) {
+            $scope.sectionE.schedule_position = $scope.cPeriod.period;
+        }
+        else {
+            $scope.sectionE.schedule_position = null;
+        }
         // save with sectionE
         var tempSection = Object.assign({}, $scope.sectionE);
         delete tempSection.id;
@@ -258,12 +260,20 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Creates and adds a new section.
      */
     $scope.addSection = function() {
-        if ($scope.addTeacher != null && $scope.addTeacher !== "") {
-            $scope.newSection.teacher = $scope.teachersLookup[$scope.addTeacher.toUpperCase()];
+
+        if($('#cteacher2 select.polyfilling').length === 0) {
+            if ($scope.addTeacher != null && $scope.addTeacher !== "") {
+                $scope.newSection.teacher = $scope.teachersLookup[$scope.addTeacher.toUpperCase()];
+            }
         }
+        else {
+            var pk = parseInt($('#cteacher2 select.polyfilling').find(':selected').attr('pk'));
+            $scope.newSection.teacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }).pk;
+        }
+
         $scope.newSection.term = $scope.newSectionTerm.id;
         if ($scope.newSectionPeriod != null) {
-            $scope.newSection.schedule_position = $scope.periodArraysLookup[$scope.termsLookup[$scope.newSection.term].id].indexOf($scope.newSectionPeriod.periodName);
+            $scope.newSection.schedule_position = $scope.newSectionPeriod.period;
         }
         var sectionPromise = sectionService.addSection($scope.newSection);
         sectionPromise.then(function success(data) {

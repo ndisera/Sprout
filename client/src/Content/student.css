@@ -1,4 +1,4 @@
-.student-image {
+.student-frame {
     height: 100px;
     width: 100px;
     background-color: #ddd;
@@ -8,19 +8,36 @@
     box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
 }
 
+.student-image {
+    height: 100px;
+    width: 100px;
+    /* account for border of frame */
+    margin-top: -5px;
+    margin-left: -5px;
+}
+
+.student-tiny-col {
+    width: 17%;
+}
+
+.student-min-col {
+    width: 1px;
+}
+
 #student-overview-image-preview {
     text-align: right;
 }
 
-#student-overview-image-preview > img {
+#student-overview-image-preview > .picture-frame {
     margin: 0 auto;
+    display: inline-block;
 }
 
-#student-overview-image-btns {
+#student-overview-image-btns > div {
     text-align: left;
 }
 
-#student-overview-image-btns > button {
+#student-overview-image-btns > div > button {
     margin: 10px auto 0px auto;
     max-width: 200px;
 }
@@ -66,7 +83,7 @@
     border-radius: 4px;
 }
 
-#student-overview-image-crop > div > img {
+#student-overview-image-crop > div > .picture-frame {
     margin-top: -45px;
 }
 
@@ -120,10 +137,23 @@
     height: 300px;
 }
 
-.student-grades-box-content {
+.student-tests-panel-info {
+    margin-bottom: 10px;
     text-align: center;
+}
+
+.student-tests-panel-info > .panel-body {
+    padding: 8px;
+}
+
+.student-tests-scrollable {
+    max-height: 300px;
+}
+
+.student-grades-box-content {
     margin-top: 20px;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 .student-behaviors-graph {
@@ -176,8 +206,17 @@
     margin-top: -6px;
 }
 
+.student-ieps-graph {
+    height: 250px;
+}
+
 .student-ieps-spacer {
     margin-top: 20px;
+}
+
+.editable-row.achieved {
+    background-color: #dbf0e7;
+    color: #245b43;
 }
 
 .student-ieps-tiny-col {
@@ -220,7 +259,7 @@
     padding-top: 7px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
 
     #student-overview-image-preview {
         text-align: center;
@@ -230,7 +269,7 @@
         text-align: center;
     }
 
-    #student-overview-image-btns > button {
+    #student-overview-image-btns > div > button {
         display: block;
         margin: 8px auto 0px auto;
     }
@@ -244,6 +283,10 @@
         float: none;
         text-align: center;
         margin-bottom: 20px;
+    }
+
+    .student-mobile-spacer {
+        margin-top: 15px;
     }
 }
 
@@ -259,10 +302,6 @@
 .student-grades-progress-circle.progress-circle.danger .progress-circle-stroke, .student-grades-progress-circle .progress-circle.danger.warning .progress-circle-stroke {
     stroke: rgba(201, 48, 44, 0.4);
 }
-
-/*#student-services-add-tip {*/
-    /*margin-top: 80px;*/
-/*}*/
 
 #student-services-add-btn {
     margin-top: -3px;

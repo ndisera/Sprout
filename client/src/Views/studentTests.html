@@ -1,12 +1,12 @@
 <div ng-include="'html/studentTabs.html'"></div>
-<div class="row voffset4" ng-repeat="error in errorMessages">
+<div class="row" ng-if="tests.length === 0">
     <div class="col-xs-12">
-        <div class="alert alert-danger no-bottom-margin" role="alert">
-            <span><b>Error:</b> {{ error }}</span>
+        <div class="alert alert-info" role="alert">
+            <span><b>Tip:</b> It looks like you school hasn't created any standardized tests yet. Speak to your admin about adding one.</span>
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row" ng-show="tests.length > 0">
     <div class="col-xs-12">
         <div class="row">
             <div class="col-xs-12 col-sm-6">
@@ -42,23 +42,141 @@
         </div>
     </div>
 </div>
-<div ng-repeat="graph in testGraphs" class="row voffset4">
+<div ng-repeat="test in tests" class="row voffset4">
     <div class="col-xs-12">
         <div class="panel-wrapper">
             <div class="panel panel-default no-bottom-margin">
                 <div class="panel-heading">
-                    <h3 class="panel-title">{{testGraphTitles[$index]}}</h3>
+                    <h3 class="panel-title">{{ test.test_name }}</h3>
                 </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-xs-12 voffset2 student-tests-graph">
                             <canvas id="testGraph-{{$index}}"
                                     class="chart chart-line"
-                                    chart-data="graph.data"
-                                    chart-labels="graph.labels"
-                                    chart-options="graph.options">
+                                    chart-data="test.graph.data"
+                                    chart-series="test.graph.series"
+                                    chart-labels="test.graph.labels"
+                                    chart-options="test.graph.options"
+                                    chart-colors="test.graph.colors">
                             </canvas>
                         </div>
+                    </div>
+                    <div class="btn-manipulate-row">
+                        <button class="btn btn-primary" type="button" ng-click="toggleEditTest(test, !test.editing)">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-wrapper voffset4" ng-if="test.editing">
+            <div class="panel panel-default no-bottom-margin">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Edit {{ test.test_name }} Scores ({{ test.min_score }} - {{ test.max_score }})</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="alert alert-info" ng-if="test.scores.length === 0 && !test.adding" role="alert">
+                                <span><b>Tip:</b> It looks like you don't have any scores. Click the <span class="glyphicon glyphicon-plus"></span> button to add one.</span>
+                            </div>
+                            <div class="panel panel-default student-tests-panel-info" ng-if="test.scores.length > 0">
+                                <div class="panel-body">
+                                    <p class="panel-title">Displaying Scores From {{ graphStartDate.format('YYYY-MM-DD').toString() }} To {{ graphEndDate.format('YYYY-MM-DD').toString() }}</p>
+                                </div>
+                            </div>
+                            <div class="table-responsive table-select student-tests-scrollable" ng-show="test.scores.length > 0">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="student-tiny-col">Date</th>
+                                            <th>Score</th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="editable-row" ng-repeat="score in test.scores" ng-click="toggleEditScore(score, true)">
+                                            <td class="student-tiny-col" ng-show="!score.editing">{{ score.date.format('YYYY-MM-DD') }}</td>
+                                            <td ng-show="!score.editing">{{ score.score }}</td>
+                                            <td class="student-min-col vertical-align-mid" ng-show="!score.editing">
+                                                <span class="glyphicon glyphicon-pencil pencilEdit student-ieps-hover-pencil"></span>
+                                            </td>
+                                            <td class="student-min-col table-button-col vertical-align-mid" ng-show="!score.editing">
+                                                <button class="btn btn-danger btn-xs pull-right" type="button" ng-click="deleteScore(test, score); $event.stopPropagation();">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </button>
+                                            </td>
+                                            <td ng-show="score.editing">
+                                                <input autocomplete="off" type="text" date-time class="form-control" ng-model="score.date_temp" view="date" min-view="date" format="YYYY-MM-DD" required>
+                                            </td>
+                                            <td ng-show="score.editing">
+                                                <input type="text" class="form-control" ng-model="score.score_temp" ng-class="{ 'ng-invalid': scoreEditValidation(test, score), }">
+                                            </td>
+                                            <td class="student-min-col table-button-col vertical-align-mid" ng-show="score.editing">
+                                                <button class="btn btn-success btn-xs" type="button" ng-disabled="scoreEditValidation(test, score)" ng-click="saveScore(test, score); $event.stopPropagation();">
+                                                    <span class="glyphicon glyphicon-ok"></span>
+                                                </button>
+                                            </td>
+                                            <td class="student-min-col table-button-col vertical-align-mid" ng-show="score.editing">
+                                                <button class="btn btn-default btn-xs" type="button" ng-click="toggleEditScore(score, false); $event.stopPropagation();">
+                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- add score panel -->
+                    <div class="row voffset3 add-panel-spacer" ng-if="test.adding">
+                        <div class="col-xs-12">
+                            <div class="panel-wrapper">
+                                <div class="panel panel-default no-bottom-margin">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">Add New {{ test.test_name }} Score ({{ test.min_score }} - {{ test.max_score }})</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        <form class="form-horizontal" name="addScoreForm{{$index}}" ng-submit="addScore(test)">
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-2">Date: </label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" date-time ng-model="test.newScore.date" view="date" min-view="date" format="YYYY-MM-DD" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-sm-2">Score: </label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" ng-model="test.newScore.score" ng-class="{ 'ng-invalid': scoreValidation(test, test.newScore), }">
+                                                </div>
+                                            </div>
+                                            <div class="form-group no-bottom-margin">
+                                                <div class="col-xs-12">
+                                                    <div class="btn-manipulate-row">
+                                                        <button class="btn btn-success" type="submit" ng-disabled="addScoreForm{{$index}}.$invalid || scoreValidation(test, test.newScore)">
+                                                            <span class="glyphicon glyphicon-ok"></span>
+                                                        </button>
+                                                        <button class="btn btn-default" type="button" ng-click="toggleAddScore(test, false)">
+                                                            <span class="glyphicon glyphicon-remove"></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-manipulate-row voffset2">
+                        <button class="btn btn-success" type="button" ng-if="!test.adding" ng-click="toggleAddScore(test, true)">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </button>
+                        <button class="btn btn-default" type="button" ng-click="toggleEditTest(test, false)">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
                     </div>
                 </div>
             </div>

@@ -62,6 +62,27 @@ class DailyScheduleSerializer(DynamicModelSerializer):
         model = DailySchedule
         fields = '__all__'
 
+    def validate(self, data):
+        validated_data = super(DailyScheduleSerializer, self).validate(data)
+        errors = {}
+
+        if 'total_periods' in validated_data:
+            total_periods = validated_data['total_periods']
+        else:
+            total_periods = self.instance.total_periods
+
+        if 'periods_per_day' in validated_data:
+            periods_per_day = validated_data['periods_per_day']
+        else:
+            periods_per_day = self.instance.periods_per_day
+
+        if periods_per_day > total_periods:
+            errors['periods_per_day'] = 'Cannot have more periods per day than total periods'
+
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+
+        return validated_data
 
 class TermSettingsSerializer(DynamicModelSerializer):
     schedule = DynamicRelationField('DailyScheduleSerializer')
@@ -145,6 +166,28 @@ class StandardizedTestSerializer(DynamicModelSerializer):
     class Meta:
         model = StandardizedTest
         fields = ('id', 'test_name', 'min_score', 'max_score',)
+
+    def validate(self, data):
+        validated_data = super(StandardizedTestSerializer, self).validate(data)
+        errors = {}
+
+        if 'min_score' in validated_data:
+            min_score = validated_data['min_score']
+        else:
+            min_score = self.instance.min_score
+
+        if 'max_score' in validated_data:
+            max_score = validated_data['max_score']
+        else:
+            max_score = self.instance.max_score
+
+        if max_score < min_score:
+            errors['max_score'] = 'Max score cannot be less than the min score'
+
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+
+        return validated_data
 
 
 class StandardizedTestScoreSerializer(DynamicModelSerializer):
@@ -356,6 +399,40 @@ class IEPGoalSerializer(DynamicModelSerializer):
     class Meta:
         model = IEPGoal
         fields = '__all__'
+
+    def validate(self, data):
+        """
+        Ensure that the quantitative range is non-empty and that
+        the quantitative target is within the range
+        """
+        if 'quantitative_range_low' in data:
+            lower_bound = data['quantitative_range_low']
+        else:
+            lower_bound = getattr(self.instance, 'quantitative_range_low', None)
+
+        if 'quantitative_range_upper' in data:
+            upper_bound = data['quantitative_range_upper']
+        else:
+            upper_bound = getattr(self.instance, 'quantitative_range_upper', None)
+
+        if 'quantitative_target' in data:
+            target = data['quantitative_target']
+        else:
+            target = getattr(self.instance, 'quantitative_target', None)
+
+        if lower_bound is not None or upper_bound is not None:
+            if lower_bound is None or upper_bound is None:
+                raise serializers.ValidationError('If one part of the quantitative range is defined, both must be')
+            if upper_bound < lower_bound:
+                raise serializers.ValidationError('The upper bound of the quantitative range must not be below the lower bound of the range')
+            if target is not None:
+                if target < lower_bound or target > upper_bound:
+                    raise serializers.ValidationError("Goal target must be within the lower and upper bounds of the range")
+        elif target is not None:
+            raise serializers.ValidationError("Does not make sense to declare a target without a range")
+
+        return data
+
     student = DynamicRelationField('StudentSerializer')
 
 

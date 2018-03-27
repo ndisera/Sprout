@@ -44,8 +44,6 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
                 break;
             default:
         }
-        // remove or set active property
-        setActiveButton(task);
     };
 
     /**
@@ -109,27 +107,6 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
             toastService.error("The server was unable to delete the student." + errorResponse());
         });
     };
-
-    /**
-     * Leaves the most recently selected button active and removes the active class from the other buttons
-     * @param {string} task - the type of task selected.
-     */
-    function setActiveButton(task) {
-        if (task === 'view/edit') {
-            document.getElementById('sViewButton').classList.add('active');
-            document.getElementById('sViewButton2').classList.add('active');
-        } else {
-            document.getElementById('sViewButton').classList.remove('active');
-            document.getElementById('sViewButton2').classList.remove('active');
-        }
-        if (task === 'add') {
-            document.getElementById('sAddButton').classList.add('active');
-            document.getElementById('sAddButton2').classList.add('active');
-        } else {
-            document.getElementById('sAddButton').classList.remove('active');
-            document.getElementById('sAddButton2').classList.remove('active');
-        }
-    }
 
     /**
      * Updates the displayed error message.

@@ -290,6 +290,8 @@ class IEPGoal(models.Model):
                                                  help_text="If defined, lower bound of the quantitative category value")
     quantitative_range_upper = models.IntegerField(null=True,
                                                    help_text="If defined, upper bound of the quantitative category value")
+    quantitative_target = models.IntegerField(null=True,
+                                              help_text="Optional value indicating where the quantitative IEP Goal should fall")
     due_date = models.DateField(null=False,
                                 help_text="Date when this IEP Goal should be completed")
 

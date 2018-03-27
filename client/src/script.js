@@ -312,20 +312,15 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
-
-                // I'm thinking this will be gotten from inside of the tests controller, not here
-                // testData: function(testService, $route) {
-                //     return testService.getTests(); //we want them all...
-                // },
-
-                // data: function(enrollmentService, $route) {
-                //     return enrollmentService.getStudentEnrollments(
-                //       {
-                //           include: ['section.*', 'student.*'],
-                //           filter: [{ name: 'student', val: $route.current.params.id, },],
-                //       }
-                //     );
-                // },
+                testData: function(testService, $route) {
+                    return testService.getTests();
+                },
+                termData: function(termService) {
+                    var config = {
+                        include: ['settings.*', 'settings.schedule.*', ],
+                    };
+                    return termService.getTerms(config);
+                },
                 auth: function(userService) {
                     return userService.authVerify();
                 },
@@ -453,7 +448,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         $location.path('/login').replace();
 
         // notify user
-        toastService.error('There was a fatal error with the server. Please log back in.');
+        toastService.error('There was an error with the server. Please log back in.');
     });
 
     /**

@@ -45,6 +45,7 @@
         <script src="includes/snap.svg-min.js"></script>
         <script src="includes/ng-file-upload.min.js"></script>
         <script src="includes/ng-img-crop.js"></script>
+        <script src="includes/datalist-polyfill.min.js"></script>
         <!-- @endif -->
         <!-- @ifdef DEBUG -->
         <script src="includes/jquery.js"></script>
@@ -67,22 +68,25 @@
         <script src="includes/snap.svg.js"></script>
         <script src="includes/ng-file-upload.js"></script>
         <script src="includes/ng-img-crop.js"></script>
+        <script src="includes/datalist-polyfill.js"></script>
         <!-- @endif -->
     </head>
     <body ng-app="app">
         <div id="nav-wrapper" ng-controller="mainController" ng-show="user.auth" ng-cloak>
-            <div class="background-container" ng-class="{ 'sidebar-extended': sidebarExtended, }">
+            <div class="background-container" ng-click="toggleSidebar(false)" ng-class="{ 'sidebar-extended': sidebarExtended, }">
+            </div>
+            <div id="background-container-notifications" ng-class="{ 'notifications-extended': showNotifications, }">
             </div>
             <div id="sidebar" ng-class="{ 'sidebar-extended': sidebarExtended, }">
                 <div class="container-fluid">
                     <div class="row voffset3">
                         <div class="col-xs-9 col-sm-12">
-                            <a href="/profile" ng-click="extendSidebar()">
+                            <a href="/profile" ng-click="toggleSidebar(false)">
                                 <img id="sidebar-logo" class="center-block" src="img/logo/svg/green_white_logo_transparent.svg">
                             </a>
                         </div>
                         <div class="col-xs-3 visible-xs">
-                            <button id="sidebar-hamburger-btn" type="button" ng-click="clearSearch(); extendSidebar();">
+                            <button id="sidebar-hamburger-btn" type="button" ng-click="clearSearch(); toggleSidebar(false);">
                                 <span class="glyphicon glyphicon-remove"></span>
                             </button>
                         </div>
@@ -90,7 +94,7 @@
                     <div class="row voffset4">
                         <div class="col-xs-12 no-padding">
                             <ul class="list-group" ng-cloak>
-                                <li ng-repeat="link in sidebarLinks" ng-click="sidebarLinkClick(link); closeSidebar();" class="list-group-item" ng-class="{ 'active': sidebarLinkActive(link), }">
+                                <li ng-repeat="link in sidebarLinks" ng-click="sidebarLinkClick(link);" class="list-group-item" ng-class="{ 'active': sidebarLinkActive(link), }">
                                     <a ng-href="{{ link.href }}">
                                         <span class="glyphicon glyphicon-{{ link.glyph }}"></span>
                                         {{ link.title }}
@@ -102,10 +106,57 @@
                     </div>
                 </div>
             </div>
+            <div id="notifications-container" ng-show="showNotifications" ng-click="$event.stopPropagation()">
+                <span id="notifications-caret" class="glyphicon glyphicon-triangle-top" ng-class="{ 'notifications-none': notifications.length === 0, }"></span>
+                <div id="notifications-drawer">
+                    <div id="notifications-close" class="visible-xs">
+                        <span class="glyphicon glyphicon-bell"></span>
+                        <button type="button" class="btn btn-primary pull-right" ng-click="toggleNotifications(false)">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                    </div>
+                    <button id="notifications-dismiss-all" type="button" class="btn btn-danger full-width" ng-click="markAsRead(null, 'all')" ng-if="notifications.length !== 0">
+                        <span class="glyphicon glyphicon-trash glyph-right-spacer"></span>
+                        <span>Dismiss All</span>
+                    </button>
+                    <div class="panel-wrapper notifications-none" ng-if="notifications.length === 0">
+                        <div class="panel panel-default notifications-panel">
+                            <div class="panel-body">
+                                <div class="notifications-content">
+                                    <div class="notifications-content-cell">
+                                        <i class="fas fa-2x fa-thumbs-up notifications-content-icon"></i>
+                                    </div>
+                                    <div class="notifications-content-cell">
+                                        <h4>You're all caught up!</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-wrapper" ng-repeat="notification in notifications" ng-class="notificationClass(notification)">
+                        <div class="panel panel-default notifications-panel" ng-click="notificationNavigate(notification)">
+                            <div class="panel-body">
+                                <button class="btn btn-default notifications-remove-icon" ng-click="markAsRead(notification); $event.stopPropagation();">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </button>
+                                <div class="notifications-content">
+                                    <div class="notifications-content-cell">
+                                        <i class="fas fa-2x notifications-content-icon" ng-class="notificationIconClass(notification)"></i>
+                                    </div>
+                                    <div class="notifications-content-cell">
+                                        <h5>{{ notification.title }}</h5>
+                                        <p>{{ notification.body }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="topbar">
                 <div class="container-fluid">
                     <div class="row visible-xs">
-                        <button id="topbar-hamburger-btn" type="button" ng-click="clearSearch(); extendSidebar();">
+                        <button id="topbar-hamburger-btn" type="button" ng-click="clearSearch(); toggleSidebar(true);">
                             <span class="glyphicon glyphicon-menu-hamburger"></span>
                         </button>
                         <a id="topbar-logo" href="/profile" class="navbar-left" ng-click="clearSearch()">
@@ -114,8 +165,11 @@
                         </a>
                         <div class="pull-right">
                             <div class="btn-group">
-                                <!--<button type="button" class="btn btn-default" ng-click="location.path('/settings')"><span class="glyphicon glyphicon-cog"></span></button>-->
-                                <!--<button type="button" class="btn btn-default" ng-click="location.path('/notifications')"><span class="glyphicon glyphicon-bell"></span></button>-->
+                                <button type="button" class="btn btn-default btn-notifications" ng-click="toggleNotifications(true); $event.stopPropagation();" ng-class="{ 'notifications-none': notifications.length === 0, }">
+                                    <span class="glyphicon glyphicon-bell"></span>
+                                    <span class="badge" ng-if="notifications.length > 0 && notifications.length <= 99">{{ notifications.length }}</span>
+                                    <span class="badge" ng-if="notifications.length > 99">99+</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -125,7 +179,7 @@
                                 <div class="input-group">
                                     <input type="text" autocomplete="off" class="form-control" placeholder="Search Students" list="student" name="student" ng-model="studentName">
                                     <datalist id="student">
-                                        <option ng-repeat="s in studentInfo.students" value="{{s.first_name}} {{s.last_name}}">
+                                        <option ng-repeat="s in studentInfo.students" value="{{s.first_name}} {{s.last_name}}">{{ s.first_name}} {{ s.last_name }}
                                     </datalist>
                                     <div class="input-group-btn">
                                         <button class="btn btn-default" type="submit">
@@ -141,8 +195,11 @@
                                     <span>{{ user.firstName }} {{ user.lastName }}</span>
                                 </div>
                                 <div class="btn-group">
-                                    <!--<button type="button" class="btn btn-default" ng-click="location.path('/settings')"><span class="glyphicon glyphicon-cog"></span></button>-->
-                                    <!--<button type="button" class="btn btn-default" ng-click="location.path('/notifications')"><span class="glyphicon glyphicon-bell"></span></button>-->
+                                    <button type="button" class="btn btn-default btn-notifications" ng-click="toggleNotifications(!showNotifications); $event.stopPropagation();" ng-class="{ 'notifications-none': notifications.length === 0, }">
+                                        <span class="glyphicon glyphicon-bell"></span>
+                                        <span class="badge" ng-if="notifications.length > 0 && notifications.length <= 99">{{ notifications.length }}</span>
+                                        <span class="badge" ng-if="notifications.length > 99">99+</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>

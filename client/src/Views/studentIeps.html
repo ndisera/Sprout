@@ -7,7 +7,7 @@
             </button>
         </div>
         <div id="student-ieps-select" class="select-full-width input-group" ng-show="ieps.length > 0" ng-class="{ 'adding': addingIep, }">
-            <span class="input-group-addon">IEP Goal</span>
+            <span class="input-group-addon">IEP</span>
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedIep.title }} <span class="caret"></span></button>
                 <ul class="dropdown-menu dropdown-menu-right">
@@ -56,6 +56,16 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-group" ng-if="iep.quantitative">
+                                    <label class="control-label col-sm-2">Goal: </label>
+                                    <div class="col-sm-10">
+                                        <p class="form-control-static" ng-if="!iep.editing && iep.quantitative_target !== null">{{ iep.quantitative_target }}</p>
+                                        <p class="form-control-static" ng-if="!iep.editing && iep.quantitative_target === null">None</p>
+                                        <div ng-if="iep.editing">
+                                            <input type="text" class="form-control" ng-model="iep.quantitative_target_temp">
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-group no-bottom-margin">
                                     <div class="col-xs-12">
                                         <div class="btn-manipulate-row" ng-if="iep.editing">
@@ -96,9 +106,6 @@
                         <div class="alert alert-info no-bottom-margin" ng-if="!iep.graph.show">
                             <span><b>Tip:</b> It looks like you haven't made any Measurements yet. Click the <span class="glyphicon glyphicon-plus"></span> button under "Measurements" to add one.</span>
                         </div>
-                        <!--<div class="table-fake" ng-show="!iep.graph.show">-->
-                            <!--<h4>No Measurements</h4>-->
-                        <!--</div>-->
                         <div class="student-ieps-graph" ng-show="iep.graph.show">
                             <canvas id="student_iep_graph_{{$index}}"
                                     class="chart chart-line"
@@ -121,7 +128,7 @@
             <div class="panel-wrapper">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="panel-title">Measurements <span ng-if="iep.quantitative">(Scored From {{ iep.quantitative_range_low }} to {{ iep.quantitative_range_upper }})</span></h4>
+                        <h4 class="panel-title">Measurements <span ng-if="iep.quantitative">({{ iep.quantitative_range_low }} - {{ iep.quantitative_range_upper }})</span></h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -141,7 +148,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr class="editable-row" ng-repeat="data in iep.datapoints" ng-click="toggleEditData(data, true)">
+                                            <tr class="editable-row" ng-repeat="data in iep.datapoints" ng-click="toggleEditData(data, true)" ng-class="{ 'achieved': iep.quantitative && iep.quantitative_target && data.value >= iep.quantitative_target, }">
                                                 <td class="student-ieps-tiny-col" ng-show="!data.editing">{{ data.date.format('YYYY-MM-DD') }}</td>
                                                 <td class="student-ieps-tiny-col" ng-show="!data.editing && iep.quantitative">{{ data.value }}</td>
                                                 <td ng-show="!data.editing">{{ data.note }}</td>
@@ -393,6 +400,12 @@
                             <label class="control-label col-sm-2">Lowest Possible Score: </label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" ng-model="newIep.quantitative_range_low" ng-required="newIep.quantitative === 'Yes'" ng-class="{ 'invalid': iepRangeValidation(), }">
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="newIep.quantitative === 'Yes'">
+                            <label class="control-label col-sm-2">Goal Score: </label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="newIep.quantitative_target" ng-class="{ 'invalid': iepRangeValidation(), }">
                             </div>
                         </div>
                         <div class="voffset3" ng-if="iepRangeValidation()">

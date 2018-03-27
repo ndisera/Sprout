@@ -1,25 +1,26 @@
-app.controller('mainController', function ($scope, $rootScope, $location, userService, studentService) {
+app.controller('mainController', function ($scope, $rootScope, $location, $q, userService, studentService) {
     $scope.location = $location;
 
     $scope.user = userService.user;
     $scope.studentInfo = studentService.studentInfo;
 
     $scope.sidebarExtended = false;
+    $scope.showNotifications = false;
+
+    $scope.notifications = userService.notificationData.relevantItems;
 
     /**
      * Toggles the sidebar
      */
-    $scope.extendSidebar = function() {
-        $scope.sidebarExtended = !$scope.sidebarExtended;
+    $scope.toggleSidebar = function(value) {
+        $scope.sidebarExtended = value;
     };
 
     /**
-     * Closes the sidebar
+     * Toggles the notifications try
      */
-    $scope.closeSidebar = function() {
-        if ($scope.sidebarExtended) {
-            $scope.sidebarExtended = false;
-        }
+    $scope.toggleNotifications = function(value) {
+        $scope.showNotifications = value;
     };
 
     /**
@@ -66,13 +67,13 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
             //click: $scope.clearSearch,
             //badgeList: [],
         //},
-        {
-            title: "Notifications",
-            glyph: "bell",
-            href: "/notifications",
-            click: $scope.clearSearch,
-            badgeList: userService.notificationData.relevantItems,
-        },
+        //{
+            //title: "Notifications",
+            //glyph: "bell",
+            //href: "/notifications",
+            //click: $scope.clearSearch,
+            //badgeList: userService.notificationData.relevantItems,
+        //},
         {
             title: "Settings",
             glyph: "cog",
@@ -111,7 +112,8 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     };
 
     $scope.sidebarLinkClick = function(link) {
-       link.click();
+        link.click();
+        $scope.toggleSidebar(false);
     };
 
     $rootScope.$on('user:auth', function(event, data) {
@@ -132,12 +134,26 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
      * Navigates to student's page if name in navigation search bar is valid.
      */
     $scope.tryNavigateToStudent = function() {
-        if ($scope.studentName.toUpperCase() in $scope.studentInfo.studentsLookup) {
-            $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentName.toUpperCase()].id);
-            $scope.clearSearch();
+        if($('#topbar select.polyfilling').length === 0) {
+            if ($scope.studentName.toUpperCase() in $scope.studentInfo.studentsLookup) {
+                $location.path('/student/' + $scope.studentInfo.studentsLookup[$scope.studentName.toUpperCase()].id);
+                $scope.clearSearch();
+            }
+            else {
+                //TODO: notify the user in some way
+            }
         }
+        // for safari datalist alternative
         else {
-            //TODO: notify the user in some way
+            var searchText = $('#topbar select.polyfilling').find(':selected').text().trim().toUpperCase();
+            if(searchText in $scope.studentInfo.studentsLookup) {
+                $scope.clearSearch();
+                $('#topbar select.polyfilling').find(':selected').removeAttr('selected');
+                $location.path('/student/' + $scope.studentInfo.studentsLookup[searchText].id);
+            }
+            else {
+                //TODO: notify the user in some way
+            }
         }
     };
 
@@ -145,6 +161,86 @@ app.controller('mainController', function ($scope, $rootScope, $location, userSe
     // enables autofocus in IE
     $(function () {
         $('[autofocus]:not(:focus)').eq(0).focus();
+    });
+
+    /*** NOTIFICATIONS ***/
+    $scope.notificationsCategories = {
+        1: {
+            panelClass: 'notifications-birthday',
+            iconClass: 'fa-birthday-cake',
+        },
+        2: {
+            panelClass: 'notifications-low-grade',
+            iconClass: 'fa-exclamation-triangle',
+        },
+    }
+
+    $scope.notificationClass = function(notification) {
+       switch(notification.category) {
+           case 1:
+               return $scope.notificationsCategories[1].panelClass;
+               break;
+           case 2:
+               return $scope.notificationsCategories[2].panelClass;
+               break;
+       }
+    };
+
+    $scope.notificationIconClass = function(notification) {
+       switch(notification.category) {
+           case 1:
+               return $scope.notificationsCategories[1].iconClass;
+               break;
+           case 2:
+               return $scope.notificationsCategories[2].iconClass;
+               break;
+       }
+    };
+
+    $scope.notificationNavigate = function(notification) {
+        $scope.toggleNotifications(false);
+        $location.path('/student/' + notification.student + notification.partial_link);
+    };
+
+    $scope.markAsRead = function(notification, command) {
+        var notificationsToRead = [];
+        if(command === 'all') {
+            _.each($scope.notifications, function(elem) {
+                var editedNotification = _.clone(elem);
+                editedNotification.unread = false;
+                notificationsToRead.push(editedNotification);
+            });
+        }
+        else {
+            var editedNotification = _.clone(notification);
+            editedNotification.unread = false;
+            notificationsToRead.push(editedNotification);
+
+        }
+
+        var promises = [];
+        _.each(notificationsToRead, function(elem) {
+            promises.push(userService.updateNotificationForUser(userService.user.id, elem.id, elem));
+        });
+
+        $q.all(promises)
+            .then(function() {
+                userService.getAllNotificationsForUser(userService.user.id).then(
+                    function success() {},
+                    function error() {},
+                );
+            });
+    }
+
+    // some of the hackiest nonsense I've ever done
+    // close notifications if the user clicks anywhere on the screen
+    // notifications panel will cancel the event before it bubbles up
+    // to body
+    $('body').click(function() {
+        var scope = angular.element($('#nav-wrapper')).scope();
+        scope.$apply(function() {
+            scope.toggleNotifications(false);
+        });
     });
 
 });

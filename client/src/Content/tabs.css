@@ -22,6 +22,12 @@
     margin-top: -60px;
 }
 
+.panel.panel-tabs > .panel-heading > .picture-frame {
+    display: inline-block;
+    float: left;
+    margin-top: -60px;
+}
+
 .panel.panel-tabs > .panel-heading > .panel-glyph > .glyphicon {
     left: 15px;
     top: 20px;
@@ -96,7 +102,7 @@
     border-bottom-left-radius: 4px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .panel.panel-tabs {
         -webkit-box-shadow: none;
         box-shadow: none;
@@ -110,7 +116,7 @@
         border: none;
     }
 
-    .panel.panel-tabs > .panel-heading > img {
+    .panel.panel-tabs > .panel-heading > .picture-frame {
         display: block;
         float: none;
         margin-left: auto;
