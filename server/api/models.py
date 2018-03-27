@@ -93,7 +93,7 @@ class Section(models.Model):
     term = models.ForeignKey(Term, on_delete=models.CASCADE,
                              help_text="Term this section takes place in")
     # Lookup the class schedule via term's TermSettings
-    schedule_position = models.IntegerField(blank=False,
+    schedule_position = models.IntegerField(blank=True, null=True,
                                             help_text="Relative position in the schedule this class takes place")
 
     class Meta:
