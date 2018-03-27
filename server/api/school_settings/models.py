@@ -34,8 +34,6 @@ class SchoolYear(AdminWriteMixin, models.Model):
                                   help_text="When this school year begins")
     end_date = models.DateField(blank=False, null=False,
                                 help_text="When this school year ends")
-    num_terms = models.IntegerField(blank=False,
-                                    help_text="Number of terms in a school year")
 
     class Meta():
         """
