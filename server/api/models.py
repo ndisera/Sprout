@@ -156,6 +156,23 @@ class Behavior(models.Model):
         ordering = ('date',)
 
 
+class BehaviorNote(models.Model):
+    """
+    BehaviorNote
+    Record a free-text note about one student's behavior on a particular day (not tied to a class)
+    Note that it is allowed to have more than one note per student per day. This is intentional.
+    """
+    date = models.DateField(blank=False,
+                            help_text="Date to which this note applies")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=False,
+                                help_text="Student to whom this note corresponds")
+    body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                             help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+    class Meta:
+        ordering = ('date', )
+
+
 class AttendanceRecord(models.Model):
     """
     AttendanceRecord

@@ -533,6 +533,47 @@ class BehaviorViewSet(NestedDynamicViewSet):
     ])
 
 
+class BehaviorNoteViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "BehaviorNote" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BehaviorNoteSerializer
+    queryset = BehaviorNote.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        BehaviorNotes should only be visible:
+            - If the user teaches the student
+            - If the user is the student's case manager
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(BehaviorNoteViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the student
+        teaches = Q(student__section__teacher=user)
+        # Filter for other related students (only case manager at this time)
+        related = Q(student__case_manager=user)
+        queryset = queryset.filter(teaches | related)
+        return queryset
+
+    """ ensure variables show as correct type for docs """
+    name_student = 'student'
+    desc_student = 'ID of the student to whom this note refers'
+    field_student = coreapi.Field(
+            name=name_student,
+            required=True,
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student))
+
+    schema = AutoSchema(manual_fields=[
+        field_student,
+    ])
+
+
 class AttendanceRecordViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "AttendanceRecord" instances
