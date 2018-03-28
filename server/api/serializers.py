@@ -155,6 +155,13 @@ class BehaviorSerializer(DynamicModelSerializer):
     enrollment = DynamicRelationField('EnrollmentSerializer')
 
 
+class BehaviorNoteSerializer(DynamicModelSerializer):
+    class Meta:
+        model = BehaviorNote
+        fields = ('__all__')
+    student = DynamicRelationField('StudentSerializer')
+
+
 class AttendanceRecordSerializer(DynamicModelSerializer):
     class Meta:
         model = AttendanceRecord
