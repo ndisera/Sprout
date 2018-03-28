@@ -176,11 +176,49 @@ class StudentViewSet(NestedDynamicViewSet):
         profile_picture_field
     ])
 
-    # Rebuild all existing fields with required=False for partial update
-    partial_update_fields = [field._asdict() for field in schema._manual_fields]
-    for field in partial_update_fields: field['required']=False
-    partial_update_fields = [coreapi.Field(**field) for field in partial_update_fields]
-    pass
+
+class ParentContactInfoViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "ParentContactInfo" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ParentContactInfoSerializer
+    queryset = ParentContactInfo.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        A regular user should only be able to see a student's parents' contact info:
+            If the user is the student's case manager
+            If the student is in a class the user teaches
+
+        :return:
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(ParentContactInfoViewSet, self).get_queryset()
+        if user.is_superuser:
+            # The superuser can see everything
+            return queryset
+        # A teacher may view parent contact info for students in their taught section
+        teaches = Q(student__enrollment__section__teacher=user)
+        # Or all parent contact info for students for whom they are case managers
+        manages = Q(student__case_manager=user)
+        queryset = queryset.filter(teaches | manages)
+        return queryset
+
+    """ ensure variables show as correct types for docs """
+    name_student = 'student'
+    desc_student = "ID of the student whoes parent's contact info is stored"
+
+    student_field = coreapi.Field(name=name_student,
+                                  required=True,
+                                  location="form",
+                                  description=desc_student,
+                                  schema=coreschema.Integer(title=name_student))
+
+    schema = AutoSchema(manual_fields=[
+        student_field,
+    ])
 
 
 class SchoolSettingsViewSet(NestedDynamicViewSet):

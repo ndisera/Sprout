@@ -82,6 +82,24 @@ class Student(models.Model):
         return ret
 
 
+class ParentContactInfo(models.Model):
+    """
+    ParentContactInfo
+    Store the contact information for a student's parent or guardian
+    There may be more than one of this model per student to allow multiple parents/guardians
+    """
+    student = models.ForeignKey(Student, null=False,
+                                help_text="Student whoes parent or guardian has their contact information stored here")
+    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="Parent or guardian's first name")
+    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                 help_text="Parent or guardian's last name")
+    email = models.EmailField(blank=True, null=True,
+                              help_text="Parent or guardian's email address")
+    phone = models.CharField(blank=True, null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Parent or guardian's phone number")
+
+
 class Section(models.Model):
     """
     Section

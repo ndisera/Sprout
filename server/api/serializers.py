@@ -38,6 +38,14 @@ class StudentSerializer(DynamicModelSerializer):
     picture = DynamicRelationField('ProfilePictureSerializer')
 
 
+class ParentContactInfoSerializer(DynamicModelSerializer):
+    class Meta:
+        model = ParentContactInfo
+        fields = '__all__'
+
+    student = DynamicRelationField('StudentSerializer')
+
+
 class SchoolSettingsSerializer(DynamicModelSerializer):
     class Meta:
         model = SchoolSettings
