@@ -207,6 +207,10 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER' : 'api.serializers.SproutRegisterSerializer',
 }
 
+REST_FRAMEWORK_EXTENSIONS = {
+    "DEFAULT_PARENT_LOOKUP_KWARG_NAME_PREFIX" : "pk_",
+}
+
 from dry_rest_permissions.generics import DRYPermissions
 REST_AUTH_REGISTER_PERMISSION_CLASSES = (DRYPermissions, )
 
