@@ -128,6 +128,8 @@ class StandardizedTest(AdminWriteMixin, models.Model):
     test_name = models.CharField(unique=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     min_score = models.IntegerField(verbose_name="Minimum possible score", blank=False)
     max_score = models.IntegerField(verbose_name="Maximum possible score", blank=False)
+    proficient_score = models.IntegerField(null=True,
+                                           help_text="Score which constitutes proficiency on this test")
 
     class Meta:
         ordering = ('test_name',)
