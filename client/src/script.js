@@ -351,6 +351,30 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             }
         })
 
+        .when('/student/:id/attendance', {
+            templateUrl: 'html/studentAttendance.html',
+            controller: 'studentAttendanceController',
+            resolve: {
+                data: function(enrollmentService, $route) {
+                    return enrollmentService.getStudentEnrollments(
+                        {
+                            include: ['section.*', ],
+                            filter: [{ name: 'student', val: $route.current.params.id, },],
+                        }
+                    );
+                },
+                terms: function(termService) {
+                    return termService.getTerms();
+                },
+                student: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+
         .when('/student/:id/ieps', {
             templateUrl: 'html/studentIeps.html',
             controller: 'studentIepsController',
@@ -524,13 +548,3 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         }
     });
 });
-
-
-
-
-
-
-
-
-
-

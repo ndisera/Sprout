@@ -1,0 +1,11 @@
+<div ng-include="'html/studentTabs.html'"></div>
+<div ng-if="sections.length === 0">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-info no-bottom-margin" role="alert">
+                <span><b>Tip:</b> It looks like this student isn't enrolled in any classes. Speak to an admin to add a class to this student's schedule.</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-include="'html/bottomSpacer.html'"></div>
