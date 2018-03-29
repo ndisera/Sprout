@@ -43,6 +43,9 @@ const include_paths = [
 
     bower_path + 'chart.js/dist/Chart.js',
     bower_path + 'chart.js/dist/Chart.bundle.js',
+	
+	// calendar
+	bower_path + 'angular-ui-calendar/src/calendar.js',
 
     // datepicker
     bower_path + 'angular-datepicker/dist/angular-datepicker.min.css',
