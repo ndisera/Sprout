@@ -302,6 +302,7 @@ class SproutRegisterSerializer(RegisterSerializer):
         last_name = profile_data.get('last_name')
         profile = SproutUserProfile(user=user, first_name=first_name, last_name=last_name)
         profile.save()
+        user.is_superuser = self.validated_data.pop('is_superuser', False)
         self.instance = user
 
     def to_representation(self, instance):
