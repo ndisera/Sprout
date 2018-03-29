@@ -9,8 +9,8 @@ from lib.services.stdtest import StandardizedTest, StandardizedTestService
 
 # https://www.schools.utah.gov/specialeducation/resources/assessment
 STD_TESTS_NAMES = ["SAGE", "WIDA", "DLM", "ELAA", "UAA"]
-STD_TESTS = [ StandardizedTest("SAGE", 100, 1000, None),
-              StandardizedTest("WIDA", 1, 6, None) # Note WIDA is for ELL students...
+STD_TESTS = [ StandardizedTest("SAGE", 100, 1000, 600, None, ),
+              StandardizedTest("WIDA", 1, 6, None, None, ) # Note WIDA is for ELL students...
               ]
 
 class StandardizedTestScoreGenerator():
