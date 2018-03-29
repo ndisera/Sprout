@@ -384,7 +384,8 @@ class ServiceRequirement(models.Model):
                                              help_text="How this service is fulfilled (max length {})".format(
                                                  settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
     type = models.IntegerField(null=False, blank=False,
-                               choices=constants.ServiceType.choices())
+                               choices=constants.ServiceType.choices(),
+                               help_text="What type of service this is, as defined by constants.ServiceType")
 
     def __repr__(self):
         if self.fulfilled :

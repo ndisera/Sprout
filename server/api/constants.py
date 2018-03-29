@@ -36,8 +36,8 @@ class ServiceType(ChoiceEnum):
     TRANSPORTATION = 6
     ESY = 7
     PERSONAL_HEALTH_CARE = 8
-    AUDIOLOGICAL_SERVICES = 9
-    VISION_SERVICES = 10
+    AUDIOLOGICAL = 9
+    VISION = 10
     MATH = 11
     READING = 12
     WRITING = 13
