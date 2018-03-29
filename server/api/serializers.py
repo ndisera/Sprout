@@ -180,7 +180,7 @@ class AttendanceRecordSerializer(DynamicModelSerializer):
 class StandardizedTestSerializer(DynamicModelSerializer):
     class Meta:
         model = StandardizedTest
-        fields = ('id', 'test_name', 'min_score', 'max_score',)
+        fields = '__all__'
 
     def validate(self, data):
         validated_data = super(StandardizedTestSerializer, self).validate(data)
