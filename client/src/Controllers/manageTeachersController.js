@@ -1,6 +1,8 @@
 app.controller("manageTeachersController", function($scope, $rootScope, $location, toastService, userData, userService, sectionService, termsInfo) {
     $scope.location = $location;
 
+    $scope.user = userService.user; // for case of editing or deleting oneself
+
     var teacherTask = "view/edit";
     $scope.displayTeacherViewSearch = true;
     $scope.displayTeacherForm = false;
