@@ -197,6 +197,12 @@ if __name__ == "__main__":
     for section in sections:
         sections_lookup[section.id] = section
 
+    # generate ServiceRequirements
+    # Depends: students, users
+    services = service_generator.generate_many_random_services(num=args.num_services)
+    for student_id in services:
+        service_generator.serviceService.add_many_services(services[student_id], student_id)
+
     # generate enrollments
     enrollments = []
     if args.boring:
@@ -215,7 +221,7 @@ if __name__ == "__main__":
     response = enrollments_service.add_many_enrollments(enrollments)
     enrollments = [Enrollment(**enrollment) for enrollment in response.json()['enrollments']]
 
-    # generate behaviors. Depends: enrollments
+    # generate behaviors. Depends: enrollments, services
     behaviors = []
     for enrollment in enrollments:
         section = sections_lookup[enrollment.section]
@@ -294,11 +300,6 @@ if __name__ == "__main__":
     iep_goals = iep_generator.generate_many_random_iep_goals(num=args.num_iep_goals)
     for student_id in iep_goals:
         iep_generator.iepService.add_many_iep_goals(iep_goals[student_id], student_id)
-
-    # generate ServiceRequirements
-    services = service_generator.generate_many_random_services(num=args.num_services)
-    for student_id in services:
-        service_generator.serviceService.add_many_services(services[student_id], student_id)
 
     std_test_score_generator.setup_tests()
     toPost = std_test_score_generator.generate(10,

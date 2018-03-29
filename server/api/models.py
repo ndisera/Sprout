@@ -4,6 +4,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+import api.constants as constants
+
 from sprout_user import SproutUser
 
 import os
@@ -381,6 +383,8 @@ class ServiceRequirement(models.Model):
     fulfilled_description = models.CharField(null=True, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
                                              help_text="How this service is fulfilled (max length {})".format(
                                                  settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+    type = models.IntegerField(null=False, blank=False,
+                               choices=constants.ServiceType.choices())
 
     def __repr__(self):
         if self.fulfilled :

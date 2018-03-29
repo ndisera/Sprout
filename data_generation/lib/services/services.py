@@ -4,9 +4,9 @@ from collections import namedtuple
 from base_service import BaseService
 
 ServiceRequirement = namedtuple("ServiceRequirement",
-                                ['id', 'student', 'title', 'description', 'fulfilled',
-                                 'fulfilled_date', 'fulfilled_user', 'fulfilled_description', ])
-ServiceRequirement.__new__.__defaults__ = (None, None, None, None, None, None, None, None, )
+                                ['student', 'title', 'description', 'fulfilled', 'fulfilled_date',
+                                 'fulfilled_user', 'fulfilled_description', 'type', 'id', ])
+ServiceRequirement.__new__.__defaults__ = (None, )
 
 
 class ServiceService(BaseService):
