@@ -59,11 +59,12 @@ class CategoryCalculator():
         behavior_lists = {}
         for behavior in self.behavior_efforts:
             behavior_lists.setdefault(behavior.enrollment_id, []).append(behavior)
-        # Todo: behavior past this point relies on the data being sorted by date. Can I always rely on this? Noooope
+
+        newlist = sorted(self.behavior_efforts, key=lambda x: x.date)
+        # behavior past this point relies on the data being sorted by date.
 
         #todo: enforce no duplicate progress and caution categories
 
-        newlist = sorted(self.behavior_efforts, key=lambda x: x.date)
         self.progress_category_choice = rand_val #todo: fix superhacky stuff
 
         if rand_val == 0:
