@@ -29,7 +29,10 @@ class CategoryCalculator():
         self.attendances = attendances
         self.behavior_efforts = behavior_efforts
         self.test_scores = test_scores
-        random.seed(behavior_efforts[0].enrollment.student_id)  # We want consistent random behavior
+        if len(behavior_efforts) != 0:
+            random.seed(behavior_efforts[0].enrollment.student_id)  # We want consistent random behavior
+        else:
+            random.seed(21)  # Nothing should really be displayed after this point, but we want to be consistent
 
     def get_progress_category(self):
         """
