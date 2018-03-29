@@ -16,6 +16,7 @@ from rest_framework.schemas import AutoSchema
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework_extensions.settings import extensions_api_settings
 from api.models import *
 from api.serializers import *
 from api.constants import NotificationCategories
@@ -1014,7 +1015,8 @@ class NotificationViewSet(NestedDynamicViewSet):
         birthday_title_template = "{first_name} {last_name}'s Birthday"
         birthday_body_template = "{first_name} {last_name} has a birthday coming up on {date}"
         # Get notifications for this user
-        user = SproutUser.objects.get(id=kwargs['parent_lookup_user'])
+        prefix = extensions_api_settings.DEFAULT_PARENT_LOOKUP_KWARG_NAME_PREFIX
+        user = SproutUser.objects.get(id=kwargs['{prefix}{field}'.format(prefix=prefix, field='user')])
 
         # Query for all students: Students for whom this user is a case manager and students for whom this users is a section teacher
         all_students_query = Q(case_manager=user.id) | Q(enrollment__section__teacher=user.id)
