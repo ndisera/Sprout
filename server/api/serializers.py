@@ -180,7 +180,7 @@ class AttendanceRecordSerializer(DynamicModelSerializer):
 class StandardizedTestSerializer(DynamicModelSerializer):
     class Meta:
         model = StandardizedTest
-        fields = ('id', 'test_name', 'min_score', 'max_score',)
+        fields = '__all__'
 
     def validate(self, data):
         validated_data = super(StandardizedTestSerializer, self).validate(data)
@@ -302,6 +302,7 @@ class SproutRegisterSerializer(RegisterSerializer):
         last_name = profile_data.get('last_name')
         profile = SproutUserProfile(user=user, first_name=first_name, last_name=last_name)
         profile.save()
+        user.is_superuser = self.validated_data.pop('is_superuser', False)
         self.instance = user
 
     def to_representation(self, instance):
