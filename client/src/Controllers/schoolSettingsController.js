@@ -1,4 +1,5 @@
 app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, terms, tests, schools, schedules, termSettings, schoolYears, holidayService, testService, termService, schoolService, scheduleService, schoolYearService) {
+    $scope.user = userService.user;
     $scope.location = $location;
     $scope.holidays = holidays.holidays;
     $scope.tests = tests.standardized_tests;

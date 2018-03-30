@@ -45,6 +45,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             href: "/profile/focus",
             click: $scope.clearSearch,
             badgeList: [],
+            adminRequired: false,
         },
         {
             title: "Students",
@@ -52,6 +53,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             href: "/profile/students",
             click: $scope.clearSearch,
             badgeList: [],
+            adminRequired: false,
         },
         {
             title: "Manage",
@@ -59,6 +61,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             href: "/manage",
             click: $scope.clearSearch,
             badgeList: [],
+            adminRequired: true,
         },
         //{
             //title: "Scores Input",
@@ -80,6 +83,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             href: "/settings",
             click: $scope.clearSearch,
             badgeList: [],
+            adminRequired: false,
         },
         {
             title: "Logout",
@@ -88,6 +92,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             click: "logout(); $scope.clearSearch();",
             click: $scope.logout,
             badgeList: [],
+            adminRequired: false,
         },
     ];
 

@@ -94,6 +94,7 @@
                             <label class="control-label col-sm-2" for="tadmin">Admin:</label>
                             <div class="col-sm-10">
                                 <span ng-if="teacherV.is_superuser && !teacherEdit" class="form-control-static glyphicon glyphicon-ok"></span>
+                                <span ng-if="!teacherV.is_superuser && !teacherEdit" class="form-control-static glyphicon glyphicon-remove form-glyph"></span>
                                 <div ng-if="teacherEdit">
                                     <input type="checkbox" class="form-control-static" id="tadmin" name="tadmin" ng-model="teacherE.is_superuser">
                                 </div>
@@ -223,6 +224,7 @@
                         <label class="control-label col-sm-4" for="tadmin3">Admin:</label>
                         <div class="col-sm-8">
                             <span ng-if="teacherD.is_superuser" class="form-control-static glyphicon glyphicon-ok"></span>
+                            <span ng-if="!teacherD.is_superuser" class="form-control-static glyphicon glyphicon-remove form-glyph"></span>
                         </div>
                     </div>
                 </form>

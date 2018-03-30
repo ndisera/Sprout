@@ -8,6 +8,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         email: null,
         firstName: null,
         lastName: null,
+        isSuperUser: null,
         id: null,
         auth: false,
     };
@@ -31,6 +32,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         user.email     = _.has(userObj, 'email') ? userObj.email : null;
         user.firstName = _.has(userObj, 'first_name') ? userObj.first_name : null;
         user.lastName  = _.has(userObj, 'last_name') ? userObj.last_name : null;
+        user.isSuperUser = _.has(userObj, 'is_superuser') ? userObj.is_superuser: null;
     }
 
     /**

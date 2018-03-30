@@ -28,7 +28,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         })
 
         .when('/manage', {
-            redirectTo: '/manage/classes',
+            redirectTo: '/manage/cases',
         })
 
         // route for the manage students page
