@@ -8,7 +8,14 @@
         </div>
     </div>
 </div>
-<div ng-if="sections.length > 0">
-    <div id='calendar'></div>
+<div class="row" ng-if="sections.length > 0">
+    <div class="col-xs-12">
+        <div class="table-responsive no-border">
+            <div class="calendar-container">
+                <div ui-calendar="uiConfig.calendar" ng-model="eventSources">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <div ng-include="'html/bottomSpacer.html'"></div>

@@ -8,6 +8,7 @@ var app = angular.module(
         'datePicker',
         'ui.sortable',
         'ngFileUpload',
+        'ui.calendar',
     ]
 );
 
@@ -355,16 +356,13 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/studentAttendance.html',
             controller: 'studentAttendanceController',
             resolve: {
-                data: function(enrollmentService, $route) {
-                    return enrollmentService.getStudentEnrollments(
+                data: function(attendanceService, $route) {
+                    return attendanceService.getStudentAttendance(
                         {
-                            include: ['section.*', ],
-                            filter: [{ name: 'student', val: $route.current.params.id, },],
+                            include: ['enrollment.*', 'enrollment.section.*'],
+                            filter: [{name: 'enrollment.student', val: $route.current.params.id}]
                         }
                     );
-                },
-                terms: function(termService) {
-                    return termService.getTerms();
                 },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);

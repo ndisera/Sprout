@@ -10,7 +10,7 @@ app.factory("attendanceService", function ($rootScope, $http, $q, queryService) 
             var deferred = $q.defer();
             $http({
                 method: 'GET',
-                url: 'https://' + $rootScope.backend + '/attendences' + query,
+                url: 'https://' + $rootScope.backend + '/attendances' + query,
             }).then(function success(response) {
                 deferred.resolve(response.data);
             }, function error(response) {

@@ -1,0 +1,8 @@
+/* .fc-day-grid-event > .fc-content {
+   white-space: normal;
+   overflow: hidden;
+} */
+
+.calendar-container {
+    min-width: 1000px;
+}
