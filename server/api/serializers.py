@@ -34,6 +34,17 @@ class StudentSerializer(DynamicModelSerializer):
                 notification.delete()
         return super(StudentSerializer, self).update(instance, validated_data)
 
+    def validate_grade_level(self, grade_level):
+        """
+        Ensure that the grade level is within the range supported by the school
+        """
+        school_settings = SchoolSettings.objects.get(id=1)
+
+        if grade_level < school_settings.grade_range_lower or grade_level > school_settings.grade_range_upper:
+            raise serializers.ValidationError("out of range for school")
+
+        return grade_level
+
     case_manager = DynamicRelationField('SproutUserSerializer')
     picture = DynamicRelationField('ProfilePictureSerializer')
 
