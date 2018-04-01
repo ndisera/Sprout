@@ -201,6 +201,7 @@ ACCOUNT_AUTHENTICATION_METHOD='email'
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER' :  'api.serializers.SproutLoginSerializer',
     'USER_DETAILS_SERIALIZER' : 'api.serializers.SproutUserSerializer',
+    'PASSWORD_RESET_SERIALIZER' : 'api.serializers.SproutPasswordResetSerializer',
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {
