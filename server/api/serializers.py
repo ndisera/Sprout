@@ -359,6 +359,8 @@ class SproutPasswordResetSerializer(PasswordResetSerializer):
     def get_email_options(self):
         opts = {}
         opts['email_template_name'] = 'registration/sprout_password_reset_email.html'
+        opts['domain_override'] = 'hardcoded_domain.com:1234'
+
         return opts
 
 
