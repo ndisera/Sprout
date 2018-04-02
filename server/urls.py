@@ -16,6 +16,7 @@ Including another URLconf
 
 from django.conf.urls import url
 from django.conf.urls import include
+from rest_auth.views import PasswordResetConfirmView
 from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.views import get_swagger_view
@@ -80,6 +81,8 @@ urlpatterns.append(url(r'^swagger/', get_swagger_view(title='Sprout API')))
 urlpatterns.append(url(r'^schema/', get_schema_view(title='Sprout Schema')))
 
 # URL Patterns for token authentication setup
+urlpatterns.append(url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetConfirmView.as_view(),
+                       name='rest_password_reset_confirm'))
 urlpatterns.append(url(r'^', include('rest_auth.urls')))
 urlpatterns.append(url(r'^registration/', include('rest_auth.registration.urls')))
 urlpatterns.append(url(r'^auth-verify/', view=AuthVerifyView.as_view(), name="auth-verify"))

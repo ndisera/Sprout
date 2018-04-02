@@ -3,9 +3,10 @@ from dynamic_rest.fields import DynamicRelationField
 from api.models import *
 import api.fields
 from rest_framework import serializers
-from rest_auth.serializers import LoginSerializer, UserDetailsSerializer
+from rest_auth.serializers import LoginSerializer, UserDetailsSerializer, PasswordResetSerializer
 from rest_auth.registration.serializers import RegisterSerializer
 from focus_category.category_calculator import CategoryCalculator
+from django.conf import settings
 
 
 class ProfilePictureSerializer(DynamicModelSerializer):
@@ -349,6 +350,31 @@ class SproutRegisterSerializer(RegisterSerializer):
             to_return['password1'] = self.validated_data.get('password1', '')
         to_return['is_superuser'] = self.validated_data.get('is_superuser', False)
         return to_return
+
+
+class SproutPasswordResetSerializer(PasswordResetSerializer):
+    """
+    Specify a custom HTML template for our password reset emails
+    """
+
+    def get_email_options(self):
+
+        if hasattr(settings, 'FRONTEND_DOMAIN'):
+            frontend_host = settings.FRONTEND_DOMAIN
+        else:
+            # Assume the frontend and backend are running on the same server
+            request = self.context.get('request')
+            backend_host = request.get_host()
+            frontend_port = getattr(settings, 'FRONTEND_PORT', 8001)
+            frontend_host, unused = backend_host.split(':')
+            frontend_host = '{host}:{port}'.format(host=frontend_host, port=frontend_port)
+
+
+        opts = {}
+        opts['email_template_name'] = 'registration/sprout_password_reset_email.html'
+        opts['domain_override'] = frontend_host
+
+        return opts
 
 
 class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerializer):
