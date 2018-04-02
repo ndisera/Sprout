@@ -68,6 +68,8 @@ class Student(models.Model):
     picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
                                    blank=True, null=True,
                                    help_text="Student's Profile Picture")
+    grade_level = models.PositiveSmallIntegerField(blank=True, null=True,
+                                                   help_text="The student's grade level")
 
     class Meta:
         ordering = ('id',)

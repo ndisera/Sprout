@@ -201,6 +201,7 @@ ACCOUNT_AUTHENTICATION_METHOD='email'
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER' :  'api.serializers.SproutLoginSerializer',
     'USER_DETAILS_SERIALIZER' : 'api.serializers.SproutUserSerializer',
+    'PASSWORD_RESET_SERIALIZER' : 'api.serializers.SproutPasswordResetSerializer',
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {
@@ -216,3 +217,6 @@ REST_AUTH_REGISTER_PERMISSION_CLASSES = (DRYPermissions, )
 
 DEFAULT_MAX_CHARFIELD_LENGTH = 100
 DESCRIPTION_CHARFIELD_MAX_LENGTH = 1600
+
+# FRONTEND_DOMAIN = 'localhost:8001' # Define a domain and port if the frontend and backend run on different hosts
+FRONTEND_PORT = 8001 # Define only a port if the frontend and backend run on the same host but different ports
