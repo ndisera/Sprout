@@ -44,6 +44,8 @@ class SproutUserProfile(models.Model):
                                   help_text="User first name")
     last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                  help_text="User last name")
+    import_id = models.CharField(null=True, blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
     picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
                                    blank=True, null=True,
                                    help_text="User's Profile Picture")
@@ -115,6 +117,8 @@ class Section(models.Model):
     # Lookup the class schedule via term's TermSettings
     schedule_position = models.IntegerField(blank=True, null=True,
                                             help_text="Relative position in the schedule this class takes place")
+    import_id = models.CharField(null=True, blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
 
     class Meta:
         ordering = ('id',)
@@ -206,6 +210,8 @@ class AttendanceRecord(models.Model):
                                   help_text="Short code of this attendance record, for digest viewing")
     description = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                   help_text="Human-readable description of this attendance record")
+    import_id = models.CharField(null=True, blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
 
     class Meta:
         unique_together = [('enrollment', 'date'),]
@@ -233,6 +239,8 @@ class Assignment(models.Model):
     """
     section = models.ForeignKey(Section, related_name='assignment_section', on_delete=models.CASCADE,
                                    verbose_name="Section to which this assigment belongs")
+    import_id = models.CharField(null=True, blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
     assignment_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
     score_min = models.IntegerField(blank=False, verbose_name="Minimum Score")
     score_max = models.IntegerField(blank=False, verbose_name="Maximum Score")
@@ -261,6 +269,10 @@ class Grade(models.Model):
                                 help_text="Student being graded")
     score = models.IntegerField(blank=False, verbose_name="Assignment score")
     handin_datetime = models.DateTimeField(blank=False)
+    late = models.BooleanField(blank=False, help_text="Whether the assignment was late")
+    missing = models.BooleanField(blank=False, help_text="Whether the assignment is missing")
+    grade = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                help_text="Letter grade received")
 
     class Meta:
         unique_together = (('assignment', 'student', 'handin_datetime'),)

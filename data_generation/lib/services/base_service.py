@@ -84,6 +84,9 @@ class BaseService():
 
         response = requests.post(uri, verify=self.verify, headers=headers, data=data)
 
+        if response.status_code > 399:
+            print response.json()
+
         response.raise_for_status()
 
         return response

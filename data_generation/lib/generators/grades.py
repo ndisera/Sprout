@@ -82,7 +82,9 @@ class GradesGenerator():
                                         due_date=str(date),
                                         score_min=score_min,
                                         score_max=score_max,
-                                        id=None)
+                                        id=None,
+                                        import_id=None,
+                                        )
                 assignments.append(assignment)
 
             to_return[section.id] = assignments
@@ -115,8 +117,8 @@ class GradesGenerator():
             for assignment in assignments:
                 # randomly decide if it's missing
                 missing_modifier = random.randint(0, 9)
-                if missing_modifier > 8:
-                    continue
+                # if missing_modifier > 8:
+                    # continue
 
                 to_return[enrollment.id][section][assignment.id] = []
 
@@ -135,16 +137,33 @@ class GradesGenerator():
                                 minute=datetime.datetime.now().minute, 
                                 second=datetime.datetime.now().second, 
                                 microsecond=datetime.datetime.now().microsecond)
-                    if late_modifier > 8:
+                    if missing_modifier > 8:
+                        handin = handin - datetime.timedelta(days=1)
+                    elif late_modifier > 8:
                         handin = handin + datetime.timedelta(days=1)
                     else:
                         handin = handin - datetime.timedelta(days=1)
 
                     score = random.randint(assignment.score_min, assignment.score_max)
+                    letter_score = ''
+                    if score > 90:
+                        letter_score = 'A'
+                    elif score > 80:
+                        letter_score = 'B'
+                    elif score > 70:
+                        letter_score = 'C'
+                    elif score > 60:
+                        letter_score = 'D'
+                    else:
+                        letter_score = 'I'
+
                     grade = Grade(assignment=assignment.id,
                                   score=score,
                                   student=student,
                                   handin_datetime=str(handin),
+                                  late=(late_modifier > 8 and missing_modifier <= 8),
+                                  missing=(missing_modifier > 8),
+                                  grade=letter_score,
                                   id=None)
                     grades.append(grade)
 

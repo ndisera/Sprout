@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-Assignment = namedtuple("Assignment", ['section', 'assignment_name', 'score_min', 'score_max', 'due_date', 'id'])
+Assignment = namedtuple("Assignment", ['section', 'assignment_name', 'score_min', 'score_max', 'due_date', 'id', 'import_id'])
 
 
 class AssignmentService(BaseService):

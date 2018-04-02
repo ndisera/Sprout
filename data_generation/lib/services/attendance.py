@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-AttendanceRecord = namedtuple("Attendance", ['enrollment', 'date', 'short_code', 'description', 'id', ])
+AttendanceRecord = namedtuple("Attendance", ['enrollment', 'date', 'short_code', 'description', 'import_id', 'id', ])
 AttendanceRecord.__new__.__defaults__= (None, ) # id is optional
 
 class AttendanceService(BaseService):

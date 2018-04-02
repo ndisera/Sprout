@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-Section = namedtuple("Section", ['teacher', 'title', 'term', 'schedule_position', 'id', ])
+Section = namedtuple("Section", ['teacher', 'title', 'term', 'schedule_position', 'id', 'import_id', ])
 
 
 class SectionService(BaseService):

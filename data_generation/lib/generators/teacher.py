@@ -35,12 +35,13 @@ class TeacherGenerator:
                 for i in range(0, num_teachers):
                     first_name = random.choice(first_names)
                     last_name = random.choice(last_names)
-                    email = "{}{}@{}.{}".format(first_name[0], last_name, "fakeemail", "edu")
+                    email = "{}{}@{}.{}".format(first_name[0], last_name, "fakeemail", "edu").lower()
                     teacher = User(
                         id=None,
                         email=email,
                         first_name=first_name,
-                        last_name=last_name
+                        last_name=last_name,
+                        import_id=None,
                     )
                     teachers.append(teacher)
         return teachers
@@ -56,6 +57,7 @@ class TeacherGenerator:
             first_name='Matthew',
             last_name='Flatt',
             email='mflatt@totallyrealemail.edu',
+            import_id=None,
         )
 
         teacher_danny = User(
@@ -63,6 +65,7 @@ class TeacherGenerator:
             first_name='Daniel',
             last_name='Kopta',
             email='dkopta@totallyrealemail.edu',
+            import_id=None,
         )
 
         return [teacher_matt, teacher_danny]

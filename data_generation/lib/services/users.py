@@ -6,7 +6,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-User = namedtuple("User", ['id', 'email', 'first_name', 'last_name'])
+User = namedtuple("User", ['id', 'email', 'first_name', 'last_name', 'import_id', ])
 
 
 class UsersService(BaseService):

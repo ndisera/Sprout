@@ -34,6 +34,8 @@ class SchoolYear(AdminWriteMixin, models.Model):
                                   help_text="When this school year begins")
     end_date = models.DateField(blank=False, null=False,
                                 help_text="When this school year ends")
+    import_id = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
 
     class Meta():
         """
@@ -89,6 +91,8 @@ class Term(AdminWriteMixin, models.Model):
                                   help_text="Term start date, such as 2018-01-18 for the 18th of January, 2018")
     end_date = models.DateField(blank=False,
                                 help_text="Term end date")
+    import_id = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
     settings = models.ForeignKey(TermSettings, blank=False, on_delete=models.PROTECT,
                                  help_text="Settings controlling this Term")
     school_year = models.ForeignKey(SchoolYear, blank=False, on_delete=models.PROTECT,

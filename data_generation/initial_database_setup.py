@@ -63,7 +63,7 @@ if __name__ == "__main__":
             try:
                 print "Unable to send login request, attempting to register user"
                 user_service = UsersService(protocol=args.protocol, hostname=args.host, verify=False, port_num=args.port)
-                user = User(id=None, email=args.username, first_name='Admin', last_name='Admin')
+                user = User(id=None, email=args.username, first_name='Admin', last_name='Admin', import_id=None)
                 response = user_service.register_user(user, args.password)
                 args.token = response.json()['token']
             except requests.exceptions.HTTPError as err:
@@ -149,6 +149,8 @@ if __name__ == "__main__":
         else:
             teacher_password = None
         response = teacher_generator.usersService.register_user(teacher, password=teacher_password, throw_error=False)
+        if response.status_code > 399:
+            print response.json()
         if 'user' in response.json():
             teacher_ids.append(response.json()['user']['pk'])
 
@@ -162,11 +164,12 @@ if __name__ == "__main__":
     response = student_generator.studentService.add_many_students(students)
     students = [Student(**data) for data in response.json()['students']]
 
+    # add terms
     terms = []
-    term = Term(name="Fall", start_date="2017-08-21", end_date="2017-12-07", settings=term_settings_id, school_year=school_year_id, id=None)
+    term = Term(name="Fall", start_date="2017-09-05", end_date="2017-12-07", settings=term_settings_id, school_year=school_year_id, id=None, import_id=None)
     response = term_service.add_term(term)
     terms.extend([Term(**data) for data in response.json()['terms']])
-    term = Term(name="Spring", start_date="2018-01-06", end_date="2018-04-24", settings=term_settings_id, school_year=school_year_id, id=None)
+    term = Term(name="Spring", start_date="2018-01-06", end_date="2018-04-24", settings=term_settings_id, school_year=school_year_id, id=None, import_id=None)
     response = term_service.add_term(term)
     terms.extend([Term(**data) for data in response.json()['terms']])
 
@@ -178,8 +181,8 @@ if __name__ == "__main__":
     # every teacher gets three random classes per term
     sections = []
     if args.boring:
-        sections.append(Section(teacher=teacher_ids[0], title="CS 5510", term=terms[0].id, schedule_position=1, id=None))
-        sections.append(Section(teacher=teacher_ids[1], title="CS 4400", term=terms[0].id, schedule_position=6, id=None))
+        sections.append(Section(teacher=teacher_ids[0], title="CS 5510", term=terms[0].id, schedule_position=1, id=None, import_id=None))
+        sections.append(Section(teacher=teacher_ids[1], title="CS 4400", term=terms[0].id, schedule_position=6, id=None, import_id=None))
     else:
         section_subjects = ['Math', 'English', 'Science', 'Reading', 'Social Studies', 'Spanish', 'PE', 'Study Hall',]
         for term in terms:
@@ -187,7 +190,7 @@ if __name__ == "__main__":
                 for i in range(num_sections_per_teacher):
                     title = random.choice(section_subjects) + ' ' + str(random.randint(1000, 9999))
                     period = i + 1
-                    sections.append(Section(teacher=teacher, title=title, term=term.id, schedule_position=period, id=None))
+                    sections.append(Section(teacher=teacher, title=title, term=term.id, schedule_position=period, id=None, import_id=None))
 
     response = sections_service.add_many_sections(sections)
     sections = [Section(**section) for section in response.json()['sections']]

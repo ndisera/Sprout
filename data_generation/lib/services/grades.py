@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-Grade = namedtuple("Grade", ['assignment', 'student', 'score', 'handin_datetime', 'id'])
+Grade = namedtuple("Grade", ['assignment', 'student', 'score', 'grade', 'handin_datetime', 'late', 'missing', 'id', ])
 
 
 class GradesService(BaseService):
@@ -88,3 +88,8 @@ class GradesService(BaseService):
 
     def _add_many_grades(self, grades, uri):
         return self._add_many_models(grades, uri)
+
+
+
+
+
