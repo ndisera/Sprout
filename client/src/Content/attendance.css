@@ -6,3 +6,15 @@
 .calendar-container {
     min-width: 1000px;
 }
+
+@media (max-width: 767px) {
+    .doughnut-height {
+        height: 275px;
+    }
+}
+
+@media (min-width: 768px) {
+    .doughnut-height {
+        height: 225px;
+    }
+}
