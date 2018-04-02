@@ -80,3 +80,11 @@ class SproutUser(AbstractBaseUser):
         if self == user:
             return True
         return user.is_superuser
+
+    def has_object_read_permission(self, request):
+        """
+        Any (authenticated) user can read all other user's basic information
+        """
+        user = request.user
+
+        return user.is_authenticated
