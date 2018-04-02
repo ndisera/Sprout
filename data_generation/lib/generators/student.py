@@ -70,6 +70,9 @@ class StudentGenerator(object):
                     # If that number turns out to be non-unique, we will be in trouble. Cross your fingers!
                     student_id = str(StudentGenerator.RANDOM_STUDENT_ID_PREFIX + str(random_id_number))
 
+                    # Generate a random grade level
+                    random_grade_level = random.randint(7, 8)
+
                     case_manager = random.choice(case_manager_ids)
                     student = Student(
                         student_id=student_id,
@@ -79,6 +82,7 @@ class StudentGenerator(object):
                         created=None,
                         case_manager=case_manager,
                         picture=None,
+                        grade_level=random_grade_level,
                         id=None,
                     )
                     students.append(student)
