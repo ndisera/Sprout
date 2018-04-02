@@ -37,10 +37,12 @@ class TeacherGenerator:
                     last_name = random.choice(last_names)
                     email = "{}{}@{}.{}".format(first_name[0], last_name, "fakeemail", "edu").lower()
                     teacher = User(
-                        id=None,
+                        pk=None,
                         email=email,
                         first_name=first_name,
                         last_name=last_name,
+                        is_active=False,
+                        is_superuser=False,
                         import_id=None,
                     )
                     teachers.append(teacher)
@@ -53,17 +55,21 @@ class TeacherGenerator:
         :return: list[User]
         """
         teacher_matt = User(
-            id=None,
+            pk=None,
             first_name='Matthew',
             last_name='Flatt',
+            is_active=False,
+            is_superuser=False,
             email='mflatt@totallyrealemail.edu',
             import_id=None,
         )
 
         teacher_danny = User(
-            id=None,
+            pk=None,
             first_name='Daniel',
             last_name='Kopta',
+            is_active=False,
+            is_superuser=False,
             email='dkopta@totallyrealemail.edu',
             import_id=None,
         )

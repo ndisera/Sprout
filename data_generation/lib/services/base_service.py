@@ -31,14 +31,19 @@ class BaseService():
                                                                        port_num=port_num,
                                                                        endpoint='{endpoint}')
 
-    def _get_models(self, model_type, uri):
+    def _get_models(self, model_type, uri, params=None):
         """
         Get all of some kind of model
 
         :param model_type: Type of model to GET
         :return: list[model]
         """
-        response = requests.get(uri, verify=self.verify, headers=self.headers)
+        req = requests.Request("GET", uri, headers=self.headers, params=params).prepare()
+        req.url = req.url.replace("%7B", "{").replace("%7D", "}")
+        response = requests.Session().send(req, verify=self.verify)
+
+        if response.status_code > 399:
+            print response.json()
 
         response.raise_for_status()
 
