@@ -54,6 +54,8 @@ class CategoryCalculator():
         rand_val = random.randint(0, 2)
         behavior_len = len(self.behavior_efforts)
         test_len = len(self.test_scores)
+        # Make sure to check for no data down the line using the lengths
+
 
         # https://stackoverflow.com/a/4143837/3518046
         behavior_lists = {}
@@ -68,11 +70,17 @@ class CategoryCalculator():
         self.progress_category_choice = rand_val #todo: fix superhacky stuff
 
         if rand_val == 0:
-            return 'test__2018-01-01__2018-03-08__' + str(self.test_scores[test_len - 1].standardized_test_id)
+            if test_len != 0:
+                return 'test__2018-01-01__2018-03-08__' + str(self.test_scores[test_len - 1].standardized_test_id)
         if rand_val == 1:
-            return 'behavior__2018-02-22__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
+            if behavior_len != 0:
+                return 'behavior__2018-02-22__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
         if rand_val == 2:
-            return 'effort__2018-03-01__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
+            if behavior_len != 0:
+                return 'effort__2018-03-01__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
+
+        # We didn't find anything: return none
+        return '__none__'
 
     def get_caution_category(self):
         """
@@ -89,11 +97,17 @@ class CategoryCalculator():
             rand_val = (rand_val + 1) % 3
 
         if rand_val == 0:
-            return 'test__2018-01-01__2018-03-08__' + str(self.test_scores[test_len - 1].standardized_test_id)
+            if test_len != 0:
+                return 'test__2018-01-01__2018-03-08__' + str(self.test_scores[test_len - 1].standardized_test_id)
         if rand_val == 1:
-            return 'behavior__2018-02-22__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
+            if behavior_len != 0:
+                return 'behavior__2018-02-22__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
         if rand_val == 2:
-            return 'effort__2018-03-01__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
+            if behavior_len != 0:
+                return 'effort__2018-03-01__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
+
+        # We didn't find anything: return none
+        return '__none__'
 
     def prepare_focus_category(self, focus):
         """
