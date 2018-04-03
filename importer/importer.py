@@ -396,7 +396,7 @@ if __name__ == "__main__":
     # assignments
     with open(os.path.join(args.folder, files['assignments'])) as csvfile:
         print "Importing Assignments and Grades"
-        reader = csv.reader(csvfile)
+        reader = csv.reader(csvfile, quoting=csv.QUOTE_NONE)
         cleared_sections = Set()
 
         # set up the headers
@@ -409,6 +409,8 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
+            print "***** ASSIGNMENT *****"
+            print row
             # get the section
             filters = { 'import_id': row[csv_idx['section_import_id']], }
             section_results = sections_service.get_sections(filters)
