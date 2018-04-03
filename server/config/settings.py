@@ -190,6 +190,7 @@ EMAIL_HOST_USER = 'sprout'
 EMAIL_HOST_PASSWORD = 'sprout'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'sprout@pimesh.club' # Need an MX record associated with the sender domain or most mail servers will bounce
 
 # Declare that we are using a custom user object
 AUTH_USER_MODEL = 'api.SproutUser'
