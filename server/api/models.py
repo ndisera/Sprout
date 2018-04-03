@@ -242,8 +242,8 @@ class Assignment(models.Model):
     import_id = models.CharField(null=True, blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                         help_text="ID as known by other importing LMS")
     assignment_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    score_min = models.IntegerField(blank=False, verbose_name="Minimum Score")
-    score_max = models.IntegerField(blank=False, verbose_name="Maximum Score")
+    score_min = models.FloatField(blank=False, verbose_name="Minimum Score")
+    score_max = models.FloatField(blank=False, verbose_name="Maximum Score")
     due_date = models.DateField(blank=False,)
 
     class Meta:
@@ -267,7 +267,7 @@ class Grade(models.Model):
                                    help_text="Assignment being reported")
     student = models.ForeignKey(Student, related_name='grade_student', on_delete=models.CASCADE,
                                 help_text="Student being graded")
-    score = models.IntegerField(blank=False, verbose_name="Assignment score")
+    score = models.FloatField(blank=False, verbose_name="Assignment score")
     handin_datetime = models.DateTimeField(blank=False)
     late = models.BooleanField(blank=False, help_text="Whether the assignment was late")
     missing = models.BooleanField(blank=False, help_text="Whether the assignment is missing")

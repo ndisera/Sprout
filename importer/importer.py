@@ -446,26 +446,31 @@ if __name__ == "__main__":
             else:
                 assignment = assignment_results[0]
 
-            if row[csv_idx['score']]  != '':
-                # get the student
-                filters = { 'student_id': row[csv_idx['student_id']], }
-                student_results = student_service.get_students(filters)
-                if len(results) is 0:
-                    sys.exit('There was an error importing ' + files['assignments'] + '. Couldn\'t find student for new assignment.')
-                student = student_results[0]
-                
-                # I know the grade won't be there since I deleted all assignments, so just add a new one
-                new_grade = Grade(
-                                id=None,
-                                student=student.id,
-                                assignment=assignment.id,
-                                handin_datetime=row[csv_idx['due_date']],
-                                score=row[csv_idx['score']],
-                                grade=row[csv_idx['grade']],
-                                late=(row[csv_idx['late']] == '1'),
-                                missing=(row[csv_idx['missing']] == '1'),
-                                )
-                grades_service.add_grade(new_grade, student=student.id)
+            # make sure this is a valid score
+            try:
+                float(row[csv_idx['score']])
+            except ValueError:
+                continue
+
+            # get the student
+            filters = { 'student_id': row[csv_idx['student_id']], }
+            student_results = student_service.get_students(filters)
+            if len(results) is 0:
+                sys.exit('There was an error importing ' + files['assignments'] + '. Couldn\'t find student for new assignment.')
+            student = student_results[0]
+            
+            # I know the grade won't be there since I deleted all assignments, so just add a new one
+            new_grade = Grade(
+                            id=None,
+                            student=student.id,
+                            assignment=assignment.id,
+                            handin_datetime=row[csv_idx['due_date']],
+                            score=row[csv_idx['score']],
+                            grade=row[csv_idx['grade']],
+                            late=(row[csv_idx['late']] == '1'),
+                            missing=(row[csv_idx['missing']] == '1'),
+                            )
+            grades_service.add_grade(new_grade, student=student.id)
 
     # attendances
     with open(os.path.join(args.folder, files['attendance'])) as csvfile:
