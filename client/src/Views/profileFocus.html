@@ -93,7 +93,7 @@
                                                 </canvas>
                                             </div>
                                             <div class="text field" ng-switch-when="true">
-                                                <!--todo: How do I make this pretty?-->
+                                                <!--todo: Make this pretty?-->
                                                 No data found
                                             </div>
                                         </a>
@@ -110,8 +110,10 @@
                                                 <span class="input-group-text">{{ focusStudent.caution_graph.category.displayName }}</span>
                                             </div>
                                         </div>
-                                        <a ng-href="/student/{{ focusStudent.student }}{{ focusStudent.caution_graph.category.href }}">
-                                            <div class="col-sm-12 focus-graph">
+                                        <a ng-href="/student/{{ focusStudent.student }}{{ focusStudent.caution_graph.category.href }}"
+                                           ng-switch="focusStudent.progress_graph.emptyGraph">
+                                            <div class="col-sm-12 focus-graph"
+                                                 ng-switch-when="false">
                                                 <canvas class="chart chart-line"
                                                         chart-data="focusStudent.caution_graph.data"
                                                         chart-series="focusStudent.caution_graph.series"
@@ -120,6 +122,10 @@
                                                         chart-dataset-override="focusStudent.caution_graph.datasetOverride"
                                                         chart-colors="graphColors.caution">
                                                 </canvas>
+                                            </div>
+                                            <div class="text field" ng-switch-when="true">
+                                                <!--todo: Make this pretty?-->
+                                                No data found
                                             </div>
                                         </a>
                                     </div>
