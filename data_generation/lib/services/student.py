@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-Student = namedtuple("Student", ['student_id', 'first_name', 'last_name', 'birthdate', 'created', 'case_manager', 'picture', 'id'])
+Student = namedtuple("Student", ['student_id', 'first_name', 'last_name', 'birthdate', 'created', 'case_manager', 'picture', 'grade_level', 'id', ])
 
 
 class StudentService(BaseService):

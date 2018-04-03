@@ -50,6 +50,8 @@ class SproutUser(AbstractBaseUser):
                                        help_text="Whether this user should have all permissions")
     is_staff = models.BooleanField(default=False,
                                    help_text="Not used")
+    is_active = models.BooleanField(default=True,
+                                    help_text="Whether this account is active or not")
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = AbstractBaseUser.get_email_field_name()
@@ -78,3 +80,11 @@ class SproutUser(AbstractBaseUser):
         if self == user:
             return True
         return user.is_superuser
+
+    def has_object_read_permission(self, request):
+        """
+        Any (authenticated) user can read all other user's basic information
+        """
+        user = request.user
+
+        return user.is_authenticated
