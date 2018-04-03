@@ -1,4 +1,5 @@
 app.controller("schoolSettingsController", function($scope, $rootScope, $location, toastService, userService, holidays, terms, tests, schools, schedules, termSettings, schoolYears, holidayService, testService, termService, schoolService, scheduleService, schoolYearService) {
+    $scope.user = userService.user;
     $scope.location = $location;
     $scope.holidays = holidays.holidays;
     $scope.tests = tests.standardized_tests;
@@ -284,6 +285,10 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                     {
                         title: 'Max Score',
                         value: item.max_score
+                    },
+                    {
+                        title: 'Proficiency Score',
+                        value: item.proficient_score
                     }
                 ];
                 break;
@@ -333,10 +338,6 @@ app.controller("schoolSettingsController", function($scope, $rootScope, $locatio
                     {
                         title: 'Ends',
                         value: item.end_date
-                    },
-                    {
-                        title: 'Number of Terms',
-                        value: item.num_terms
                     }
                 ];
                 break;

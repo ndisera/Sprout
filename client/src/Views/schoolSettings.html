@@ -117,7 +117,6 @@
                                 <th>Name</th>
                                 <th>Begins</th>
                                 <th>Ends</th>
-                                <th>Number of Terms</th>
                                 <th class="text-button-column"></th>
                                 <th class="text-button-column"></th>
                             </tr>
@@ -127,13 +126,11 @@
                                 <td ng-hide="edit">{{ schoolYear.title }}</td>
                                 <td ng-hide="edit">{{ schoolYear.start_date }}</td>
                                 <td ng-hide="edit">{{ schoolYear.end_date }}</td>
-                                <td ng-hide="edit">{{ schoolYear.num_terms}}</td>
                                 <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
                                 </td>
                                 <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eSchoolYears[schoolYear.id].title"></td>
                                 <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eSchoolYears[schoolYear.id].start_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
                                 <td ng-show="edit"><input autocomplete="off" type="text" date-time class="form-control" ng-model="eSchoolYears[schoolYear.id].end_date" view="year" min-view="date" format="YYYY-MM-DD"></td>
-                                <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eSchoolYears[schoolYear.id].num_terms"></td>
                                 <td ng-show="edit">
                                     <button class="btn btn-success" type="button" ng-click="updateSchoolYear(schoolYear.id, $index); $event.stopPropagation();">
                                         Save
@@ -181,12 +178,6 @@
                                     <label class="control-label col-sm-2">Ends:</label>
                                     <div class="col-sm-10">
                                         <input required autocomplete="off" type="text" date-time class="form-control" ng-model="newSchoolYear.end_date" view="year" min-view="date" format="YYYY-MM-DD">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-sm-2">Number of Terms:</label>
-                                    <div class="col-sm-10">
-                                        <input required autocomplete="off" placeholder="Enter Number of Terms in School Year" type="number" class="form-control" ng-model="newSchoolYear.num_terms">
                                     </div>
                                 </div>
                                 <div class="form-group no-bottom-margin">
@@ -485,6 +476,7 @@
                                 <th>Name</th>
                                 <th>Min Score</th>
                                 <th>Max Score</th>
+                                <th>Proficiency Score</th>
                                 <th class="text-button-column"></th>
                                 <th class="text-button-column"></th>
                             </tr>
@@ -494,11 +486,13 @@
                                 <td ng-hide="edit">{{ test.test_name }}</td>
                                 <td ng-hide="edit">{{ test.min_score }}</td>
                                 <td ng-hide="edit">{{ test.max_score }}</td>
+                                <td ng-hide="edit">{{ test.proficient_score }}</td>
                                 <td ng-hide="edit"><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
                                 </td>
                                 <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="text" class="form-control" ng-model="eTests[test.id].test_name"></td>
                                 <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].min_score"></td>
                                 <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].max_score"></td>
+                                <td ng-show="edit"><input autocomplete="off" autocapitalize="off" type="number" class="form-control" ng-model="eTests[test.id].proficient_score"></td>
                                 <td ng-show="edit">
                                     <button class="btn btn-success" type="button" ng-click="updateTest(test.id, $index); $event.stopPropagation();">
                                         Save
@@ -546,6 +540,12 @@
                                     <label class="control-label col-sm-2">Max Score:</label>
                                     <div class="col-sm-10">
                                         <input required autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Maximum Score" ng-model="newTest.max_score">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Proficiency Score:</label>
+                                    <div class="col-sm-10">
+                                        <input autocomplete="off" autocapitalize="off" type="number" class="form-control" placeholder="Enter Proficiency Score" ng-model="newTest.proficient_score">
                                     </div>
                                 </div>
                                 <div class="form-group no-bottom-margin">

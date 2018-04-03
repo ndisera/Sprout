@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils import timezone
 import django.db.utils
 from django.http.response import HttpResponseNotFound, HttpResponse
+from dry_rest_permissions.generics import DRYPermissions, DRYObjectPermissions
 from dynamic_rest.viewsets import DynamicModelViewSet, WithDynamicViewSetMixin
 from rest_framework import mixins, generics
 from rest_framework.permissions import IsAuthenticated
@@ -15,6 +16,7 @@ from rest_framework.schemas import AutoSchema
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework_extensions.settings import extensions_api_settings
 from api.models import *
 from api.serializers import *
 from api.constants import NotificationCategories
@@ -129,6 +131,28 @@ class StudentViewSet(NestedDynamicViewSet):
     serializer_class = StudentSerializer
     queryset = Student.objects.all()
 
+    def get_queryset(self, queryset=None):
+        """
+        A regular user should only be able to see students:
+            If the user is the student's case manager
+            If the student is in a class the user teaches
+
+        :return:
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(StudentViewSet, self).get_queryset()
+        if user.is_superuser:
+            # The superuser can see everything
+            return queryset
+        # A teacher may view students in their taught section
+        teaches = Q(enrollment__section__teacher=user)
+        # Or all students for whom they are case managers
+        manages = Q(case_manager=user)
+        queryset = queryset.filter(teaches | manages)
+        return queryset
+
+
     """ ensure variables show as correct types for docs """
     name_case_manager = 'case_manager'
     desc_case_manager = "ID of the User who oversees this student"
@@ -153,28 +177,56 @@ class StudentViewSet(NestedDynamicViewSet):
         profile_picture_field
     ])
 
-    # Rebuild all existing fields with required=False for partial update
-    partial_update_fields = [field._asdict() for field in schema._manual_fields]
-    for field in partial_update_fields: field['required']=False
-    partial_update_fields = [coreapi.Field(**field) for field in partial_update_fields]
-    pass
 
+class ParentContactInfoViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "ParentContactInfo" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ParentContactInfoSerializer
+    queryset = ParentContactInfo.objects.all()
 
-class SchoolSettingsSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    SchoolSettingsViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(SchoolSettingsSetSchema, self).get_link(path, method, base_url)
-        return set_link(SchoolSettingsViewSet, path, method, link)
+    def get_queryset(self, queryset=None):
+        """
+        A regular user should only be able to see a student's parents' contact info:
+            If the user is the student's case manager
+            If the student is in a class the user teaches
+
+        :return:
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(ParentContactInfoViewSet, self).get_queryset()
+        if user.is_superuser:
+            # The superuser can see everything
+            return queryset
+        # A teacher may view parent contact info for students in their taught section
+        teaches = Q(student__enrollment__section__teacher=user)
+        # Or all parent contact info for students for whom they are case managers
+        manages = Q(student__case_manager=user)
+        queryset = queryset.filter(teaches | manages)
+        return queryset
+
+    """ ensure variables show as correct types for docs """
+    name_student = 'student'
+    desc_student = "ID of the student whoes parent's contact info is stored"
+
+    student_field = coreapi.Field(name=name_student,
+                                  required=True,
+                                  location="form",
+                                  description=desc_student,
+                                  schema=coreschema.Integer(title=name_student))
+
+    schema = AutoSchema(manual_fields=[
+        student_field,
+    ])
 
 
 class SchoolSettingsViewSet(NestedDynamicViewSet):
     """
     allows interaction with the "SchoolSettings" instance
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = SchoolSettingsSerializer
 
     # Build the 'singleton' object if it doesn't exist
@@ -190,14 +242,14 @@ class SchoolSettingsViewSet(NestedDynamicViewSet):
     queryset = SchoolSettings.objects.all()
 
     """ define custom schema for documentation """
-    schema = SchoolSettingsSetSchema()
+    schema = AutoSchema()
 
 
 class SchoolYearViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "SchoolYear" instance
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = SchoolYearSerializer
     queryset = SchoolYear.objects.all()
 
@@ -205,33 +257,23 @@ class SchoolYearViewSet(NestedDynamicViewSet):
     schema = AutoSchema()
 
 
-class DailyScheduleSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    DailyScheduleViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(DailyScheduleSetSchema, self).get_link(path, method, base_url)
-        return set_link(DailyScheduleViewSet, path, method, link)
-
-
 class DailyScheduleViewSet(NestedDynamicViewSet):
     """
     allows interaction with the "DailySchedule" instance
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = DailyScheduleSerializer
     queryset = DailySchedule.objects.all()
 
     """ define custom schema for documentation """
-    schema = DailyScheduleSetSchema()
+    schema = AutoSchema()
 
 
 class TermSettingsViewSet(NestedDynamicViewSet):
     """
-    allows interaction with the set of "Term" instances
+    allows interaction with the set of "TermSettings" instances
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = TermSettingsSerializer
     queryset = TermSettings.objects.all()
 
@@ -251,26 +293,13 @@ class TermSettingsViewSet(NestedDynamicViewSet):
         ])
 
 
-class TermViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    BehaviorViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(TermViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(TermViewSet, path, method, link)
-
-
 class TermViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "Term" instances
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = TermSerializer
     queryset = Term.objects.all()
-
-    """ define custom schema for documentation """
-    schema = TermViewSetSchema()
 
     """ ensure variables show as correct types for docs """
     name_term_settings = 'settings'
@@ -280,24 +309,18 @@ class TermViewSet(NestedDynamicViewSet):
                                         required=True,
                                         location="form",
                                         description=desc_term_settings,
-                                        schema=coreschema.Integer(title=name_term_settings)),
+                                        schema=coreschema.Integer(title=name_term_settings))
 
-    create_fields = (
-        term_settings_field
-    )
-    update_fields = (
-        term_settings_field
-    )
-    partial_update_fields = (
-        term_settings_field
-    )
+    schema = AutoSchema(manual_fields=[
+        term_settings_field,
+    ])
 
 
 class HolidayViewSet(NestedDynamicViewSet):
     """
-    allows interaction with the set of "Student" instances
+    allows interaction with the set of "Holiday" instances
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = HolidaySerializer
     queryset = Holiday.objects.all()
 
@@ -317,14 +340,36 @@ class HolidayViewSet(NestedDynamicViewSet):
     ])
 
 
-class SectionViewSetSchema(AutoSchema):
+class StandardizedTestViewSet(NestedDynamicViewSet):
     """
-    class that allows specification of more detailed schema for the
-    SectionViewSet class in the coreapi documentation.
+    allows interaction with the set of "StandardizedTests" instances
+
+    list:
+    gets all the configured standardized tests in Sprout.
+
+    create:
+    inform Sprout about a new standardized test. requires a name and minimum and maximum score
+
+    retrieve:
+    gets the standardized test specified by the id path param.
+
+    update:
+    update the parameters of a recorded standardized test
+
+    partial_update:
+    update the parameters of a recorded standardized test specified by path param.
+    does not require all values.
+
+    delete:
+    delete a specified standardized test specified by the path param.
     """
-    def get_link(self, path, method, base_url):
-        link = super(SectionViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(SectionViewSet, path, method, link)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
+    serializer_class = StandardizedTestSerializer
+    queryset = StandardizedTest.objects.all()
+
+    """ define custom schema for documentation """
+    schema = AutoSchema()
+
 
 class SectionViewSet(NestedDynamicViewSet):
     """
@@ -355,45 +400,41 @@ class SectionViewSet(NestedDynamicViewSet):
     serializer_class = SectionSerializer
     queryset = Section.objects.all()
 
-    """ define custom schema for documentation """
-    schema = SectionViewSetSchema()
+    def get_queryset(self, queryset=None):
+        """
+        Sections should only be visible:
+            - If the user teaches the section
+            - If the teacher has a relationship to a student enrolled in the section
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(SectionViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(teacher=user)
+        # Filter for other related students:
+        # Case manager
+        manages = Q(enrollment__student__case_manager=user)
+        # The teacher of another section in which the student is enrolled
+        other_teacher = Q(enrollment__student__enrollment__section__teacher=user)
+        queryset = queryset.filter(teaches | manages | other_teacher).distinct()
+        return queryset
 
     """ ensure variables show as correct types for docs """
     name_teacher = 'teacher'
     desc_teacher = "ID of the teacher of the section."
-    create_fields = (
-        coreapi.Field(
-            name=name_teacher, 
-            required=True,
-            location="form", 
-            description=desc_teacher,
-            schema=coreschema.Integer(title=name_teacher)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_teacher, 
-            required=True,
-            location="form", 
-            description=desc_teacher,
-            schema=coreschema.Integer(title=name_teacher)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_teacher, 
-            location="form", 
-            description=desc_teacher,
-            schema=coreschema.Integer(title=name_teacher)),
-    )
+    field_teacher = coreapi.Field(
+        name=name_teacher,
+        required=True,
+        location="form",
+        description=desc_teacher,
+        schema=coreschema.Integer(title=name_teacher))
 
+    schema = AutoSchema(manual_fields=[
+        field_teacher,
+    ])
 
-class EnrollmentViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    EnrollmentViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(EnrollmentViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(EnrollmentViewSet, path, method, link)
 
 class EnrollmentViewSet(NestedDynamicViewSet):
     """
@@ -423,64 +464,51 @@ class EnrollmentViewSet(NestedDynamicViewSet):
     serializer_class = EnrollmentSerializer
     queryset = Enrollment.objects.all()
 
-    """ define custom schema """
-    schema = EnrollmentViewSetSchema()
+    def get_queryset(self, queryset=None):
+        """
+        Enrollments should only be visible:
+            - If the user teaches the related section
+            - If the enrollment refers to a student the teacher has another relation to
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(EnrollmentViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(section__teacher=user)
+        # Filter for other related students:
+        # Case manager
+        manages = Q(student__case_manager=user)
+        # The teacher of another section in which the student is enrolled
+        other_teacher = Q(student__enrollment__section__teacher=user)
+        queryset = queryset.filter(teaches | manages | other_teacher).distinct()
+        return queryset
 
     """ ensure variables show as correct type for docs """
     name_student = 'student'
     name_section = 'section'
     desc_student = 'ID of the student'
     desc_section = 'ID of the section'
-    create_fields = (
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form", 
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-        coreapi.Field(
-            name=name_section,
-            required=True,
-            location="form", 
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form", 
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-        coreapi.Field(
-            name=name_section, 
-            required=True,
-            location="form", 
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_student,
-            location="form", 
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-        coreapi.Field(
-            name=name_section, 
-            location="form", 
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
 
+    student_field = coreapi.Field(
+        name=name_student,
+        required=True,
+        location="form",
+        description=desc_student,
+        schema=coreschema.Integer(title=name_student))
+    section_field = coreapi.Field(
+        name=name_section,
+        required=True,
+        location="form",
+        description=desc_section,
+        schema=coreschema.Integer(title=name_section))
 
-class BehaviorViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    BehaviorViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(BehaviorViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(BehaviorViewSet, path, method, link)
+    schema = AutoSchema(manual_fields=[
+        student_field,
+        section_field,
+    ])
+
 
 class BehaviorViewSet(NestedDynamicViewSet):
     """
@@ -511,35 +539,78 @@ class BehaviorViewSet(NestedDynamicViewSet):
     serializer_class = BehaviorSerializer
     queryset = Behavior.objects.all()
 
-    """ define custom schema for documentation """
-    schema = BehaviorViewSetSchema()
+    def get_queryset(self, queryset=None):
+        """
+        Behaviors should only be visible:
+            - If the user teaches the related section
+            - If the user is the student's case manager
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(BehaviorViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(enrollment__section__teacher=user)
+        # Filter for other related students (only case manager at this time)
+        related = Q(enrollment__student__case_manager=user)
+        queryset = queryset.filter(teaches | related)
+        return queryset
 
     """ ensure variables show as correct type for docs """
     name_enrollment = 'enrollment'
     desc_enrollment = 'ID of the enrollment (student and section)'
-    create_fields = (
-        coreapi.Field(
+    field_enrollment = coreapi.Field(
             name=name_enrollment,
             required=True,
-            location="form", 
+            location="form",
             description=desc_enrollment,
-            schema=coreschema.Integer(title=name_enrollment)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_enrollment,
+            schema=coreschema.Integer(title=name_enrollment))
+
+    schema = AutoSchema(manual_fields=[
+        field_enrollment,
+    ])
+
+
+class BehaviorNoteViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "BehaviorNote" instances
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = BehaviorNoteSerializer
+    queryset = BehaviorNote.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        BehaviorNotes should only be visible:
+            - If the user teaches the student
+            - If the user is the student's case manager
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(BehaviorNoteViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the student
+        teaches = Q(student__section__teacher=user)
+        # Filter for other related students (only case manager at this time)
+        related = Q(student__case_manager=user)
+        queryset = queryset.filter(teaches | related)
+        return queryset
+
+    """ ensure variables show as correct type for docs """
+    name_student = 'student'
+    desc_student = 'ID of the student to whom this note refers'
+    field_student = coreapi.Field(
+            name=name_student,
             required=True,
-            location="form", 
-            description=desc_enrollment,
-            schema=coreschema.Integer(title=name_enrollment)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_enrollment,
-            location="form", 
-            description=desc_enrollment,
-            schema=coreschema.Integer(title=name_enrollment)),
-    )
+            location="form",
+            description=desc_student,
+            schema=coreschema.Integer(title=name_student))
+
+    schema = AutoSchema(manual_fields=[
+        field_student,
+    ])
 
 
 class AttendanceRecordViewSet(NestedDynamicViewSet):
@@ -549,6 +620,28 @@ class AttendanceRecordViewSet(NestedDynamicViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = AttendanceRecordSerializer
     queryset = AttendanceRecord.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        AttendanceRecords should only be visible:
+            - If the user teaches the related section
+            - If the attendance record refers to a student the teacher has another relation to
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(AttendanceRecordViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(enrollment__section__teacher=user)
+        # Filter for other related students:
+        # Case manager
+        manages = Q(student__case_manager=user)
+        # The teacher of another section in which the student is enrolled
+        other_teacher = Q(student__enrollment__section__teacher=user)
+        queryset = queryset.filter(teaches | manages | other_teacher)
+        return queryset
+
 
     """ ensure variables show as correct type for docs """
     name_enrollment = 'enrollment'
@@ -563,57 +656,6 @@ class AttendanceRecordViewSet(NestedDynamicViewSet):
     schema = AutoSchema(manual_fields=[
         enrollment_field,
     ])
-
-
-class StandardizedTestViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    StandardizedTestViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(StandardizedTestViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(StandardizedTestViewSet, path, method, link)
-
-
-class StandardizedTestViewSet(NestedDynamicViewSet):
-    """
-    allows interaction with the set of "StandardizedTests" instances
-
-    list:
-    gets all the configured standardized tests in Sprout.
-
-    create:
-    inform Sprout about a new standardized test. requires a name and minimum and maximum score
-
-    retrieve:
-    gets the standardized test specified by the id path param.
-
-    update:
-    update the parameters of a recorded standardized test
-
-    partial_update:
-    update the parameters of a recorded standardized test specified by path param.
-    does not require all values.
-
-    delete:
-    delete a specified standardized test specified by the path param.
-    """
-    permission_classes = (IsAuthenticated,)
-    serializer_class = StandardizedTestSerializer
-    queryset = StandardizedTest.objects.all()
-
-    """ define custom schema for documentation """
-    schema = StandardizedTestViewSetSchema()
-
-
-class StandardizedTestScoreViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    StandardizedTestScoreViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(StandardizedTestScoreViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(StandardizedTestScoreViewSet, path, method, link)
 
 
 class StandardizedTestScoreViewSet(NestedDynamicViewSet):
@@ -644,68 +686,48 @@ class StandardizedTestScoreViewSet(NestedDynamicViewSet):
     serializer_class = StandardizedTestScoreSerializer
     queryset = StandardizedTestScore.objects.all()
 
-    """ define custom schema for documentation """
-    schema = StandardizedTestScoreViewSetSchema()
+    def get_queryset(self, queryset=None):
+        """
+        Test Scores should only be visible:
+            - If the user teaches the student
+            - If the user is the student's case manager
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(StandardizedTestScoreViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the student
+        teaches = Q(student__enrollment__section__teacher=user)
+        # Filter for other related students (only case manager at this time)
+        related = Q(student__case_manager=user)
+        queryset = queryset.filter(teaches | related)
+        return queryset
 
     """ ensure variables show as correct type for docs """
     name_student = 'student'
     desc_student = 'ID of the graded student'
     name_standardized_test = 'standardized_test'
     desc_standardized_test = 'ID of the related standardized test'
-    create_fields = (
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=desc_student)),
 
-        coreapi.Field(
+    field_student = coreapi.Field(
+        name=name_student,
+        required=True,
+        location="form",
+        description=desc_student,
+        schema=coreschema.Integer(title=desc_student))
+
+    field_standardized_test = coreapi.Field(
             name=name_standardized_test,
             required=True,
             location="form",
             description=desc_standardized_test,
-            schema=coreschema.Integer(title=desc_standardized_test)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=desc_student)),
+            schema=coreschema.Integer(title=desc_standardized_test))
 
-        coreapi.Field(
-            name=name_standardized_test,
-            required=True,
-            location="form",
-            description=desc_standardized_test,
-            schema=coreschema.Integer(title=desc_standardized_test)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_student,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=desc_student)),
-
-        coreapi.Field(
-            name=name_standardized_test,
-            required=True,
-            location="form",
-            description=desc_standardized_test,
-            schema=coreschema.Integer(title=desc_standardized_test)),
-    )
-
-
-class AssignmentViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    AssignmentViewSetSchema class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(AssignmentViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(AssignmentViewSet, path, method, link)
+    schema = AutoSchema(manual_fields=[
+        field_student,
+        field_standardized_test,
+    ])
 
 
 class AssignmentViewSet(NestedDynamicViewSet):
@@ -736,45 +758,40 @@ class AssignmentViewSet(NestedDynamicViewSet):
     serializer_class = AssignmentSerializer
     queryset = Assignment.objects.all()
 
-    """ define custom schema for documentation """
-    schema = AssignmentViewSetSchema()
+    def get_queryset(self, queryset=None):
+        """
+        AttendanceRecords should only be visible:
+            - If the user teaches the related section
+            - If the attendance record refers to a student the teacher has another relation to
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(AssignmentViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(section__teacher=user)
+        # Filter for other related students:
+        # Case manager
+        manages = Q(section__enrollment__student__case_manager=user)
+        # The teacher of another section in which the student is enrolled
+        other_teacher = Q(section__enrollment__student__enrollment__section__teacher=user)
+        queryset = queryset.filter(teaches | manages | other_teacher)
+        return queryset
 
     """ ensure variables show as correct type for docs """
     name_section = 'section'
     desc_section = 'ID of the section to which this assignment belongs'
-    create_fields = (
-        coreapi.Field(
-            name=name_section,
-            required=True,
-            location="form",
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_section,
-            required=True,
-            location="form",
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_section,
-            location="form",
-            description=desc_section,
-            schema=coreschema.Integer(title=name_section)),
-    )
+    field_section = coreapi.Field(
+        name=name_section,
+        required=True,
+        location="form",
+        description=desc_section,
+        schema=coreschema.Integer(title=name_section))
 
-
-class GradeViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    GradeViewSet class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(GradeViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(GradeViewSet, path, method, link)
+    schema = AutoSchema(manual_fields=[
+        field_section,
+    ])
 
 
 class GradeViewSet(NestedDynamicViewSet):
@@ -805,63 +822,55 @@ class GradeViewSet(NestedDynamicViewSet):
     serializer_class = GradeSerializer
     queryset = Grade.objects.all()
 
-    """ define custom schema for documentation """
-    schema = GradeViewSetSchema()
+    def get_queryset(self, queryset=None):
+        user = self.request.user
+        if queryset is None:
+            queryset = super(GradeViewSet, self).get_queryset()
+        if user.is_superuser:
+            # The superuser is allowed to view everything
+            return queryset
+        # A teacher may view grades for assignments in their taught section
+        teaches = Q(assignment__section__teacher=user)
+        # Filter for other related students:
+        # Case manager
+        manages = Q(student__case_manager=user)
+        # The teacher of another section in which the student is enrolled
+        other_teacher = Q(student__enrollment__section__teacher=user)
+        queryset = queryset.filter(teaches | manages | other_teacher).distinct()
+        return queryset
 
     """ ensure variables show as correct type for docs """
     name_assignment = 'assignment'
     name_student = 'student'
     desc_assignment = 'ID of the assignment to which this grade belongs'
     desc_student = 'ID of the student owning this grade report'
-    create_fields = (
-        coreapi.Field(
-            name=name_assignment,
-            required=True,
-            location="form",
-            description=desc_assignment,
-            schema=coreschema.Integer(title=name_assignment)),
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_assignment,
-            required=True,
-            location="form",
-            description=desc_assignment,
-            schema=coreschema.Integer(title=name_assignment)),
+    assignment_field = coreapi.Field(
+        name=name_assignment,
+        required=True,
+        location="form",
+        description=desc_assignment,
+        schema=coreschema.Integer(title=name_assignment))
+    student_field = coreapi.Field(
+        name=name_student,
+        required=True,
+        location="form",
+        description=desc_student,
+        schema=coreschema.Integer(title=name_student))
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_assignment,
-            location="form",
-            description=desc_assignment,
-            schema=coreschema.Integer(title=name_assignment)),
-
-        coreapi.Field(
-            name=name_student,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
+    schema = AutoSchema(manual_fields=[
+        assignment_field,
+        student_field,
+    ])
 
 
 class AuthVerifyView(generics.RetrieveAPIView):
     # If we ever add more authentication methods, this will need to be updated...
     authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
+    def get_serializer_class(self):
+        return SproutUserSerializer
 
     def get(self, request, format=None, **kwargs):
         """
@@ -877,12 +886,9 @@ class AuthVerifyView(generics.RetrieveAPIView):
 
         include_user = request.query_params.get('user', None)
         if include_user == 'true':
-            response['user'] = {
-                'email': request._user.email,
-                'first_name': request._user.sproutuserprofile.first_name,
-                'last_name': request._user.sproutuserprofile.last_name,
-                'pk': request._user.id,
-            }
+            user = request.user
+            data = self.get_serializer().to_representation(user)
+            response['user'] = data
 
         return Response(data=response)
 
@@ -909,10 +915,12 @@ class SproutUserViewSet(WithDynamicViewSetMixin,
     partial_update:
     change the particulars of a User in Sprout
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYObjectPermissions, )
     serializer_class = SproutUserSerializer
+    queryset = SproutUser.objects.all()
+
     def get_queryset(self, queryset=None):
-        queryset = SproutUser.objects.all()
+        queryset = super(SproutUserViewSet, self).get_queryset()
         # Get rid of the "deleted_user" user
         queryset = queryset.exclude(email='deleted_user')
         return queryset
@@ -958,6 +966,16 @@ class NotificationViewSet(NestedDynamicViewSet):
     serializer_class = NotificationSerializer
     queryset = Notification.objects.all()
 
+    def get_queryset(self, queryset=None):
+        user = self.request.user
+        queryset = super(NotificationViewSet, self).get_queryset()
+        if user.is_superuser:
+            # The superuser is allowed to view everything
+            return queryset
+        # A regular user may only view their own notifications
+        queryset = queryset.filter(user=user)
+        return queryset
+
     """ ensure variables show as correct type for docs """
     name_user = 'user'
     name_student = 'student'
@@ -991,14 +1009,14 @@ class NotificationViewSet(NestedDynamicViewSet):
         :param request:
         :return:
         """
-        queryset = self.get_queryset()
 
         # Generate student birthday notifications for all students this user
         # should see
         birthday_title_template = "{first_name} {last_name}'s Birthday"
         birthday_body_template = "{first_name} {last_name} has a birthday coming up on {date}"
         # Get notifications for this user
-        user = SproutUser.objects.get(id=kwargs['parent_lookup_user'])
+        prefix = extensions_api_settings.DEFAULT_PARENT_LOOKUP_KWARG_NAME_PREFIX
+        user = SproutUser.objects.get(id=kwargs['{prefix}{field}'.format(prefix=prefix, field='user')])
 
         # Query for all students: Students for whom this user is a case manager and students for whom this users is a section teacher
         all_students_query = Q(case_manager=user.id) | Q(enrollment__section__teacher=user.id)
@@ -1040,7 +1058,7 @@ class NotificationViewSet(NestedDynamicViewSet):
                                                  date=str(birthdate.date()))
             # See if the notification already exists
             try:
-                queryset.get(category=category, student=student, user=user, date=birthdate)
+                Notification.objects.get(category=category, student=student, user=user, date=birthdate)
             except Notification.DoesNotExist:
                 # The notification did not exist. Make one!
                 Notification.objects.create(title=title,
@@ -1055,16 +1073,6 @@ class NotificationViewSet(NestedDynamicViewSet):
 
         # Now make the normal call to list to let Dynamic REST do its magic
         return super(NotificationViewSet, self).list(request, *args, **kwargs)
-
-
-class FocusStudentViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    FocusStudentViewSetSchema class in the coreapi documentation.
-    """
-    def get_link(self, path, method, base_url):
-        link = super(FocusStudentViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(FocusStudentViewSet, path, method, link)
 
 
 class FocusStudentViewSet(NestedDynamicViewSet):
@@ -1095,68 +1103,39 @@ class FocusStudentViewSet(NestedDynamicViewSet):
     serializer_class = FocusStudentSerializer
     queryset = FocusStudent.objects.all()
 
-    """ define custom schema for documentation """
-    schema = FocusStudentViewSetSchema()
+    def get_queryset(self, queryset=None):
+        user = self.request.user
+        queryset = super(FocusStudentViewSet, self).get_queryset()
+        if user.is_superuser:
+            # The superuser is allowed to view everything
+            return queryset
+        # A regular user may only view their own focus students
+        queryset = queryset.filter(user=user)
+        return queryset
 
     """ ensure variables show as correct type for docs """
     name_user = 'user'
     name_student = 'student'
     desc_user = 'ID of the user who wants to focus on this student'
     desc_student = 'ID of the student being focused'
-    create_fields = (
-        coreapi.Field(
-            name=name_user,
-            required=True,
-            location="form",
-            description=desc_user,
-            schema=coreschema.Integer(title=name_user)),
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    update_fields = (
-        coreapi.Field(
-            name=name_user,
-            required=True,
-            location="form",
-            description=desc_user,
-            schema=coreschema.Integer(title=name_user)),
+    field_user = coreapi.Field(
+        name=name_user,
+        required=True,
+        location="form",
+        description=desc_user,
+        schema=coreschema.Integer(title=name_user))
+    field_student = coreapi.Field(
+        name=name_student,
+        required=True,
+        location="form",
+        description=desc_student,
+        schema=coreschema.Integer(title=name_student))
 
-        coreapi.Field(
-            name=name_student,
-            required=True,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-    partial_update_fields = (
-        coreapi.Field(
-            name=name_user,
-            location="form",
-            description=desc_user,
-            schema=coreschema.Integer(title=name_user)),
-
-        coreapi.Field(
-            name=name_student,
-            location="form",
-            description=desc_student,
-            schema=coreschema.Integer(title=name_student)),
-    )
-
-
-class IEPGoalViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    HolidayViewSetSchema class in the coreapi documentation.
-    """
-
-    def get_link(self, path, method, base_url):
-        link = super(IEPGoalViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(IEPGoalViewSet, path, method, link)
+    schema = AutoSchema(manual_fields=[
+        field_user,
+        field_student,
+    ])
 
 
 class IEPGoalViewSet(NestedDynamicViewSet):
@@ -1166,9 +1145,6 @@ class IEPGoalViewSet(NestedDynamicViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = IEPGoalSerializer
     queryset = IEPGoal.objects.all()
-
-    # define custom schema for documentation
-    schema = IEPGoalViewSetSchema()
 
     # ensure variables show as correct types for docs
     student_name = 'student'
@@ -1181,15 +1157,9 @@ class IEPGoalViewSet(NestedDynamicViewSet):
         description=student_desc,
         schema=coreschema.Integer(title=student_name))
 
-    create_fields = (
+    schema = AutoSchema(manual_fields=[
         student_field,
-    )
-    update_fields = (
-        student_field,
-    )
-    partial_update_fields = (
-        student_field,
-    )
+    ])
 
 
 class IEPGoalDatapointViewSetSchema(AutoSchema):

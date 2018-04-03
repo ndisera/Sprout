@@ -7,6 +7,7 @@ import random
 from lib.services.student import Student, StudentService
 from lib.services.services import ServiceRequirement, ServiceService
 
+import lib.constants as constants
 
 class ServiceGenerator(object):
     """IEPGenerator contains various methods for generating IEP data
@@ -17,9 +18,8 @@ class ServiceGenerator(object):
 
     CERT_PATH = os.path.dirname(os.path.realpath(__file__))
 
-    SERVICE_TITLE_TEMPLATES = ["Meet with the school psychologist 30 minutes per week",
-                                     "Get specialized {} tutoring 30 minutes per day"]
-    SERVICE_SUBJECTS = ["math", "science", "reading"]
+    SERVICE_TITLE_TEMPLATE = "Service type {type}"
+    SERVICE_BODY_TEMPLATE = "This student should get special {type} service"
 
     def __init__(self, headers=None, protocol='https', hostname="localhost", port_num=8000, verify=False):
         self.studentService = StudentService(headers=headers, protocol=protocol, hostname=hostname, port_num=port_num, verify=verify)
@@ -30,13 +30,11 @@ class ServiceGenerator(object):
                                        fulfilled_chance = 0.5,
                                       ):
         """
-        Generate the specified number of IEPGoals for each student in the database
+        Generate the specified number of ServiceRequirements for each student in the database
 
-        :param num: Number of IEP Goals to generate for each student
+        :param num: Number of Services to generate for each student
         :param fulfilled_chance: Chance that a service has been fulfilled
-        :param duedate_range_start:
-        :param duedate_range_end:
-        :return: Dictionary of student_id -> List of IEPGoals
+        :return: Dictionary of student_id -> List of Services
         """
         to_return = {}
 
@@ -45,17 +43,19 @@ class ServiceGenerator(object):
         for student in students:
             service_requirements = []
             for i in range(num):
-                # Generate a randomly assembled title
-                title = random.choice(self.SERVICE_TITLE_TEMPLATES).format(
-                    random.choice(self.SERVICE_SUBJECTS)
-                )
 
-                description = "{first_name} needs to {title}".format(
-                    first_name=student.first_name,
-                    title=(lambda s: s[:1].lower() + s[1:])(title), # Append the title, but with the first letter lower-case
-                )
+                # Select a type
+                type_val, type_name = random.choice(constants.ServiceType.choices())
+                type_val = int(type_val)
 
-                # Decide whether this goal shall be quantitative
+                type_name = type_name.replace('_', ' ')
+                type_name = type_name.lower()
+
+                # Build a title from the type. There is massive room for improvement
+                title = self.SERVICE_TITLE_TEMPLATE.format(type=type_name)
+                description = self.SERVICE_BODY_TEMPLATE.format(type=type_name)
+
+                # Decide whether this service shall be fulfilled
                 fulfilled = random.random() < fulfilled_chance
                 fulfilled_date = None
                 fulfilled_user = None
@@ -69,8 +69,7 @@ class ServiceGenerator(object):
                         title=(lambda s: s[:1].lower() + s[1:])(title), # Append the title, but with the first letter lower-case
                     )
 
-
-                goal = ServiceRequirement(
+                service = ServiceRequirement(
                     student=student.id,
                     title=title,
                     description=description,
@@ -78,7 +77,8 @@ class ServiceGenerator(object):
                     fulfilled_date=fulfilled_date,
                     fulfilled_user=fulfilled_user,
                     fulfilled_description=fulfilled_description,
+                    type=type_val,
                 )
-                service_requirements.append(goal)
+                service_requirements.append(service)
             to_return[student.id] = service_requirements
         return to_return

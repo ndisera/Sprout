@@ -77,7 +77,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
         });
         return includedTerms;
     }
-    
+
     /**
      * graph-related code
      */
@@ -142,7 +142,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                 yAxes: [{
                     display: true,
                     ticks: {
-                        min: 1,
+                        min: 0,
                         stepSize: 1,
                         max: 5
                     }
@@ -157,11 +157,11 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
     };
 
     // start off the two graphs with empty datasets
-    $scope.behaviorGraph = { 
+    $scope.behaviorGraph = {
         data: [],
         options: _.clone($scope.sharedGraph.options),
     };
-    $scope.effortGraph = { 
+    $scope.effortGraph = {
         data: [],
         options: _.clone($scope.sharedGraph.options),
     };
@@ -289,27 +289,31 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
     $scope.inputOptions = [
         {
             display: "",
-            value: null, 
+            value: null,
+        },
+        {
+            display: "0",
+            value: 0,
         },
         {
             display: "1",
-            value: 1, 
+            value: 1,
         },
         {
             display: "2",
-            value: 2, 
+            value: 2,
         },
         {
             display: "3",
-            value: 3, 
+            value: 3,
         },
         {
             display: "4",
-            value: 4, 
+            value: 4,
         },
         {
             display: "5",
-            value: 5, 
+            value: 5,
         },
     ];
 

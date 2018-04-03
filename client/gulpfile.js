@@ -43,6 +43,24 @@ const include_paths = [
 
     bower_path + 'chart.js/dist/Chart.js',
     bower_path + 'chart.js/dist/Chart.bundle.js',
+	
+	// calendar
+	bower_path + 'fullcalendar/dist/fullcalendar.js',
+	bower_path + 'fullcalendar/dist/fullcalendar.min.js',
+	
+	bower_path + 'fullcalendar/dist/fullcalendar.css',
+	bower_path + 'fullcalendar/dist/fullcalendar.min.css',
+	
+	bower_path + 'fullcalendar/dist/fullcalendar.print.css',
+	bower_path + 'fullcalendar/dist/fullcalendar.print.min.css',
+	
+	bower_path + 'fullcalendar/dist/gcal.js',
+	bower_path + 'fullcalendar/dist/gcal.min.js',
+	
+	bower_path + 'fullcalendar/dist/locale-all.js',
+	
+	// angular calendar directive
+	bower_path + 'angular-ui-calendar/src/calendar.js', 
 
     // datepicker
     bower_path + 'angular-datepicker/dist/angular-datepicker.min.css',

@@ -4,6 +4,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+import api.constants as constants
+
 from sprout_user import SproutUser
 
 import os
@@ -64,6 +66,8 @@ class Student(models.Model):
     picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
                                    blank=True, null=True,
                                    help_text="Student's Profile Picture")
+    grade_level = models.PositiveSmallIntegerField(blank=True, null=True,
+                                                   help_text="The student's grade level")
 
     class Meta:
         ordering = ('id',)
@@ -82,6 +86,24 @@ class Student(models.Model):
         return ret
 
 
+class ParentContactInfo(models.Model):
+    """
+    ParentContactInfo
+    Store the contact information for a student's parent or guardian
+    There may be more than one of this model per student to allow multiple parents/guardians
+    """
+    student = models.ForeignKey(Student, null=False,
+                                help_text="Student whoes parent or guardian has their contact information stored here")
+    first_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="Parent or guardian's first name")
+    last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                 help_text="Parent or guardian's last name")
+    email = models.EmailField(blank=True, null=True,
+                              help_text="Parent or guardian's email address")
+    phone = models.CharField(blank=True, null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Parent or guardian's phone number")
+
+
 class Section(models.Model):
     """
     Section
@@ -93,7 +115,7 @@ class Section(models.Model):
     term = models.ForeignKey(Term, on_delete=models.CASCADE,
                              help_text="Term this section takes place in")
     # Lookup the class schedule via term's TermSettings
-    schedule_position = models.IntegerField(blank=False,
+    schedule_position = models.IntegerField(blank=True, null=True,
                                             help_text="Relative position in the schedule this class takes place")
 
     class Meta:
@@ -119,6 +141,12 @@ class Enrollment(models.Model):
     class Meta:
         unique_together = (('section', 'student'),)
         ordering = ('section',)
+
+    def __repr__(self):
+        return "{student} in {section}".format(student=repr(self.student), section=repr(self.section))
+
+    def __str__(self):
+        return self.__repr__()
 
     def delete(self, using=None, keep_parents=False):
         """
@@ -150,6 +178,23 @@ class Behavior(models.Model):
         ordering = ('date',)
 
 
+class BehaviorNote(models.Model):
+    """
+    BehaviorNote
+    Record a free-text note about one student's behavior on a particular day (not tied to a class)
+    Note that it is allowed to have more than one note per student per day. This is intentional.
+    """
+    date = models.DateField(blank=False,
+                            help_text="Date to which this note applies")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=False,
+                                help_text="Student to whom this note corresponds")
+    body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                             help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+    class Meta:
+        ordering = ('date', )
+
+
 class AttendanceRecord(models.Model):
     """
     AttendanceRecord
@@ -166,24 +211,6 @@ class AttendanceRecord(models.Model):
 
     class Meta:
         unique_together = [('enrollment', 'date'),]
-
-class StandardizedTest(models.Model):
-    """
-    StandardizedTest
-    Represent a standardized test as enabled by the school
-    """
-    test_name = models.CharField(unique=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    min_score = models.IntegerField(verbose_name="Minimum possible score", blank=False)
-    max_score = models.IntegerField(verbose_name="Maximum possible score", blank=False)
-
-    class Meta:
-        ordering = ('id',)
-
-    def __repr__(self):
-        return str(self.test_name)
-
-    def __str__(self):
-        return self.__repr__();
 
 
 class StandardizedTestScore(models.Model):
@@ -358,6 +385,9 @@ class ServiceRequirement(models.Model):
     fulfilled_description = models.CharField(null=True, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
                                              help_text="How this service is fulfilled (max length {})".format(
                                                  settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+    type = models.IntegerField(null=False, blank=False,
+                               choices=constants.ServiceType.choices(),
+                               help_text="What type of service this is, as defined by constants.ServiceType")
 
     def __repr__(self):
         if self.fulfilled :

@@ -3,8 +3,8 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-StandardizedTest = namedtuple("StandardizedTest", ['test_name', 'min_score', 'max_score', 'id'])
-
+StandardizedTest = namedtuple("StandardizedTest", ['test_name', 'min_score', 'max_score', 'proficient_score', 'id'])
+StandardizedTest.__new__.__defaults__ = (None, None, )
 
 class StandardizedTestService(BaseService):
 

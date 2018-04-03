@@ -16,6 +16,13 @@
     border-radius: 4px 4px 0px 0px;
 }
 
+.panel.panel-no-tabs > .panel-heading {
+    padding: 15px;
+    background-color: #0b3c5d;
+    background: linear-gradient(to right, #0b3c5d, #105989);
+    border-radius: 4px 4px 4px 4px;
+}
+
 .panel.panel-tabs > .panel-heading > img, .panel.panel-tabs > .panel-heading > .panel-glyph {
     display: inline-block;
     float: left;
@@ -70,7 +77,7 @@
 .panel.panel-tabs .nav-tabs li {
     cursor: pointer;
 }
-    
+
 .panel.panel-tabs .nav-pills > li {
     float: none;
     display: inline-block;

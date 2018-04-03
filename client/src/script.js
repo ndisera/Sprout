@@ -8,6 +8,7 @@ var app = angular.module(
         'datePicker',
         'ui.sortable',
         'ngFileUpload',
+        'ui.calendar',
     ]
 );
 
@@ -28,7 +29,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         })
 
         .when('/manage', {
-            redirectTo: '/manage/classes',
+            redirectTo: '/manage/cases',
         })
 
         // route for the manage students page
@@ -351,6 +352,27 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             }
         })
 
+        .when('/student/:id/attendance', {
+            templateUrl: 'html/studentAttendance.html',
+            controller: 'studentAttendanceController',
+            resolve: {
+                data: function(attendanceService, $route) {
+                    return attendanceService.getStudentAttendance(
+                        {
+                            include: ['enrollment.*', 'enrollment.section.*'],
+                            filter: [{name: 'enrollment.student', val: $route.current.params.id}]
+                        }
+                    );
+                },
+                student: function(studentService, $route) {
+                    return studentService.getStudent($route.current.params.id);
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            }
+        })
+
         .when('/student/:id/ieps', {
             templateUrl: 'html/studentIeps.html',
             controller: 'studentIepsController',
@@ -524,13 +546,3 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         }
     });
 });
-
-
-
-
-
-
-
-
-
-
