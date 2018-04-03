@@ -212,8 +212,6 @@ class AttendanceRecord(models.Model):
                                   help_text="Short code of this attendance record, for digest viewing")
     description = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                   help_text="Human-readable description of this attendance record")
-    import_id = models.CharField(null=True, blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                                        help_text="ID as known by other importing LMS")
 
     class Meta:
         unique_together = [('enrollment', 'date'),]

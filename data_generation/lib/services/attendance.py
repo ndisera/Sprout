@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-AttendanceRecord = namedtuple("Attendance", ['enrollment', 'date', 'short_code', 'description', 'import_id', 'id', ])
+AttendanceRecord = namedtuple("Attendance", ['enrollment', 'date', 'short_code', 'description', 'id', ])
 AttendanceRecord.__new__.__defaults__= (None, ) # id is optional
 
 class AttendanceService(BaseService):
@@ -39,3 +39,21 @@ class AttendanceService(BaseService):
         :return:
         """
         return self._add_many_models(attendance_records, self.complete_uri)
+
+    def delete_attendance_record(self, attendance_record):
+        """
+        Delete an attendance record from the server
+
+        :param assignment: Attendance object to delete
+        :type assignment: AttendanceRecord
+        """
+        return self.delete_many_attendance_records(attendance_records=[attendance_record])
+
+    def delete_many_attendance_records(self, attendance_records):
+        """
+        Delete many attendance records from the server
+
+        :param attendance_records: Attendance records to delete
+        :type attendance_records: List of AttendanceRecord
+        """
+        return self._delete_many_models(attendance_records, self.complete_uri)
