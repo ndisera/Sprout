@@ -18,3 +18,7 @@
         height: 225px;
     }
 }
+
+.fc-unthemed td.fc-today {
+    background: #dbf0e7;
+}
