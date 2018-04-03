@@ -221,29 +221,34 @@ if __name__ == "__main__":
             year_id_len = len(year_id)
             split_term_id = row[csv_idx['import_id']][year_id_len:]
 
-            if split_term_id != '00':
-                # this is a term
-                # see if it's already in the db
-                filters = { 'import_id': row[csv_idx['import_id']], }
-                results = term_service.get_terms(filters)
+
+            # see if it's already in the db
+            filters = { 'import_id': row[csv_idx['import_id']], }
+            results = term_service.get_terms(filters)
+            if len(results) is 0:
+                # get the year this should belong to, import id of that year should be year_id followed by '00'
+                filters = { 'import_id': year_id + '00', }
+                results = settings_service.get_school_years(filters)
                 if len(results) is 0:
-                    # get the year this should belong to, import id of that year should be year_id followed by '00'
-                    filters = { 'import_id': year_id + '00', }
-                    results = settings_service.get_school_years(filters)
-                    if len(results) is 0:
-                        # that's not good
-                        sys.exit(files['terms'] + ' contained a term with a year id that wasn\'t in the csv file and didn\'t exist in the database')
-                    school_year = results[0]
-                    new_entry = Term(
-                            id=None,
-                            import_id=row[csv_idx['import_id']],
-                            name=school_year.title + ' ' + row[csv_idx['title']],
-                            start_date=str(datetime.datetime.strptime(row[csv_idx['start_date']], '%Y-%m-%d %H:%M:%S').date()),
-                            end_date=str(datetime.datetime.strptime(row[csv_idx['end_date']], '%Y-%m-%d %H:%M:%S').date()),
-                            settings=term_settings_id,
-                            school_year=school_year.id,
-                            )
-                    term_service.add_term(new_entry)
+                    # that's not good
+                    sys.exit(files['terms'] + ' contained a term with a year id that wasn\'t in the csv file and didn\'t exist in the database')
+                school_year = results[0]
+
+                # prefix term name with year if it's not the 'year term'
+                term_name = school_year.title
+                if school_year.import_id != row[csv_idx['import_id']]:
+                    term_name += (' ' + row[csv_idx['title']])
+
+                new_entry = Term(
+                        id=None,
+                        import_id=row[csv_idx['import_id']],
+                        name=term_name,
+                        start_date=str(datetime.datetime.strptime(row[csv_idx['start_date']], '%Y-%m-%d %H:%M:%S').date()),
+                        end_date=str(datetime.datetime.strptime(row[csv_idx['end_date']], '%Y-%m-%d %H:%M:%S').date()),
+                        settings=term_settings_id,
+                        school_year=school_year.id,
+                        )
+                term_service.add_term(new_entry)
 
     # teachers
     teachers_by_import = {}
