@@ -272,11 +272,11 @@ class GradeSerializer(DynamicModelSerializer):
         else:
             assignment = self.instance.assignment
 
-        if 'score' in validated_data:
-            # Make sure the score is not out of range
-            score = validated_data['score']
-            if score < assignment.score_min or score > assignment.score_max:
-                raise serializers.ValidationError({'score': 'Out of range for assignment with id {id}'.format(id=assignment.id)})
+        # if 'score' in validated_data:
+            # # Make sure the score is not out of range
+            # score = validated_data['score']
+            # if score < assignment.score_min or score > assignment.score_max:
+                # raise serializers.ValidationError({'score': 'Out of range for assignment with id {id}'.format(id=assignment.id)})
 
         # Check that the student is enrolled in the class to which the assignment belongs
         section = assignment.section
