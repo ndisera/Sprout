@@ -11,19 +11,15 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
     // order attendance by date
     $scope.sortedAttendance = _.sortBy($scope.attendance, 'date');
 
-    /**
-     * graph-related code
-     */
+    // graph-related code
     var graphStartDateKey = 'graphStartDate';
     var graphEndDateKey = 'graphEndDate';
 
-    // calculate first and last days of school week
+    // calculate first day of month and current day
     $scope[graphStartDateKey] = moment().startOf('month');
     $scope[graphEndDateKey] = moment();
 
-    // basically need to be able to display class name, message (tardy, absent, extracurricular, etc.), the date it takes place for the given student
-    // then probably include a donut graph of this at the top or bottom of the calendar
-
+    // calendar settings
     $scope.uiConfig = {
         calendar: {
             handleWindowResize: false,
@@ -41,23 +37,7 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
         }
     };
 
-    function populateEvents() {
-        _.each($scope.attendance, function(elem) {
-            var className = $scope.sectionsLookup[$scope.enrollmentsLookup[elem.enrollment].section].title;
-            var message = elem.description;
-            $scope.events.push({
-                title: className + ": " + message,
-                start: elem.date.substring(0, 10),
-                color: '#337ab7',
-                // color: '#57bc90',
-                // color: '#45B9BD',
-            });
-        });
-        $scope.eventSources = [$scope.events];
-    }
-
-    populateEvents();
-
+    // graph grouped by class
     $scope.classGraph = {
         data: [],
         labels: [],
@@ -82,6 +62,7 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
         },
     };
 
+    // graph grouped by type
     $scope.typeGraph = {
         data: [],
         labels: [],
@@ -106,7 +87,34 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
         },
     };
 
-    $scope.updateGraphs = function() {
+    // fill in the calendar
+    populateEvents();
+
+    // update the attendance charts
+    updateGraphs();
+
+    /**
+     * Sets up calendar events
+     */
+    function populateEvents() {
+        _.each($scope.attendance, function(elem) {
+            var className = $scope.sectionsLookup[$scope.enrollmentsLookup[elem.enrollment].section].title;
+            var message = elem.description;
+            $scope.events.push({
+                title: className + ": " + message,
+                start: elem.date.substring(0, 10),
+                color: '#337ab7',
+                // color: '#57bc90',
+                // color: '#45B9BD',
+            });
+        });
+        $scope.eventSources = [$scope.events];
+    }
+
+    /**
+     * Updates the attendance doughnut charts
+     */
+    function updateGraphs() {
         // grab between start date and end date
         var typeData = {};
         var classData = {};
@@ -152,11 +160,13 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
                 $scope.classGraph.data.push(classData[propertyName]);
             }
         }
-    };
+    }
 
-    // set default display data to this month
-    $scope.updateGraphs();
-
+    /**
+     * Updates datepickers and charts to reflect date change
+     * @param {string} varName - the scope variable name
+     * @param {date} newDate - the new date selected
+     */
     $scope.graphDateRangeChange = function(varName, newDate) {
         // update date
         $scope[varName] = newDate;
@@ -169,6 +179,6 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
             $scope.$broadcast('pickerUpdate', graphStartDateKey, { maxDate: $scope[graphEndDateKey] });
         }
 
-        $scope.updateGraphs();
+        updateGraphs();
     };
 });

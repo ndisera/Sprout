@@ -33,6 +33,7 @@
                                 <th>Last Name</th>
                                 <th>Student ID</th>
                                 <th>Birthday</th>
+                                <th>Grade</th>
                                 <th class="buttonColumn"></th>
                                 <th class="buttonColumn"></th>
                             </tr>
@@ -43,6 +44,7 @@
                                 <td>{{ student.last_name }}</td>
                                 <td>{{ student.student_id }}</td>
                                 <td>{{ student.birthdate }}</td>
+                                <td>{{ displayGrade(student.grade_level) }}</td>
                                 <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
                                 <td class="buttonColumn table-button-col">
                                     <button class="btn btn-danger btn-xs" type="button" ng-click="setStudentD(student); $event.stopPropagation();">
@@ -88,6 +90,12 @@
                         <input required autocomplete="off" type="text" date-time class="form-control" id="sbirthday" placeholder="Enter Birthday (Example: '1996-05-20')" name="sbirthday" ng-model="newStudent.birthdate" view="year" min-view="date" format="YYYY-MM-DD">
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-2" for="sgrade">Grade:</label>
+                    <div class="col-sm-10">
+                        <select required ng-model="newStudent.grade_level" ng-options="x for x in gradeLevels" id="sgrade" class="form-control"></select>
+                    </div>
+                </div>
                 <div class="form-group no-bottom-margin">
                     <div class="col-xs-12">
                         <div class="btn-manipulate-row">
@@ -117,21 +125,21 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-4" for="sfirstname2">First Name:</label>
+                        <label class="control-label col-sm-4" for="sname">Name:</label>
                         <div class="col-sm-8">
-                            <p class="form-control-static" id="sfirstname2">{{ studentD.first_name }}</p>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-4" for="slastname2">Last Name:</label>
-                        <div class="col-sm-8">
-                            <p class="form-control-static" id="slastname2">{{ studentD.last_name }}</p>
+                            <p class="form-control-static" id="sname">{{ studentD.first_name }} {{studentD.last_name}}</p>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-4" for="sbirthday2">Birthday:</label>
                         <div class="col-sm-8">
                             <p class="form-control-static" id="sbirthday2">{{ studentD.birthdate }}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="sgrade2">Grade:</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static" id="sgrade2">{{ displayGrade(studentD.grade_level) }}</p>
                         </div>
                     </div>
                 </form>

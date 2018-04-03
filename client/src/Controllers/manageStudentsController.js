@@ -7,6 +7,18 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
     $scope.studentD = {};
     $scope.newStudent = {};
     $scope.studentInfo = studentService.studentInfo;
+    $scope.gradeLevels = ["K", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+    /**
+     * Returns the display value for a student's grade level
+     * @param {number} grade - grade level.
+     */
+    $scope.displayGrade = function(grade) {
+        if (grade === 0) {
+            return "K";
+        }
+        return grade;
+    }
 
     /**
      * Extra part of error message
@@ -58,6 +70,9 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
      */
     $scope.addStudent = function() {
         $scope.newStudent.birthdate = moment($scope.newStudent.birthdate).format('YYYY-MM-DD').toString();
+        if ($scope.newStudent.grade_level === "K") {
+            $scope.newStudent.grade_level = 0;
+        }
         var studentPromise = studentService.addStudent($scope.newStudent);
         studentPromise.then(function success(data) {
             $scope.newStudent = {};
