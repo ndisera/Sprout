@@ -12,14 +12,15 @@ class AttendanceService(BaseService):
         super(AttendanceService, self).__init__(**kwargs)
         self.complete_uri = self.complete_uri_template.format(endpoint="/attendances/")
 
-    def get_attendances(self):
+    def get_attendances(self, params=None):
         """
-        Download a complete list of attendances
+        Download a complete list of attendances, with optional filters
 
+        :param params: dict representing filter_key -> filter_val
         :return: list of attendance objects
         :rtype: list[AttendanceRecord]
         """
-        return self._get_models(AttendanceRecord, self.complete_uri)
+        return self._get_models(AttendanceRecord, self.complete_uri, params=self._prepare_params(params))
 
     def add_attendance_record(self, attendance_record):
         """

@@ -25,20 +25,6 @@ class UsersService(BaseService):
         """
         return self._get_models(User, self.complete_list_uri)
 
-    def filter_users(self, filter_key, filter_val):
-        """
-        Get a user with a specified filter_val for filter_key
-
-        :param filter_key: key of property to filter
-        :param filter_val: value of property for which to filter
-        :return: list of user objects
-        :rtype: list[User]
-        """
-        # filter_key = "filter{" + filter_key + "}"
-        # params = { "filter{" + filter_key + "}": filter_val, }
-        params = { filter_key: filter_val, }
-        return self._get_models(User, self.complete_list_uri, params)
-
     def register_user(self, user, password=None, throw_error=True):
         """
         Register a user, optionally with a password

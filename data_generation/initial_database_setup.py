@@ -117,7 +117,6 @@ if __name__ == "__main__":
     school_year = SchoolYear(
         start_date=str(school_year_start),
         end_date=str(school_year_end),
-        num_terms=4,
         title="2017/18 School Year")
     response = settings_service.add_school_year(school_year)
     school_year_id = response.json()['school_years'][0]['id']

@@ -31,6 +31,19 @@ class BaseService():
                                                                        port_num=port_num,
                                                                        endpoint='{endpoint}')
 
+    def _prepare_params(self, params):
+        """
+        Convert params to dynamic_rest filtering scheme
+
+        :param params: dict representing filter_key -> filter_val
+        :return: dict{filter_key: filter_val}
+        """
+        filters = {}
+        if params is not None:
+            for key in params:
+                filters["filter{" + key + "}"] = params[key]
+        return filters
+
     def _get_models(self, model_type, uri, params=None):
         """
         Get all of some kind of model
@@ -95,3 +108,36 @@ class BaseService():
         response.raise_for_status()
 
         return response
+
+    def _delete_many_models(self, models, uri):
+        data = []
+
+        for model in models:
+            data.append({ 'id': model.id, })
+
+        data = json.dumps(data)
+
+        headers = self.headers
+        headers['content-type'] = 'application/json'
+
+        response = requests.delete(uri, verify=self.verify, headers=headers, data=data)
+
+        if response.status_code > 399:
+            print response.json()
+
+        response.raise_for_status()
+
+        return response
+
+
+
+
+
+
+
+
+
+
+
+
+

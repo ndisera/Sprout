@@ -12,14 +12,15 @@ class SectionService(BaseService):
         super(SectionService, self).__init__(**kwargs)
         self.complete_uri = self.complete_uri_template.format(endpoint="/sections/")
 
-    def get_sections(self):
+    def get_sections(self, params=None):
         """
-        Download a complete list of sections
+        Download a complete list of sections, with optional filters
 
+        :param params: dict representing filter_key -> filter_val
         :return: list of section objects
         :rtype: list[Section]
         """
-        return self._get_models(Section, self.complete_uri)
+        return self._get_models(Section, self.complete_uri, params=self._prepare_params(params))
 
     def add_section(self, section):
         """

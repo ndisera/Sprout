@@ -12,28 +12,15 @@ class StudentService(BaseService):
         super(StudentService, self).__init__(**kwargs)
         self.complete_uri = self.complete_uri_template.format(endpoint="/students/")
 
-    def get_students(self):
+    def get_students(self, params=None):
         """
-        Download a complete list of students
+        Download a complete list of students, with optional filter
 
+        :param params: dict representing filter_key -> filter_val
         :return: list of student objects
         :rtype: list[Student]
         """
-        return self._get_models(Student, self.complete_uri)
-
-    def filter_students(self, filter_key, filter_val):
-        """
-        Get a user with a specified filter_val for filter_key
-
-        :param filter_key: key of property to filter
-        :param filter_val: value of property for which to filter
-        :return: list of user objects
-        :rtype: list[User]
-        """
-        # filter_key = "filter{" + filter_key + "}"
-        params = { "filter{" + filter_key + "}": filter_val, }
-        # params = { filter_key: filter_val, }
-        return self._get_models(Student, self.complete_uri, params)
+        return self._get_models(Student, self.complete_uri, params=self._prepare_params(params))
 
     def add_student(self, student):
         """
