@@ -271,7 +271,7 @@ class Grade(models.Model):
     handin_datetime = models.DateTimeField(blank=False)
     late = models.BooleanField(blank=False, help_text="Whether the assignment was late")
     missing = models.BooleanField(blank=False, help_text="Whether the assignment is missing")
-    grade = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+    grade = models.CharField(blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                 help_text="Letter grade received")
 
     class Meta:
