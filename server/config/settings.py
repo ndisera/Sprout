@@ -182,14 +182,15 @@ PASSWORD_HASHERS = [
 ]
 
 # Email configuration
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 8025
 EMAIL_HOST_USER = 'sprout'
 EMAIL_HOST_PASSWORD = 'sprout'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'sprout@pimesh.club' # Need an MX record associated with the sender domain or most mail servers will bounce
 
 # Declare that we are using a custom user object
 AUTH_USER_MODEL = 'api.SproutUser'
@@ -197,6 +198,7 @@ ACCOUNT_USERNAME_REQUIRED=False
 ACCOUNT_USER_MODEL_USERNAME_FIELD=None
 ACCOUNT_EMAIL_REQUIRED=True
 ACCOUNT_AUTHENTICATION_METHOD='email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER' :  'api.serializers.SproutLoginSerializer',
