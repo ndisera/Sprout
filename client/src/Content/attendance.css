@@ -1,0 +1,24 @@
+/* .fc-day-grid-event > .fc-content {
+   white-space: normal;
+   overflow: hidden;
+} */
+
+.calendar-container {
+    min-width: 1000px;
+}
+
+@media (max-width: 767px) {
+    .doughnut-height {
+        height: 275px;
+    }
+}
+
+@media (min-width: 768px) {
+    .doughnut-height {
+        height: 225px;
+    }
+}
+
+.fc-unthemed td.fc-today {
+    background: #dbf0e7;
+}

@@ -2,6 +2,10 @@
     display: inline-block;
 }
 
+.form-glyph {
+    margin-top:2px;
+}
+
 .taskSelection {
     /*display: inline-block;*/
     float: right;
