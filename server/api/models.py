@@ -269,6 +269,21 @@ class Grade(models.Model):
         ordering = ('assignment',)
 
 
+class FinalGrade(models.Model):
+    """
+    FinalGrade
+    Represent the student's weighted score, assuming assignments don't all have the same weight,
+    and a letter grade
+    """
+    enrollment = models.ForeignKey(Enrollment, related_name='finalgrade_enrollment', on_delete=models.CASCADE,
+                                   unique=True,
+                                   help_text="The enrollment being graded")
+    final_percent = models.IntegerField(blank=False,
+                                        help_text="The weighted final grade for this enrollment")
+    letter_grade = models.CharField(null=True, max_length=3,
+                                    help_text="A codified representation of the grade, such as A-F or 1-5")
+
+
 class Notification(models.Model):
     """
     Notification
