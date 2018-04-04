@@ -68,8 +68,8 @@ class Student(models.Model):
     picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
                                    blank=True, null=True,
                                    help_text="Student's Profile Picture")
-    grade_level = models.PositiveSmallIntegerField(blank=True, null=True,
-                                                   help_text="The student's grade level")
+    grade_level = models.SmallIntegerField(blank=True, null=True,
+                                           help_text="The student's grade level")
 
     class Meta:
         ordering = ('id',)
@@ -277,6 +277,21 @@ class Grade(models.Model):
     class Meta:
         unique_together = (('assignment', 'student', 'handin_datetime'),)
         ordering = ('assignment',)
+
+
+class FinalGrade(models.Model):
+    """
+    FinalGrade
+    Represent the student's weighted score, assuming assignments don't all have the same weight,
+    and a letter grade
+    """
+    enrollment = models.OneToOneField(Enrollment, related_name='finalgrade_enrollment', on_delete=models.CASCADE,
+                                      unique=True,
+                                      help_text="The enrollment being graded")
+    final_percent = models.IntegerField(blank=False,
+                                        help_text="The weighted final grade for this enrollment")
+    letter_grade = models.CharField(null=True, max_length=3,
+                                    help_text="A codified representation of the grade, such as A-F or 1-5")
 
 
 class Notification(models.Model):

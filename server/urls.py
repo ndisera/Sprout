@@ -62,6 +62,8 @@ students_router.register('behaviors', viewset=BehaviorViewSet, base_name='studen
 students_router.register('behavior-notes', viewset=BehaviorNoteViewSet, base_name='student-behavior-notes', parents_query_lookups=['student'])
 # Add nested route for students' parents' contact info as /student/{pk}/parent-contact-info
 students_router.register('parent-contact-info', viewset=ParentContactInfoViewSet, base_name='student-parent_contact_info', parents_query_lookups=['student'])
+# Add nested route for student final grades as /student/{pk}/final-grades
+students_router.register('final-grades', viewset=FinalGradeViewSet, base_name='student-final-grades', parents_query_lookups=['enrollment__student'])
 
 # Add nested routes for iep notes as /student/{pk}/ieps/{pk}/notes
 iep_router.register('notes', viewset=IEPGoalNoteViewSet, base_name='iep-notes', parents_query_lookups=['goal__student', 'goal'])

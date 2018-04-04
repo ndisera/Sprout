@@ -291,6 +291,27 @@ class GradeSerializer(DynamicModelSerializer):
     student = DynamicRelationField('StudentSerializer')
 
 
+class FinalGradeSerializer(DynamicModelSerializer):
+    class Meta:
+        model = FinalGrade
+        fields = '__all__'
+    enrollment = DynamicRelationField('EnrollmentSerializer')
+
+    def validate_final_percent(self, final_percent):
+        """
+        Ensure the final_percent is in the valid range to be a percentage
+        """
+        if final_percent > 100 or final_percent < 0:
+            raise serializers.ValidationError('should be in the range 0-100')
+        return final_percent
+
+    def validate_letter_grade(self, letter_grade):
+        """
+        Normalize the letter grade to be capitalized
+        """
+        return letter_grade.upper()
+
+
 class SproutLoginSerializer(LoginSerializer):
     username = None
     email = serializers.EmailField(required=True)
@@ -391,6 +412,18 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
         fields.extend(('first_name', 'last_name', 'import_id', 'is_active', 'is_superuser'))
         if 'username' in fields:
             del fields[fields.index('username')]
+
+    def validate_is_superuser(self, is_superuser):
+        """
+        A user is not allowed to update their own superuser-ness
+        """
+
+        user = self.context['request'].user
+
+        if user == self.instance:
+            raise serializers.ValidationError("Not allowed to modify your own superuser-ness")
+
+        return is_superuser
 
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('sproutuserprofile', {})

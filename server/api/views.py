@@ -864,6 +864,53 @@ class GradeViewSet(NestedDynamicViewSet):
     ])
 
 
+class FinalGradeViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "FinalGrade" instances
+
+    list:
+    gets all the FinalGrade reports in Sprout
+
+    delete:
+    deletes the existing FinalGrade report specified by the path param
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FinalGradeSerializer
+    queryset = FinalGrade.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        Behaviors should only be visible:
+            - If the user teaches the related section
+            - If the user is the student's case manager
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(FinalGradeViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+        # Filter for the user teaches the section
+        teaches = Q(enrollment__section__teacher=user)
+        # Filter for other related students (only case manager at this time)
+        related = Q(enrollment__student__case_manager=user)
+        queryset = queryset.filter(teaches | related)
+        return queryset
+
+    """ ensure variables show as correct type for docs """
+    name_enrollment = 'enrollment'
+    desc_enrollment = 'ID of the graded enrollment (student and section)'
+    field_enrollment = coreapi.Field(
+            name=name_enrollment,
+            required=True,
+            location="form",
+            description=desc_enrollment,
+            schema=coreschema.Integer(title=name_enrollment))
+
+    schema = AutoSchema(manual_fields=[
+        field_enrollment,
+    ])
+
+
 class AuthVerifyView(generics.RetrieveAPIView):
     # If we ever add more authentication methods, this will need to be updated...
     authentication_classes = (JSONWebTokenAuthentication,)
