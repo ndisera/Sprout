@@ -409,6 +409,18 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
         if 'username' in fields:
             del fields[fields.index('username')]
 
+    def validate_is_superuser(self, is_superuser):
+        """
+        A user is not allowed to update their own superuser-ness
+        """
+
+        user = self.context['request'].user
+
+        if user == self.instance:
+            raise serializers.ValidationError("Not allowed to modify your own superuser-ness")
+
+        return is_superuser
+
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('sproutuserprofile', {})
         first_name = profile_data.get('first_name')
