@@ -30,10 +30,8 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
                 right: 'month,basicWeek,basicDay,listWeek'
             },
             editable: false,
-            eventLimit: 2,
-            // eventRedner: function(event, element) {
-            //     element.find('.fc-title').append("<br/>" + event.description);
-            // },
+            // does the little panel that doesn't work well the window size is smaller
+            //eventLimit: 2,
         }
     };
 
