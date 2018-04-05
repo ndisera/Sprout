@@ -28,13 +28,6 @@ source env/bin/activate
 # install api server dependencies
 pip install -r requirements.txt
 
-# Install Haraka SMTP server
-pushd haraka-smtp
-
-npm install
-
-popd # End Haraka setup
-
 # set up database
 python manage.py makemigrations
 python manage.py migrate
@@ -44,6 +37,14 @@ echo ""
 echo "Please enter credentials for the initial superuser"
 echo "(Ctrl-C to skip)"
 python manage.py createsuperuser
+deactivate # Leave the backend virtualenv
+
+# Install Haraka SMTP server
+pushd haraka-smtp
+
+npm install
+
+popd # End Haraka setup
 
 # FRONTEND SETUP
 # install the node dependencies
