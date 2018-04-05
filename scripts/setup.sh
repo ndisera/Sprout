@@ -19,10 +19,27 @@ if [ ! $? -eq 0 ]; then
 fi
 
 # set up the virtualenv
-cd "${SCRIPT_PATH}"/../server
+pushd "${SCRIPT_PATH}"/../server
 virtualenv env
+popd
+
+# Install Haraka SMTP server
+pushd "${SCRIPT_PATH}"/../server/haraka-smtp
+npm install
+popd # End Haraka setup
+
+# FRONTEND SETUP
+# install the node dependencies
+cd "${SCRIPT_PATH}"/../client
+pwd
+npm install
+
+cd src
+pwd
+"${SCRIPT_PATH}"/../client/node_modules/bower/bin/bower install
 
 # activate the virtualenv
+pushd "${SCRIPT_PATH}"/../server
 source env/bin/activate
 
 # install api server dependencies
@@ -38,20 +55,4 @@ echo "Please enter credentials for the initial superuser"
 echo "(Ctrl-C to skip)"
 python manage.py createsuperuser
 deactivate # Leave the backend virtualenv
-
-# Install Haraka SMTP server
-pushd haraka-smtp
-
-npm install
-
-popd # End Haraka setup
-
-# FRONTEND SETUP
-# install the node dependencies
-cd "${SCRIPT_PATH}"/../client
-pwd
-npm install
-
-cd src
-pwd
-"${SCRIPT_PATH}"/../client/node_modules/bower/bin/bower install
+popd
