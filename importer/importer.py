@@ -80,6 +80,18 @@ if __name__ == "__main__":
     grades_service = GradesService(**service_args)
     attendance_service = AttendanceService(**service_args)
 
+                    # new_substring = row[left_index + 1:right_index - 1].replace('\\', '\\\\').replace('"', r'\"').replace(',', r'\,')
+    def escape_string(string):
+        to_escape = [
+                ('\\', '\\\\'),
+                ('"', '\\"'),
+                (',', '\\,'),
+                ]
+
+        for seq in to_escape:
+            string = string.replace(seq[0], seq[1])
+        return string
+
     files = {
             'terms': 'terms.csv',
             'teachers': 'teachers.csv',
@@ -140,6 +152,31 @@ if __name__ == "__main__":
                 'YEARID': 'year_import_id',
                 },
             }
+
+    # preprocess assignments
+    with open(os.path.join(args.folder, files['assignments'])) as csvfile:
+        with open(os.path.join(args.folder, 'temp_' + files['assignments']), 'w+') as newcsvfile:
+
+            first_read = False
+            for row in csvfile:
+                if not first_read:
+                    first_read = True
+                    newcsvfile.write(row)
+                    continue
+
+                left_index = 0
+                right_index = len(row) - 1
+                for i in range(0, 2):
+                    left_index += (row[left_index:].find(',') + 1)
+                for i in range(0, 8):
+                    right_index = (row[:right_index].rfind(','))
+
+                if row[left_index] == '"' and row[right_index - 1] == '"':
+                    left_index += 1
+                    right_index -= 1
+
+                escaped_string = escape_string(row[left_index:right_index])
+                newcsvfile.write(row[:left_index] + escaped_string + row[right_index:])
 
     # school years
     with open(os.path.join(args.folder, files['terms'])) as csvfile:
@@ -394,9 +431,9 @@ if __name__ == "__main__":
                 enrollments_service.add_enrollment(new_entry)
 
     # assignments
-    with open(os.path.join(args.folder, files['assignments'])) as csvfile:
+    with open(os.path.join(args.folder, 'temp_' + files['assignments'])) as csvfile:
         print "Importing Assignments and Grades"
-        reader = csv.reader(csvfile, quoting=csv.QUOTE_NONE)
+        reader = csv.reader(csvfile, escapechar='\\')
         cleared_sections = Set()
 
         # set up the headers
@@ -404,6 +441,7 @@ if __name__ == "__main__":
         csv_idx = {}
         i = 0
         for header in first_row:
+            print header
             csv_idx[csv_headers['assignments'][header]] = i
             i += 1
 
