@@ -345,19 +345,25 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                         }
 
                         // at this point if the count isn't 0, store avg info
+                        $scope.behaviorAvgInfo[i] = {
+                            count: behaviorCount,
+                            sum: behaviorSum
+                        };
+                        $scope.effortAvgInfo[i] = {
+                            count: effortCount,
+                            sum: effortSum
+                        };
+
                         if (behaviorCount > 0) {
-                            $scope.behaviorAvgInfo[i] = {
-                                count: behaviorCount,
-                                sum: behaviorSum
-                            };
                             $scope.avgBehaviorGraph.data[0][i] = behaviorSum / behaviorCount;
+                        } else {
+                            $scope.avgBehaviorGraph.data[0][i] = null;
                         }
+
                         if (effortCount > 0) {
-                            $scope.effortAvgInfo[i] = {
-                                count: effortCount,
-                                sum: effortSum
-                            };
                             $scope.avgEffortGraph.data[0][i] = effortSum / effortCount;
+                        } else {
+                            $scope.avgEffortGraph.data[0][i] = null;
                         }
                     }
 
@@ -521,9 +527,15 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                                 $scope.behaviorAvgInfo[dateIndex].sum -= $scope.behaviorGraph.data[index][dateIndex];
                                 setNewAvg($scope.avgBehaviorGraph, $scope.behaviorAvgInfo, dateIndex);
                             } else {
-                                $scope.behaviorAvgInfo[dateIndex].sum -= $scope.behaviorGraph.data[index][dateIndex];
-                                $scope.behaviorAvgInfo[dateIndex].sum += updatedEntry.behavior;
-                                setNewAvg($scope.avgBehaviorGraph, $scope.behaviorAvgInfo, dateIndex);
+                                if ($scope.behaviorGraph.data[index][dateIndex] === null) {
+                                    $scope.behaviorAvgInfo[dateIndex].count++;
+                                    $scope.behaviorAvgInfo[dateIndex].sum += updatedEntry.behavior;
+                                    setNewAvg($scope.avgBehaviorGraph, $scope.behaviorAvgInfo, dateIndex);
+                                } else {
+                                    $scope.behaviorAvgInfo[dateIndex].sum -= $scope.behaviorGraph.data[index][dateIndex];
+                                    $scope.behaviorAvgInfo[dateIndex].sum += updatedEntry.behavior;
+                                    setNewAvg($scope.avgBehaviorGraph, $scope.behaviorAvgInfo, dateIndex);
+                                }
                             }
 
                             $scope.behaviorGraph.data[index][dateIndex] = updatedEntry.behavior;
@@ -534,9 +546,15 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                                 $scope.effortAvgInfo[dateIndex].sum -= $scope.effortGraph.data[index][dateIndex];
                                 setNewAvg($scope.avgEffortGraph, $scope.effortAvgInfo, dateIndex);
                             } else {
-                                $scope.effortAvgInfo[dateIndex].sum -= $scope.effortGraph.data[index][dateIndex];
-                                $scope.effortAvgInfo[dateIndex].sum += updatedEntry.effort;
-                                setNewAvg($scope.avgEffortGraph, $scope.effortAvgInfo, dateIndex);
+                                if ($scope.effortGraph.data[index][dateIndex] === null) {
+                                    $scope.effortAvgInfo[dateIndex].count++;
+                                    $scope.effortAvgInfo[dateIndex].sum += updatedEntry.effort;
+                                    setNewAvg($scope.avgEffortGraph, $scope.effortAvgInfo, dateIndex);
+                                } else {
+                                    $scope.effortAvgInfo[dateIndex].sum -= $scope.effortGraph.data[index][dateIndex];
+                                    $scope.effortAvgInfo[dateIndex].sum += updatedEntry.effort;
+                                    setNewAvg($scope.avgEffortGraph, $scope.effortAvgInfo, dateIndex);
+                                }
                             }
 
                             $scope.effortGraph.data[index][dateIndex] = updatedEntry.effort;
