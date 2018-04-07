@@ -35,9 +35,19 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
 
             // classOptions for report
             $scope.classOptions = [];
-            $scope.classOptions.push({id: null, title: "All Classes"});
+            $scope.classOptions.push({
+                id: null,
+                title: "Average"
+            });
+            $scope.classOptions.push({
+                id: null,
+                title: "All Classes"
+            });
             _.each($scope.sections, function(elem) {
-                $scope.classOptions.push({id: elem.id, title: elem.title});
+                $scope.classOptions.push({
+                    id: elem.id,
+                    title: elem.title
+                });
             });
         }
     }
@@ -204,11 +214,11 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         options: _.clone($scope.avgGraphOptions),
     };
     $scope.singleBehaviorGraph = {
-        data: [],
+        data: [[]],
         options: _.clone($scope.avgGraphOptions),
     };
     $scope.singleEffortGraph = {
-        data: [],
+        data: [[]],
         options: _.clone($scope.avgGraphOptions),
     };
 
@@ -631,16 +641,59 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
      */
     $scope.openReportForm = function() {
         $("#generateReportModal").modal();
-        $scope.test = true;
+        if ($scope.report.class != null) {
+            $scope.updateClassGraphs();
+        }
     };
+
+    /**
+     * Fills individual class graph data with data from the parent graph 
+     * @param {object} graph - individual class graph
+     * @param {object} dataGraph - parent graph
+     */
+    function fillGraphData(graph, dataGraph) {
+        _.each(dataGraph.data[$scope.sectionToDataIndex[$scope.report.class.id]], function(elem) {
+            graph.data[0].push(elem);
+        });
+    }
 
     /**
      * Updates the class graphs with data from the chosen class
      */
     $scope.updateClassGraphs = function() {
-        if ($scope.report.class.title !== "All Classes") {
-            $scope.singleBehaviorGraph.data = [$scope.behaviorGraph.data[$scope.sectionToDataIndex[$scope.report.class.id]]];
-            $scope.singleEffortGraph.data = [$scope.effortGraph.data[$scope.sectionToDataIndex[$scope.report.class.id]]];
+        // this needs to be called on create report button as well
+        if ($scope.sectionToDataIndex.hasOwnProperty($scope.report.class.id) && $scope.report.class.title !== "All Classes" && $scope.report.class.title !== "Average") {
+            $scope.showClass = true;
+            $scope.singleBehaviorGraph.data[0] = [];
+            $scope.singleEffortGraph.data[0] = [];
+            fillGraphData($scope.singleBehaviorGraph, $scope.behaviorGraph);
+            fillGraphData($scope.singleEffortGraph, $scope.effortGraph);
+        } else if ($scope.report.class.title !== "All Classes" && $scope.report.class.title !== "Average") {
+            $scope.showClass = true;
+            $scope.singleBehaviorGraph.data[0] = [];
+            $scope.singleEffortGraph.data[0] = [];
+        } else {
+            $scope.showClass = false;
+        }
+    }
+
+    /**
+     * Calculates the sums and counts for the report graphs
+     * @param {object} behaviorGraph - the report behavior graph
+     * @param {object} effortGraph - the report effort graph
+     */
+    function setCalcAvgInfo(behaviorGraph, effortGraph) {
+        // only display classes that are in this date range...
+        $scope.report.length = behaviorGraph.data[0];
+        for (var i = 0; i < $scope.report.length; i++) {
+            if (behaviorGraph.data[0][i] !== null) {
+                $scope.report.behaviorSum += behaviorGraph.data[0][i];
+                $scope.report.behaviorCount++;
+            }
+            if (effortGraph.data[0][i] !== null) {
+                $scope.report.effortSum += effortGraph.data[0][i];
+                $scope.report.effortCount++;
+            }
         }
     }
 
@@ -648,56 +701,40 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
      * Downloads a report pdf
      */
     $scope.generateReport = function() {
-        var behaviorSum = 0;
-        var effortSum = 0;
-        var behaviorCount = 0;
-        var effortCount = 0;
-        var length = 0;
+        $scope.report.behaviorSum = 0;
+        $scope.report.effortSum = 0;
+        $scope.report.behaviorCount = 0;
+        $scope.report.effortCount = 0;
+        $scope.report.length = 0;
+
         var behaviorCanvas = null;
         var effortCanvas = null;
         var behaviorAvg = "N/A";
         var effortAvg = "N/A";
 
-        if ($scope.report.class.title === "All Classes") {
-            behaviorCanvas = document.getElementById('student_avg_behavior');
-            effortCanvas = document.getElementById('student_avg_effort');
+        if ($scope.report.class.title === "Average") {
+            behaviorCanvas = document.getElementById('report_student_avg_behavior');
+            effortCanvas = document.getElementById('report_student_avg_effort');
 
-            // length of behavior and effort are same
-            length = $scope.avgBehaviorGraph.data[0].length;
-            for (var i = 0; i < length; i++) {
-                if ($scope.avgBehaviorGraph.data[0][i] !== null) {
-                    behaviorSum += $scope.avgBehaviorGraph.data[0][i];
-                    behaviorCount++;
-                }
-                if ($scope.avgEffortGraph.data[0][i] !== null) {
-                    effortSum += $scope.avgEffortGraph.data[0][i];
-                    effortCount++;
-                }
-            }
+            setCalcAvgInfo($scope.avgBehaviorGraph, $scope.avgEffortGraph);
+        } else if ($scope.report.class.title === "All Classes") {
+            behaviorCanvas = document.getElementById('report_student_behavior');
+            effortCanvas = document.getElementById('report_student_effort');
+
+            setCalcAvgInfo($scope.behaviorGraph, $scope.effortGraph);
         } else {
             // now create chart..., maybe using ng-hide will work for this? I hate this...
-            behaviorCanvas = document.getElementById('student_class_behavior');
-            effortCanvas = document.getElementById('student_class_effort');
+            behaviorCanvas = document.getElementById('report_student_class_behavior');
+            effortCanvas = document.getElementById('report_student_class_effort');
 
-            // length of behavior and effort are same
-            length = $scope.singleBehaviorGraph.data[0].length;
-            for (var i = 0; i < length; i++) {
-                if ($scope.singleBehaviorGraph.data[0][i] !== null) {
-                    behaviorSum += $scope.singleBehaviorGraph.data[0][i];
-                    behaviorCount++;
-                }
-                if ($scope.singleEffortGraph.data[0][i] !== null) {
-                    effortSum += $scope.singleEffortGraph.data[0][i];
-                    effortCount++;
-                }
-            }
+            setCalcAvgInfo($scope.singleBehaviorGraph, $scope.singleEffortGraph);
         }
 
-        if (behaviorCount > 0) {
-            behaviorAvg = Math.round(behaviorSum / behaviorCount * 100) / 100 + "";
+        if ($scope.report.behaviorCount > 0) {
+            behaviorAvg = Math.round($scope.report.behaviorSum / $scope.report.behaviorCount * 100) / 100 + "";
         }
-        if (effortCount > 0) {
-            effortAvg = Math.round(effortSum / effortCount * 100) / 100 + "";
+        if ($scope.report.effortCount > 0) {
+            effortAvg = Math.round($scope.report.effortSum / $scope.report.effortCount * 100) / 100 + "";
         }
 
         var behaviorImgData = behaviorCanvas.toDataURL("image/jpeg", 1.0);
@@ -707,23 +744,35 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         var startDate = moment($scope.graphStartDate).format('YYYY-MM-DD').toString();
         var endDate = moment($scope.graphEndDate).format('YYYY-MM-DD').toString();
 
+        // 568, 150 (height won't change)
+        // About 700 looks to be max
+        // Will alter to fit pdf and place average scores above or below (don't know how to center the other way)
+        // if I don't have a center image method, I can just do center - half of image width
+        var width = behaviorCanvas.width * 0.26;
+        var height = behaviorCanvas.height * 0.26;
+
         doc.setFontSize(26);
         doc.text(105, 25, 'Behavior and Effort Report', 'center');
         doc.text(105, 40, 'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + ' in ' + $scope.report.class.title, 'center');
         doc.text(105, 55, startDate + " to " + endDate, 'center');
-        doc.text(25, 115, 'Behavior', 'center');
-        doc.text(25, 125, behaviorAvg, 'center');
-        doc.addImage(behaviorImgData, 'JPEG', 50, 80, 145, 80);
-        doc.text(25, 225, 'Effort', 'center');
-        doc.text(25, 235, effortAvg, 'center');
-        doc.addImage(effortImgData, 'JPEG', 50, 190, 145, 80);
+        // doc.text(25, 115, 'Behavior', 'center');
+        // doc.text(25, 125, behaviorAvg, 'center');
+        doc.addImage(behaviorImgData, 'JPEG', 105 - width / 2, 80, width, height);
+        // doc.text(25, 225, 'Effort', 'center');
+        // doc.text(25, 235, effortAvg, 'center');
+        doc.addImage(effortImgData, 'JPEG', 105 - width / 2, 190, width, height);
+        // the max width it should be is 180
+        // so 0.26 * width
+        // find a decent height to go with that
+        // var width = 200;
+        // doc.addImage(imgData, 'JPEG', 105 - width / 2, 40, 0.26 * width, 160);
+
         // doc.save($scope.student.first_name + $scope.student.last_name + '.pdf');
         doc.save('test.pdf');
         // clear report obj
         $scope.report = {};
 
         // close modal here since data-dismiss isn't working
-        $scope.test = false;
         $('#generateReportModal').modal('toggle');
     };
 
@@ -741,5 +790,8 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
      */
     updateGraph();
     updateInputScores();
-    $scope.test = false;
+    $scope.average = false;
+    $scope.graphDisplayOptions = ["Average", "All Classes"];
+    $scope.behaviorGraphSelection = "All Classes";
+    $scope.effortGraphSelection = "All Classes";
 });

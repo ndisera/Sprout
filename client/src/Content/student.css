@@ -159,6 +159,9 @@
 .student-behaviors-graph {
     height: 300px;
 }
+.student-behaviors-report-graph {
+    height: 150px;
+}
 
 .student-services-panel .form-control-static {
     display: inline-block;
@@ -310,4 +313,3 @@
 #student-services-add-btn.btn-manipulate-row-bottom {
     margin-top: 20px;
 }
-
