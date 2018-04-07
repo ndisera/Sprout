@@ -9,6 +9,7 @@ import sys
 import csv
 import random
 import math
+import urllib3
 
 from sets import Set
 
@@ -30,7 +31,21 @@ from lib.services.assignment import Assignment, AssignmentService
 from lib.services.grades import Grade, GradesService
 from lib.services.attendance import AttendanceRecord, AttendanceService
 
+def escape_string(string):
+    to_escape = [
+            ('\\', '\\\\'),
+            ('"', '\\"'),
+            (',', '\\,'),
+            ]
+
+    for seq in to_escape:
+        string = string.replace(seq[0], seq[1])
+    return string
+
 if __name__ == "__main__":
+    # disable annoying warnings
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     parser = argparse.ArgumentParser(description="Import csv data to Sprout")
     parser.add_argument("--protocol", action='store', default='https', type=str,
                         help="protocol to use (default: https)")
@@ -79,18 +94,6 @@ if __name__ == "__main__":
     assignments_service = AssignmentService(**service_args)
     grades_service = GradesService(**service_args)
     attendance_service = AttendanceService(**service_args)
-
-                    # new_substring = row[left_index + 1:right_index - 1].replace('\\', '\\\\').replace('"', r'\"').replace(',', r'\,')
-    def escape_string(string):
-        to_escape = [
-                ('\\', '\\\\'),
-                ('"', '\\"'),
-                (',', '\\,'),
-                ]
-
-        for seq in to_escape:
-            string = string.replace(seq[0], seq[1])
-        return string
 
     files = {
             'terms': 'terms.csv',
@@ -156,6 +159,7 @@ if __name__ == "__main__":
     # preprocess assignments
     with open(os.path.join(args.folder, files['assignments'])) as csvfile:
         with open(os.path.join(args.folder, 'temp_' + files['assignments']), 'w+') as newcsvfile:
+            print 'pre-processing csv\'s...'
 
             first_read = False
             for row in csvfile:
@@ -177,10 +181,12 @@ if __name__ == "__main__":
 
                 escaped_string = escape_string(row[left_index:right_index])
                 newcsvfile.write(row[:left_index] + escaped_string + row[right_index:])
+            print 'done pre-processing csv\'s'
+            print ''
 
     # school years
     with open(os.path.join(args.folder, files['terms'])) as csvfile:
-        print "Importing School Years"
+        print 'importing school years...'
         reader = csv.reader(csvfile)
 
         # set up the headers
@@ -196,6 +202,10 @@ if __name__ == "__main__":
             # check to see if I'm on a new year entry
             # year's import_id should be it's year id followed by '00'
             year_id = row[csv_idx['year_id']]
+
+            print 'importing year ' + year_id + '\r',
+            sys.stdout.flush()
+
             year_id_len = len(year_id)
             split_year_id = row[csv_idx['import_id']][:year_id_len]
             split_term_id = row[csv_idx['import_id']][year_id_len:]
@@ -213,10 +223,12 @@ if __name__ == "__main__":
                             end_date=str(datetime.datetime.strptime(row[csv_idx['end_date']], '%Y-%m-%d %H:%M:%S').date())
                             )
                     settings_service.add_school_year(new_entry)
+        print 'done importing school years          \r'
+        print ''
 
     # terms
     with open(os.path.join(args.folder, files['terms'])) as csvfile:
-        print "Importing Terms"
+        print 'importing terms...'
 
         # find or create the term_settings object to use
         schedule_id = -1
@@ -252,6 +264,9 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
+            print 'importing school term ' + row[csv_idx['import_id']] + '\r',
+            sys.stdout.flush()
+
             # check to see if I'm on a new year entry
             # year's import_id should be it's year id followed by '00'
             year_id = row[csv_idx['year_id']]
@@ -286,11 +301,13 @@ if __name__ == "__main__":
                         school_year=school_year.id,
                         )
                 term_service.add_term(new_entry)
+        print 'done importing terms          \r'
+        print ''
 
     # teachers
     teachers_by_import = {}
     with open(os.path.join(args.folder, files['teachers'])) as csvfile:
-        print "Importing Teachers"
+        print 'importing teachers...'
 
         # build import_id lookup
         db_results = users_service.get_users()
@@ -310,6 +327,9 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
+            print 'importing teacher ' + row[csv_idx['import_id']] + '\r',
+            sys.stdout.flush()
+
             if row[csv_idx['import_id']] not in teachers_by_import:
                 new_entry = User(pk=None,
                                 is_active=None,
@@ -323,9 +343,12 @@ if __name__ == "__main__":
                     new_teacher = User(**response.json()['user'])
                     teachers_by_import[new_teacher.import_id] = new_teacher
 
+        print 'done importing teachers          \r'
+        print ''
+
     # students
     with open(os.path.join(args.folder, files['students'])) as csvfile:
-        print "Importing Students"
+        print 'importing students...'
         reader = csv.reader(csvfile)
 
         # set up the headers
@@ -338,6 +361,9 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
+            print 'importing student ' + row[csv_idx['student_id']] + '\r',
+            sys.stdout.flush()
+
             filters = { 'student_id': row[csv_idx['student_id']], }
             results = student_service.get_students(filters)
             if len(results) is 0:
@@ -353,10 +379,12 @@ if __name__ == "__main__":
                         id=None,
                         )
                 student_service.add_student(new_entry)
+        print 'done importing students          \r'
+        print ''
 
     # sections
     with open(os.path.join(args.folder, files['enrollments'])) as csvfile:
-        print "Importing Classes"
+        print 'importing sections...'
         reader = csv.reader(csvfile)
 
         # set up the headers
@@ -369,6 +397,9 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
+            print 'importing section ' + row[csv_idx['section_import_id']] + '\r',
+            sys.stdout.flush()
+
             filters = { 'import_id': row[csv_idx['section_import_id']], }
             results = sections_service.get_sections(filters)
             if len(results) is 0:
@@ -394,10 +425,12 @@ if __name__ == "__main__":
                         schedule_position=None,
                         )
                 sections_service.add_section(new_entry)
+        print 'done importing sections          \r'
+        print ''
 
     # enrollments
     with open(os.path.join(args.folder, files['enrollments'])) as csvfile:
-        print "Importing Student Enrollments"
+        print 'importing student enrollments...'
         reader = csv.reader(csvfile)
 
         # set up the headers
@@ -410,6 +443,9 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
+            print 'importing enrollment for student ' + row[csv_idx['student_id']] + ' in section ' + row[csv_idx['section_import_id']] + '\r',
+            sys.stdout.flush()
+
             filters = { 'section.import_id': row[csv_idx['section_import_id']], 'student.student_id': row[csv_idx['student_id']], }
             results = enrollments_service.get_enrollments(filters)
             if len(results) is 0:
@@ -429,10 +465,12 @@ if __name__ == "__main__":
 
                 new_entry = Enrollment(id=None, section=section.id, student=student.id)
                 enrollments_service.add_enrollment(new_entry)
+        print 'done importing enrollments                                                 \r'
+        print ''
 
     # assignments
     with open(os.path.join(args.folder, 'temp_' + files['assignments'])) as csvfile:
-        print "Importing Assignments and Grades"
+        print 'importing assignments and grades...'
         reader = csv.reader(csvfile, escapechar='\\')
         cleared_sections = Set()
 
@@ -441,14 +479,14 @@ if __name__ == "__main__":
         csv_idx = {}
         i = 0
         for header in first_row:
-            print header
             csv_idx[csv_headers['assignments'][header]] = i
             i += 1
 
         # read in rows
         for row in reader:
-            print "***** ASSIGNMENT *****"
-            print row
+            print 'importing assignment ' + row[csv_idx['assignment_import_id']] + ' for student ' + row[csv_idx['student_id']] + '\r',
+            sys.stdout.flush()
+
             # get the section
             filters = { 'import_id': row[csv_idx['section_import_id']], }
             section_results = sections_service.get_sections(filters)
@@ -511,10 +549,12 @@ if __name__ == "__main__":
                             missing=(row[csv_idx['missing']] == '1'),
                             )
             grades_service.add_grade(new_grade, student=student.id)
+        print 'done importing assignments and grades                               \r'
+        print ''
 
     # attendances
     with open(os.path.join(args.folder, files['attendance'])) as csvfile:
-        print "Importing Attendance"
+        print 'importing attendance...'
         reader = csv.reader(csvfile)
         cleared_enrollments = Set()
 
@@ -526,13 +566,21 @@ if __name__ == "__main__":
             csv_idx[csv_headers['attendance'][header]] = i
             i += 1
 
+        missing_enrollments = 0
+
         # read in rows
         for row in reader:
+            print 'importing attendance for student ' + row[csv_idx['student_id']] + ' for section ' + row[csv_idx['section_import_id']] + '\r',
+            sys.stdout.flush()
+
             # get the enrollment
             filters = { 'student.student_id': row[csv_idx['student_id']], 'section.import_id': row[csv_idx['section_import_id']], }
             enrollment_results = enrollments_service.get_enrollments(params=filters)
             if len(enrollment_results) is 0:
-                sys.exit(files['attendance'] + ' contained an attendance with an enrollment (student and section) that wasn\'t in the csv files and didn\'t exist in the database')
+                missing_enrollments += 1
+                continue
+                # sys.exit(files['attendance'] + ' contained an attendance with an enrollment (student and section) that wasn\'t in the csv files and didn\'t exist in the database')
+
             enrollment = enrollment_results[0]
 
             # get and delete all the attendances for this enrollment
@@ -556,4 +604,8 @@ if __name__ == "__main__":
                                             )
             attendance_service.add_attendance_record(new_attendance_record)
 
-    print "Done Importing"
+    print 'done importing attendance                                                  \r'
+    if missing_enrollments > 0:
+        print files['attendance'] + ' had ' + str(missing_enrollments) + ' enrollments that weren\'t in the csv files and didn\'t exist in the database. They weren\'t added.'
+    print ''
+    print 'done importing'
