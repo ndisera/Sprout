@@ -61,6 +61,9 @@ const include_paths = [
 	
 	// angular calendar directive
 	bower_path + 'angular-ui-calendar/src/calendar.js', 
+	
+	// pdf
+	bower_path + 'jspdf/dist/jspdf.min.js',
 
     // datepicker
     bower_path + 'angular-datepicker/dist/angular-datepicker.min.css',

@@ -1,44 +1,55 @@
-app.controller("studentBehaviorsController", function ($scope, $routeParams, $location, toastService, behaviorService, data, terms, student) {
+app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, behaviorService, data, terms, student) {
     $scope.location = $location;
 
+    $scope.report = {};
+
     // I know this will be here, because I filtered on the student ID, and only that student
-    $scope.student               = student.student;
-    $scope.enrollments           = [];
-    $scope.enrollmentsLookup     = {};
+    $scope.student = student.student;
+    $scope.enrollments = [];
+    $scope.enrollmentsLookup = {};
     $scope.sectionsToEnrollments = {};
 
-    $scope.sections              = [];
-    $scope.sectionsLookup        = {};
+    $scope.sections = [];
+    $scope.sectionsLookup = {};
 
-    $scope.terms                 = [];
+    $scope.terms = [];
     // each subarray represents term and has all sections in that term (array to preserve order, and term id not sequential)
-    $scope.sectionsByTerm        = [];
+    $scope.sectionsByTerm = [];
     // will give index into sectionsByTerm if given a term id
-    $scope.termToSectionsByTerm  = {};
+    $scope.termToSectionsByTerm = {};
     // will give index into graph's data array if given section id
-    $scope.sectionToDataIndex    = {};
+    $scope.sectionToDataIndex = {};
 
-    if(data !== null && data !== undefined) {
-        if(data.enrollments !== null && data.enrollments !== undefined) {
+    if (data !== null && data !== undefined) {
+        if (data.enrollments !== null && data.enrollments !== undefined) {
             $scope.enrollments = data.enrollments;
             // set up lookup for enrollments
-            $scope.enrollmentsLookup     = _.indexBy(data.enrollments, 'id');
+            $scope.enrollmentsLookup = _.indexBy(data.enrollments, 'id');
             $scope.sectionsToEnrollments = _.indexBy(data.enrollments, 'section');
         }
-        if(data.sections !== null && data.sections !== undefined) {
+        if (data.sections !== null && data.sections !== undefined) {
             $scope.sections = data.sections;
             // for now, sort sections alphabetically
-            $scope.sections       = _.sortBy(data.sections, 'title');
+            $scope.sections = _.sortBy(data.sections, 'title');
             $scope.sectionsLookup = _.indexBy(data.sections, 'id');
+
+            // classOptions for report
+            $scope.classOptions = [];
+            $scope.classOptions.push({id: null, title: "All Classes"});
+            _.each($scope.sections, function(elem) {
+                $scope.classOptions.push({id: elem.id, title: elem.title});
+            });
         }
     }
-    if(terms !== null && terms !== undefined && terms.terms !== null && terms.terms !== undefined) {
+    if (terms !== null && terms !== undefined && terms.terms !== null && terms.terms !== undefined) {
         $scope.terms = terms.terms;
         _.each($scope.terms, function(elem) {
             elem.start_date = moment(elem.start_date);
-            elem.end_date   = moment(elem.end_date);
+            elem.end_date = moment(elem.end_date);
         });
-        $scope.terms = _.sortBy($scope.terms, function(elem) { return -elem.start_date; });
+        $scope.terms = _.sortBy($scope.terms, function(elem) {
+            return -elem.start_date;
+        });
     }
 
     // set up term-lookup variables
@@ -58,9 +69,9 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
             // endDate in the middle of the term
             // startDate and endDate between term dates taken care of by above
             // term dates between startDate and endDate
-            if(startDate >= elem.start_date && startDate <= elem.end_date
-                || endDate >= elem.start_date && endDate <= elem.end_date
-                || startDate <= elem.start_date && endDate >= elem.end_date) {
+            if (startDate >= elem.start_date && startDate <= elem.end_date ||
+                endDate >= elem.start_date && endDate <= elem.end_date ||
+                startDate <= elem.start_date && endDate >= elem.end_date) {
                 includedTerms.push(elem.id);
             }
         });
@@ -71,7 +82,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
         var includedTerms = [];
         _.each(terms, function(elem) {
             // is the date between term start/end
-            if(date >= elem.start_date && date <= elem.end_date) {
+            if (date >= elem.start_date && date <= elem.end_date) {
                 includedTerms.push(elem.id);
             }
         });
@@ -82,43 +93,40 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
      * graph-related code
      */
     var graphStartDateKey = 'graphStartDate';
-    var graphEndDateKey   = 'graphEndDate';
+    var graphEndDateKey = 'graphEndDate';
 
     // calculate first and last days of school week
     $scope[graphStartDateKey] = moment().startOf('isoWeek');
-    $scope[graphEndDateKey]   = moment().startOf('isoWeek').add(4, 'd');
+    $scope[graphEndDateKey] = moment().startOf('isoWeek').add(4, 'd');
 
     //TODO(gzuber): there must be a better way to do this...
     function legendClick(e, legendItem) {
         var index = legendItem.datasetIndex;
         var value = true;
-        if(this.chart.options.graph === 'behavior') {
-            if($scope.activeBehaviorLegendItem === index) {
+        if (this.chart.options.graph === 'behavior') {
+            if ($scope.activeBehaviorLegendItem === index) {
                 value = null;
                 $scope.activeBehaviorLegendItem = null;
-            }
-            else {
+            } else {
                 $scope.activeBehaviorLegendItem = index;
             }
         }
-        if(this.chart.options.graph === 'effort') {
-            if($scope.activeEffortLegendItem === index) {
+        if (this.chart.options.graph === 'effort') {
+            if ($scope.activeEffortLegendItem === index) {
                 value = null;
                 $scope.activeEffortLegendItem = null;
-            }
-            else {
+            } else {
                 $scope.activeEffortLegendItem = index;
             }
         }
 
         var i = 0;
         var cont = true;
-        while(cont) {
+        while (cont) {
             try {
                 this.chart.getDatasetMeta(i).hidden = value;
                 i++;
-            }
-            catch(err) {
+            } catch (err) {
                 cont = false;
             }
         }
@@ -148,13 +156,35 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                     }
                 }]
             },
-            legend:
-            {
+            legend: {
                 onClick: legendClick,
                 display: true,
             }
         },
     };
+
+    $scope.avgGraphOptions = {
+        elements: {
+            line: {
+                fill: false,
+            },
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            yAxes: [{
+                display: true,
+                ticks: {
+                    min: 0,
+                    stepSize: 1,
+                    max: 5
+                }
+            }]
+        },
+        legend: {
+            display: false,
+        }
+    }
 
     // start off the two graphs with empty datasets
     $scope.behaviorGraph = {
@@ -165,9 +195,28 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
         data: [],
         options: _.clone($scope.sharedGraph.options),
     };
+    $scope.avgBehaviorGraph = {
+        data: [],
+        options: _.clone($scope.avgGraphOptions),
+    };
+    $scope.avgEffortGraph = {
+        data: [],
+        options: _.clone($scope.avgGraphOptions),
+    };
+    $scope.singleBehaviorGraph = {
+        data: [],
+        options: _.clone($scope.avgGraphOptions),
+    };
+    $scope.singleEffortGraph = {
+        data: [],
+        options: _.clone($scope.avgGraphOptions),
+    };
 
     $scope.behaviorGraph.options.graph = 'behavior';
     $scope.effortGraph.options.graph = 'effort';
+    // don't think this is actually necessary
+    $scope.avgBehaviorGraph.options.graph = 'avgBehavior';
+    $scope.avgEffortGraph.options.graph = 'avgEffort';
 
     /**
      * called when start or end daterange picker changed
@@ -183,11 +232,14 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
         $scope[varName] = newDate;
 
         // broadcast event to update min/max values
-        if(varName === graphStartDateKey) {
-            $scope.$broadcast('pickerUpdate', graphEndDateKey, { minDate: $scope[graphStartDateKey] });
-        }
-        else if(varName === graphEndDateKey) {
-            $scope.$broadcast('pickerUpdate', graphStartDateKey, { maxDate: $scope[graphEndDateKey] });
+        if (varName === graphStartDateKey) {
+            $scope.$broadcast('pickerUpdate', graphEndDateKey, {
+                minDate: $scope[graphStartDateKey]
+            });
+        } else if (varName === graphEndDateKey) {
+            $scope.$broadcast('pickerUpdate', graphStartDateKey, {
+                maxDate: $scope[graphEndDateKey]
+            });
         }
 
         $scope.activeEffortLegendItem = null;
@@ -203,14 +255,22 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
      */
     function updateGraph() {
         var config = {
-            include: ['enrollment.section.*',],
-            exclude: ['id',],
-            filter: [
-                { name: 'date.range', val: $scope.graphStartDate.format('YYYY-MM-DD').toString(), },
-                { name: 'date.range', val: $scope.graphEndDate.format('YYYY-MM-DD').toString(), },
-                { name: 'enrollment.student', val: $scope.student.id, },
+            include: ['enrollment.section.*', ],
+            exclude: ['id', ],
+            filter: [{
+                    name: 'date.range',
+                    val: $scope.graphStartDate.format('YYYY-MM-DD').toString(),
+                },
+                {
+                    name: 'date.range',
+                    val: $scope.graphEndDate.format('YYYY-MM-DD').toString(),
+                },
+                {
+                    name: 'enrollment.student',
+                    val: $scope.student.id,
+                },
             ],
-            sort: ['date',],
+            sort: ['date', ],
         };
 
         behaviorService.getStudentBehavior(config).then(
@@ -222,8 +282,13 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                 $scope.sharedGraph.labels = [];
                 $scope.sharedGraph.series = [];
                 $scope.behaviorGraph.data = [];
-                $scope.effortGraph.data   = [];
+                $scope.effortGraph.data = [];
+                $scope.avgBehaviorGraph.data = [];
+                $scope.avgEffortGraph.data = [];
                 $scope.sharedGraph.datasetOverride = [];
+                // contains objects with count and sum
+                $scope.behaviorAvgInfo = [];
+                $scope.effortAvgInfo = [];
 
                 var termsToInclude = termsByDateRange($scope.terms, $scope.graphStartDate, $scope.graphEndDate);
 
@@ -239,7 +304,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                 });
 
                 $scope.sharedGraph.options.legend.display = true;
-                if(hasSection === false) {
+                if (hasSection === false) {
                     $scope.sharedGraph.series = ["", ];
                     $scope.sectionToDataIndex = {};
                     $scope.behaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
@@ -247,24 +312,66 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                     $scope.sharedGraph.options.legend.display = false;
                 }
 
+                // will only have one line
+                $scope.avgBehaviorGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                $scope.avgEffortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
+
                 // iterate through each date, setting data as necessary
                 var iterDate = $scope.graphStartDate.clone();
                 var j = 0;
-                for(var i = 0; i < dateDiff + 1; i++) {
+                for (var i = 0; i < dateDiff + 1; i++) {
                     $scope.sharedGraph.labels[i] = iterDate.format('MM/DD').toString();
 
-                    if(data.behaviors[j]) {
+                    if (data.behaviors[j]) {
                         var behaviorDate = moment(data.behaviors[j].date);
-                        while(behaviorDate.diff(iterDate, 'd') === 0) {
+                        // for calculating average
+                        var behaviorCount = 0;
+                        var behaviorSum = 0;
+                        var effortCount = 0;
+                        var effortSum = 0;
+                        while (behaviorDate.diff(iterDate, 'd') === 0) {
+                            // have to check for nulls before incrementing the total and calculating the average
                             var enrollment = $scope.enrollmentsLookup[data.behaviors[j].enrollment];
-                            if(_.has($scope.sectionToDataIndex, enrollment.section)) {
+                            if (_.has($scope.sectionToDataIndex, enrollment.section)) {
+                                if (data.behaviors[j].behavior != null) {
+                                    behaviorCount++;
+                                    behaviorSum += data.behaviors[j].behavior;
+                                }
+                                if (data.behaviors[j].effort != null) {
+                                    effortCount++;
+                                    effortSum += data.behaviors[j].effort;
+                                }
                                 $scope.behaviorGraph.data[$scope.sectionToDataIndex[enrollment.section]][i] = data.behaviors[j].behavior;
                                 $scope.effortGraph.data[$scope.sectionToDataIndex[enrollment.section]][i] = data.behaviors[j].effort;
                             }
 
                             j++;
-                            if(j >= data.behaviors.length) { break; }
+                            if (j >= data.behaviors.length) {
+                                break;
+                            }
                             behaviorDate = moment(data.behaviors[j].date);
+                        }
+
+                        // at this point if the count isn't 0, store avg info
+                        $scope.behaviorAvgInfo[i] = {
+                            count: behaviorCount,
+                            sum: behaviorSum
+                        };
+                        $scope.effortAvgInfo[i] = {
+                            count: effortCount,
+                            sum: effortSum
+                        };
+
+                        if (behaviorCount > 0) {
+                            $scope.avgBehaviorGraph.data[0][i] = behaviorSum / behaviorCount;
+                        } else {
+                            $scope.avgBehaviorGraph.data[0][i] = null;
+                        }
+
+                        if (effortCount > 0) {
+                            $scope.avgEffortGraph.data[0][i] = effortSum / effortCount;
+                        } else {
+                            $scope.avgEffortGraph.data[0][i] = null;
                         }
                     }
 
@@ -286,8 +393,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
 
     // get today for input box, set input options
     $scope.inputDate = moment();
-    $scope.inputOptions = [
-        {
+    $scope.inputOptions = [{
             display: "",
             value: null,
         },
@@ -339,10 +445,15 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
      */
     function updateInputScores() {
         var config = {
-            include: ['enrollment.section.*',],
-            filter: [
-                { name: 'date', val: $scope.inputDate.format('YYYY-MM-DD').toString(), },
-                { name: 'enrollment.student', val: $scope.student.id, },
+            include: ['enrollment.section.*', ],
+            filter: [{
+                    name: 'date',
+                    val: $scope.inputDate.format('YYYY-MM-DD').toString(),
+                },
+                {
+                    name: 'enrollment.student',
+                    val: $scope.student.id,
+                },
             ],
         }
 
@@ -355,7 +466,7 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                 _.each(termsToInclude, function(termId) {
                     _.each($scope.sectionsByTerm[$scope.termToSectionsByTerm[termId]], function(section) {
                         var enrollmentRecord = $scope.sectionsToEnrollments[section.id];
-                        var record           = newBehaviorsMap[enrollmentRecord.id];
+                        var record = newBehaviorsMap[enrollmentRecord.id];
                         $scope.scoresInput.push({
                             title: section.title,
                             enrollment: enrollmentRecord.id,
@@ -396,32 +507,64 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
             date: entry.date,
         };
 
-        if(type === 'behavior') {
+        if (type === 'behavior') {
             newObj.behavior = entry.curBehavior;
         }
-        if(type === 'effort') {
+        if (type === 'effort') {
             newObj.effort = entry.curEffort;
         }
 
-        if(entry.id !== null) {
+        if (entry.id !== null) {
             behaviorService.updateBehavior(entry.id, newObj).then(
                 function success(data) {
                     var updatedEntry = data.behavior;
 
-                    entry.behavior    = updatedEntry.behavior;
+                    entry.behavior = updatedEntry.behavior;
                     entry.curBehavior = updatedEntry.behavior;
-                    entry.effort      = updatedEntry.effort;
-                    entry.curEffort   = updatedEntry.effort;
+                    entry.effort = updatedEntry.effort;
+                    entry.curEffort = updatedEntry.effort;
 
-                    // update the graph
+                    // update the graph and avg graph
                     var entryDate = moment(updatedEntry.date);
-                    if(entryDate >= $scope.graphStartDate && entryDate <= $scope.graphEndDate) {
-                        var index     = $scope.sectionToDataIndex[entry.section];
+                    if (entryDate >= $scope.graphStartDate && entryDate <= $scope.graphEndDate) {
+                        var index = $scope.sectionToDataIndex[entry.section];
                         var dateIndex = Math.abs($scope.graphStartDate.diff(entryDate, 'd'));
-                        if(type === 'behavior') {
+                        if (type === 'behavior') {
+                            if (updatedEntry.behavior === null) {
+                                $scope.behaviorAvgInfo[dateIndex].count--;
+                                $scope.behaviorAvgInfo[dateIndex].sum -= $scope.behaviorGraph.data[index][dateIndex];
+                                setNewAvg($scope.avgBehaviorGraph, $scope.behaviorAvgInfo, dateIndex);
+                            } else {
+                                if ($scope.behaviorGraph.data[index][dateIndex] === null) {
+                                    $scope.behaviorAvgInfo[dateIndex].count++;
+                                    $scope.behaviorAvgInfo[dateIndex].sum += updatedEntry.behavior;
+                                    setNewAvg($scope.avgBehaviorGraph, $scope.behaviorAvgInfo, dateIndex);
+                                } else {
+                                    $scope.behaviorAvgInfo[dateIndex].sum -= $scope.behaviorGraph.data[index][dateIndex];
+                                    $scope.behaviorAvgInfo[dateIndex].sum += updatedEntry.behavior;
+                                    setNewAvg($scope.avgBehaviorGraph, $scope.behaviorAvgInfo, dateIndex);
+                                }
+                            }
+
                             $scope.behaviorGraph.data[index][dateIndex] = updatedEntry.behavior;
                         }
-                        if(type === 'effort') {
+                        if (type === 'effort') {
+                            if (updatedEntry.effort === null) {
+                                $scope.effortAvgInfo[dateIndex].count--;
+                                $scope.effortAvgInfo[dateIndex].sum -= $scope.effortGraph.data[index][dateIndex];
+                                setNewAvg($scope.avgEffortGraph, $scope.effortAvgInfo, dateIndex);
+                            } else {
+                                if ($scope.effortGraph.data[index][dateIndex] === null) {
+                                    $scope.effortAvgInfo[dateIndex].count++;
+                                    $scope.effortAvgInfo[dateIndex].sum += updatedEntry.effort;
+                                    setNewAvg($scope.avgEffortGraph, $scope.effortAvgInfo, dateIndex);
+                                } else {
+                                    $scope.effortAvgInfo[dateIndex].sum -= $scope.effortGraph.data[index][dateIndex];
+                                    $scope.effortAvgInfo[dateIndex].sum += updatedEntry.effort;
+                                    setNewAvg($scope.avgEffortGraph, $scope.effortAvgInfo, dateIndex);
+                                }
+                            }
+
                             $scope.effortGraph.data[index][dateIndex] = updatedEntry.effort;
                         }
                     }
@@ -429,31 +572,38 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
                 function error(response) {
                     // notify the user
                     toastService.error('The server wasn\'t able to save the behavior score.');
-               }
+                }
             );
-        }
-        else {
+        } else {
             behaviorService.addBehavior(newObj).then(
                 function success(data) {
                     updatedEntry = data.behavior;
 
-                    entry.id          = updatedEntry.id;
-                    entry.behavior    = updatedEntry.behavior;
+                    entry.id = updatedEntry.id;
+                    entry.behavior = updatedEntry.behavior;
                     entry.curBehavior = updatedEntry.behavior;
-                    entry.effort      = updatedEntry.effort;
-                    entry.curEffort   = updatedEntry.effort;
-                    entry.date        = updatedEntry.date;
+                    entry.effort = updatedEntry.effort;
+                    entry.curEffort = updatedEntry.effort;
+                    entry.date = updatedEntry.date;
 
                     // update the graph
                     var entryDate = moment(updatedEntry.date);
-                    if(entryDate >= $scope.graphStartDate && entryDate <= $scope.graphEndDate) {
-                        var index     = $scope.sectionToDataIndex[entry.section];
+                    if (entryDate >= $scope.graphStartDate && entryDate <= $scope.graphEndDate) {
+                        var index = $scope.sectionToDataIndex[entry.section];
                         var dateIndex = Math.abs($scope.graphStartDate.diff(entryDate, 'd'));
-                        if(type === 'behavior') {
+                        if (type === 'behavior') {
                             $scope.behaviorGraph.data[index][dateIndex] = updatedEntry.behavior;
+
+                            $scope.behaviorAvgInfo[dateIndex].count++;
+                            $scope.behaviorAvgInfo[dateIndex].sum += updatedEntry.behavior;
+                            setNewAvg($scope.avgBehaviorGraph, $scope.behaviorAvgInfo, dateIndex);
                         }
-                        if(type === 'effort') {
+                        if (type === 'effort') {
                             $scope.effortGraph.data[index][dateIndex] = updatedEntry.effort;
+
+                            $scope.effortAvgInfo[dateIndex].count++;
+                            $scope.effortAvgInfo[dateIndex].sum += updatedEntry.effort;
+                            setNewAvg($scope.avgEffortGraph, $scope.effortAvgInfo, dateIndex);
                         }
                     }
                 },
@@ -466,9 +616,130 @@ app.controller("studentBehaviorsController", function ($scope, $routeParams, $lo
     }
 
     /**
+     * Updates the avgGraph at dateIndex
+     * @param {array} avgGraph - graph to be updated
+     * @param {array} avgInfoArr - array containing info to calculate the avg
+     * @param {number} dateIndex - index to access the arrays
+     */
+    function setNewAvg(avgGraph, avgInfoArr, dateIndex) {
+        var newAvg = avgInfoArr[dateIndex].sum / avgInfoArr[dateIndex].count;
+        avgGraph.data[0][dateIndex] = newAvg;
+    }
+
+    /**
+     * Brings up the report form
+     */
+    $scope.openReportForm = function() {
+        $("#generateReportModal").modal();
+        $scope.test = true;
+    };
+
+    /**
+     * Updates the class graphs with data from the chosen class
+     */
+    $scope.updateClassGraphs = function() {
+        if ($scope.report.class.title !== "All Classes") {
+            $scope.singleBehaviorGraph.data = [$scope.behaviorGraph.data[$scope.sectionToDataIndex[$scope.report.class.id]]];
+            $scope.singleEffortGraph.data = [$scope.effortGraph.data[$scope.sectionToDataIndex[$scope.report.class.id]]];
+        }
+    }
+
+    /**
+     * Downloads a report pdf
+     */
+    $scope.generateReport = function() {
+        var behaviorSum = 0;
+        var effortSum = 0;
+        var behaviorCount = 0;
+        var effortCount = 0;
+        var length = 0;
+        var behaviorCanvas = null;
+        var effortCanvas = null;
+        var behaviorAvg = "N/A";
+        var effortAvg = "N/A";
+
+        if ($scope.report.class.title === "All Classes") {
+            behaviorCanvas = document.getElementById('student_avg_behavior');
+            effortCanvas = document.getElementById('student_avg_effort');
+
+            // length of behavior and effort are same
+            length = $scope.avgBehaviorGraph.data[0].length;
+            for (var i = 0; i < length; i++) {
+                if ($scope.avgBehaviorGraph.data[0][i] !== null) {
+                    behaviorSum += $scope.avgBehaviorGraph.data[0][i];
+                    behaviorCount++;
+                }
+                if ($scope.avgEffortGraph.data[0][i] !== null) {
+                    effortSum += $scope.avgEffortGraph.data[0][i];
+                    effortCount++;
+                }
+            }
+        } else {
+            // now create chart..., maybe using ng-hide will work for this? I hate this...
+            behaviorCanvas = document.getElementById('student_class_behavior');
+            effortCanvas = document.getElementById('student_class_effort');
+
+            // length of behavior and effort are same
+            length = $scope.singleBehaviorGraph.data[0].length;
+            for (var i = 0; i < length; i++) {
+                if ($scope.singleBehaviorGraph.data[0][i] !== null) {
+                    behaviorSum += $scope.singleBehaviorGraph.data[0][i];
+                    behaviorCount++;
+                }
+                if ($scope.singleEffortGraph.data[0][i] !== null) {
+                    effortSum += $scope.singleEffortGraph.data[0][i];
+                    effortCount++;
+                }
+            }
+        }
+
+        if (behaviorCount > 0) {
+            behaviorAvg = Math.round(behaviorSum / behaviorCount * 100) / 100 + "";
+        }
+        if (effortCount > 0) {
+            effortAvg = Math.round(effortSum / effortCount * 100) / 100 + "";
+        }
+
+        var behaviorImgData = behaviorCanvas.toDataURL("image/jpeg", 1.0);
+        var effortImgData = effortCanvas.toDataURL("image/jpeg", 1.0);
+
+        var doc = new jsPDF();
+        var startDate = moment($scope.graphStartDate).format('YYYY-MM-DD').toString();
+        var endDate = moment($scope.graphEndDate).format('YYYY-MM-DD').toString();
+
+        doc.setFontSize(26);
+        doc.text(105, 25, 'Behavior and Effort Report', 'center');
+        doc.text(105, 40, 'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + ' in ' + $scope.report.class.title, 'center');
+        doc.text(105, 55, startDate + " to " + endDate, 'center');
+        doc.text(25, 115, 'Behavior', 'center');
+        doc.text(25, 125, behaviorAvg, 'center');
+        doc.addImage(behaviorImgData, 'JPEG', 50, 80, 145, 80);
+        doc.text(25, 225, 'Effort', 'center');
+        doc.text(25, 235, effortAvg, 'center');
+        doc.addImage(effortImgData, 'JPEG', 50, 190, 145, 80);
+        // doc.save($scope.student.first_name + $scope.student.last_name + '.pdf');
+        doc.save('test.pdf');
+        // clear report obj
+        $scope.report = {};
+
+        // close modal here since data-dismiss isn't working
+        $scope.test = false;
+        $('#generateReportModal').modal('toggle');
+    };
+
+    // sets chart backgrounds to white for the reports (default is transparent and it ends up black)
+    Chart.plugins.register({
+        beforeDraw: function(chartInstance) {
+            var ctx = chartInstance.chart.ctx;
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
+        }
+    });
+
+    /**
      * initialization
      */
     updateGraph();
     updateInputScores();
-
+    $scope.test = false;
 });
