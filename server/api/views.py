@@ -1056,14 +1056,15 @@ class NotificationViewSet(NestedDynamicViewSet):
         :param request:
         :return:
         """
-
-        # Generate student birthday notifications for all students this user
-        # should see
-        birthday_title_template = "{first_name} {last_name}'s Birthday"
-        birthday_body_template = "{first_name} {last_name} has a birthday coming up on {date}"
         # Get notifications for this user
         prefix = extensions_api_settings.DEFAULT_PARENT_LOOKUP_KWARG_NAME_PREFIX
         user = SproutUser.objects.get(id=kwargs['{prefix}{field}'.format(prefix=prefix, field='user')])
+
+        # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - #
+        # Generate Student Birthday Notifications
+        # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - #
+        birthday_title_template = "{first_name} {last_name}'s Birthday"
+        birthday_body_template = "{first_name} {last_name} has a birthday coming up on {date}"
 
         # Query for all students: Students for whom this user is a case manager and students for whom this users is a section teacher
         all_students_query = Q(case_manager=user.id) | Q(enrollment__section__teacher=user.id)
@@ -1117,6 +1118,39 @@ class NotificationViewSet(NestedDynamicViewSet):
                                             partial_link="/",
                                             unread=True,
                                             )
+
+        # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - #
+        # Generate IEP Checkup Notifications
+        # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - #
+        # IEP goals need to be checked at the end of the semester. Let's give them two week's notice
+        today = datetime.date.today()
+        filter_start = today
+        filter_end = today + datetime.timedelta(days=14)
+        valid_terms = Term.objects.filter(end_date__range=[filter_start, filter_end])
+
+        title = "End of Term IEP Goal Notification"
+        body = "The term {term} is ending soon. Don't forget to make any required measurements."
+        category = NotificationCategories.IEP_GOAL
+
+        # Get this teacher's first managed student
+        first_student = Student.objects.filter(case_manager=user)
+        if not first_student.count() < 1:
+            first_student = first_student[0]
+
+            for term in valid_terms:
+                try:
+                    Notification.objects.get(category=category, user=user, date=term.end_date)
+                except Notification.DoesNotExist:
+                    Notification.objects.create(title=title,
+                                                body=body.format(term=str(term)),
+                                                date=term.end_date,
+                                                student=first_student,
+                                                user=user,
+                                                category=category,
+                                                partial_link="/ieps",
+                                                unread=True,
+                                                )
+
 
         # Now make the normal call to list to let Dynamic REST do its magic
         return super(NotificationViewSet, self).list(request, *args, **kwargs)
