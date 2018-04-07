@@ -175,6 +175,18 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
     };
 
     /**
+     * Partially rejects the user
+     */
+    function rejectUser() {
+        saveToken(null);
+        saveUser(null);
+        user.auth = false;
+
+        // notify app that there was a problem, assume user is not auth-ed
+        $rootScope.$emit('user:auth', { type: 'logout' });
+    }
+
+    /**
      * Check whether the current authentication token is valid
      *
      * Response will be:
@@ -185,7 +197,7 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
      *
      * @return {promise} promise that will resolve to the response
      */
-    userService.authVerify = function() {
+    userService.authVerify = function(adminRequired = false) {
         var query = '?user=true';
 
         var deferred = $q.defer();
@@ -196,20 +208,20 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
             if(_.has(response.data, 'user')) {
                 saveUser(response.data.user);
             }
-            user.auth = true;
 
-            // notify app that user is logged in
-            $rootScope.$emit('user:auth', { type: 'login' });
+            if (adminRequired && !user.isSuperUser) {
+                rejectUser();
+                deferred.reject(response);
+            } else {
+                user.auth = true;
 
-            deferred.resolve(response.data);
+                // notify app that user is logged in
+                $rootScope.$emit('user:auth', { type: 'login' });
+
+                deferred.resolve(response.data);
+            }
         }, function error(response) {
-            saveToken(null);
-            saveUser(null);
-            user.auth = false;
-
-            // notify app that there was a problem, assume user is not auth-ed
-            $rootScope.$emit('user:auth', { type: 'logout' });
-
+            rejectUser();
             deferred.reject(response);
         });
         return deferred.promise;
