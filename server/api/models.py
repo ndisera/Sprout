@@ -205,6 +205,13 @@ class Term(AdminWriteMixin, models.Model):
     def __str__(self):
         return self.__repr__()
 
+    def delete(self, **kwargs):
+        """
+        Delete any notifications which might be associated with this term so they can be deleted later
+        """
+        notifications = Notification.objects.filter(date=self.end_date).delete()
+        super(Term, self).delete(**kwargs)
+
 
 class Holiday(AdminWriteMixin, models.Model):
     """

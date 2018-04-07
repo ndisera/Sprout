@@ -21,6 +21,8 @@ class NotificationCategories(ChoiceEnum):
     Define machine-readable categories for notifications
     """
     BIRTHDAY = 1
+    GRADE = 2
+    IEP_GOAL = 3
 
 
 class ServiceType(ChoiceEnum):
