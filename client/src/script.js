@@ -37,11 +37,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/manageStudents.html',
             controller: 'manageStudentsController',
             resolve: {
+                auth: function (userService) {
+                    return userService.authVerify(true);
+                },
                 students: function (studentService) {
                     return studentService.getStudents();
-                },
-                auth: function (userService) {
-                    return userService.authVerify();
                 },
             }
         })
@@ -51,11 +51,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/manageTeachers.html',
             controller: 'manageTeachersController',
             resolve: {
+                auth: function (userService) {
+                    return userService.authVerify(true);
+                },
                 userData: function(userService) {
                     return userService.getUsers();
-                },
-                auth: function (userService) {
-                    return userService.authVerify();
                 },
                 termsInfo: function(termService) {
                     return termService.getTerms({
@@ -70,14 +70,14 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/manageCases.html',
             controller: 'manageCasesController',
             resolve: {
+                auth: function (userService) {
+                    return userService.authVerify(true);
+                },
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
                 userData: function(userService) {
                     return userService.getUsers();
-                },
-                auth: function (userService) {
-                    return userService.authVerify();
                 },
             }
         })
@@ -87,6 +87,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/manageClasses.html',
             controller: 'manageClassesController',
             resolve: {
+                auth: function(userService) {
+                    return userService.authVerify(true);
+                },
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
@@ -95,9 +98,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 sections: function (sectionService) {
                     return sectionService.getSections();
-                },
-                auth: function(userService) {
-                    return userService.authVerify();
                 },
                 termsInfo: function(termService) {
                     return termService.getTerms({
@@ -129,7 +129,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             controller: 'schoolSettingsController',
             resolve: {
                 auth: function(userService) {
-                    return userService.authVerify();
+                    return userService.authVerify(true);
                 },
                 holidays: function(holidayService) {
                     return holidayService.getHolidays();

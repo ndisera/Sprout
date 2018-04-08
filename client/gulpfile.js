@@ -64,6 +64,10 @@ const include_paths = [
 	
 	// pdf
 	bower_path + 'jspdf/dist/jspdf.min.js',
+	
+	// pdf tables
+	bower_path + 'jspdf-autotable/dist/jspdf.plugin.autotable.js',
+	bower_path + 'jspdf-autotable/dist/jspdf.plugin.autotable.min.js',
 
     // datepicker
     bower_path + 'angular-datepicker/dist/angular-datepicker.min.css',

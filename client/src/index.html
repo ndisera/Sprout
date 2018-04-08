@@ -55,6 +55,7 @@
         <script src="includes/locale-all.js"></script>
         <script src="includes/calendar.js"></script>
         <script src="includes/jspdf.min.js"></script>
+        <script src="includes/jspdf.plugin.autotable.min.js"></script>
         <!-- @endif -->
         <!-- @ifdef DEBUG -->
         <script src="includes/jquery.js"></script>
@@ -83,6 +84,7 @@
         <script src="includes/locale-all.js"></script>
         <script src="includes/calendar.js"></script>
         <script src="includes/jspdf.min.js"></script>
+        <script src="includes/jspdf.plugin.autotable.js"></script>
         <!-- @endif -->
     </head>
     <body ng-app="app">
@@ -204,7 +206,7 @@
                             </form>
                         </div>
                         <div class="col-sm-4 hidden-xs">
-                            <div class="pull-right">
+                            <div class="pull-right bell-margin">
                                 <div class="topbar-user">
                                     <span>{{ user.firstName }} {{ user.lastName }}</span>
                                 </div>

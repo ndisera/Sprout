@@ -14,9 +14,39 @@
             <div class="modal-body">
                 <form class="form-horizontal" name="reportForm" ng-submit="generateReport()">
                     <div class="form-group">
-                        <label class="control-label col-sm-2" for="reportClass">Class:</label>
-                        <div class="col-sm-10">
+                        <label class="control-label col-sm-1" for="reportClass">Class:</label>
+                        <div class="col-sm-11">
                             <select required ng-model="report.class" ng-options="x.title for x in classOptions" id="reportClass" name="reportClass" class="form-control" ng-change="updateClassGraphs()"></select>
+                        </div>
+                        <div class="voffset3 col-xs-12 centerText" ng-if="report.class.title != null">
+                            <p><b>Behavior</b></p>
+                        </div>
+                        <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'Average'">
+                            <canvas id="report_student_avg_behavior" class="chart chart-line" chart-data="avgBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="avgBehaviorGraph.options" chart-click="onClick">
+                            </canvas>
+                        </div>
+                        <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'All Classes'">
+                            <canvas id="report_student_behavior" class="chart chart-line" chart-data="behaviorGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="behaviorGraph.options" chart-click="onClick">
+                            </canvas>
+                        </div>
+                        <div class="student-behaviors-report-graph col-xs-12" ng-if="showClass" id="classBehaviorContainer">
+                            <canvas id="report_student_class_behavior" class="chart chart-line" chart-data="singleBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="singleBehaviorGraph.options">
+                            </canvas>
+                        </div>
+                        <div class="voffset3 col-xs-12 centerText" ng-if="report.class.title != null">
+                            <p><b>Effort</b></p>
+                        </div>
+                        <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'Average'">
+                            <canvas id="report_student_avg_effort" class="chart chart-line" chart-data="avgEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="avgEffortGraph.options" chart-click="onClick">
+                            </canvas>
+                        </div>
+                        <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'All Classes'">
+                            <canvas id="report_student_effort" class="chart chart-line" chart-data="effortGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="effortGraph.options" chart-click="onClick">
+                            </canvas>
+                        </div>
+                        <div class="student-behaviors-report-graph col-xs-12" ng-if="showClass">
+                            <canvas id="report_student_class_effort" class="chart chart-line" chart-data="singleEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="singleEffortGraph.options">
+                            </canvas>
                         </div>
                     </div>
                 </form>
@@ -60,43 +90,20 @@
             <div class="panel-wrapper">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">All Classes Average Behavior</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="student-behaviors-graph">
-                            <canvas id="student_avg_behavior" class="chart chart-line" chart-data="avgBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="avgBehaviorGraph.options" chart-click="onClick">
-                            </canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="panel-wrapper">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">All Classes Average Effort </h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="student-behaviors-graph">
-                            <canvas id="student_avg_effort" class="chart chart-line" chart-data="avgEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="avgEffortGraph.options" chart-click="onClick">
-                            </canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row voffset4">
-        <div class="col-lg-6">
-            <div class="panel-wrapper">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
                         <h3 class="panel-title">Behavior</h3>
                     </div>
                     <div class="panel-body">
-                        <div class="student-behaviors-graph">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <select required ng-model="behaviorGraphSelection" ng-options="x for x in graphDisplayOptions" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="student-behaviors-graph voffset2" ng-if="behaviorGraphSelection === 'All Classes'">
                             <canvas id="student_behavior" class="chart chart-line" chart-data="behaviorGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="behaviorGraph.options" chart-click="onClick">
+                            </canvas>
+                        </div>
+                        <div class="student-behaviors-graph voffset2" ng-if="behaviorGraphSelection === 'Average'">
+                            <canvas id="student_avg_behavior" class="chart chart-line" chart-data="avgBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="avgBehaviorGraph.options" chart-click="onClick">
                             </canvas>
                         </div>
                     </div>
@@ -110,8 +117,17 @@
                         <h3 class="panel-title">Effort</h3>
                     </div>
                     <div class="panel-body">
-                        <div class="student-behaviors-graph">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <select required ng-model="effortGraphSelection" ng-options="x for x in graphDisplayOptions" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="student-behaviors-graph voffset2" ng-if="effortGraphSelection === 'All Classes'">
                             <canvas id="student_effort" class="chart chart-line" chart-data="effortGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="effortGraph.options" chart-click="onClick">
+                            </canvas>
+                        </div>
+                        <div class="student-behaviors-graph voffset2" ng-if="effortGraphSelection === 'Average'">
+                            <canvas id="student_avg_effort" class="chart chart-line" chart-data="avgEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="avgEffortGraph.options" chart-click="onClick">
                             </canvas>
                         </div>
                     </div>
@@ -163,20 +179,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-lg-6">
-        <div class="student-behaviors-graph" ng-show="test">
-            <canvas id="student_class_behavior" class="chart chart-line" chart-data="singleBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="singleBehaviorGraph.options">
-    </canvas>
-        </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="student-behaviors-graph" ng-show="test">
-            <canvas id="student_class_effort" class="chart chart-line" chart-data="singleEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="singleEffortGraph.options">
-    </canvas>
         </div>
     </div>
 </div>
