@@ -214,11 +214,15 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         options: _.clone($scope.avgGraphOptions),
     };
     $scope.singleBehaviorGraph = {
-        data: [[]],
+        data: [
+            []
+        ],
         options: _.clone($scope.avgGraphOptions),
     };
     $scope.singleEffortGraph = {
-        data: [[]],
+        data: [
+            []
+        ],
         options: _.clone($scope.avgGraphOptions),
     };
 
@@ -647,7 +651,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
     };
 
     /**
-     * Fills individual class graph data with data from the parent graph 
+     * Fills individual class graph data with data from the parent graph
      * @param {object} graph - individual class graph
      * @param {object} dataGraph - parent graph
      */
@@ -684,15 +688,17 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
      */
     function setCalcAvgInfo(behaviorGraph, effortGraph) {
         // only display classes that are in this date range...
-        $scope.report.length = behaviorGraph.data[0];
+        $scope.report.length = behaviorGraph.data[0].length;
         for (var i = 0; i < $scope.report.length; i++) {
-            if (behaviorGraph.data[0][i] !== null) {
-                $scope.report.behaviorSum += behaviorGraph.data[0][i];
-                $scope.report.behaviorCount++;
-            }
-            if (effortGraph.data[0][i] !== null) {
-                $scope.report.effortSum += effortGraph.data[0][i];
-                $scope.report.effortCount++;
+            for (var j = 0; j < behaviorGraph.data.length; j++) {
+                if (behaviorGraph.data[j][i] !== null) {
+                    $scope.report.behaviorSum += behaviorGraph.data[j][i];
+                    $scope.report.behaviorCount++;
+                }
+                if (effortGraph.data[j][i] !== null) {
+                    $scope.report.effortSum += effortGraph.data[j][i];
+                    $scope.report.effortCount++;
+                }
             }
         }
     }
@@ -711,21 +717,31 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         var effortCanvas = null;
         var behaviorAvg = "N/A";
         var effortAvg = "N/A";
+        var behaviorReportGraph = null;
+        var effortReportGraph = null;
+        var includeClassNames = false;
 
         if ($scope.report.class.title === "Average") {
             behaviorCanvas = document.getElementById('report_student_avg_behavior');
             effortCanvas = document.getElementById('report_student_avg_effort');
+            behaviorReportGraph = $scope.avgBehaviorGraph;
+            effortReportGraph = $scope.avgEffortGraph;
 
             setCalcAvgInfo($scope.avgBehaviorGraph, $scope.avgEffortGraph);
         } else if ($scope.report.class.title === "All Classes") {
             behaviorCanvas = document.getElementById('report_student_behavior');
             effortCanvas = document.getElementById('report_student_effort');
+            behaviorReportGraph = $scope.behaviorGraph;
+            effortReportGraph = $scope.effortGraph;
+            includeClassNames = true;
 
             setCalcAvgInfo($scope.behaviorGraph, $scope.effortGraph);
         } else {
             // now create chart..., maybe using ng-hide will work for this? I hate this...
             behaviorCanvas = document.getElementById('report_student_class_behavior');
             effortCanvas = document.getElementById('report_student_class_effort');
+            behaviorReportGraph = $scope.singleBehaviorGraph;
+            effortReportGraph = $scope.singleEffortGraph;
 
             setCalcAvgInfo($scope.singleBehaviorGraph, $scope.singleEffortGraph);
         }
@@ -740,35 +756,54 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         var behaviorImgData = behaviorCanvas.toDataURL("image/jpeg", 1.0);
         var effortImgData = effortCanvas.toDataURL("image/jpeg", 1.0);
 
-        var doc = new jsPDF();
+        var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
         var startDate = moment($scope.graphStartDate).format('YYYY-MM-DD').toString();
         var endDate = moment($scope.graphEndDate).format('YYYY-MM-DD').toString();
 
-        // 568, 150 (height won't change)
-        // About 700 looks to be max
-        // Will alter to fit pdf and place average scores above or below (don't know how to center the other way)
-        // if I don't have a center image method, I can just do center - half of image width
+        // 568x150 (height won't change)
+        // About 700 looks to be max for width
         var width = behaviorCanvas.width * 0.26;
         var height = behaviorCanvas.height * 0.26;
+        var scale = 2.83465;
 
-        doc.setFontSize(26);
-        doc.text(105, 25, 'Behavior and Effort Report', 'center');
-        doc.text(105, 40, 'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + ' in ' + $scope.report.class.title, 'center');
-        doc.text(105, 55, startDate + " to " + endDate, 'center');
-        // doc.text(25, 115, 'Behavior', 'center');
-        // doc.text(25, 125, behaviorAvg, 'center');
-        doc.addImage(behaviorImgData, 'JPEG', 105 - width / 2, 80, width, height);
-        // doc.text(25, 225, 'Effort', 'center');
-        // doc.text(25, 235, effortAvg, 'center');
-        doc.addImage(effortImgData, 'JPEG', 105 - width / 2, 190, width, height);
-        // the max width it should be is 180
-        // so 0.26 * width
-        // find a decent height to go with that
-        // var width = 200;
-        // doc.addImage(imgData, 'JPEG', 105 - width / 2, 40, 0.26 * width, 160);
+        doc.setFontSize(30);
+        doc.text(105 * scale, 25 * scale, 'Behavior and Effort Report', 'center');
+        doc.setFontSize(18);
+        var forMessage = $scope.report.class.title !== "Average" ?
+        'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + ' in ' + $scope.report.class.title:
+        forMessage = 'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + '\'s Average in All Classes';
+        // for person's average in all classes
+        doc.text(105 * scale, 33 * scale, forMessage, 'center');
+        doc.text(105 * scale, 41 * scale, startDate + " to " + endDate, 'center');
+        doc.text(105 * scale, 84 * scale, 'Behavior', 'center');
+        doc.text(105 * scale, 92 * scale, 'Average: ' + behaviorAvg, 'center');
+        doc.addImage(behaviorImgData, 'JPEG', (105 - width / 2) * scale, 100 * scale, width * scale, height * scale);
+        doc.text(105 * scale, 184 * scale, 'Effort', 'center');
+        doc.text(105 * scale, 192 * scale, 'Average: ' + effortAvg, 'center');
+        doc.addImage(effortImgData, 'JPEG', (105 - width / 2) * scale, 200 * scale, width * scale, height * scale);
 
-        // doc.save($scope.student.first_name + $scope.student.last_name + '.pdf');
-        doc.save('test.pdf');
+        doc.addPage();
+        var columns = includeClassNames ? ["Date", "Class", "Behavior Score", "Effort Score"]: ["Date", "Behavior Score", "Effort Score"];
+        var rows = [];
+
+        for (var i = 0; i < behaviorReportGraph.data[0].length; i++) {
+            // for every class (if there is one)
+            for (var j = 0; j < behaviorReportGraph.data.length; j++) {
+                var date = $scope.sharedGraph.labels[i]; // actually get date
+                var behavior = behaviorReportGraph.data[j][i] === null ? "" : behaviorReportGraph.data[j][i];
+                var effort = effortReportGraph.data[j][i] === null ? "" : effortReportGraph.data[j][i];
+                if (includeClassNames) {
+                    var className = $scope.sharedGraph.series[j];
+                    rows.push([date, className, behavior, effort]);
+                } else {
+                    rows.push([date, behavior, effort]);
+                }
+            }
+        }
+
+        doc.autoTable(columns, rows);
+        doc.save($scope.student.first_name + $scope.student.last_name + '.pdf');
+
         // clear report obj
         $scope.report = {};
 
