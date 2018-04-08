@@ -9,6 +9,8 @@ from api.mixins import AdminWriteMixin
 
 from sprout_user import SproutUser
 
+from grade_notification_calculator.calculator import GradeNotificationCalculator
+
 import os
 
 def get_sentinel_user():
@@ -416,6 +418,32 @@ class Grade(models.Model):
     class Meta:
         unique_together = (('assignment', 'student', 'handin_datetime'),)
         ordering = ('assignment',)
+
+    def save(self, **kwargs):
+        """
+        Check the new grade, generating notifications if it is significantly outside of normal
+        """
+        grades = Grade.objects.filter(student=self.student)
+        attendances = AttendanceRecord.objects.filter(enrollment__student=self.student)
+        behavior_effors = Behavior.objects.filter(enrollment__student=self.student)
+        test_scores = StandardizedTestScore.objects.filter(student=self.student)
+
+        calculator = GradeNotificationCalculator(student=self.student,
+                                                 grades=grades,
+                                                 attendances=attendances,
+                                                 behavior_efforts=behavior_effors,
+                                                 test_scores=test_scores)
+        notifications = calculator.get_notifications(self)
+        for notification in notifications:
+            try:
+                Notification.objects.get(**notification)
+            except Notification.DoesNotExist:
+                Notification.objects.create(user=self.student.case_manager,
+                                            partial_link="/grades",
+                                            unread=True,
+                                            category=constants.NotificationCategories.GRADE,
+                                            **notification)
+        super(Grade, self).save(**kwargs)
 
 
 class FinalGrade(models.Model):
