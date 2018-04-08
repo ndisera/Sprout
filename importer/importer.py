@@ -581,7 +581,7 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
-            print '\rimporting assignment ' + row[csv_idx['assignment_import_id']] + ' for student ' + row[csv_idx['student_id']],
+            print '\rimporting assignment ' + row[csv_idx['assignment_import_id']] + ' for student ' + row[csv_idx['student_id']] + '          ',
             sys.stdout.flush()
 
             # get the section

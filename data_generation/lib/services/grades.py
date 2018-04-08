@@ -15,7 +15,7 @@ class GradesService(BaseService):
         self.uri_template_students = self.complete_uri_template.format(endpoint="/students/{students_pk}/grades/")
         self.uri_template_final_grade = self.complete_uri_template.format(endpoint="/students/{students_pk}/final-grades/")
 
-    def get_grades(self, section=None, assignment=None, student=None):
+    def get_grades(self, section=None, assignment=None, student=None, params=None):
         """
         Download a complete list of grades either:
             for the specified assignment in the specified section
@@ -29,6 +29,7 @@ class GradesService(BaseService):
         :param assignment: ID of the assignment to fetch grades for
         :type assignment: num
         :param student: ID of the student to fetch grades for
+        :param params: dict representing filter_key -> filter_val
         :rtype: list[Grade]
         """
 
@@ -39,16 +40,17 @@ class GradesService(BaseService):
         else:
             raise TypeError("get_grades must be called with either a studentID or both sectionID and assignmentID")
 
-        return self._get_grades(uri=complete_uri)
+        return self._get_grades(uri=complete_uri, params=params)
 
-    def _get_grades(self, uri):
+    def _get_grades(self, uri, params=None):
         """
         Get grades using the endpoint specified in uri
 
         :param uri: complete URI to send a get request to
+        :param params: dict representing filter_key -> filter_val
         :return: list[Grade]
         """
-        return self._get_models(Grade, uri)
+        return self._get_models(Grade, uri, params=self._prepare_params(params))
 
     def add_grade(self, grade, section=None, assignment=None, student=None):
         """

@@ -288,7 +288,7 @@ class FinalGrade(models.Model):
     enrollment = models.OneToOneField(Enrollment, related_name='finalgrade_enrollment', on_delete=models.CASCADE,
                                       unique=True,
                                       help_text="The enrollment being graded")
-    final_percent = models.IntegerField(blank=False,
+    final_percent = models.FloatField(blank=False,
                                         help_text="The weighted final grade for this enrollment")
     letter_grade = models.CharField(null=True, max_length=3,
                                     help_text="A codified representation of the grade, such as A-F or 1-5")

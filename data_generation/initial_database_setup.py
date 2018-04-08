@@ -6,6 +6,7 @@ import requests
 import sys
 import random
 import math
+import urllib3
 
 from lib.generators.behavior import BehaviorGenerator
 from lib.generators.standardized_test_score import StandardizedTestScoreGenerator
@@ -24,6 +25,9 @@ from lib.services.term import Term, TermService
 from lib.services.users import User, UsersService
 
 if __name__ == "__main__":
+    # disable annoying warnings
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     parser = argparse.ArgumentParser(description="Upload students and relevant information to Sprout")
     parser.add_argument("--protocol", action='store', default='https', type=str,
                         help="protocol to use (default: https)")
@@ -109,6 +113,7 @@ if __name__ == "__main__":
     service_generator = ServiceGenerator(**generator_args)
 
     # Setup the school
+    print "generating school..."
     school_settings = SchoolSettings(school_name="Centennial Middle School", school_location="305 E 2320 N, Provo, UT 84604", grade_range_lower=6, grade_range_upper=8, id=1)
     settings_service.add_school(school_settings)
 
@@ -135,6 +140,7 @@ if __name__ == "__main__":
     # We don't care about this term_settings' ID
 
     # Setup the teachers
+    print "generating teachers..."
     teachers = []
     if args.boring:
         teachers = TeacherGenerator.generate_default_teacher_users()
@@ -154,6 +160,7 @@ if __name__ == "__main__":
             teacher_ids.append(response.json()['user']['pk'])
 
     # Setup the students
+    print "generating students..."
     students = []
     if args.boring:
         students = student_generator.generate_developer_students(teacher_ids)
@@ -164,6 +171,7 @@ if __name__ == "__main__":
     students = [Student(**data) for data in response.json()['students']]
 
     # add terms
+    print "generating terms..."
     terms = []
     term = Term(name="Fall", start_date="2017-09-05", end_date="2017-12-07", settings=term_settings_id, school_year=school_year_id, id=None, import_id=None)
     response = term_service.add_term(term)
@@ -178,6 +186,7 @@ if __name__ == "__main__":
         term_lookup[term.id] = term
 
     # every teacher gets three random classes per term
+    print "generating sections..."
     sections = []
     if args.boring:
         sections.append(Section(teacher=teacher_ids[0], title="CS 5510", term=terms[0].id, schedule_position=1, id=None, import_id=None))
@@ -201,11 +210,13 @@ if __name__ == "__main__":
 
     # generate ServiceRequirements
     # Depends: students, users
+    print "generating service requirements..."
     services = service_generator.generate_many_random_services(num=args.num_services)
     for student_id in services:
         service_generator.serviceService.add_many_services(services[student_id], student_id)
 
     # generate enrollments
+    print "generating enrollments..."
     enrollments = []
     if args.boring:
         for student in students:
@@ -224,6 +235,7 @@ if __name__ == "__main__":
     enrollments = [Enrollment(**enrollment) for enrollment in response.json()['enrollments']]
 
     # generate behaviors. Depends: enrollments, services
+    print "generating behaviors..."
     behaviors = []
     for enrollment in enrollments:
         section = sections_lookup[enrollment.section]
@@ -263,6 +275,7 @@ if __name__ == "__main__":
         behavior_generator.behaviorService.add_many_behaviors(behaviors_chunk)
 
     # generate attendances. Depends: enrollments
+    print "generating attendance..."
     attendances = attendance_generator.generate_attendances(
         date_range_start=datetime.datetime.combine(school_year_start, datetime.time()),
         date_range_end=datetime.datetime.today())
@@ -282,11 +295,13 @@ if __name__ == "__main__":
         attendance_generator.attendanceService.add_many_attendance_records(attendance_chunk)
 
     # generate assignments
+    print "generating assignments..."
     assignments = grades_generator.generate_assignments(num_assignments_per_section)
     for section_id in assignments.keys():
         grades_generator.assignmentService.add_many_assignments(assignments[section_id], section=section_id)
 
     # generate grades
+    print "generating grades..."
     grades = grades_generator.generate_grades(num_grades_per_assignment)
     for enrollment in grades.keys():
         for section in grades[enrollment].keys():
@@ -298,7 +313,14 @@ if __name__ == "__main__":
                                                               section=section,
                                                               assignment=assignment)
 
+    # generate final grades
+    print "generating final grades..."
+    final_grades = grades_generator.generate_final_grades()
+    for student in final_grades.keys():
+        grades_generator.gradeService.add_many_final_grades(final_grades[student], student)
+
     # generate IEPs
+    print "generating ieps..."
     iep_goals = iep_generator.generate_many_random_iep_goals(num=args.num_iep_goals)
     for student_id in iep_goals:
         iep_generator.iepService.add_many_iep_goals(iep_goals[student_id], student_id)
