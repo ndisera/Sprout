@@ -72,6 +72,30 @@ class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
 
 
+def get_all_allowed_enrollments(user):
+    """
+    Return a queryset of all enrollments this user should have access to data for
+
+    A user should be able to access:
+        - All enrollments, past and present, for a student for whom the user is a case manager
+        - All enrollments in any taught section
+        - All enrollments for any student in a taught section for the same term as that section
+    """
+    if user.is_superuser:
+        return Enrollment.objects.all()
+
+    # Enrollments belonging to students the user manages
+    manages = Q(student__case_manager=user)
+    # Enrollments belonging to sections the user teaches
+    teaches = Q(section__teacher=user)
+
+    taught_terms = [section.term for section in Section.objects.filter(teacher=user)]
+    # The teacher of another section in the same term in which the student is enrolled
+    other_teacher = Q()
+    for term in taught_terms:
+        other_teacher = other_teacher | Q(student__enrollment__section__teacher=user, section__term=term)
+    return Enrollment.objects.filter(teaches | manages | other_teacher).distinct()
+
 class ProfilePictureViewSet(mixins.CreateModelMixin,
                             mixins.RetrieveModelMixin,
                             mixins.ListModelMixin,
@@ -462,7 +486,6 @@ class EnrollmentViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = EnrollmentSerializer
-    queryset = Enrollment.objects.all()
 
     def get_queryset(self, queryset=None):
         """
@@ -472,17 +495,8 @@ class EnrollmentViewSet(NestedDynamicViewSet):
         """
         user = self.request.user
         if queryset is None:
-            queryset = super(EnrollmentViewSet, self).get_queryset()
-        if user.is_superuser:
-            return queryset
-        # Filter for the user teaches the section
-        teaches = Q(section__teacher=user)
-        # Filter for other related students:
-        # Case manager
-        manages = Q(student__case_manager=user)
-        # The teacher of another section in which the student is enrolled
-        other_teacher = Q(student__enrollment__section__teacher=user)
-        queryset = queryset.filter(teaches | manages | other_teacher).distinct()
+            queryset = get_all_allowed_enrollments(user)
+            
         return queryset
 
     """ ensure variables show as correct type for docs """
