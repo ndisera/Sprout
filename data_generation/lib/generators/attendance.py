@@ -61,7 +61,6 @@ class AttendanceGenerator():
                     short_code=short_code,
                     description=description,
                     id=None,
-                    import_id=None,
                 )
                 attendances.append(record)
 
