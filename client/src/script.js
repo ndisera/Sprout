@@ -464,8 +464,8 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     /**
      * Set listener for route change errors (user is not auth-ed)
      */
-    $rootScope.$on('$routeChangeError', function(event, next, current) {
-        console.log(userService.user);
+    $rootScope.$on('$routeChangeError', function(event, next, current, rejection) {
+        console.log(rejection);
         // log out the user
         userService.logout();
 
@@ -473,6 +473,27 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         $location.path('/login').replace();
 
         // notify user
+        if(rejection !== null && rejection !== undefined && rejection.data !== null && rejection.data !== undefined) {
+            if(rejection.data.message !== null && rejection.data.message !== undefined) {
+                // tried to access admin priviledged page
+                if(rejection.status === 200 && rejection.data.message === 'Token valid') {
+                    toastService.error('You are not authorized to view that page.');
+                    return;
+                }
+            }
+            if(rejection.data.detail !== null && rejection.data.detail !== undefined) {
+                // went to sprout for the first time
+                if(rejection.data.detail === "Authentication credentials were not provided.") {
+                    return;
+                }
+                // token expired
+                if(rejection.data.detail === "Signature has expired.") {
+                    toastService.info('Your session has timed out. Please log in again.');
+                    return;
+                }
+            }
+        }
+        // catch-all
         toastService.error('There was an error with the server. Please log back in.');
     });
 
