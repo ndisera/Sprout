@@ -325,6 +325,8 @@ if __name__ == "__main__":
     for student_id in iep_goals:
         iep_generator.iepService.add_many_iep_goals(iep_goals[student_id], student_id)
 
+    # generate standardized tests and scores
+    print "generating standardized test scores..."
     std_test_score_generator.setup_tests()
     toPost = std_test_score_generator.generate(10,
                                                range_start=datetime.date(year=2018, month=01, day=01),
