@@ -4,6 +4,7 @@ from collections import namedtuple
 from base_service import BaseService
 
 Grade = namedtuple("Grade", ['assignment', 'student', 'score', 'grade', 'handin_datetime', 'late', 'missing', 'id', ])
+FinalGrade = namedtuple("FinalGrade", ['enrollment', 'letter_grade', 'final_percent', 'id', ])
 
 
 class GradesService(BaseService):
@@ -12,6 +13,7 @@ class GradesService(BaseService):
         super(GradesService, self).__init__(**kwargs)
         self.uri_template_sections = self.complete_uri_template.format(endpoint="/sections/{sections_pk}/assignments/{assignments_pk}/grades")
         self.uri_template_students = self.complete_uri_template.format(endpoint="/students/{students_pk}/grades/")
+        self.uri_template_final_grade = self.complete_uri_template.format(endpoint="/students/{students_pk}/final-grades/")
 
     def get_grades(self, section=None, assignment=None, student=None):
         """
@@ -88,6 +90,68 @@ class GradesService(BaseService):
 
     def _add_many_grades(self, grades, uri):
         return self._add_many_models(grades, uri)
+
+
+    def get_final_grades(self, student, params=None):
+        """
+        Download a complete list of final grades for a specified student
+
+        :param student: ID of the student
+        :type student: num
+        :param params: dict representing filter_key -> filter_val
+        :type params: dict
+        :return: list of final grades objects
+        :rtype: list[FinalGrade]
+        """
+        uri = self.uri_template_final_grade.format(students_pk=student)
+        return self._get_models(FinalGrade, uri, params=self._prepare_params(params))
+
+    def add_final_grade(self, final_grade, student):
+        """
+        Upload a final_grade object to the server under the specified student
+
+        :param final_grade: FinalGrade object to upload
+        :type final_grade: FinalGrade
+        :param student: ID of the student to post this FinalGrade to
+        :type student: num
+        """
+        return self.add_many_final_grades(final_grades=[final_grade], student=student)
+
+    def add_many_final_grades(self, final_grades, student):
+        """
+        Upload a list of final_grade objects to the server under the specified student
+
+        :param final_grades: FinalGrade object to upload
+        :type final_grades: list[FinalGrade]
+        :param student: ID of the student to post this FinalGrade to
+        :type student: num
+        """
+        uri = self.uri_template_final_grade.format(students_pk=student)
+        return self._add_many_models(final_grades, uri)
+
+    def delete_final_grade(self, final_grade, student):
+        """
+        Delete a final_grade object from the server under the specified student
+
+        :param final_grade: FinalGrade object to delete
+        :type final_grade: FinalGrade
+        :param student: ID of the student to delete this FinalGrade from
+        :type student: num
+        """
+        return self.delete_many_final_grades(final_grades=[final_grade], student=student)
+
+    def delete_many_final_grades(self, final_grades, student):
+        """
+        Delete a list of final_grade objects from the server under the specified student
+
+        :param final_grades: FinalGrade object to delete
+        :type final_grades: list[FinalGrade]
+        :param student: ID of the student to delete this FinalGrade from
+        :type student: num
+        """
+        uri = self.uri_template_final_grade.format(students_pk=student)
+        return self._delete_many_models(final_grades, uri)
+
 
 
 

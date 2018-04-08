@@ -28,7 +28,7 @@ from lib.services.term import Term, TermService
 from lib.services.users import User, UsersService
 from lib.services.student import Student, StudentService
 from lib.services.assignment import Assignment, AssignmentService
-from lib.services.grades import Grade, GradesService
+from lib.services.grades import Grade, FinalGrade, GradesService
 from lib.services.attendance import AttendanceRecord, AttendanceService
 
 # caches
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     student_service = StudentService(**service_args)
     enrollment_service = EnrollmentService(**service_args)
     assignment_service = AssignmentService(**service_args)
-    grades_service = GradesService(**service_args)
+    grade_service = GradesService(**service_args)
     attendance_service = AttendanceService(**service_args)
 
     files = {
@@ -180,8 +180,8 @@ if __name__ == "__main__":
             'teachers': 'teachers.csv',
             'students': 'students.csv',
             'enrollments': 'classes.csv',
-            'grades': 'finalgrade.csv',
             'assignments': 'assignments.csv',
+            'final_grades': 'finalgrade.csv',
             'attendance': 'attendance.csv',
             }
 
@@ -225,6 +225,12 @@ if __name__ == "__main__":
                 'GRADE': 'grade',
                 'LATE': 'late',
                 'MISSING': 'missing',
+                },
+            'final_grades': {
+                'STUDENT_NUMBER': 'student_id',
+                'SECTIONID': 'section_import_id',
+                'GRADE': 'letter_grade',
+                'PERCENT': 'final_percent',
                 },
             'attendance': {
                 'STUDENT_NUMBER': 'student_id',
@@ -283,7 +289,7 @@ if __name__ == "__main__":
             # year's import_id should be it's year id followed by '00'
             year_id = row[csv_idx['year_id']]
 
-            print 'importing year ' + year_id + '\r',
+            print '\rimporting year ' + year_id,
             sys.stdout.flush()
 
             year_id_len = len(year_id)
@@ -303,7 +309,7 @@ if __name__ == "__main__":
                             end_date=str(datetime.datetime.strptime(row[csv_idx['end_date']], '%Y-%m-%d %H:%M:%S').date())
                             )
                     settings_service.add_school_year(new_entry)
-        print 'done importing school years          \r'
+        print '\rdone importing school years          '
         print ''
 
     # terms
@@ -344,7 +350,7 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
-            print 'importing school term ' + row[csv_idx['import_id']] + '\r',
+            print '\rimporting school term ' + row[csv_idx['import_id']],
             sys.stdout.flush()
 
             # check to see if I'm on a new year entry
@@ -381,7 +387,7 @@ if __name__ == "__main__":
                         school_year=school_year.id,
                         )
                 term_service.add_term(new_entry)
-        print 'done importing terms          \r'
+        print '\rdone importing terms          '
         print ''
 
     # teachers
@@ -406,7 +412,7 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
-            print 'importing teacher ' + row[csv_idx['import_id']] + '\r',
+            print '\rimporting teacher ' + row[csv_idx['import_id']],
             sys.stdout.flush()
 
             if row[csv_idx['import_id']] not in teacher_cache:
@@ -424,7 +430,7 @@ if __name__ == "__main__":
                     new_teacher = User(**response.json()['user'])
                     teacher_cache[new_teacher.import_id] = new_teacher.pk
 
-        print 'done importing teachers          \r'
+        print '\rdone importing teachers          '
         print ''
 
     # students
@@ -442,7 +448,7 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
-            print 'importing student ' + row[csv_idx['student_id']] + '\r',
+            print '\rimporting student ' + row[csv_idx['student_id']],
             sys.stdout.flush()
 
             student_id = get_student_id(student_service, row[csv_idx['student_id']])
@@ -464,7 +470,7 @@ if __name__ == "__main__":
                 new_student = Student(**response.json()['students'][0])
                 student_cache[new_student.student_id] = new_student.id
 
-        print 'done importing students          \r'
+        print '\rdone importing students          '
         print ''
 
     # sections
@@ -482,7 +488,7 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
-            print 'importing section ' + row[csv_idx['section_import_id']] + '\r',
+            print '\rimporting section ' + row[csv_idx['section_import_id']],
             sys.stdout.flush()
 
             section_id = get_section_id(section_service, row[csv_idx['section_import_id']])
@@ -513,7 +519,7 @@ if __name__ == "__main__":
                 new_section = Section(**response.json()['sections'][0])
                 section_cache[new_section.import_id] = new_section.id
 
-        print 'done importing sections          \r'
+        print '\rdone importing sections          '
         print ''
 
     # enrollments
@@ -531,14 +537,14 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
-            print 'importing enrollment for student ' + row[csv_idx['student_id']] + ' in section ' + row[csv_idx['section_import_id']] + '\r',
+            print '\rimporting enrollment for student ' + row[csv_idx['student_id']] + ' in section ' + row[csv_idx['section_import_id']],
             sys.stdout.flush()
 
             filters = { 'section.import_id': row[csv_idx['section_import_id']], 'student.student_id': row[csv_idx['student_id']], }
             results = enrollment_service.get_enrollments(filters)
             if len(results) is 0:
                 # get the section
-                section_id = get_section_id(section_service, import_id)
+                section_id = get_section_id(section_service, row[csv_idx['section_import_id']])
                 if section_id is None:
                     sys.exit(files['enrollments'] + ' contained an enrollment with a class that wasn\'t in the csv files and didn\'t exist in the database')
 
@@ -547,12 +553,12 @@ if __name__ == "__main__":
                 if student_id is None:
                     sys.exit(files['enrollments'] + ' contained an enrollment with a student that wasn\'t in the csv files and didn\'t exist in the database')
 
-                new_entry = Enrollment(id=None, section=section.id, student=student_id)
+                new_entry = Enrollment(id=None, section=section_id, student=student_id)
                 enrollment_service.add_enrollment(new_entry)
-        print 'done importing enrollments                                                 \r'
+        print '\rdone importing enrollments                                                 '
         print ''
 
-    # assignments
+    # assignments and grades
     invalid_grades = 0
     with open(os.path.join(args.folder, 'temp_' + files['assignments'])) as csvfile:
         print 'importing assignments and grades...'
@@ -569,7 +575,7 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
-            print 'importing assignment ' + row[csv_idx['assignment_import_id']] + ' for student ' + row[csv_idx['student_id']] + '\r',
+            print '\rimporting assignment ' + row[csv_idx['assignment_import_id']] + ' for student ' + row[csv_idx['student_id']],
             sys.stdout.flush()
 
             # get the section
@@ -630,10 +636,66 @@ if __name__ == "__main__":
                             late=(row[csv_idx['late']] == '1'),
                             missing=(row[csv_idx['missing']] == '1'),
                             )
-            grades_service.add_grade(new_grade, student=student_id)
-        print 'done importing assignments and grades                               \r'
+            grade_service.add_grade(new_grade, student=student_id)
+        print '\rdone importing assignments and grades                               '
         if invalid_grades > 0:
             print '*** GRADES ERROR: ' + files['assignments'] + ' had ' + str(invalid_grades) + ' grades that weren\'t a valid number. They weren\'t added.'
+        print ''
+
+    # final grades
+    invalid_final_grades = 0
+    with open(os.path.join(args.folder, files['final_grades'])) as csvfile:
+        print 'importing final grades...'
+        reader = csv.reader(csvfile)
+        cleared_students = Set()
+
+        # set up the headers
+        first_row = reader.next()
+        csv_idx = {}
+        i = 0
+        for header in first_row:
+            csv_idx[csv_headers['final_grades'][header]] = i
+            i += 1
+
+        # read in rows
+        for row in reader:
+            print '\rimporting final grade for student ' + row[csv_idx['student_id']] + ' in section ' + row[csv_idx['section_import_id']],
+            sys.stdout.flush()
+
+            # get the student
+            student_id = get_student_id(student_service, row[csv_idx['student_id']])
+            if student_id == None:
+                sys.exit(files['final_grades'] + ' contained a student that wasn\'t in the csv files and didn\'t exist in the database')
+
+            # get and delete all the assignments for this section
+            # we do this because assignments/grades are not mutable in Sprout
+            # and we have no way of knowing if an assignment was deleted from
+            # the importing csvs, so we just re-add them
+            if row[csv_idx['student_id']] not in cleared_students:
+                old_final_grades = grade_service.get_final_grades(student_id)
+                if len(old_final_grades) > 0:
+                    grade_service.delete_many_final_grades(old_final_grades, student_id)
+                cleared_students.add(row[csv_idx['student_id']])
+
+            # get the enrollment
+            filters = { 'section.import_id': row[csv_idx['section_import_id']], 'student.student_id': row[csv_idx['student_id']], }
+            results = enrollment_service.get_enrollments(filters)
+            if len(results) is 0:
+                sys.exit(files['final_grades'] + ' contained an enrollment that wasn\'t in the csv files and didn\'t exist in the database')
+            enrollment_id = results[0].id
+
+            # make sure this is a valid percent
+            try:
+                float(row[csv_idx['final_percent']])
+            except ValueError:
+                invalid_final_grades += 1
+                continue
+
+            # add final grade because we know we cleared everything since the last import
+            new_entry = FinalGrade(id=None, enrollment=enrollment_id, letter_grade=row[csv_idx['letter_grade']], final_percent=row[csv_idx['final_percent']])
+            grade_service.add_final_grade(new_entry, student_id)
+
+        print '\rdone importing final grades                                                            '
         print ''
 
     # attendances
@@ -653,7 +715,7 @@ if __name__ == "__main__":
 
         # read in rows
         for row in reader:
-            print 'importing attendance for student ' + row[csv_idx['student_id']] + ' for section ' + row[csv_idx['section_import_id']] + '\r',
+            print '\rimporting attendance for student ' + row[csv_idx['student_id']] + ' for section ' + row[csv_idx['section_import_id']],
             sys.stdout.flush()
 
             # get the enrollment
@@ -687,7 +749,7 @@ if __name__ == "__main__":
                                             )
             attendance_service.add_attendance_record(new_attendance_record)
 
-        print 'done importing attendance                                                  \r'
+        print '\rdone importing attendance                                                  '
         if missing_enrollments > 0:
             print '*** ATTENDANCE ERROR: ' + files['attendance'] + ' had ' + str(missing_enrollments) + ' enrollments that weren\'t in the csv files and didn\'t exist in the database. They weren\'t added.'
         print ''
