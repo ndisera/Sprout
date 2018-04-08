@@ -96,7 +96,13 @@ def get_section_id(section_service, import_id):
             section_id = results[0].id
     return section_id
 
-def get_assignment_id(assignment_service, section_id, import_id):
+def cache_assignment(section_import_id, assignment_import_id, assignment_id):
+    if section_import_id in assignment_cache:
+        assignment_cache[section_import_id][assignment_import_id] = results[0].id
+    else:
+        assignment_cache[section_import_id] = { assignment_import_id: assignment_id, }
+
+def get_assignment_id(assignment_service, section_id, section_import_id, import_id):
     """
     get the db id for a given assignment's import_id.
     returns None and caches result if not found.
@@ -111,14 +117,14 @@ def get_assignment_id(assignment_service, section_id, import_id):
     :rtype: int or None
     """
     assignment_id = None
-    if import_id in assignment_cache:
-        assignment_id = assignment_cache[import_id]
+    if section_import_id in assignment_cache and import_id in assignment_cache[section_import_id]:
+        assignment_id = assignment_cache[section_import_id][import_id]
     else:
         filters = { 'import_id': import_id, }
         results = assignment_service.get_assignments(section_id, filters)
         if len(results) > 0:
             # cache the results
-            assignment_cache[import_id] = results[0].id
+            cache_assignment(section_import_id, import_id, results[0].id)
             assignment_id = results[0].id
     return assignment_id
 
@@ -594,7 +600,7 @@ if __name__ == "__main__":
                 cleared_sections.add(row[csv_idx['section_import_id']])
 
             # get or create the assignment
-            assignment_id = get_assignment_id(assignment_service, section_id, row[csv_idx['assignment_import_id']])
+            assignment_id = get_assignment_id(assignment_service, section_id, row[csv_idx['section_import_id']], row[csv_idx['assignment_import_id']])
             if assignment_id is None:
                 # add the assignment
                 new_assignment = Assignment(
@@ -610,7 +616,7 @@ if __name__ == "__main__":
                 new_assignment = Assignment(**response.json()['assignments'][0])
 
                 # cache the new assignment
-                assignment_cache[new_assignment.import_id] = new_assignment.id
+                cache_assignment(row[csv_idx['section_import_id']], new_assignment.import_id, new_assignment.id)
                 assignment_id = new_assignment.id
 
             # make sure this is a valid score
