@@ -13,7 +13,7 @@
 
 #notifications-container {
     z-index: 3;
-    position: absolute;
+    position: fixed;
     top: 50px;
     right: 10px;
     width: 330px;
