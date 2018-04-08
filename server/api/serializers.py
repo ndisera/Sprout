@@ -325,7 +325,7 @@ class SproutRegisterSerializer(RegisterSerializer):
     username = None
     first_name = serializers.CharField(source='sproutuserprofile.first_name')
     last_name = serializers.CharField(source='sproutuserprofile.last_name')
-    import_id = serializers.CharField(source='sproutuserprofile.import_id', allow_null=True)
+    import_id = serializers.CharField(source='sproutuserprofile.import_id', required=False, allow_null=True, allow_blank=True)
     password1 = serializers.CharField(write_only=True, required=False)
     password2 = serializers.CharField(write_only=True, required=False)
     is_superuser = serializers.BooleanField(default=False)
@@ -404,7 +404,7 @@ class SproutPasswordResetSerializer(PasswordResetSerializer):
 class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerializer):
     first_name = serializers.CharField(source='sproutuserprofile.first_name')
     last_name = serializers.CharField(source='sproutuserprofile.last_name')
-    import_id = serializers.CharField(source='sproutuserprofile.import_id')
+    import_id = serializers.CharField(source='sproutuserprofile.import_id', required=False, allow_null=True, allow_blank=True)
 
     class Meta(UserDetailsSerializer.Meta):
         fields = []
