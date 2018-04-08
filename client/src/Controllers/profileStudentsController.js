@@ -1,4 +1,4 @@
-app.controller("profileStudentsController", function ($scope, $location, data) {
+app.controller("profileStudentsController", function ($scope, $location, students, data) {
     $scope.location = $location;
 
     // I know the order because I specified it in the route
@@ -32,8 +32,7 @@ app.controller("profileStudentsController", function ($scope, $location, data) {
         $scope.sections[elem.section]['students'].push(studentsLookup[elem.student]);
     });
 
-
-    $scope.students = _.values(studentsLookup);
+    $scope.students = students.students;
 
     // the sections array is what builds the caseload and class
     // panels. add the caseload as a fake 'section' and then

@@ -1,7 +1,10 @@
-app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, behaviorService, data, terms, student) {
+app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, behaviorService, studentService, data, terms, student) {
     $scope.location = $location;
 
     $scope.report = {};
+
+    $scope.behaviorNote = {};
+    $scope.editingNote = false;
 
     // I know this will be here, because I filtered on the student ID, and only that student
     $scope.student = student.student;
@@ -460,7 +463,8 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
     function updateInputScores() {
         var config = {
             include: ['enrollment.section.*', ],
-            filter: [{
+            filter: [
+                {
                     name: 'date',
                     val: $scope.inputDate.format('YYYY-MM-DD').toString(),
                 },
@@ -500,7 +504,95 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                 toastService.error('The server wasn\'t able to get student behaviors.');
             }
         );
+
+        // update the date's comment
+        var commentConfig = {
+            filter: [{ name: 'date', val: $scope.inputDate.format('YYYY-MM-DD').toString(), }, ],
+        };
+
+        studentService.getBehaviorNotesForStudent($scope.student.id, commentConfig).then(
+            function success(data) {
+                if(data.behavior_notes.length > 0) {
+                    $scope.behaviorNote = data.behavior_notes[0];
+                }
+                else {
+                    $scope.behaviorNote = {
+                        date: $scope.inputDate.format('YYYY-MM-DD').toString(),
+                        body: '',
+                        id: null,
+                        student: $scope.student.id,
+                    };
+                }
+
+                $scope.behaviorNote.body_temp = $scope.behaviorNote.body;
+            },
+            function error(response) {
+                // notify user
+                toastService.error('The server wasn\'t able to get student behavior comment.');
+            },
+        );
     }
+
+    $scope.toggleEditingNote = function(value) {
+        $scope.editingNote = value;
+        if(!value) {
+            $scope.behaviorNote.body_temp = $scope.behaviorNote.body;
+        }
+    };
+
+    $scope.saveNote = function() {
+        var newNote = {
+            date: $scope.behaviorNote.date,
+            body: $scope.behaviorNote.body_temp,
+            student: $scope.behaviorNote.student,
+        };
+
+        if($scope.behaviorNote.id !== null && ($scope.behaviorNote.body_temp === null || $scope.behaviorNote.body_temp === undefined || $scope.behaviorNote.body_temp === '')) {
+            studentService.deleteBehaviorNoteForStudent($scope.student.id, $scope.behaviorNote.id).then(
+                function success(data) {
+                    $scope.behaviorNote = {
+                        date: $scope.inputDate.format('YYYY-MM-DD').toString(),
+                        body: '',
+                        id: null,
+                        student: $scope.student.id,
+                    };
+                },
+                function error(response) {
+                    // notify user
+                    toastService.error('The server wasn\'t able to save the student behavior comment.');
+                },
+            );
+        }
+        else if($scope.behaviorNote.id !== null) {
+            newNote.id = $scope.behaviorNote.id;
+
+            studentService.updateBehaviorNoteForStudent($scope.student.id, newNote.id, newNote).then(
+                function success(data) {
+                    $scope.behaviorNote           = data.behavior_note;
+                    $scope.behaviorNote.body_temp = data.behavior_note.body;
+                },
+                function error(response) {
+                    // notify user
+                    toastService.error('The server wasn\'t able to save the student behavior comment.');
+                },
+            );
+        }
+        else {
+            studentService.addBehaviorNoteForStudent($scope.student.id, newNote).then(
+                function success(data) {
+                    $scope.behaviorNote           = data.behavior_note;
+                    $scope.behaviorNote.body_temp = data.behavior_note.body;
+                },
+                function error(response) {
+                    // notify user
+                    toastService.error('The server wasn\'t able to save the student behavior comment.');
+                },
+            );
+        }
+
+        $scope.toggleEditingNote(false);
+    }
+
 
 
     /**
