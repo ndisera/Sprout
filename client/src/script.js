@@ -200,7 +200,10 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             controller: 'profileStudentsController',
             controllerAs: 'control',
             resolve: {
-                data: function ($q, userService, enrollmentService, studentService) {
+                students: function(studentService) {
+                    return studentService.getStudents();
+                },
+                data: function($q, userService, enrollmentService, studentService) {
                     //TODO(gzuber): I don't like this in script.js...
                     var deferred = $q.defer();
                     userService.authVerify().then(
