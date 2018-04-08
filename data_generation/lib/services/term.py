@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-Term = namedtuple("Term", ['name', 'start_date', 'end_date', 'settings', 'school_year', 'id'])
+Term = namedtuple("Term", ['name', 'start_date', 'end_date', 'settings', 'school_year', 'id', 'import_id'])
 
 
 class TermService(BaseService):
@@ -12,14 +12,15 @@ class TermService(BaseService):
         super(TermService, self).__init__(**kwargs)
         self.complete_uri = self.complete_uri_template.format(endpoint="/terms/")
 
-    def get_terms(self):
+    def get_terms(self, params=None):
         """
-        Download a complete list of terms
+        Download a complete list of terms, with optional filter
 
+        :param params: dict representing filter_key -> filter_val
         :return: list of term objects
         :rtype: list[Terms]
         """
-        return self._get_models(Term, self.complete_uri)
+        return self._get_models(Term, self.complete_uri, params=self._prepare_params(params))
 
     def add_term(self, term):
         """

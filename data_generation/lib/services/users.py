@@ -6,7 +6,7 @@ from collections import namedtuple
 
 from base_service import BaseService
 
-User = namedtuple("User", ['id', 'email', 'first_name', 'last_name'])
+User = namedtuple("User", ['pk', 'is_active', 'is_superuser', 'email', 'first_name', 'last_name', 'import_id', ])
 
 
 class UsersService(BaseService):
@@ -34,7 +34,9 @@ class UsersService(BaseService):
         :return:
         """
         data = user._asdict()
-        del data['id']
+        del data['pk']
+        del data['is_active']
+        del data['is_superuser']
         if password is not None:
             data['password1'] = password
             data['password2'] = password

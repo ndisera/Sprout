@@ -248,14 +248,14 @@ class StandardizedTestScoreSerializer(DynamicModelSerializer):
 class AssignmentSerializer(DynamicModelSerializer):
     class Meta:
         model = Assignment
-        fields = ('id', 'section', 'assignment_name', 'score_min', 'score_max', 'due_date')
+        fields = '__all__'
     section = DynamicRelationField('SectionSerializer')
 
 
 class GradeSerializer(DynamicModelSerializer):
     class Meta:
         model = Grade
-        fields = ('id', 'assignment', 'student', 'handin_datetime', 'score',)
+        fields = '__all__'
 
     def validate(self, data):
         """
@@ -272,11 +272,11 @@ class GradeSerializer(DynamicModelSerializer):
         else:
             assignment = self.instance.assignment
 
-        if 'score' in validated_data:
-            # Make sure the score is not out of range
-            score = validated_data['score']
-            if score < assignment.score_min or score > assignment.score_max:
-                raise serializers.ValidationError({'score': 'Out of range for assignment with id {id}'.format(id=assignment.id)})
+        # if 'score' in validated_data:
+            # # Make sure the score is not out of range
+            # score = validated_data['score']
+            # if score < assignment.score_min or score > assignment.score_max:
+                # raise serializers.ValidationError({'score': 'Out of range for assignment with id {id}'.format(id=assignment.id)})
 
         # Check that the student is enrolled in the class to which the assignment belongs
         section = assignment.section
@@ -325,6 +325,7 @@ class SproutRegisterSerializer(RegisterSerializer):
     username = None
     first_name = serializers.CharField(source='sproutuserprofile.first_name')
     last_name = serializers.CharField(source='sproutuserprofile.last_name')
+    import_id = serializers.CharField(source='sproutuserprofile.import_id', allow_null=True)
     password1 = serializers.CharField(write_only=True, required=False)
     password2 = serializers.CharField(write_only=True, required=False)
     is_superuser = serializers.BooleanField(default=False)
@@ -333,7 +334,8 @@ class SproutRegisterSerializer(RegisterSerializer):
         profile_data = self.validated_data.pop('sproutuserprofile', {})
         first_name = profile_data.get('first_name')
         last_name = profile_data.get('last_name')
-        profile = SproutUserProfile(user=user, first_name=first_name, last_name=last_name)
+        import_id = profile_data.get('import_id')
+        profile = SproutUserProfile(user=user, first_name=first_name, last_name=last_name, import_id=import_id)
         profile.save()
         user.is_superuser = self.validated_data.pop('is_superuser', False)
         self.instance = user
@@ -344,6 +346,7 @@ class SproutRegisterSerializer(RegisterSerializer):
         representation['is_superuser'] = instance.is_superuser
         user_profile = {'first_name' : instance.sproutuserprofile.first_name,
                         'last_name' : instance.sproutuserprofile.last_name,
+                        'import_id' : instance.sproutuserprofile.import_id,
                         }
         representation['sproutuserprofile'] = user_profile
         return representation
@@ -401,11 +404,12 @@ class SproutPasswordResetSerializer(PasswordResetSerializer):
 class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerializer):
     first_name = serializers.CharField(source='sproutuserprofile.first_name')
     last_name = serializers.CharField(source='sproutuserprofile.last_name')
+    import_id = serializers.CharField(source='sproutuserprofile.import_id')
 
     class Meta(UserDetailsSerializer.Meta):
         fields = []
         fields.extend(UserDetailsSerializer.Meta.fields)
-        fields.extend(('first_name', 'last_name', 'is_active', 'is_superuser'))
+        fields.extend(('first_name', 'last_name', 'import_id', 'is_active', 'is_superuser'))
         if 'username' in fields:
             del fields[fields.index('username')]
 
@@ -425,13 +429,14 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
         profile_data = validated_data.pop('sproutuserprofile', {})
         first_name = profile_data.get('first_name')
         last_name = profile_data.get('last_name')
+        import_id = profile_data.get('import_id')
 
         instance = super(SproutUserSerializer, self).update(instance, validated_data)
         try:
             profile = instance.sproutuserprofile
         except SproutUserProfile.DoesNotExist:
             # Try/Catch should not be necessary because the user profile should never not exist
-            profile = SproutUserProfile(user=instance, first_name=first_name, last_name=last_name)
+            profile = SproutUserProfile(user=instance, first_name=first_name, last_name=last_name, import_id=import_id)
 
         profile_changed = False
         if first_name:
@@ -439,6 +444,9 @@ class SproutUserSerializer(WithDynamicModelSerializerMixin, UserDetailsSerialize
             profile_changed = True
         if last_name:
             profile.last_name = last_name
+            profile_changed = True
+        if import_id:
+            profile.import_id = import_id
             profile_changed = True
         if profile_changed:
             profile.save()

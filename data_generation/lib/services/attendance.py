@@ -12,14 +12,15 @@ class AttendanceService(BaseService):
         super(AttendanceService, self).__init__(**kwargs)
         self.complete_uri = self.complete_uri_template.format(endpoint="/attendances/")
 
-    def get_attendances(self):
+    def get_attendances(self, params=None):
         """
-        Download a complete list of attendances
+        Download a complete list of attendances, with optional filters
 
+        :param params: dict representing filter_key -> filter_val
         :return: list of attendance objects
         :rtype: list[AttendanceRecord]
         """
-        return self._get_models(AttendanceRecord, self.complete_uri)
+        return self._get_models(AttendanceRecord, self.complete_uri, params=self._prepare_params(params))
 
     def add_attendance_record(self, attendance_record):
         """
@@ -38,3 +39,21 @@ class AttendanceService(BaseService):
         :return:
         """
         return self._add_many_models(attendance_records, self.complete_uri)
+
+    def delete_attendance_record(self, attendance_record):
+        """
+        Delete an attendance record from the server
+
+        :param assignment: Attendance object to delete
+        :type assignment: AttendanceRecord
+        """
+        return self.delete_many_attendance_records(attendance_records=[attendance_record])
+
+    def delete_many_attendance_records(self, attendance_records):
+        """
+        Delete many attendance records from the server
+
+        :param attendance_records: Attendance records to delete
+        :type attendance_records: List of AttendanceRecord
+        """
+        return self._delete_many_models(attendance_records, self.complete_uri)

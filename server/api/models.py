@@ -45,6 +45,8 @@ class SproutUserProfile(models.Model):
                                   help_text="User first name")
     last_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                  help_text="User last name")
+    import_id = models.CharField(null=True, blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
     picture = models.OneToOneField(ProfilePicture, on_delete=models.SET_NULL,
                                    blank=True, null=True,
                                    help_text="User's Profile Picture")
@@ -133,6 +135,8 @@ class SchoolYear(AdminWriteMixin, models.Model):
                                   help_text="When this school year begins")
     end_date = models.DateField(blank=False, null=False,
                                 help_text="When this school year ends")
+    import_id = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
 
     class Meta():
         """
@@ -188,6 +192,8 @@ class Term(AdminWriteMixin, models.Model):
                                   help_text="Term start date, such as 2018-01-18 for the 18th of January, 2018")
     end_date = models.DateField(blank=False,
                                 help_text="Term end date")
+    import_id = models.CharField(null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
     settings = models.ForeignKey(TermSettings, blank=False, on_delete=models.PROTECT,
                                  help_text="Settings controlling this Term")
     school_year = models.ForeignKey(SchoolYear, blank=False, on_delete=models.PROTECT,
@@ -266,6 +272,8 @@ class Section(models.Model):
     # Lookup the class schedule via term's TermSettings
     schedule_position = models.IntegerField(blank=True, null=True,
                                             help_text="Relative position in the schedule this class takes place")
+    import_id = models.CharField(null=True, blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
 
     class Meta:
         ordering = ('id',)
@@ -384,9 +392,11 @@ class Assignment(models.Model):
     """
     section = models.ForeignKey(Section, related_name='assignment_section', on_delete=models.CASCADE,
                                    verbose_name="Section to which this assigment belongs")
+    import_id = models.CharField(null=True, blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                        help_text="ID as known by other importing LMS")
     assignment_name = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH)
-    score_min = models.IntegerField(blank=False, verbose_name="Minimum Score")
-    score_max = models.IntegerField(blank=False, verbose_name="Maximum Score")
+    score_min = models.FloatField(blank=False, verbose_name="Minimum Score")
+    score_max = models.FloatField(blank=False, verbose_name="Maximum Score")
     due_date = models.DateField(blank=False,)
 
     class Meta:
@@ -410,8 +420,12 @@ class Grade(models.Model):
                                    help_text="Assignment being reported")
     student = models.ForeignKey(Student, related_name='grade_student', on_delete=models.CASCADE,
                                 help_text="Student being graded")
-    score = models.IntegerField(blank=False, verbose_name="Assignment score")
+    score = models.FloatField(blank=False, verbose_name="Assignment score")
     handin_datetime = models.DateTimeField(blank=False)
+    late = models.BooleanField(blank=False, help_text="Whether the assignment was late")
+    missing = models.BooleanField(blank=False, help_text="Whether the assignment is missing")
+    grade = models.CharField(blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                help_text="Letter grade received")
 
     class Meta:
         unique_together = (('assignment', 'student', 'handin_datetime'),)
@@ -427,7 +441,7 @@ class FinalGrade(models.Model):
     enrollment = models.OneToOneField(Enrollment, related_name='finalgrade_enrollment', on_delete=models.CASCADE,
                                       unique=True,
                                       help_text="The enrollment being graded")
-    final_percent = models.IntegerField(blank=False,
+    final_percent = models.FloatField(blank=False,
                                         help_text="The weighted final grade for this enrollment")
     letter_grade = models.CharField(null=True, max_length=3,
                                     help_text="A codified representation of the grade, such as A-F or 1-5")
