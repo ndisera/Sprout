@@ -48,7 +48,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             quantitative_range_low: 0,
             quantitative_range_upper: 100,
             quantitative_target: null,
-            title: 'New IEP',
+            title: 'New Goal',
             student: $scope.student.id,
         };
     }

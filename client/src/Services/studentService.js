@@ -258,6 +258,86 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
+     * Get behavior notes for a specific student
+     * @param {number} studentId - ID of the student
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function getBehaviorNotesForStudent(studentId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/behavior-notes/' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Add an behavior note for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {behaviorNote} behaviorNoteObj - the behavior note object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function addBehaviorNoteForStudent(studentId, behaviorNoteObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/behavior-notes/',
+            data: behaviorNoteObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Update specific behavior note for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} behaviorNoteId - the behavior note's id.
+     * @param {service} behaviorNoteObj - the behavior note object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function updateBehaviorNoteForStudent(studentId, behaviorNoteId, behaviorNoteObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/behavior-notes/' + behaviorNoteId,
+            data: behaviorNoteObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Delete specific behavior note for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} behaviorNoteId - the behavior note's id.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function deleteBehaviorNoteForStudent(studentId, behaviorNoteId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/behavior-notes/' + behaviorNoteId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
      * Get services for a specific student
      * @param {number} studentId - ID of the student
      * @param {object} config - config object for query parameters (see queryService)
@@ -640,6 +720,10 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         addStudentPicture: addStudentPicture,
         deleteStudentPicture: deleteStudentPicture,
         getGradesForStudent: getGradesForStudent,
+        getBehaviorNotesForStudent: getBehaviorNotesForStudent,
+        addBehaviorNoteForStudent: addBehaviorNoteForStudent,
+        updateBehaviorNoteForStudent: updateBehaviorNoteForStudent,
+        deleteBehaviorNoteForStudent: deleteBehaviorNoteForStudent,
         getServicesForStudent: getServicesForStudent,
         getServiceForStudent: getServiceForStudent,
         addServiceForStudent: addServiceForStudent,
