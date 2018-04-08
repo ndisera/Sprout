@@ -98,7 +98,7 @@ def get_section_id(section_service, import_id):
 
 def cache_assignment(section_import_id, assignment_import_id, assignment_id):
     if section_import_id in assignment_cache:
-        assignment_cache[section_import_id][assignment_import_id] = results[0].id
+        assignment_cache[section_import_id][assignment_import_id] = assignment_id
     else:
         assignment_cache[section_import_id] = { assignment_import_id: assignment_id, }
 
