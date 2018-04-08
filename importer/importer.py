@@ -31,6 +31,12 @@ from lib.services.assignment import Assignment, AssignmentService
 from lib.services.grades import Grade, GradesService
 from lib.services.attendance import AttendanceRecord, AttendanceService
 
+# caches
+teacher_cache    = {}
+student_cache    = {}
+section_cache    = {}
+assignment_cache = {}
+
 def escape_string(string):
     to_escape = [
             ('\\', '\\\\'),
@@ -41,6 +47,80 @@ def escape_string(string):
     for seq in to_escape:
         string = string.replace(seq[0], seq[1])
     return string
+
+def get_student_id(student_service, import_id):
+    """
+    get the db id for a given student's import_id (aka student_id).
+    returns None and caches result if not found.
+
+    :param student_service: 
+    :type student_service: StudentService
+    :param import_id: import student_id
+    :type import_id: string
+    :return: db id of student or None
+    :rtype: int or None
+    """
+    student_id = None
+    if import_id in student_cache:
+        student_id = student_cache[import_id]
+    else:
+        filters = { 'student_id': import_id, }
+        results = student_service.get_students(filters)
+        if len(results) > 0:
+            # cache the results
+            student_cache[import_id] = results[0].id
+            student_id = results[0].id
+    return student_id
+
+def get_section_id(section_service, import_id):
+    """
+    get the db id for a given section's import_id.
+    returns None and caches result if not found.
+
+    :param section_service: 
+    :type section_service: SectionService
+    :param import_id: section's import_id
+    :type import_id: string
+    :return: db id of section or None
+    :rtype: int or None
+    """
+    section_id = None
+    if import_id in section_cache:
+        section_id = section_cache[import_id]
+    else:
+        filters = { 'import_id': import_id, }
+        results = section_service.get_sections(filters)
+        if len(results) > 0:
+            # cache the results
+            section_cache[import_id] = results[0].id
+            section_id = results[0].id
+    return section_id
+
+def get_assignment_id(assignment_service, section_id, import_id):
+    """
+    get the db id for a given assignment's import_id.
+    returns None and caches result if not found.
+
+    :param assignment_service: 
+    :type assignment_service: AssignmentService
+    :param section_id: db id of section to which assignment belongs
+    :type section_id: int
+    :param import_id: assignment's import_id
+    :type import_id: string
+    :return: db id of assignment or None
+    :rtype: int or None
+    """
+    assignment_id = None
+    if import_id in assignment_cache:
+        assignment_id = assignment_cache[import_id]
+    else:
+        filters = { 'import_id': import_id, }
+        results = assignment_service.get_assignments(section_id, filters)
+        if len(results) > 0:
+            # cache the results
+            assignment_cache[import_id] = results[0].id
+            assignment_id = results[0].id
+    return assignment_id
 
 if __name__ == "__main__":
     # disable annoying warnings
@@ -87,11 +167,11 @@ if __name__ == "__main__":
 
     settings_service = SettingsService(**service_args)
     term_service = TermService(**service_args)
-    users_service = UsersService(**service_args)
-    sections_service = SectionService(**service_args)
+    user_service = UsersService(**service_args)
+    section_service = SectionService(**service_args)
     student_service = StudentService(**service_args)
-    enrollments_service = EnrollmentService(**service_args)
-    assignments_service = AssignmentService(**service_args)
+    enrollment_service = EnrollmentService(**service_args)
+    assignment_service = AssignmentService(**service_args)
     grades_service = GradesService(**service_args)
     attendance_service = AttendanceService(**service_args)
 
@@ -305,15 +385,14 @@ if __name__ == "__main__":
         print ''
 
     # teachers
-    teachers_by_import = {}
     with open(os.path.join(args.folder, files['teachers'])) as csvfile:
         print 'importing teachers...'
 
         # build import_id lookup
-        db_results = users_service.get_users()
+        db_results = user_service.get_users()
         for result in db_results:
             if result.import_id is not None:
-                teachers_by_import[result.import_id] = result 
+                teacher_cache[result.import_id] = result.pk
 
         reader = csv.reader(csvfile)
 
@@ -330,7 +409,7 @@ if __name__ == "__main__":
             print 'importing teacher ' + row[csv_idx['import_id']] + '\r',
             sys.stdout.flush()
 
-            if row[csv_idx['import_id']] not in teachers_by_import:
+            if row[csv_idx['import_id']] not in teacher_cache:
                 new_entry = User(pk=None,
                                 is_active=None,
                                 is_superuser=None,
@@ -338,10 +417,12 @@ if __name__ == "__main__":
                                 first_name=row[csv_idx['first_name']],
                                 last_name=row[csv_idx['last_name']],
                                 import_id=row[csv_idx['import_id']])
-                response = users_service.register_user(new_entry)
+                response = user_service.register_user(new_entry)
+
+                # cache the new teacher
                 if 'user' in response.json():
                     new_teacher = User(**response.json()['user'])
-                    teachers_by_import[new_teacher.import_id] = new_teacher
+                    teacher_cache[new_teacher.import_id] = new_teacher.pk
 
         print 'done importing teachers          \r'
         print ''
@@ -364,9 +445,8 @@ if __name__ == "__main__":
             print 'importing student ' + row[csv_idx['student_id']] + '\r',
             sys.stdout.flush()
 
-            filters = { 'student_id': row[csv_idx['student_id']], }
-            results = student_service.get_students(filters)
-            if len(results) is 0:
+            student_id = get_student_id(student_service, row[csv_idx['student_id']])
+            if student_id == None:
                 new_entry = Student(
                         student_id=row[csv_idx['student_id']],
                         first_name=row[csv_idx['first_name']],
@@ -378,7 +458,12 @@ if __name__ == "__main__":
                         grade_level=row[csv_idx['grade_level']],
                         id=None,
                         )
-                student_service.add_student(new_entry)
+                response = student_service.add_student(new_entry)
+
+                # cache the new student
+                new_student = Student(**response.json()['students'][0])
+                student_cache[new_student.student_id] = new_student.id
+
         print 'done importing students          \r'
         print ''
 
@@ -400,31 +485,34 @@ if __name__ == "__main__":
             print 'importing section ' + row[csv_idx['section_import_id']] + '\r',
             sys.stdout.flush()
 
-            filters = { 'import_id': row[csv_idx['section_import_id']], }
-            results = sections_service.get_sections(filters)
-            if len(results) is 0:
+            section_id = get_section_id(section_service, row[csv_idx['section_import_id']])
+            if section_id is None:
                 # get the teacher
-                if row[csv_idx['teacher_import_id']] not in teachers_by_import:
+                if row[csv_idx['teacher_import_id']] not in teacher_cache:
                     sys.exit(files['enrollments'] + ' contained a class with a teachernumber that wasn\'t in the csv files and didn\'t exist in the database')
-                teacher = teachers_by_import[row[csv_idx['teacher_import_id']]]
+                teacher_id = teacher_cache[row[csv_idx['teacher_import_id']]]
 
                 # get the term
                 filters = { 'import_id': row[csv_idx['term_import_id']], }
                 results = term_service.get_terms(filters)
                 if len(results) is 0:
-                    print row
                     sys.exit(files['enrollments'] + ' contained a class with a term that wasn\'t in the csv files and didn\'t exist in the database')
-                term = results[0]
+                term_id = results[0].id
 
                 new_entry = Section(
                         id=None,
                         import_id=row[csv_idx['section_import_id']],
-                        teacher=teacher.pk,
-                        term=term.id,
+                        teacher=teacher_id,
+                        term=term_id,
                         title=row[csv_idx['title']],
                         schedule_position=None,
                         )
-                sections_service.add_section(new_entry)
+                response = section_service.add_section(new_entry)
+
+                # cache the new student
+                new_section = Section(**response.json()['sections'][0])
+                section_cache[new_section.import_id] = new_section.id
+
         print 'done importing sections          \r'
         print ''
 
@@ -447,28 +535,25 @@ if __name__ == "__main__":
             sys.stdout.flush()
 
             filters = { 'section.import_id': row[csv_idx['section_import_id']], 'student.student_id': row[csv_idx['student_id']], }
-            results = enrollments_service.get_enrollments(filters)
+            results = enrollment_service.get_enrollments(filters)
             if len(results) is 0:
                 # get the section
-                filters = { 'import_id': row[csv_idx['section_import_id']], }
-                results = sections_service.get_sections(filters)
-                if len(results) is 0:
-                    sys.exit('There was an error importing ' + files['enrollments'] + '. Couldn\'t find section for new enrollment.')
-                section = results[0]
+                section_id = get_section_id(section_service, import_id)
+                if section_id is None:
+                    sys.exit(files['enrollments'] + ' contained an enrollment with a class that wasn\'t in the csv files and didn\'t exist in the database')
 
-                # get the student
-                filters = { 'student_id': row[csv_idx['student_id']], }
-                results = student_service.get_students(filters)
-                if len(results) is 0:
-                    sys.exit(files['enrollments'] + ' contained a class with a student that wasn\'t in the csv files and didn\'t exist in the database')
-                student = results[0]
+                # get the student id
+                student_id = get_student_id(student_service, row[csv_idx['student_id']])
+                if student_id is None:
+                    sys.exit(files['enrollments'] + ' contained an enrollment with a student that wasn\'t in the csv files and didn\'t exist in the database')
 
-                new_entry = Enrollment(id=None, section=section.id, student=student.id)
-                enrollments_service.add_enrollment(new_entry)
+                new_entry = Enrollment(id=None, section=section.id, student=student_id)
+                enrollment_service.add_enrollment(new_entry)
         print 'done importing enrollments                                                 \r'
         print ''
 
     # assignments
+    invalid_grades = 0
     with open(os.path.join(args.folder, 'temp_' + files['assignments'])) as csvfile:
         print 'importing assignments and grades...'
         reader = csv.reader(csvfile, escapechar='\\')
@@ -488,71 +573,71 @@ if __name__ == "__main__":
             sys.stdout.flush()
 
             # get the section
-            filters = { 'import_id': row[csv_idx['section_import_id']], }
-            section_results = sections_service.get_sections(filters)
-            if len(results) is 0:
+            section_id = get_section_id(section_service, row[csv_idx['section_import_id']])
+            if section_id is None:
                 sys.exit('There was an error importing ' + files['assignments'] + '. Couldn\'t find section for new assignment.')
-            section = section_results[0]
 
             # get and delete all the assignments for this section
             # we do this because assignments/grades are not mutable in Sprout
             # and we have no way of knowing if an assignment was deleted from
             # the importing csvs, so we just re-add them
             if row[csv_idx['section_import_id']] not in cleared_sections:
-                old_assignments = assignments_service.get_assignments(section.id)
+                old_assignments = assignment_service.get_assignments(section_id)
                 if len(old_assignments) > 0:
-                    assignments_service.delete_many_assignments(old_assignments, section.id)
+                    assignment_service.delete_many_assignments(old_assignments, section_id)
                 cleared_sections.add(row[csv_idx['section_import_id']])
 
-            # see if the assignment is already there
-            assignment = None
-            filters = { 'import_id': row[csv_idx['assignment_import_id']], }
-            assignment_results = assignments_service.get_assignments(section.id, params=filters)
-            if len(assignment_results) is 0:
+            # get or create the assignment
+            assignment_id = get_assignment_id(assignment_service, section_id, row[csv_idx['assignment_import_id']])
+            if assignment_id is None:
                 # add the assignment
                 new_assignment = Assignment(
                                     id=None,
                                     import_id=row[csv_idx['assignment_import_id']],
-                                    section=section.id,
+                                    section=section_id,
                                     assignment_name=row[csv_idx['assignment_name']],
                                     due_date=str(datetime.datetime.strptime(row[csv_idx['due_date']], '%Y-%m-%d %H:%M:%S').date()),
                                     score_min=0,
                                     score_max=row[csv_idx['score_max']],
                                     )
-                response = assignments_service.add_assignment(new_assignment, section.id)
-                assignment = Assignment(**response.json()['assignments'][0])
-            else:
-                assignment = assignment_results[0]
+                response = assignment_service.add_assignment(new_assignment, section_id)
+                new_assignment = Assignment(**response.json()['assignments'][0])
+
+                # cache the new assignment
+                assignment_cache[new_assignment.import_id] = new_assignment.id
+                assignment_id = new_assignment.id
 
             # make sure this is a valid score
             try:
                 float(row[csv_idx['score']])
             except ValueError:
+                invalid_grades += 1
                 continue
 
-            # get the student
-            filters = { 'student_id': row[csv_idx['student_id']], }
-            student_results = student_service.get_students(filters)
-            if len(results) is 0:
+            # get the student id
+            student_id = get_student_id(student_service, row[csv_idx['student_id']])
+            if student_id is None:
                 sys.exit('There was an error importing ' + files['assignments'] + '. Couldn\'t find student for new assignment.')
-            student = student_results[0]
             
             # I know the grade won't be there since I deleted all assignments, so just add a new one
             new_grade = Grade(
                             id=None,
-                            student=student.id,
-                            assignment=assignment.id,
+                            student=student_id,
+                            assignment=assignment_id,
                             handin_datetime=row[csv_idx['due_date']],
                             score=row[csv_idx['score']],
                             grade=row[csv_idx['grade']],
                             late=(row[csv_idx['late']] == '1'),
                             missing=(row[csv_idx['missing']] == '1'),
                             )
-            grades_service.add_grade(new_grade, student=student.id)
+            grades_service.add_grade(new_grade, student=student_id)
         print 'done importing assignments and grades                               \r'
+        if invalid_grades > 0:
+            print '*** GRADES ERROR: ' + files['assignments'] + ' had ' + str(invalid_grades) + ' grades that weren\'t a valid number. They weren\'t added.'
         print ''
 
     # attendances
+    missing_enrollments = 0
     with open(os.path.join(args.folder, files['attendance'])) as csvfile:
         print 'importing attendance...'
         reader = csv.reader(csvfile)
@@ -566,8 +651,6 @@ if __name__ == "__main__":
             csv_idx[csv_headers['attendance'][header]] = i
             i += 1
 
-        missing_enrollments = 0
-
         # read in rows
         for row in reader:
             print 'importing attendance for student ' + row[csv_idx['student_id']] + ' for section ' + row[csv_idx['section_import_id']] + '\r',
@@ -575,7 +658,7 @@ if __name__ == "__main__":
 
             # get the enrollment
             filters = { 'student.student_id': row[csv_idx['student_id']], 'section.import_id': row[csv_idx['section_import_id']], }
-            enrollment_results = enrollments_service.get_enrollments(params=filters)
+            enrollment_results = enrollment_service.get_enrollments(params=filters)
             if len(enrollment_results) is 0:
                 missing_enrollments += 1
                 continue
@@ -604,8 +687,9 @@ if __name__ == "__main__":
                                             )
             attendance_service.add_attendance_record(new_attendance_record)
 
-    print 'done importing attendance                                                  \r'
-    if missing_enrollments > 0:
-        print files['attendance'] + ' had ' + str(missing_enrollments) + ' enrollments that weren\'t in the csv files and didn\'t exist in the database. They weren\'t added.'
-    print ''
-    print 'done importing'
+        print 'done importing attendance                                                  \r'
+        if missing_enrollments > 0:
+            print '*** ATTENDANCE ERROR: ' + files['attendance'] + ' had ' + str(missing_enrollments) + ' enrollments that weren\'t in the csv files and didn\'t exist in the database. They weren\'t added.'
+        print ''
+
+    print 'done importing!'
