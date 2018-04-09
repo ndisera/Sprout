@@ -1,4 +1,11 @@
 <div ng-include="'html/studentTabs.html'"></div>
+<div ng-if="!hasBehaviorService" class="row">
+    <div class="col-xs-12">
+        <div id="student-behaviors-service-warning" class="alert alert-warning" role="alert">
+            <span><b>Warning:</b> This student doesn't have a Behavior Service. If this student did in the past, you may view that history here. If not, please add a Behavior Service to this student before recording Behavior and Effort.</span>
+        </div>
+    </div>
+</div>
 <div ng-if="sections.length > 0" class="row">
     <div class="col-xs-12">
         <button ng-click="openReportForm()" class="btn btn-primary pull-right focus-top-button" type="button">Generate Report</button>

@@ -982,7 +982,7 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
     font-weight: 100;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-anchor: middle;
-    alignment-baseline: middle;
+    dominant-baseline: middle;
 }
 
 .input-group-dropdown > .input-group-addon {

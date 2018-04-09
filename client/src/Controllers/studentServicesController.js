@@ -3,25 +3,6 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
 
     $scope.student = student.student;
 
-    $scope.serviceTypes = {
-        '0': 'Behavior',
-        '1': 'Psych',
-        '2': 'Speech Therapy',
-        '3': 'Occupational Therapy',
-        '4': 'Physical Therapy',
-        '5': 'Adaptive PE',
-        '6': 'Transportation',
-        '7': 'ESY',
-        '8': 'Personal Health Care',
-        '9': 'Audiological',
-        '10': 'Vision',
-        '11': 'Math',
-        '12': 'Reading',
-        '13': 'Writing',
-        '14': 'Academic Support',
-        '15': 'Transition',
-    };
-
     $scope.services       = [];
     $scope.newService     = {};
 

@@ -156,6 +156,10 @@
     text-align: center;
 }
 
+#student-behaviors-service-warning {
+    margin-bottom: 15px;
+}
+
 .student-behaviors-graph {
     height: 300px;
 }

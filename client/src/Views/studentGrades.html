@@ -32,7 +32,7 @@
                         <span ng-if="selectedSection === null">No Classes</span>
                         <span class="caret"></span></button>
                     <ul class="dropdown-menu dropdown-menu-right">
-                        <li ng-repeat="entry in sections | filter: { term: selectedTerm.id, }" ng-click="selectSection(entry)" ng-class="{ 'active': entry.id === selectedSection.id, }">
+                        <li ng-repeat="entry in sections | filter: sectionsForTermFilter" ng-click="selectSection(entry)" ng-class="{ 'active': entry.id === selectedSection.id, }">
                             <a>{{ entry.title }}  <span ng-if="entry.id === selectedSection.id" class="glyphicon glyphicon-ok"></span></a>
                         </li>
                     </ul>
@@ -186,6 +186,34 @@
                                         <span><b>Looking Good!</b> No missing assignments.</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row voffset3" ng-if="noGradeData.length > 0">
+                <div class="col-xs-12">
+                    <div class="panel-wrapper">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">No Grade Data Available</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Due Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="assignment in noGradeData">
+                                            <td>{{ assignment.assignment_name }}</td>
+                                            <td>{{ assignment.due_date.format('MM/DD').toString() }}</td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
                             </div>
                         </div>
                     </div>

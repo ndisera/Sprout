@@ -1,10 +1,15 @@
-app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, behaviorService, studentService, data, terms, student) {
+app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, behaviorService, studentService, data, terms, service, student) {
     $scope.location = $location;
 
     $scope.report = {};
 
     $scope.behaviorNote = {};
     $scope.editingNote = false;
+
+    $scope.hasBehaviorService = false;
+    if(service !== null && service !== undefined && service.service_requirements !== null && service.service_requirements !== undefined) {
+        $scope.hasBehaviorService = service.service_requirements.length > 0;
+    }
 
     // I know this will be here, because I filtered on the student ID, and only that student
     $scope.student = student.student;

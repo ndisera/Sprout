@@ -203,6 +203,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 students: function(studentService) {
                     return studentService.getStudents();
                 },
+                terms: function(termService) {
+                    return termService.getTerms();
+                },
                 data: function($q, userService, enrollmentService, studentService) {
                     //TODO(gzuber): I don't like this in script.js...
                     var deferred = $q.defer();
@@ -348,6 +351,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
+                },
+                service: function(studentService, $rootScope, $route) {
+                    return studentService.getServicesForStudent($route.current.params.id, {
+                        filter: [{ name: 'type', val: $rootScope.serviceNameToType['Behavior'], }],
+                    });
                 },
                 auth: function(userService) {
                     return userService.authVerify();
@@ -525,6 +533,44 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     // set chartjs default colors
     Chart.defaults.global.colors = _.map($rootScope.colors, function(elem) { return elem.toHexString(); });
 
+    /*** GLOBAL ENUM RELATED SETUP ***/
+    $rootScope.serviceTypeToName = {
+        '0': 'Behavior',
+        '1': 'Psych',
+        '2': 'Speech Therapy',
+        '3': 'Occupational Therapy',
+        '4': 'Physical Therapy',
+        '5': 'Adaptive PE',
+        '6': 'Transportation',
+        '7': 'ESY',
+        '8': 'Personal Health Care',
+        '9': 'Audiological',
+        '10': 'Vision',
+        '11': 'Math',
+        '12': 'Reading',
+        '13': 'Writing',
+        '14': 'Academic Support',
+        '15': 'Transition',
+    };
+
+    $rootScope.serviceNameToType = {
+        'Behavior': '0',
+        'Psych': '1',
+        'Speech Therapy': '2',
+        'Occupational Therapy': '3',
+        'Physical Therapy': '4',
+        'Adaptive PE': '5',
+        'Transportation': '6',
+        'ESY': '7',
+        'Personal Health Care': '8',
+        'Audiological': '9',
+        'Vision': '10',
+        'Math': '11',
+        'Reading': '12',
+        'Writing': '13',
+        'Academic Support': '14',
+        'Transition': '15',
+    };
 
     /*** STUDENT PICTURE RELATED SETUP ***/
 
