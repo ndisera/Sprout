@@ -496,17 +496,21 @@ class Behavior(AuthenticatedUserReadMixin, models.Model):
         A user may write the behavior of an enrollment if they can access the enrollment
         """
         user = request.user
+        if user.is_superuser:
+            return user.is_superuser
         visible_enrollments = user.get_all_allowed_enrollments()
         return self.enrollment in visible_enrollments
 
     @staticmethod
     def has_write_permission(request):
+        user = request.user
+        if user.is_superuser:
+            return user.is_superuser
         from api.serializers import BehaviorSerializer
         behavior = BehaviorSerializer(data=request.data)
         if not "enrollment" in request.data:
             behavior.is_valid(raise_exception=True)
         enrollment = Enrollment.objects.get(id=request.data["enrollment"])
-        user = request.user
         return enrollment in user.get_all_allowed_enrollments()
 
 
@@ -531,17 +535,21 @@ class BehaviorNote(AuthenticatedUserReadMixin, models.Model):
         A user may write the behavior of an enrollment if they can access the enrollment
         """
         user = request.user
+        if user.is_superuser:
+            return user.is_superuser
         visible_students = user.get_all_allowed_students()
         return self.student in visible_students
 
     @staticmethod
     def has_write_permission(request):
+        user = request.user
+        if user.is_superuser:
+            return user.is_superuser
         from api.serializers import BehaviorNoteSerializer
         note = BehaviorNoteSerializer(data=request.data)
         if not "student" in request.data:
             note.is_valid(raise_exception=True)
         student = Student.objects.get(id=request.data["student"])
-        user = request.user
         return student in user.get_all_allowed_students()
 
 
