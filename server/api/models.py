@@ -510,7 +510,7 @@ class Behavior(AuthenticatedUserReadMixin, models.Model):
         return enrollment in user.get_all_allowed_enrollments()
 
 
-class BehaviorNote(models.Model):
+class BehaviorNote(AuthenticatedUserReadMixin, models.Model):
     """
     BehaviorNote
     Record a free-text note about one student's behavior on a particular day (not tied to a class)
@@ -525,6 +525,24 @@ class BehaviorNote(models.Model):
 
     class Meta:
         ordering = ('date', )
+
+    def has_object_write_permission(self, request):
+        """
+        A user may write the behavior of an enrollment if they can access the enrollment
+        """
+        user = request.user
+        visible_students = user.get_all_allowed_students()
+        return self.student in visible_students
+
+    @staticmethod
+    def has_write_permission(request):
+        from api.serializers import BehaviorNoteSerializer
+        note = BehaviorNoteSerializer(data=request.data)
+        if not "student" in request.data:
+            note.is_valid(raise_exception=True)
+        student = Student.objects.get(id=request.data["student"])
+        user = request.user
+        return student in user.get_all_allowed_students()
 
 
 class AttendanceRecord(models.Model):

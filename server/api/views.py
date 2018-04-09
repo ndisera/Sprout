@@ -555,7 +555,7 @@ class BehaviorNoteViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "BehaviorNote" instances
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions,)
     serializer_class = BehaviorNoteSerializer
     queryset = BehaviorNote.objects.all()
 
