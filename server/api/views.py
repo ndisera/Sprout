@@ -91,10 +91,17 @@ def get_all_allowed_enrollments(user):
 
     taught_terms = [section.term for section in Section.objects.filter(teacher=user)]
     # The teacher of another section in the same term in which the student is enrolled
-    other_teacher = Q()
+    other_teacher = Q(pk__in=[])
     for term in taught_terms:
-        other_teacher = other_teacher | Q(student__enrollment__section__teacher=user, section__term=term)
+        term_sections = Section.objects.filter(term=term)
+        # Get all the enrollments in any section from this term
+        term_enrollments = Enrollment.objects.filter(section__in=term_sections)
+        # Get all the students taught by this user this term
+        term_taught_students = Student.objects.filter(enrollment__in=term_enrollments.filter(section__teacher=user))
+        # Get all the enrollments of those students for this term
+        other_teacher = other_teacher | Q(student__in=term_taught_students, section__term=term)
     return Enrollment.objects.filter(teaches | manages | other_teacher).distinct()
+
 
 class ProfilePictureViewSet(mixins.CreateModelMixin,
                             mixins.RetrieveModelMixin,
