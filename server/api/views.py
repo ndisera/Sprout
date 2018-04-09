@@ -72,6 +72,31 @@ class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
 
 
+def get_all_allowed_sections(user):
+    """
+    Return a queryset containing all the sections this user should have access to data for
+
+    A user should be able to access:
+        - All sections for in which a student whom the user manages is enrolled
+        - All sections taught by the user
+        - All sections in the same term in which a student enrolled in a taught section is enrolled
+    """
+    if user.is_superuser:
+        return Section.objects.all()
+
+    # Sections for managed students
+    manages = Q(enrollment__student__case_manager=user)
+    # Sections taught by the user
+    teaches = Q(teacher=user)
+
+    # Sections in the same term in which a student enrolled in a taught section is enrolled
+    valid_enrollments = get_all_allowed_enrollments(user)
+    related_teaches = Q(enrollment__in=valid_enrollments)
+
+    valid_sections = Section.objects.filter(manages | teaches | related_teaches).distinct()
+    return valid_sections
+
+
 def get_all_allowed_enrollments(user):
     """
     Return a queryset of all enrollments this user should have access to data for
@@ -439,17 +464,8 @@ class SectionViewSet(NestedDynamicViewSet):
         """
         user = self.request.user
         if queryset is None:
-            queryset = super(SectionViewSet, self).get_queryset()
-        if user.is_superuser:
-            return queryset
-        # Filter for the user teaches the section
-        teaches = Q(teacher=user)
-        # Filter for other related students:
-        # Case manager
-        manages = Q(enrollment__student__case_manager=user)
-        # The teacher of another section in which the student is enrolled
-        other_teacher = Q(enrollment__student__enrollment__section__teacher=user)
-        queryset = queryset.filter(teaches | manages | other_teacher).distinct()
+            queryset = get_all_allowed_sections(user)
+
         return queryset
 
     """ ensure variables show as correct types for docs """
