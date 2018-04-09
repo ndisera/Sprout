@@ -1381,6 +1381,22 @@ class ServiceRequirementViewSet(NestedDynamicViewSet):
     queryset = ServiceRequirement.objects.all()
     serializer_class = ServiceRequirementSerializer
 
+    def get_queryset(self, queryset=None):
+        """
+        ServiceRequirements should only be visible if the student is visible
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(ServiceRequirementViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+
+        valid_students = get_all_allowed_students(user)
+        # Filter for records for those students
+        queryset = queryset.filter(student__in=valid_students)
+
+        return queryset
+
     # ensure variables show as correct types for docs
     student_name = 'student'
     student_desc = 'Student to whom this service requirement applies'
