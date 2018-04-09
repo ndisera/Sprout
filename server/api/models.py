@@ -553,7 +553,7 @@ class BehaviorNote(AuthenticatedUserReadMixin, models.Model):
         return student in user.get_all_allowed_students()
 
 
-class AttendanceRecord(models.Model):
+class AttendanceRecord(AuthenticatedUserReadMixin, models.Model):
     """
     AttendanceRecord
     Keep track of whether a student did not attend a particular class or was late, etc.
@@ -569,6 +569,28 @@ class AttendanceRecord(models.Model):
 
     class Meta:
         unique_together = [('enrollment', 'date'),]
+
+    def has_object_write_permission(self, request):
+        """
+        A user may write the behavior of an enrollment if they can access the enrollment
+        """
+        user = request.user
+        if user.is_superuser:
+            return user.is_superuser
+        visible_enrollments = user.get_all_allowed_enrollments()
+        return self.enrollment in visible_enrollments
+
+    @staticmethod
+    def has_write_permission(request):
+        user = request.user
+        if user.is_superuser:
+            return user.is_superuser
+        from api.serializers import AttendanceRecordSerializer
+        attendace = AttendanceRecordSerializer(data=request.data)
+        if not "enrollment" in request.data:
+            attendace.is_valid(raise_exception=True)
+        enrollment = Enrollment.objects.get(id=request.data["enrollment"])
+        return enrollment in user.get_all_allowed_enrollments()
 
 
 class StandardizedTestScore(models.Model):

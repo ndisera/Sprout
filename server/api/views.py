@@ -594,7 +594,7 @@ class AttendanceRecordViewSet(NestedDynamicViewSet):
     """
     allows interaction with the set of "AttendanceRecord" instances
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions,)
     serializer_class = AttendanceRecordSerializer
     queryset = AttendanceRecord.objects.all()
 
