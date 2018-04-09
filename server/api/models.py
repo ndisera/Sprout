@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
@@ -96,6 +97,79 @@ class SproutUser(AbstractBaseUser):
         user = request.user
 
         return user.is_authenticated
+
+    def get_all_allowed_students(self):
+        """
+        Return a queryset containing all the students this user should have access to data for
+
+        A user should be able to access:
+            - All students for whom they are case manager
+            - All students in their taught classes
+        """
+        if self.is_superuser:
+            return Student.objects.all()
+
+        # Students who this user manages
+        manages = Q(case_manager=self)
+        # Students in a class this user teaches
+        teaches = Q(enrollment__section__teacher=self)
+
+        valid_students = Student.objects.filter(teaches | manages)
+        return valid_students
+
+    def get_all_allowed_sections(self):
+        """
+        Return a queryset containing all the sections this user should have access to data for
+
+        A user should be able to access:
+            - All sections for in which a student whom the user manages is enrolled
+            - All sections taught by the user
+            - All sections in the same term in which a student enrolled in a taught section is enrolled
+        """
+        if self.is_superuser:
+            return Section.objects.all()
+
+        # Sections for managed students
+        manages = Q(enrollment__student__case_manager=self)
+        # Sections taught by the user
+        teaches = Q(teacher=self)
+
+        # Sections in the same term in which a student enrolled in a taught section is enrolled
+        valid_enrollments = self.get_all_allowed_enrollments()
+        related_teaches = Q(enrollment__in=valid_enrollments)
+
+        valid_sections = Section.objects.filter(manages | teaches | related_teaches).distinct()
+        return valid_sections
+
+    def get_all_allowed_enrollments(self):
+        """
+        Return a queryset of all enrollments this user should have access to data for
+
+        A user should be able to access:
+            - All enrollments, past and present, for a student for whom the user is a case manager
+            - All enrollments in any taught section
+            - All enrollments for any student in a taught section for the same term as that section
+        """
+        if self.is_superuser:
+            return Enrollment.objects.all()
+
+        # Enrollments belonging to students the user manages
+        manages = Q(student__case_manager=self)
+        # Enrollments belonging to sections the user teaches
+        teaches = Q(section__teacher=self)
+
+        taught_terms = [section.term for section in Section.objects.filter(teacher=self)]
+        # The teacher of another section in the same term in which the student is enrolled
+        other_teacher = Q(pk__in=[])
+        for term in taught_terms:
+            term_sections = Section.objects.filter(term=term)
+            # Get all the enrollments in any section from this term
+            term_enrollments = Enrollment.objects.filter(section__in=term_sections)
+            # Get all the students taught by this user this term
+            term_taught_students = Student.objects.filter(enrollment__in=term_enrollments.filter(section__teacher=self))
+            # Get all the enrollments of those students for this term
+            other_teacher = other_teacher | Q(student__in=term_taught_students, section__term=term)
+        return Enrollment.objects.filter(teaches | manages | other_teacher).distinct()
 
 
 class ProfilePicture(models.Model):
