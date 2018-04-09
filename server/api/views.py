@@ -1294,17 +1294,6 @@ class IEPGoalViewSet(NestedDynamicViewSet):
     ])
 
 
-class IEPGoalDatapointViewSetSchema(AutoSchema):
-    """
-    class that allows specification of more detailed schema for the
-    IEPGoalDatapointViewSet class in the coreapi documentation.
-    """
-
-    def get_link(self, path, method, base_url):
-        link = super(IEPGoalDatapointViewSetSchema, self).get_link(path, method, base_url)
-        return set_link(IEPGoalDatapointViewSet, path, method, link)
-
-
 class IEPGoalDatapointViewSet(NestedDynamicViewSet):
     """
     allows interaction with the custom datapoints associated with an IEP Goal
@@ -1313,8 +1302,21 @@ class IEPGoalDatapointViewSet(NestedDynamicViewSet):
     serializer_class = IEPGoalDatapointSerializer
     queryset = IEPGoalDatapoint.objects.all()
 
-    # define custom schema for documentation
-    schema = IEPGoalDatapointViewSetSchema()
+    def get_queryset(self, queryset=None):
+        """
+        IEPGoalDatapoints should only be visible if the student is visible
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(IEPGoalDatapointViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+
+        valid_students = get_all_allowed_students(user)
+        # Filter for records for those students
+        queryset = queryset.filter(goal__student__in=valid_students)
+
+        return queryset
 
     # ensure variables show as correct types for docs
     iep_name = 'goal'
@@ -1327,15 +1329,9 @@ class IEPGoalDatapointViewSet(NestedDynamicViewSet):
         description=iep_desc,
         schema=coreschema.Integer(title=iep_name))
 
-    create_fields = (
+    schema = AutoSchema(manual_fields=[
         iep_field,
-    )
-    update_fields = (
-        iep_field,
-    )
-    partial_update_fields = (
-        iep_field,
-    )
+    ])
 
 
 class IEPGoalNoteViewSetSchema(AutoSchema):
