@@ -454,7 +454,6 @@ class SectionViewSet(NestedDynamicViewSet):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = SectionSerializer
-    queryset = Section.objects.all()
 
     def get_queryset(self, queryset=None):
         """
@@ -578,20 +577,19 @@ class BehaviorViewSet(NestedDynamicViewSet):
 
     def get_queryset(self, queryset=None):
         """
-        Behaviors should only be visible:
-            - If the user teaches the related section
-            - If the user is the student's case manager
+        Behaviors should only be visible if the enrollment is visible
         """
         user = self.request.user
         if queryset is None:
             queryset = super(BehaviorViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
-        # Filter for the user teaches the section
-        teaches = Q(enrollment__section__teacher=user)
-        # Filter for other related students (only case manager at this time)
-        related = Q(enrollment__student__case_manager=user)
-        queryset = queryset.filter(teaches | related)
+
+        # Get all valid enrollments
+        valid_enrollments = get_all_allowed_enrollments(user)
+        # Filter for behavior records in those enrollments
+        queryset = queryset.filter(enrollment__in=valid_enrollments)
+
         return queryset
 
     """ ensure variables show as correct type for docs """
