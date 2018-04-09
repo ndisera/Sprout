@@ -365,7 +365,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                 },
                 function error(response) {
                     toastService.error('The server wasn\'t able to get test scores for "' + studentsLookup[studentId].first_name + ' ' + studentsLookup[studentId].last_name + '"');
-                },
+                }
             );
         } else if (category === "grades") {
             console.log("Grades category does not exist yet");
@@ -606,7 +606,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
             function error(response) {
                 // notify the user
                 toastService.error('The server wasn\'t able to save the new "Focus Category."');
-            },
+            }
         );
     };
 });

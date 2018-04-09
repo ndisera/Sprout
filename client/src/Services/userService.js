@@ -197,7 +197,11 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
      *
      * @return {promise} promise that will resolve to the response
      */
-    userService.authVerify = function(adminRequired = false) {
+    userService.authVerify = function(adminRequired) {
+        if(adminRequired === undefined || adminRequired === null) {
+            adminRequired = false;
+        }
+
         var query = '?user=true';
 
         var deferred = $q.defer();

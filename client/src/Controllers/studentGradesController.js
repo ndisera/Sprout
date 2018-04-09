@@ -214,7 +214,7 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
                     },
                     function error(response) {
                         toastService.error('The server wasn\'t able to get the student\'s grades for this class.');
-                    },
+                    }
                 );
 
 

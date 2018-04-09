@@ -125,7 +125,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
         if(data.type === 'login') {
             userService.getAllNotificationsForUser(userService.user.id, null).then(
                 function success(data) {},
-                function error(response) {},
+                function error(response) {}
             );
         }
     });
@@ -232,7 +232,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             .then(function() {
                 userService.getAllNotificationsForUser(userService.user.id).then(
                     function success() {},
-                    function error() {},
+                    function error() {}
                 );
             });
     }

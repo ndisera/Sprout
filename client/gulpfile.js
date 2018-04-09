@@ -4,6 +4,12 @@ const del = require('del');
 const concat = require('gulp-concat');
 const filter = require('gulp-filter');
 const preprocess = require('gulp-preprocess');
+const annotate = require('gulp-ng-annotate');
+const uglify = require('gulp-uglify');
+const htmlmin = require('gulp-htmlmin');
+const cssmin = require('gulp-clean-css');
+
+const debug = true;
 
 const public_path = 'public';
 
@@ -175,23 +181,49 @@ function copy_imgs() {
 }
 
 function copy_views() {
-    return gulp.src(paths.views.src)
-            .pipe(gulp.dest(paths.views.dest));
+    if(debug) {
+        return gulp.src(paths.views.src)
+                .pipe(gulp.dest(paths.views.dest));
+    }
+    else {
+        return gulp.src(paths.views.src)
+                .pipe(htmlmin({ collapseWhitespace: true, }))
+                .pipe(gulp.dest(paths.views.dest));
+    }
 }
 
 function copy_partials() {
-    return gulp.src(paths.partials.src)
-            .pipe(gulp.dest(paths.partials.dest));
+    if(debug) {
+        return gulp.src(paths.partials.src)
+                .pipe(gulp.dest(paths.partials.dest));
+    }
+    else {
+        return gulp.src(paths.partials.src)
+                .pipe(htmlmin({ collapseWhitespace: true, }))
+                .pipe(gulp.dest(paths.partials.dest));
+    }
 }
 
 function copy_index() {
-    return gulp.src(paths.index.src)
-            .pipe(preprocess({ 
-                context: {
-                    DEBUG: true,
-                }
-            }))
-            .pipe(gulp.dest(paths.index.dest));
+    if(debug) {
+        return gulp.src(paths.index.src)
+                .pipe(preprocess({ 
+                    context: {
+                        DEBUG: true,
+                    }
+                }))
+                .pipe(gulp.dest(paths.index.dest));
+    }
+    else {
+        return gulp.src(paths.index.src)
+                .pipe(preprocess({ 
+                    //context: {
+                        //DEBUG: debug,
+                    //}
+                }))
+                .pipe(htmlmin({ collapseWhitespace: true, }))
+                .pipe(gulp.dest(paths.index.dest));
+    }
 }
 
 function copy_includes() {
@@ -200,15 +232,32 @@ function copy_includes() {
 }
 
 function concat_styles() {
-    return gulp.src(paths.styles.src)
-            .pipe(concat('styles.css'))
-            .pipe(gulp.dest(paths.styles.dest));
+    if(debug) {
+        return gulp.src(paths.styles.src)
+                .pipe(concat('styles.css'))
+                .pipe(gulp.dest(paths.styles.dest));
+    }
+    else {
+        return gulp.src(paths.styles.src)
+                .pipe(cssmin({ compatibility: 'ie9', level: 2, }))
+                .pipe(concat('styles.css'))
+                .pipe(gulp.dest(paths.styles.dest));
+    }
 }
 
 function concat_scripts() {
-    return gulp.src(paths.scripts.src)
+    if(debug) {
+        return gulp.src(paths.scripts.src)
             .pipe(concat('script.js'))
             .pipe(gulp.dest(paths.scripts.dest));
+    }
+    else {
+        return gulp.src(paths.scripts.src)
+            .pipe(annotate())
+            .pipe(concat('script.js'))
+            .pipe(uglify())
+            .pipe(gulp.dest(paths.scripts.dest));
+    }
 }
 
 var build = gulp.series(
