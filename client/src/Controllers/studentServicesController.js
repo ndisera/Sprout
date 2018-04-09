@@ -142,7 +142,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the service requirement.');
-            },
+            }
         );
     };
 
@@ -173,7 +173,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the service requirement.');
-            },
+            }
         );
     };
 
@@ -187,7 +187,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             },
             function error(data) {
                 toastService.error('The server wasn\'t able to delete the service.');
-            },
+            }
         );
     };
 
@@ -224,7 +224,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             },
             function error(data) {
                 toastService.error('The server wasn\'t able to save your new service.');
-            },
+            }
         );
     };
 

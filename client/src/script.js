@@ -234,7 +234,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                         },
                         function error(response) {
                             deferred.reject(response);
-                        },
+                        }
                     );
                     return deferred.promise;
                 },
@@ -269,12 +269,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                                 },
                                 function error(response) {
                                     deferred.reject(response);
-                                },
+                                }
                             );
                         },
                         function error(response) {
                             deferred.reject(response);
-                        },
+                        }
                     );
                     return deferred.promise;
                 },
@@ -610,7 +610,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                     function success(picture) {
                         $rootScope.currentStudent.id = next.params.id;
                         $rootScope.currentStudent.picture = picture;
-                    },
+                    }
                 );
             }
         }

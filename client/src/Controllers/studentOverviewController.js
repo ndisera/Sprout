@@ -225,7 +225,7 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save your image.');
-            },
+            }
         );
     };
 
@@ -243,7 +243,7 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to delete your image.');
-            },
+            }
         );
 
     };

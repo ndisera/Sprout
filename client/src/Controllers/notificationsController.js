@@ -98,7 +98,7 @@ app.controller("notificationsController", function ($scope, $location, $q, userS
                     function success() {
                         $scope.updateNotifications();
                     },
-                    function error() {},
+                    function error() {}
                 );
             });
     }

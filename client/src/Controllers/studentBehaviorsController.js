@@ -534,7 +534,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
             function error(response) {
                 // notify user
                 toastService.error('The server wasn\'t able to get student behavior comment.');
-            },
+            }
         );
     }
 
@@ -565,7 +565,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                 function error(response) {
                     // notify user
                     toastService.error('The server wasn\'t able to save the student behavior comment.');
-                },
+                }
             );
         }
         else if($scope.behaviorNote.id !== null) {
@@ -579,7 +579,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                 function error(response) {
                     // notify user
                     toastService.error('The server wasn\'t able to save the student behavior comment.');
-                },
+                }
             );
         }
         else {
@@ -591,7 +591,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                 function error(response) {
                     // notify user
                     toastService.error('The server wasn\'t able to save the student behavior comment.');
-                },
+                }
             );
         }
 
