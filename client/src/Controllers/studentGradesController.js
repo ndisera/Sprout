@@ -1,47 +1,32 @@
-app.controller("studentGradesController", function ($scope, $rootScope, $location, $routeParams, toastService, sectionService, studentService, studentData, termData, enrollmentData) {
+app.controller("studentGradesController", function ($scope, $rootScope, $location, $routeParams, toastService, sectionService, studentService, termService, studentData, termData, enrollmentData) {
     $scope.location = $location;
     $scope.student  = studentData.student;
 
     $scope.sections = [];
     $scope.selectedSection = {};
 
+    $scope.terms           = [];
+    $scope.selectedTerm    = null;
+    var currentTerms       = [];
+    var currentTermsLookup = {};
+
     if(termData.terms !== null && termData.terms !== undefined) {
-        $scope.terms = termData.terms;
-        _.each($scope.terms, function(elem) {
-            elem.start_date = moment(elem.start_date);
-            elem.end_date   = moment(elem.end_date);
-        });
-        // sort so most current first
-        $scope.terms = _.sortBy($scope.terms, function(elem) { return -elem.start_date; });
+        $scope.terms = termService.transformAndSortTerms(termData.terms);
+        currentTerms = termService.getAllCurrentTerms(termData.terms);
+
+        // set up an option for all current terms
+        if(currentTerms.length > 0) {
+            // create special term for all current terms
+            $scope.terms.unshift({ id: -1, name: 'All Current Terms', });
+            currentTermsLookup = _.indexBy(currentTerms, 'id');
+        }
+
+        // select a term
+        $scope.selectedTerm = $scope.terms[0];
     }
 
     if(enrollmentData.sections !== null && enrollmentData.sections !== undefined) {
         $scope.sections = _.sortBy(enrollmentData.sections, 'schedule_position');
-    }
-
-    // find biggest current term
-    $scope.selectedTerm = null;
-    _.each($scope.terms, function(elem) {
-        if(moment() > elem.start_date && moment() < elem.end_date) {
-            // I have found a candidate
-            // but we want the biggest current term
-            if($scope.selectedTerm === null) {
-                $scope.selectedTerm = elem;
-            }
-            else {
-                // take the bigger one
-                var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
-                var newDelta = elem.end_date - elem.start_date;
-                if(newDelta > curDelta) {
-                    $scope.selectedTerm = elem;
-                }
-            }
-        }
-    });
-
-    // if we're between terms (over break)
-    if($scope.selectedTerm === null) {
-        $scope.selectedTerm = $scope.terms[0];
     }
 
     $scope.assignmentsGraph = {
@@ -58,6 +43,7 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
                     },
                 }],
                 xAxes: [{
+                    display: false,
                     maxBarThickness: 70,
                 }],
             },
@@ -108,11 +94,15 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
                     $scope.missingAssignments = [];
                     return;
                 }
-                $scope.assignments = _.sortBy(data.assignments, function(elem) { return moment(elem.due_date); });
+
+                $scope.assignments = data.assignments;
+                // tranforms dates to moments
+                _.each($scope.assignments, function(elem) { elem.due_date = moment(elem.due_date); });
+                $scope.assignments = _.sortBy(data.assignments, function(elem) { return elem.due_date; });
 
                 // Save off the upcoming assignments, then remove them from our current assignments list
-                $scope.upcomingAssignments = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) >= 0; });
-                $scope.assignments         = _.filter($scope.assignments, function(elem) { return (moment(elem.due_date).diff(moment(), 'days')) < 0; });
+                $scope.upcomingAssignments = _.filter($scope.assignments, function(elem) { return (elem.due_date.diff(moment(), 'days')) >= 0; });
+                $scope.assignments         = _.filter($scope.assignments, function(elem) { return (elem.due_date.diff(moment(), 'days')) < 0; });
 
                 // make sure there are enough colors for every assignment in assignment graph
                 var backgroundColors      = [];
@@ -127,11 +117,6 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
                 $scope.assignmentsGraph.datasetOverride.hoverBackgroundColor = _.flatten(hoverBackgroundColors);
                 $scope.assignmentsGraph.datasetOverride.borderColor          = _.flatten(borderColors);
 
-                // Save the upcoming assignment due dates
-                _.each($scope.upcomingAssignments, function(assignmentElem) {
-                    assignmentElem.due_date = moment(assignmentElem.due_date);
-                });
-                
                 // get all the grades for this class
                 var gradesConfig = {
                     filter: [
@@ -142,12 +127,11 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
                 studentService.getGradesForStudent($scope.student.id, gradesConfig).then(
                     function success(data) {
                         // reset relevant data
-                        $scope.classGrade              = 0;
-                        $scope.classGradeString        = '0%';
                         $scope.completionGraph.data    = [0,0,0,];
                         $scope.assignmentsGraph.labels = [];
                         $scope.assignmentsGraph.data   = [];
                         $scope.missingAssignments      = [];
+                        $scope.noGradeData             = [];
 
                         $scope.grades              = data.grades;
                         $scope.assignmentsToGrades = {};
@@ -155,19 +139,17 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
                         _.each($scope.assignments, function(assignmentElem) {
                             // sort grades for assignment by date turned in
                             var gradesForAssignment       = _.where($scope.grades, { assignment: assignmentElem.id, });
-                            var sortedGradesForAssignment = _.sortBy(gradesForAssignment, function(elem) { return moment(elem.handin_datetime); });
-
-                            assignmentElem.due_date = moment(assignmentElem.due_date);
+                            var sortedGradesForAssignment = _.sortBy(gradesForAssignment, function(elem) { return -moment(elem.handin_datetime); });
 
                             // create lookup for grade on assignment, update completion graph with ontime/late/missing
-                            //TODO(gzuber): if there are multiple grades, make sure the latest one isn't late?
+                            // TODO(gzuber): what is there's no grade for this assignment?
                             if(sortedGradesForAssignment.length > 0) {
-                                var gradeForAssignment = sortedGradesForAssignment[sortedGradesForAssignment.length - 1];
+                                // take the most recent grade
+                                var gradeForAssignment = sortedGradesForAssignment[0];
                                 $scope.assignmentsToGrades[assignmentElem.id] = gradeForAssignment.score;
 
                                 // was it on time?
-                                var handin  = moment(gradeForAssignment.handin_datetime);
-                                if(assignmentElem.due_date.diff(handin, 'm') > 0) {
+                                if(!gradeForAssignment.late) {
                                     // on time
                                     $scope.completionGraph.data[$scope.ontimeIndex]++;
                                 }
@@ -175,11 +157,16 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
                                     // late
                                     $scope.completionGraph.data[$scope.lateIndex]++;
                                 }
+
+                                if(gradeForAssignment.missing) {
+                                    // missing
+                                    $scope.completionGraph.data[$scope.missingIndex]++;
+                                    $scope.missingAssignments.push(assignmentElem);
+                                }
                             }
+                            // mark it as "no data from lms"
                             else {
-                                // missing
-                                $scope.completionGraph.data[$scope.missingIndex]++;
-                                $scope.missingAssignments.push(assignmentElem);
+                                $scope.noGradeData.push(assignmentElem);
                             }
                         });
 
@@ -195,17 +182,42 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
                             // calculate percentage on assignment and update overall class grade
                             var percentage = 100 * (gradeForAssignment - assignmentElem.score_min) / (assignmentElem.score_max - assignmentElem.score_min);
                             $scope.assignmentsGraph.data.push(percentage);
-                            $scope.classGrade += percentage;
                         });
 
-                        // calculate final class grade
-                        $scope.classGrade /= $scope.assignments.length;
-                        $scope.classGradeText = $scope.classGrade.toString().slice(0, _.indexOf($scope.classGrade.toString(), '.') + 3) + '%';
                     },
                     function error(response) {
                         toastService.error('The server wasn\'t able to get the student\'s grades for this class.');
                     }
                 );
+
+                // get the student's final grade for the class
+                var finalGradeConfig = {
+                    filter: [
+                        { name: 'enrollment.section', val: section.id, },
+                    ],
+                };
+
+                studentService.getFinalGradesForStudent($scope.student.id, finalGradeConfig).then(
+                    function success(data) {
+                        $scope.classGrade       = 0;
+                        $scope.classGradeString = 'N/A';
+
+                        if(data.final_grades !== null && data.final_grades !== undefined && data.final_grades.length > 0) {
+                            var finalGrade = data.final_grades[0];
+                            $scope.classGrade = finalGrade.final_percent;
+                            $scope.classLetterGrade = finalGrade.letter_grade;
+
+                            var classGradeString = $scope.classGrade.toString();
+                            var decimalIndex = _.indexOf(classGradeString, '.');
+                            $scope.classGradeText = decimalIndex === -1 ? classGradeString + '%' : classGradeString.slice(0, decimalIndex + 3) + '%';
+                        }
+                    },
+                    function error(response) {
+                        toastService.error('The server wasn\'t able to get the student\'s grades for this class.');
+                    },
+                );
+
+
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to get the assignments for this class.');
@@ -215,7 +227,16 @@ app.controller("studentGradesController", function ($scope, $rootScope, $locatio
 
     $scope.selectTerm = function(term) {
         $scope.selectedTerm = term;
-        var sectionsInTerm = _.filter($scope.sections, function(elem) { return elem.term === term.id; });
+
+        $scope.sectionsForTermFilter = null;
+        if(term.id === -1) {
+            // all current terms
+            $scope.sectionsForTermFilter = function(elem) { return _.has(currentTermsLookup, elem.term); };
+        }
+        else {
+            $scope.sectionsForTermFilter = function(elem) { return elem.term === term.id; };
+        }
+        var sectionsInTerm = _.filter($scope.sections, $scope.sectionsForTermFilter);
         if(sectionsInTerm.length === 0) {
             $scope.selectedSection = null;
         }

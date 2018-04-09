@@ -1,5 +1,8 @@
-app.controller("profileStudentsController", function ($scope, $location, students, data) {
+app.controller("profileStudentsController", function ($scope, $location, termService, students, terms, data) {
     $scope.location = $location;
+
+    // set up all students (this is for the filter box)
+    $scope.students = students.students;
 
     // I know the order because I specified it in the route
     var enrollmentData  = data[0];
@@ -7,9 +10,14 @@ app.controller("profileStudentsController", function ($scope, $location, student
 
     $scope.caseManagerStudents = caseManagerData.students;
 
+    // get all current terms and filter sections
+    var currentTerms = termService.getAllCurrentTerms(terms.terms);
+    var currentTermsLookup = _.indexBy(currentTerms, 'id');
+    var sectionsInCurrentTerms = _.filter(enrollmentData.sections, function(elem) { return _.has(currentTermsLookup, elem.term); });
+
     // set up the teacher's sections
     $scope.sections = {};
-    _.each(enrollmentData.sections, function(elem) {
+    _.each(sectionsInCurrentTerms, function(elem) {
         $scope.sections[elem.id] = elem;
         $scope.sections[elem.id]['students'] = [];
     });
@@ -27,12 +35,12 @@ app.controller("profileStudentsController", function ($scope, $location, student
         }
     });
 
-    // place all students in all class rosters that they belong to
+    // place all students in all class rosters that they belong to (if those sections are in the current term)
     _.each(enrollmentData.enrollments, function(elem) {
-        $scope.sections[elem.section]['students'].push(studentsLookup[elem.student]);
+        if(_.has($scope.sections, elem.section)) {
+            $scope.sections[elem.section]['students'].push(studentsLookup[elem.student]);
+        }
     });
-
-    $scope.students = students.students;
 
     // the sections array is what builds the caseload and class
     // panels. add the caseload as a fake 'section' and then

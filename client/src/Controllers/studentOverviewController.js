@@ -1,4 +1,4 @@
-app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, studentService, termData, enrollmentData, userData, studentData) {
+app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, studentService, termService, termData, enrollmentData, userData, studentData) {
     $scope.location = $location;
 
     $scope.newStudentImage = null;
@@ -12,17 +12,28 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
     var termSettingsLookup = {};
     var scheduleLookup     = {};
 
+    $scope.terms = [];
+    $scope.selectedTerm = null;
+    var currentTerms = [];
+    var currentTermsLookup = {};
+
     if(termData.terms !== null && termData.terms !== undefined) {
-        $scope.terms = termData.terms;
-        _.each($scope.terms, function(elem) {
-            elem.start_date = moment(elem.start_date);
-            elem.end_date   = moment(elem.end_date);
-        });
-        // sort so most current first
-        $scope.terms       = _.sortBy($scope.terms, function(elem) { return -elem.start_date; });
+        $scope.terms       = termService.transformAndSortTerms(termData.terms);
         termsLookup        = _.indexBy($scope.terms, 'id');
         termSettingsLookup = _.indexBy(termData.term_settings, 'id');
         scheduleLookup     = _.indexBy(termData.daily_schedules, 'id');
+
+        currentTerms = termService.getAllCurrentTerms(termData.terms);
+
+        // set up an option for all current terms
+        if(currentTerms.length > 0) {
+            // create special term for all current terms
+            $scope.terms.unshift({ id: -1, name: 'All Current Terms', });
+            currentTermsLookup = _.indexBy(currentTerms, 'id');
+        }
+
+        // select a term
+        $scope.selectedTerm = $scope.terms[0];
     }
 
     if(enrollmentData.enrollments !== null && enrollmentData.enrollments !== undefined) {
@@ -41,34 +52,43 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
         });
     }
 
-    // find biggest current term
-    $scope.selectedTerm = null;
-    _.each($scope.terms, function(elem) {
-        if(moment() > elem.start_date && moment() < elem.end_date) {
-            // I have found a candidate
-            // but we want the biggest current term
-            if($scope.selectedTerm === null) {
-                $scope.selectedTerm = elem;
-            }
-            else {
-                // take the bigger one
-                var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
-                var newDelta = elem.end_date - elem.start_date;
-                if(newDelta > curDelta) {
-                    $scope.selectedTerm = elem;
-                }
-            }
-        }
-    });
+    //// find biggest current term
+    //$scope.selectedTerm = null;
+    //_.each($scope.terms, function(elem) {
+        //if(moment() > elem.start_date && moment() < elem.end_date) {
+            //// I have found a candidate
+            //// but we want the biggest current term
+            //if($scope.selectedTerm === null) {
+                //$scope.selectedTerm = elem;
+            //}
+            //else {
+                //// take the bigger one
+                //var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
+                //var newDelta = elem.end_date - elem.start_date;
+                //if(newDelta > curDelta) {
+                    //$scope.selectedTerm = elem;
+                //}
+            //}
+        //}
+    //});
 
-    // if we're between terms (over break)
-    if($scope.selectedTerm === null) {
-        $scope.selectedTerm = $scope.terms[0];
-    }
+    //// if we're between terms (over break)
+    //if($scope.selectedTerm === null) {
+        //$scope.selectedTerm = $scope.terms[0];
+    //}
 
     $scope.selectTerm = function(term) {
         $scope.selectedTerm = term;
-        $scope.termSections = _.filter($scope.sections, function(elem) { return elem.term === term.id; });
+
+        var sectionsForTermFilter = null;
+        if(term.id === -1) {
+            // all current terms
+            sectionsForTermFilter = function(elem) { return _.has(currentTermsLookup, elem.term); };
+        }
+        else {
+            sectionsForTermFilter = function(elem) { return elem.term === term.id; };
+        }
+        $scope.termSections = _.filter($scope.sections, sectionsForTermFilter);
     };
 
     $scope.selectTerm($scope.selectedTerm);

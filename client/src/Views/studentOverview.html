@@ -91,7 +91,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="section in sections | filter:{ term: selectedTerm.id, }">
+                                <tr ng-repeat="section in termSections">
                                     <td>{{ section.period }}</td>
                                     <td>{{ section.title }}</td>
                                     <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
