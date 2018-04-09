@@ -103,6 +103,12 @@ class ParentContactInfo(models.Model):
                               help_text="Parent or guardian's email address")
     phone = models.CharField(blank=True, null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                              help_text="Parent or guardian's phone number")
+    relationship = models.CharField(blank=True, null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="Relationship to Student")
+    preferred_method_of_contact = models.CharField(blank=True, null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="Preferred method of contact")
+    preferred_time = models.CharField(blank=True, null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                  help_text="Preferred time of day to contact")
 
 
 class SchoolSettings(AdminWriteMixin, models.Model):

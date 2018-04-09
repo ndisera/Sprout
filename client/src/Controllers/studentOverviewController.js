@@ -1,4 +1,4 @@
-app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, studentService, termService, termData, enrollmentData, userData, studentData) {
+app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, studentService, termService, termData, enrollmentData, userData, studentData, parentContactData) {
     $scope.location = $location;
 
     $scope.newStudentImage = null;
@@ -51,31 +51,6 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
             }
         });
     }
-
-    //// find biggest current term
-    //$scope.selectedTerm = null;
-    //_.each($scope.terms, function(elem) {
-        //if(moment() > elem.start_date && moment() < elem.end_date) {
-            //// I have found a candidate
-            //// but we want the biggest current term
-            //if($scope.selectedTerm === null) {
-                //$scope.selectedTerm = elem;
-            //}
-            //else {
-                //// take the bigger one
-                //var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
-                //var newDelta = elem.end_date - elem.start_date;
-                //if(newDelta > curDelta) {
-                    //$scope.selectedTerm = elem;
-                //}
-            //}
-        //}
-    //});
-
-    //// if we're between terms (over break)
-    //if($scope.selectedTerm === null) {
-        //$scope.selectedTerm = $scope.terms[0];
-    //}
 
     $scope.selectTerm = function(term) {
         $scope.selectedTerm = term;
@@ -210,6 +185,162 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
             }
         );
     };
+    
+    // parent contact info
+    
+    function resetNewParentContactInfo() {
+        $scope.newParentContactInfo = {};
+        var keys = _.keys($scope.parentContactInfoProperties);
+        _.each(keys, function(key) {
+            $scope.newParentContactInfo[key] = '';
+        });
+    }
+
+    function prepareParentContactInfo(elem) {
+        var keys = _.keys($scope.parentContactInfoProperties);
+        _.each(keys, function(key) {
+            elem[key + '_temp'] = elem[key];
+        });
+        elem.editing = false;
+    }
+
+    function copyParentContactInfo(elem, updating) {
+        var newElem = {};
+        var keys = _.keys($scope.parentContactInfoProperties);
+        _.each(keys, function(key) {
+            if(updating) {
+                newElem[key] = elem[key + '_temp'];
+            }
+            else {
+                newElem[key] = elem[key];
+            }
+        });
+        return newElem;
+    }
+
+
+    $scope.parentContactInfoProperties = {
+        first_name: {
+            key: 'first_name',
+            title: 'First Name',
+            required: true,
+            type: 'text',
+        },
+        last_name: {
+            key: 'last_name',
+            title: 'Last Name',
+            required: true,
+            type: 'text',
+        },
+        phone: {
+            key: 'phone',
+            title: 'Phone Number',
+            required: false,
+            type: 'text',
+        },
+        email: {
+            key: 'email',
+            title: 'Email',
+            required: false,
+            type: 'email',
+        },
+        relationship: {
+            key: 'relationship',
+            title: 'Relationship to Student',
+            required: false,
+            type: 'text',
+        },
+        preferred_method_of_contact: {
+            key: 'preferred_method_of_contact',
+            title: 'Preferred Method',
+            required: false,
+            type: 'select',
+            options: 'option as option for option in parentContactInfoSelectOptions',
+        },
+        preferred_time: {
+            key: 'preferred_time',
+            title: 'Preferred Time',
+            required: false,
+            type: 'text',
+        },
+    };
+    $scope.parentContactInfoSelectOptions = ['N/A', 'Phone', 'Email', ];
+    $scope.addingParentContactInfo = false;
+
+    $scope.parentContactInfo = parentContactData.parent_contact_infos;
+    _.each($scope.parentContactInfo, function(elem) { prepareParentContactInfo(elem); });
+
+    $scope.toggleAddParentContactInfo = function(value) {
+        $scope.addingParentContactInfo = value;
+        if(!value) {
+            resetNewParentContactInfo(entry);
+        }
+    };
+
+    $scope.toggleEditParentContactInfo = function(entry, value) {
+        entry.editing = value;
+        if(!value) {
+            prepareParentContactInfo(entry);
+        }
+    };
+
+    $scope.addParentContactInfo = function() {
+        var newEntry = copyParentContactInfo($scope.newParentContactInfo);
+        newEntry.student = $scope.student.id;
+
+        studentService.addParentContactInfoForStudent($scope.student.id, newEntry).then(
+            function success(data) {
+                var preparedEntry = data.parent_contact_info;
+                prepareParentContactInfo(preparedEntry);
+                $scope.parentContactInfo.push(preparedEntry);
+                $scope.toggleAddParentContactInfo(false);
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to save the new contact info.');
+            }
+        );
+    };
+
+    $scope.saveParentContactInfo = function(entry) {
+        var newEntry = copyParentContactInfo(entry, true);
+
+        newEntry.id      = entry.id;
+        newEntry.student = $scope.student.id;
+
+        studentService.updateParentContactInfoForStudent($scope.student.id, newEntry.id, newEntry).then(
+            function success(data) {
+                var keys = _.keys($scope.parentContactInfoProperties);
+                _.each(keys, function(key) {
+                    entry[key] = newEntry[key];
+                });
+                $scope.toggleEditParentContactInfo(entry, false);
+            },
+            function error(response) {
+                var moreInfo = '';
+                if(response.data['email']) {
+                    moreInfo = 'Please enter a valid email address.';
+                }
+                toastService.error('The server wasn\'t able to save the new contact info. ' + moreInfo);
+            }
+        );
+    };
+
+    $scope.deleteParentContactInfo = function(entry) {
+        studentService.deleteParentContactInfoForStudent($scope.student.id, entry.id).then(
+            function success(data) {
+                var index = _.findIndex($scope.parentContactInfo, function(elem) { return elem.id === entry.id; });
+                if(index !== -1) {
+                    $scope.parentContactInfo.splice(index, 1);
+                }
+            },
+            function error(response) {
+                toastService.error('The server wasn\'t able to delete the contact info.');
+            }
+        );
+    };
+
+
+    resetNewParentContactInfo();
 
     /*** IMAGE RELATED ***/
 

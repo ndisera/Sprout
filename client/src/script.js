@@ -306,6 +306,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
                 },
+                parentContactData: function(studentService, $route) {
+                    return studentService.getParentContactInfoForStudent($route.current.params.id);
+                },
                 auth: function(userService) {
                     return userService.authVerify();
                 },
