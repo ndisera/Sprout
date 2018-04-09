@@ -56,6 +56,112 @@
                 </div>
             </div>
         </div>
+        <div class="panel-wrapper voffset4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Parent Contact Info</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="panel panel-default student-overview-parent-panel" ng-repeat="entry in parentContactInfo">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><b>{{ entry.first_name }}</b> {{ entry.last_name }} ({{ entry.relationship }})</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="parent-info" ng-show="!entry.editing">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <span><b>Phone:</b> {{ entry.phone }}</span><span class="fas fa-certificate" ng-if="entry.preferred_method_of_contact === 'Phone'"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <span><b>Email:</b> {{ entry.email }}</span><span class="fas fa-certificate" ng-if="entry.preferred_method_of_contact === 'Email'"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <span><b>Preferred Time:</b> {{ entry.preferred_time }}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="btn-manipulate-row">
+                                        <button class="btn btn-primary" type="button" ng-if="!entry.editing" ng-click="toggleEditParentContactInfo(entry, true)">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <form class="form-horizontal" name="editParentContactInfo{{$index}}" ng-submit="saveParentContactInfo(entry)" ng-show="entry.editing">
+                                <div class="form-group" ng-repeat="property in parentContactInfoProperties">
+                                    <label class="control-label col-xs-12 col-sm-4">{{ property.title }}:</label>
+                                    <div class="col-sm-8">
+                                        <div ng-switch="property.type">
+                                            <input ng-switch-when="text" class="form-control" type="text" name="editParentContactInfoForm{{$index}}" ng-model="entry[property.key + '_temp']" ng-required="property.required"/>
+                                            <input ng-switch-when="email" class="form-control" type="email" name="editParentContactInfoForm{{$index}}" ng-model="entry[property.key + '_temp']" ng-required="property.required"/>
+                                            <select ng-switch-when="select" class="form-control" ng-model="entry[property.key + '_temp']" name="editParentContactInfoForm{{$index}}" ng-options="{{ property.options }}" ng-required="property.required">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group no-bottom-margin">
+                                    <div class="col-xs-12">
+                                        <div class="btn-manipulate-row">
+                                            <button class="btn btn-danger delete-left" type="button" ng-click="deleteParentContactInfo(entry)">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </button>
+                                            <button class="btn btn-success" type="submit" ng-disabled="editParentContactInfo{{$index}}.$invalid">
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            </button>
+                                            <button class="btn btn-default" type="button" ng-click="toggleEditParentContactInfo(entry, false)">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="panel-wrapper voffset4" ng-show="addingParentContactInfo">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Add New Contact Info</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" name="addParentContactInfoForm" ng-submit="addParentContactInfo(entry)">
+                                    <div class="form-group" ng-repeat="property in parentContactInfoProperties">
+                                        <label class="control-label col-xs-12 col-sm-4">{{ property.title }}:</label>
+                                        <div class="col-sm-8">
+                                            <div ng-switch="property.type">
+                                                <input ng-switch-when="text" class="form-control" type="text" name="addParentContactInfoForm{{$index}}" ng-model="newParentContactInfo[property.key]" ng-required="property.required">
+                                                <input ng-switch-when="email" class="form-control" type="text" name="addParentContactInfoForm{{$index}}" ng-model="newParentContactInfo[property.key]" ng-required="property.required">
+                                                <select ng-switch-when="select" class="form-control" ng-model="newParentContactInfo[property.key]" name="addParentContactInfoForm{{$index}}" ng-options="{{ property.options }}" ng-required="property.required"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group no-bottom-margin">
+                                        <div class="col-xs-12">
+                                            <div class="btn-manipulate-row">
+                                                <button class="btn btn-success" type="submit" ng-disabled="addParentContactInfoForm.$invalid">
+                                                    <span class="glyphicon glyphicon-ok"></span>
+                                                </button>
+                                                <button class="btn btn-default" type="button" ng-click="toggleAddParentContactInfo(false)">
+                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-manipulate-row student-overview-parent-spacer">
+                        <button class="btn btn-success" ng-if="!addingParentContactInfo" ng-click="toggleAddParentContactInfo(true)">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="col-xs-12 col-sm-6">
         <div class="panel-wrapper manipulate-panel-spacer">

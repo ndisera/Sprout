@@ -238,6 +238,87 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
+     * Get a student's parent contact info
+     * @param {number} studentId - ID of the student
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with the base64 encoded image string OR null,
+     *                   or reject with response
+     */
+    function getParentContactInfoForStudent(studentId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/parent-contact-info' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Add parent contact info for student
+     * @param {number} studentId - ID of the student
+     * @param {ParentContactInfo} parentContactInfoObj - the parent contact info object
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function addParentContactInfoForStudent(studentId, parentContactInfoObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/parent-contact-info',
+            data: parentContactInfoObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Update parent contact info for student
+     * @param {number} studentId - ID of the student
+     * @param {number} parentContactInfoId - ID of the parent contact info entry
+     * @param {ParentContactInfo} parentContactInfoObj - the parent contact info object
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function updateParentContactInfoForStudent(studentId, parentContactInfoId, parentContactInfoObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/parent-contact-info/' + parentContactInfoId,
+            data: parentContactInfoObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Delete parent contact info for student
+     * @param {number} studentId - ID of the student
+     * @param {number} parentContactInfoId - ID of the parent contact info entry
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function deleteParentContactInfoForStudent(studentId, parentContactInfoId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/parent-contact-info/' + parentContactInfoId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
      * Get grades for a specific student
      * @param {number} studentId - ID of the student
      * @param {object} config - config object for query parameters (see queryService)
@@ -740,6 +821,10 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         addStudentPicture: addStudentPicture,
         deleteStudentPicture: deleteStudentPicture,
         getGradesForStudent: getGradesForStudent,
+        getParentContactInfoForStudent: getParentContactInfoForStudent,
+        addParentContactInfoForStudent: addParentContactInfoForStudent,
+        updateParentContactInfoForStudent: updateParentContactInfoForStudent,
+        deleteParentContactInfoForStudent: deleteParentContactInfoForStudent,
         getFinalGradesForStudent: getFinalGradesForStudent,
         getBehaviorNotesForStudent: getBehaviorNotesForStudent,
         addBehaviorNoteForStudent: addBehaviorNoteForStudent,
