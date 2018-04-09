@@ -396,7 +396,7 @@ class SectionViewSet(NestedDynamicViewSet):
     delete:
     deletes the existing section specified by the path param.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions, )
     serializer_class = SectionSerializer
 
     def get_queryset(self, queryset=None):
@@ -450,7 +450,7 @@ class EnrollmentViewSet(NestedDynamicViewSet):
     delete:
     deletes the existing enrollment specified by the path param.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions,)
     serializer_class = EnrollmentSerializer
 
     def get_queryset(self, queryset=None):
@@ -515,7 +515,7 @@ class BehaviorViewSet(NestedDynamicViewSet):
     delete:
     deletes the existing behavior report specified by the path param.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions,)
     serializer_class = BehaviorSerializer
     queryset = Behavior.objects.all()
 

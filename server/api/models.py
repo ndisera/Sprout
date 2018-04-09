@@ -8,7 +8,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 
 import api.constants as constants
-from api.mixins import AdminWriteMixin
+from api.mixins import AdminWriteMixin, AuthenticatedUserReadMixin
 
 import os
 
@@ -416,7 +416,7 @@ class StandardizedTest(AdminWriteMixin, models.Model):
         return self.__repr__()
 
 
-class Section(models.Model):
+class Section(AdminWriteMixin, models.Model):
     """
     Section
     Represents a section (most likely class) in the system.
@@ -442,7 +442,7 @@ class Section(models.Model):
         return self.__repr__()
 
 
-class Enrollment(models.Model):
+class Enrollment(AdminWriteMixin, models.Model):
     """
     Enrollment
     Represents an enrollment relationship in the system. That is, a
@@ -476,7 +476,7 @@ class Enrollment(models.Model):
         return super(Enrollment, self).delete(using, keep_parents)
 
 
-class Behavior(models.Model):
+class Behavior(AuthenticatedUserReadMixin, models.Model):
     """
     Behavior
     Represents a student's behavior score in a class on a
@@ -490,6 +490,24 @@ class Behavior(models.Model):
     class Meta:
         unique_together = (('enrollment', 'date'),)
         ordering = ('date',)
+
+    def has_object_write_permission(self, request):
+        """
+        A user may write the behavior of an enrollment if they can access the enrollment
+        """
+        user = request.user
+        visible_enrollments = user.get_all_allowed_enrollments()
+        return self.enrollment in visible_enrollments
+
+    @staticmethod
+    def has_write_permission(request):
+        from api.serializers import BehaviorSerializer
+        behavior = BehaviorSerializer(data=request.data)
+        if not "enrollment" in request.data:
+            behavior.is_valid(raise_exception=True)
+        enrollment = Enrollment.objects.get(id=request.data["enrollment"])
+        user = request.user
+        return enrollment in user.get_all_allowed_enrollments()
 
 
 class BehaviorNote(models.Model):
@@ -604,7 +622,7 @@ class FinalGrade(models.Model):
                                     help_text="A codified representation of the grade, such as A-F or 1-5")
 
 
-class Notification(models.Model):
+class Notification(AdminWriteMixin, models.Model):
     """
     Notification
     Represent and store a notification which should be displayed to a User
