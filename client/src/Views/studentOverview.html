@@ -64,7 +64,9 @@
                 <div class="panel-body">
                     <div class="panel panel-default student-overview-parent-panel" ng-repeat="entry in parentContactInfo">
                         <div class="panel-heading">
-                            <h3 class="panel-title"><b>{{ entry.first_name }}</b> {{ entry.last_name }} ({{ entry.relationship }})</h3>
+                            <h3 class="panel-title">
+                                <b>{{ entry.first_name }}</b> {{ entry.last_name }} <span ng-if="entry.relationship !== null && entry.relationship !== ''">({{ entry.relationship }})</span>
+                            </h3>
                         </div>
                         <div class="panel-body">
                             <div class="parent-info" ng-show="!entry.editing">

@@ -32,6 +32,7 @@
 .student-overview-parent-panel > .panel-heading {
     padding: 15px;
     background: linear-gradient(to right, #0b3c5d, #105989);
+    border: none;
 }
 
 .student-overview-parent-panel > .panel-heading > .panel-title {
