@@ -607,6 +607,28 @@ class StandardizedTestScore(models.Model):
         unique_together = (('standardized_test', 'date', 'student'),)
         ordering = ('date',)
 
+    def has_object_write_permission(self, request):
+        """
+        A user may write the behavior of an enrollment if they can access the enrollment
+        """
+        user = request.user
+        if user.is_superuser:
+            return user.is_superuser
+        visible_students = user.get_all_allowed_students()
+        return self.student in visible_students
+
+    @staticmethod
+    def has_write_permission(request):
+        user = request.user
+        if user.is_superuser:
+            return user.is_superuser
+        from api.serializers import StandardizedTestScoreSerializer
+        score = StandardizedTestScoreSerializer(data=request.data)
+        if not "student" in request.data:
+            score.is_valid(raise_exception=True)
+        student = Student.objects.get(id=request.data["student"])
+        return student in user.get_all_allowed_students()
+
 
 class Assignment(models.Model):
     """

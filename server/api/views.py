@@ -655,7 +655,7 @@ class StandardizedTestScoreViewSet(NestedDynamicViewSet):
     delete:
     deletes the existing standardized test score report specified by the path param.
     """
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DRYPermissions,)
     serializer_class = StandardizedTestScoreSerializer
     queryset = StandardizedTestScore.objects.all()
 
