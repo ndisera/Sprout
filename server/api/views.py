@@ -604,7 +604,7 @@ class BehaviorViewSet(NestedDynamicViewSet):
 
         # Get all valid enrollments
         valid_enrollments = get_all_allowed_enrollments(user)
-        # Filter for behavior records in those enrollments
+        # Filter for records in those enrollments
         queryset = queryset.filter(enrollment__in=valid_enrollments)
 
         return queryset
@@ -643,7 +643,9 @@ class BehaviorNoteViewSet(NestedDynamicViewSet):
             return queryset
 
         valid_students = get_all_allowed_students(user)
+        # Filter for records for those students
         queryset = queryset.filter(student__in=valid_students)
+
         return queryset
 
     """ ensure variables show as correct type for docs """
@@ -671,23 +673,19 @@ class AttendanceRecordViewSet(NestedDynamicViewSet):
 
     def get_queryset(self, queryset=None):
         """
-        AttendanceRecords should only be visible:
-            - If the user teaches the related section
-            - If the attendance record refers to a student the teacher has another relation to
+        AttendanceRecords should only be visible if the related enrollment is visible
         """
         user = self.request.user
         if queryset is None:
             queryset = super(AttendanceRecordViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
-        # Filter for the user teaches the section
-        teaches = Q(enrollment__section__teacher=user)
-        # Filter for other related students:
-        # Case manager
-        manages = Q(student__case_manager=user)
-        # The teacher of another section in which the student is enrolled
-        other_teacher = Q(student__enrollment__section__teacher=user)
-        queryset = queryset.filter(teaches | manages | other_teacher)
+
+        # Get all valid enrollments
+        valid_enrollments = get_all_allowed_enrollments(user)
+        # Filter for records in those enrollments
+        queryset = queryset.filter(enrollment__in=valid_enrollments)
+
         return queryset
 
 
@@ -736,20 +734,17 @@ class StandardizedTestScoreViewSet(NestedDynamicViewSet):
 
     def get_queryset(self, queryset=None):
         """
-        Test Scores should only be visible:
-            - If the user teaches the student
-            - If the user is the student's case manager
+        Test Scores should only be visible if the related student is visible
         """
         user = self.request.user
         if queryset is None:
             queryset = super(StandardizedTestScoreViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
-        # Filter for the user teaches the student
-        teaches = Q(student__enrollment__section__teacher=user)
-        # Filter for other related students (only case manager at this time)
-        related = Q(student__case_manager=user)
-        queryset = queryset.filter(teaches | related)
+
+        valid_students = get_all_allowed_students(user)
+        queryset = queryset.filter(student__in=valid_students)
+
         return queryset
 
     """ ensure variables show as correct type for docs """
@@ -808,23 +803,18 @@ class AssignmentViewSet(NestedDynamicViewSet):
 
     def get_queryset(self, queryset=None):
         """
-        AttendanceRecords should only be visible:
-            - If the user teaches the related section
-            - If the attendance record refers to a student the teacher has another relation to
+        AttendanceRecords should only be visible if the related section is visible
         """
         user = self.request.user
         if queryset is None:
             queryset = super(AssignmentViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
-        # Filter for the user teaches the section
-        teaches = Q(section__teacher=user)
-        # Filter for other related students:
-        # Case manager
-        manages = Q(section__enrollment__student__case_manager=user)
-        # The teacher of another section in which the student is enrolled
-        other_teacher = Q(section__enrollment__student__enrollment__section__teacher=user)
-        queryset = queryset.filter(teaches | manages | other_teacher)
+
+        valid_sections = get_all_allowed_sections(user)
+        # Filter for records in those sections
+        queryset = queryset.filter(section__in=valid_sections)
+
         return queryset
 
     """ ensure variables show as correct type for docs """
@@ -871,20 +861,18 @@ class GradeViewSet(NestedDynamicViewSet):
     queryset = Grade.objects.all()
 
     def get_queryset(self, queryset=None):
+        """
+        A grade report should only be visible if the related enrollment is visible
+        """
         user = self.request.user
         if queryset is None:
             queryset = super(GradeViewSet, self).get_queryset()
         if user.is_superuser:
             # The superuser is allowed to view everything
             return queryset
-        # A teacher may view grades for assignments in their taught section
-        teaches = Q(assignment__section__teacher=user)
-        # Filter for other related students:
-        # Case manager
-        manages = Q(student__case_manager=user)
-        # The teacher of another section in which the student is enrolled
-        other_teacher = Q(student__enrollment__section__teacher=user)
-        queryset = queryset.filter(teaches | manages | other_teacher).distinct()
+
+        valid_enrollments = get_all_allowed_enrollments(user)
+        queryset.filter(assignment__section__enrollment__in=valid_enrollments)
         return queryset
 
     """ ensure variables show as correct type for docs """
@@ -928,20 +916,19 @@ class FinalGradeViewSet(NestedDynamicViewSet):
 
     def get_queryset(self, queryset=None):
         """
-        Behaviors should only be visible:
-            - If the user teaches the related section
-            - If the user is the student's case manager
+        FinalGrade Reports should only be visible if the enrollment is visible
         """
         user = self.request.user
         if queryset is None:
             queryset = super(FinalGradeViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
-        # Filter for the user teaches the section
-        teaches = Q(enrollment__section__teacher=user)
-        # Filter for other related students (only case manager at this time)
-        related = Q(enrollment__student__case_manager=user)
-        queryset = queryset.filter(teaches | related)
+
+        # Get all valid enrollments
+        valid_enrollments = get_all_allowed_enrollments(user)
+        # Filter for records in those enrollments
+        queryset = queryset.filter(enrollment__in=valid_enrollments)
+
         return queryset
 
     """ ensure variables show as correct type for docs """
@@ -1269,11 +1256,27 @@ class FocusStudentViewSet(NestedDynamicViewSet):
 
 class IEPGoalViewSet(NestedDynamicViewSet):
     """
-    allows interaction with the set of "Student" instances
+    allows interaction with the set of "IEPGoal" instances
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = IEPGoalSerializer
     queryset = IEPGoal.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        IEPGoals should only be visible if the student is visible
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(IEPGoalViewSet, self).get_queryset()
+        if user.is_superuser:
+            return queryset
+
+        valid_students = get_all_allowed_students(user)
+        # Filter for records for those students
+        queryset = queryset.filter(student__in=valid_students)
+
+        return queryset
 
     # ensure variables show as correct types for docs
     student_name = 'student'
