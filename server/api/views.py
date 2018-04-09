@@ -72,6 +72,23 @@ class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
 
 
+def get_all_allowed_students(user):
+    """
+    Return a queryset containing all the students this user should have access to data for
+
+    A user should be able to access:
+        - All students for whom they are case manager
+        - All students in their taught classes
+    """
+    # Students who this user manages
+    manages = Q(case_manager=user)
+    # Students in a class this user teaches
+    teaches = Q(enrollment__section__teacher=user)
+
+    valid_students = Student.objects.filter(teaches | manages)
+    return valid_students
+
+
 def get_all_allowed_sections(user):
     """
     Return a queryset containing all the sections this user should have access to data for
@@ -617,20 +634,16 @@ class BehaviorNoteViewSet(NestedDynamicViewSet):
 
     def get_queryset(self, queryset=None):
         """
-        BehaviorNotes should only be visible:
-            - If the user teaches the student
-            - If the user is the student's case manager
+        BehaviorNotes should only be visible if the student is visible
         """
         user = self.request.user
         if queryset is None:
             queryset = super(BehaviorNoteViewSet, self).get_queryset()
         if user.is_superuser:
             return queryset
-        # Filter for the user teaches the student
-        teaches = Q(student__section__teacher=user)
-        # Filter for other related students (only case manager at this time)
-        related = Q(student__case_manager=user)
-        queryset = queryset.filter(teaches | related)
+
+        valid_students = get_all_allowed_students(user)
+        queryset = queryset.filter(student__in=valid_students)
         return queryset
 
     """ ensure variables show as correct type for docs """
