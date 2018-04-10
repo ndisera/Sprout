@@ -251,11 +251,13 @@ app.controller("inputTestsController", function ($scope, $location, $q, toastSer
     }
 
     // this will update all the scores to match the scores that were saved on the server
+    // will also reset the temp variable because it was saved
     function propagateChanges(scores) {
         _.each(scores, function(elem) {
             if(_.has(studentsLookup, elem.student)) {
                 studentsLookup[elem.student].score    = elem.score;
                 studentsLookup[elem.student].score_id = elem.score_id;
+                studentsLookup[elem.student].score_temp = null;
             }
         });
     }
