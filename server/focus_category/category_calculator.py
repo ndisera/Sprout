@@ -16,6 +16,7 @@ class CategoryCalculator():
         Future focus student records will create a new instance of this class
     """
 
+
     def __init__(self, student, grades, attendances, behavior_efforts, test_scores):
         """
         Construct a CategoryCalculator, storing all relevant datalists for future use
@@ -29,6 +30,8 @@ class CategoryCalculator():
         self.attendances = attendances
         self.behavior_efforts = behavior_efforts
         self.test_scores = test_scores
+        self.no_data_string = "none______"
+
         if len(behavior_efforts) != 0:
             random.seed(behavior_efforts[0].enrollment.student_id)  # We want consistent random behavior
         else:
@@ -62,7 +65,7 @@ class CategoryCalculator():
         for behavior in self.behavior_efforts:
             behavior_lists.setdefault(behavior.enrollment_id, []).append(behavior)
 
-        newlist = sorted(self.behavior_efforts, key=lambda x: x.date)
+        behavior_lists = sorted(self.behavior_efforts, key=lambda x: x.date)
         # behavior past this point relies on the data being sorted by date.
 
         #todo: enforce no duplicate progress and caution categories
@@ -80,7 +83,7 @@ class CategoryCalculator():
                 return 'effort__2018-03-01__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
 
         # We didn't find anything: return none
-        return '__none__'
+        return self.no_data_string
 
     def get_caution_category(self):
         """
@@ -107,7 +110,7 @@ class CategoryCalculator():
                 return 'effort__2018-03-01__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
 
         # We didn't find anything: return none
-        return '__none__'
+        return self.no_data_string
 
     def prepare_focus_category(self, focus):
         """
