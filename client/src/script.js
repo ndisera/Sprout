@@ -28,6 +28,16 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             controller: 'loginController',
         })
 
+        .when('/password/reset', {
+            templateUrl: 'html/passwordReset.html',
+            controller: 'passwordResetController',
+        })
+
+        .when('/password/reset/confirm/:id/:token', {
+            templateUrl: 'html/passwordResetConfirm.html',
+            controller: 'passwordResetConfirmController',
+        })
+
         // route tests query page
         .when('/tests', {
             templateUrl: 'html/tests.html',

@@ -232,6 +232,47 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
     };
 
     /**
+     * send password reset link to provided email
+     * @param {string} email - email address
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.resetPassword = function(email, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/password/reset/' + query,
+            data: { 'email': email, },
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * reset a password
+     * @param {PasswordReset} passwordResetObj - object server expects in order to reset password
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.confirmNewPassword = function(passwordResetObj, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/password/reset/confirm/' + query,
+            data: passwordResetObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+
+    /**
      * Get all user records
      * @param {object} config - config object for query parameters (see queryService)
      * @return {promise} promise that will resolve with data or reject with response code.

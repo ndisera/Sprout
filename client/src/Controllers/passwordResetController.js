@@ -1,7 +1,9 @@
-app.controller('loginController', function ($scope, $rootScope, $location, userService, studentService) {
+app.controller('passwordResetController', function ($scope, $rootScope, $location, userService, studentService) {
     $scope.location = $location;
 
-    // array for all errors to display to user
+    $scope.successfulReset = false;
+
+    // arrays for all alerts to display to user
     $scope.errors = [];
 
     /**
@@ -37,7 +39,7 @@ app.controller('loginController', function ($scope, $rootScope, $location, userS
         if(input === null 
             || input === undefined 
             || input === NaN
-            || input === "") 
+            || input === '') 
         {
             return false;
         }
@@ -45,42 +47,32 @@ app.controller('loginController', function ($scope, $rootScope, $location, userS
     }
 
     /**
-     * Verify if token from local storage (if exists) is valid
+     * attempts to send a password reset link to email
      */
-    if(userService.user.token !== null) {
-        var includeUser = true;
-        userService.authVerify(includeUser).then(
-            function success(data) {
-                $location.path('');
-            },
-            function error(response) {
-                userService.saveToken(null);
-                userService.saveUser(null);
-            }
-        );
-    }
-
-    /**
-     * Checks login credentials and logs the user in if valid.
-     */
-    $scope.attemptLogin = function (event) {
+    $scope.attemptPasswordReset = function (event) {
         event.preventDefault();
 
-        if(!validateInput($scope.email) || !validateInput($scope.password)) {
-            displayErrors("Email and password must not be blank.");
+        $scope.successfulReset = false;
+
+        if(!validateInput($scope.email)) {
+            displayErrors('Email must not be blank.');
             return;
         }
 
-        userService.login($scope.email, $scope.password).then(
+        var savedEmail = $scope.email;
+
+        userService.resetPassword($scope.email).then(
             function success(response) {
-                $location.path('');
+                $scope.lastEmail = savedEmail;
+                $scope.successfulReset = true;
+                displayErrors([]);
             }, function error(response) {
-                if (response.data && response.data["non_field_errors"]) {
-                    displayErrors(response.data["non_field_errors"]);
+                if (response.data && response.data['non_field_errors']) {
+                    displayErrors(response.data['non_field_errors']);
                 }
 
-                if (response.data && response.data["email"]) {
-                    displayErrors(response.data["email"]);
+                if (response.data && response.data['email']) {
+                    displayErrors(response.data['email']);
                 }
             }
         );
