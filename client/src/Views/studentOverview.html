@@ -62,6 +62,9 @@
                     <h3 class="panel-title">Parent Contact Info</h3>
                 </div>
                 <div class="panel-body">
+                    <div class="alert alert-info" role="alert" ng-show="parentContactInfo.length === 0 && !addingParentContactInfo">
+                        <span><b>Tip:</b> It looks like this student doesn't have any parent contact info. You can add an entry by pressing the <span class="glyphicon glyphicon-plus"></span> button below.</span>
+                    </div>
                     <div class="panel panel-default student-overview-parent-panel" ng-repeat="entry in parentContactInfo">
                         <div class="panel-heading">
                             <h3 class="panel-title">

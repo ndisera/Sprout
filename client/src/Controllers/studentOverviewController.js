@@ -273,7 +273,7 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
     $scope.toggleAddParentContactInfo = function(value) {
         $scope.addingParentContactInfo = value;
         if(!value) {
-            resetNewParentContactInfo(entry);
+            resetNewParentContactInfo();
         }
     };
 
