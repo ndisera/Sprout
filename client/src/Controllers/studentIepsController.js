@@ -48,7 +48,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             quantitative_range_low: 0,
             quantitative_range_upper: 100,
             quantitative_target: null,
-            title: 'New IEP',
+            title: 'New Goal',
             student: $scope.student.id,
         };
     }
@@ -309,7 +309,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to get this IEP Goal.');
-            },
+            }
         );
 
         studentService.getIepNotesForStudent($scope.student.id, iep.id).then(
@@ -328,7 +328,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to get this IEP Goal.');
-            },
+            }
         );
     }
 
@@ -392,7 +392,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to add the measurement.');
-            },
+            }
         );
     }
 
@@ -418,7 +418,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the measurement.');
-            },
+            }
         );
     }
 
@@ -429,7 +429,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to delete the measurement.');
-            },
+            }
         );
     }
 
@@ -455,7 +455,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to add the note.');
-            },
+            }
         );
 
     }
@@ -480,7 +480,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the note.');
-            },
+            }
         );
     }
 
@@ -492,7 +492,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to delete the note.');
-            },
+            }
         );
     }
 
@@ -536,7 +536,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to create the new IEP.');
-            },
+            }
         );
 
     };
@@ -568,7 +568,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the measurement.');
-            },
+            }
         );
     }
 
@@ -590,7 +590,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
             },
             function error(data) {
                 toastService.error('The server wasn\'t able to delete the IEP.');
-            },
+            }
         );
     };
 

@@ -58,7 +58,7 @@ app.directive('progressCircle', function() {
             // create the outer circle, the main circle that shows progress
             var outerCircle = snap.circle(center, center, radius);
             outerCircle.addClass('progress-circle-stroke');
-            outerCircle.transform('r-90,' + center.toString() + ',' + center.toString());
+            outerCircle.transform('r270.1,' + center.toString() + ',' + center.toString());
             outerCircle.attr({
                 'stroke-dasharray': '0' + ', ' + circumference.toString(),
                 'stroke-width': strokeWidth.toString() + 'px',

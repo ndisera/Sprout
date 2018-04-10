@@ -12,14 +12,15 @@ class StudentService(BaseService):
         super(StudentService, self).__init__(**kwargs)
         self.complete_uri = self.complete_uri_template.format(endpoint="/students/")
 
-    def get_students(self):
+    def get_students(self, params=None):
         """
-        Download a complete list of students
+        Download a complete list of students, with optional filter
 
+        :param params: dict representing filter_key -> filter_val
         :return: list of student objects
         :rtype: list[Student]
         """
-        return self._get_models(Student, self.complete_uri)
+        return self._get_models(Student, self.complete_uri, params=self._prepare_params(params))
 
     def add_student(self, student):
         """

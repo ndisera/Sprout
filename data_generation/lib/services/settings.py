@@ -5,7 +5,7 @@ from collections import namedtuple
 SchoolSettings = namedtuple("SchoolSettings", ['id', 'school_name', 'school_location', 'grade_range_lower', 'grade_range_upper', ])
 DailySchedule = namedtuple("DailySchedule", ['id', 'name', 'total_periods', 'periods_per_day', ])
 TermSettings  = namedtuple("TermSettings", ['id', 'schedule', ])
-SchoolYear = namedtuple("SchoolYear", ['start_date', 'end_date', 'num_terms', 'title', 'id'])
+SchoolYear = namedtuple("SchoolYear", ['start_date', 'end_date', 'title', 'id', 'import_id'])
 SchoolYear.__new__.__defaults__= (None, None, ) # title and id optional
 
 
@@ -38,11 +38,13 @@ class SettingsService(BaseService):
         """
         return self._get_models(TermSettings, self.complete_uri_term_settings)
 
-    def get_school_years(self):
+    def get_school_years(self, params=None):
         """
-        Get all the SchoolYear objects for the school
+        Get all the SchoolYear objects for the school, with optional filters
+
+        :param params: dict representing filter_key -> filter_val
         """
-        return self._get_models(SchoolYear, self.complete_uri_school_years)
+        return self._get_models(SchoolYear, self.complete_uri_school_years, params=self._prepare_params(params))
 
     def add_school(self, school):
         """

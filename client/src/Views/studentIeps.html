@@ -2,12 +2,15 @@
 <div class="row">
     <div class="col-xs-12">
         <div id="student-ieps-select-manipulate">
-            <button class="btn btn-success btn-manipulate" type="button" ng-click="toggleAddIep(true)" ng-disabled="addingIep">
+            <button class="btn btn-success btn-manipulate" type="button" ng-click="toggleAddIep(true)" ng-show="!addingIep">
                 <span class="glyphicon glyphicon-plus"></span>
+            </button>
+            <button class="btn btn-default btn-manipulate" type="button" ng-click="toggleAddIep(false)" ng-show="addingIep">
+                <span class="glyphicon glyphicon-remove"></span>
             </button>
         </div>
         <div id="student-ieps-select" class="select-full-width input-group" ng-show="ieps.length > 0" ng-class="{ 'adding': addingIep, }">
-            <span class="input-group-addon">IEP</span>
+            <span class="input-group-addon">Goal</span>
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedIep.title }} <span class="caret"></span></button>
                 <ul class="dropdown-menu dropdown-menu-right">
@@ -22,7 +25,7 @@
 <div class="row" ng-if="ieps.length === 0 && !addingIep">
     <div class="col-xs-12 voffset3">
         <div class="alert alert-info" role="alert">
-            <span><b>Tip:</b> It looks like you don't have any IEPs. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
+            <span><b>Tip:</b> It looks like you don't have any Goals. Click the <span class="glyphicon glyphicon-plus"></span> button to create one.</span>
         </div>
     </div>
 </div>
@@ -33,7 +36,7 @@
             <div id="student-ieps-edit-form" class="panel-wrapper">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="panel-title">IEP Info</h4>
+                        <h4 class="panel-title">Goal Info</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -57,7 +60,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group" ng-if="iep.quantitative">
-                                    <label class="control-label col-sm-2">Goal: </label>
+                                    <label class="control-label col-sm-2">Target Score: </label>
                                     <div class="col-sm-10">
                                         <p class="form-control-static" ng-if="!iep.editing && iep.quantitative_target !== null">{{ iep.quantitative_target }}</p>
                                         <p class="form-control-static" ng-if="!iep.editing && iep.quantitative_target === null">None</p>
@@ -142,7 +145,7 @@
                                             <tr>
                                                 <th class="student-ieps-tiny-col">Date</th>
                                                 <th class="student-ieps-tiny-col" ng-show="iep.quantitative">Score</th>
-                                                <th>Note</th>
+                                                <th>Details</th>
                                                 <th></th>
                                                 <th></th>
                                             </tr>
@@ -214,7 +217,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label class="control-label col-sm-2">Note: </label>
+                                                    <label class="control-label col-sm-2">Details: </label>
                                                     <div class="col-sm-10">
                                                         <input type="text" class="form-control" ng-model="iep.newData.note">
                                                     </div>
@@ -367,7 +370,7 @@
         <div class="panel-wrapper">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h4 class="panel-title">Create IEP</h4>
+                    <h4 class="panel-title">Create Goal</h4>
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal" name="addIepForm" ng-submit="addIep()">
@@ -403,7 +406,7 @@
                             </div>
                         </div>
                         <div class="form-group" ng-show="newIep.quantitative === 'Yes'">
-                            <label class="control-label col-sm-2">Goal Score: </label>
+                            <label class="control-label col-sm-2">Target Score: </label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" ng-model="newIep.quantitative_target" ng-class="{ 'invalid': iepRangeValidation(), }">
                             </div>

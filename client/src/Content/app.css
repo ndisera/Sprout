@@ -157,13 +157,17 @@ a {
 }
 
 #topbar .btn-group {
-    margin-top: -2px;
+    margin-top: 4px;
 }
 
 #topbar .btn-group > .btn {
-    padding: 4px 0px 4px 12px;
+    padding: 4px 6px 4px 6px;
     border: none;
     background: none;
+}
+
+.bell-margin {
+    margin-right:-6px;
 }
 
 #topbar .btn-group > .btn > .badge {
@@ -178,7 +182,7 @@ a {
 #topbar .topbar-user {
     display: inline-block;
     margin-top: 10px;
-    margin-right: 10px;
+    margin-right: 9px;
 }
 
 #topbar-hamburger-btn {
@@ -978,7 +982,7 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
     font-weight: 100;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-anchor: middle;
-    alignment-baseline: middle;
+    dominant-baseline: middle;
 }
 
 .input-group-dropdown > .input-group-addon {

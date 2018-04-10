@@ -165,7 +165,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to get the requested test scores.');
-            },
+            }
         );
 
     }
@@ -245,7 +245,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the test score.');
-            },
+            }
         );
     };
 
@@ -256,7 +256,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to delete the test score.');
-            },
+            }
         );
     };
 
@@ -282,7 +282,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
             },
             function error(response) {
 
-            },
+            }
         );
     };
 

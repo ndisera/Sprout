@@ -1,4 +1,5 @@
 app.controller('loginController', function ($scope, $rootScope, $location, userService, studentService) {
+    $scope.location = $location;
 
     // array for all errors to display to user
     $scope.errors = [];

@@ -13,14 +13,15 @@ class EnrollmentService(BaseService):
         super(EnrollmentService, self).__init__(**kwargs)
         self.complete_uri = self.complete_uri_template.format(endpoint="/enrollments/")
 
-    def get_enrollments(self):
+    def get_enrollments(self, params=None):
         """
-        Download a complete list of enrollments
+        Download a complete list of enrollments, with optional filters
 
+        :param params: dict representing filter_key -> filter_val
         :return: list of enrollment objects
         :rtype: list[Enrollment]
         """
-        return self._get_models(Enrollment, self.complete_uri)
+        return self._get_models(Enrollment, self.complete_uri, params=self._prepare_params(params))
 
     def add_enrollment(self, enrollment):
         """

@@ -54,6 +54,8 @@
         <script src="includes/gcal.min.js"></script>
         <script src="includes/locale-all.js"></script>
         <script src="includes/calendar.js"></script>
+        <script src="includes/jspdf.min.js"></script>
+        <script src="includes/jspdf.plugin.autotable.min.js"></script>
         <!-- @endif -->
         <!-- @ifdef DEBUG -->
         <script src="includes/jquery.js"></script>
@@ -81,6 +83,8 @@
         <script src="includes/gcal.js"></script>
         <script src="includes/locale-all.js"></script>
         <script src="includes/calendar.js"></script>
+        <script src="includes/jspdf.min.js"></script>
+        <script src="includes/jspdf.plugin.autotable.js"></script>
         <!-- @endif -->
     </head>
     <body ng-app="app">
@@ -202,16 +206,18 @@
                             </form>
                         </div>
                         <div class="col-sm-4 hidden-xs">
-                            <div class="pull-right">
-                                <div class="topbar-user">
-                                    <span>{{ user.firstName }} {{ user.lastName }}</span>
-                                </div>
+                            <div class="pull-right bell-margin">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-default btn-notifications" ng-click="toggleNotifications(!showNotifications); $event.stopPropagation();" ng-class="{ 'notifications-none': notifications.length === 0, }">
                                         <span class="glyphicon glyphicon-bell"></span>
                                         <span class="badge" ng-if="notifications.length > 0 && notifications.length <= 99">{{ notifications.length }}</span>
                                         <span class="badge" ng-if="notifications.length > 99">99+</span>
                                     </button>
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <div class="topbar-user">
+                                    <span>{{ user.firstName }} {{ user.lastName }}</span>
                                 </div>
                             </div>
                         </div>
