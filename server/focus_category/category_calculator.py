@@ -64,7 +64,7 @@ class CategoryCalculator():
         test_lists = sorted(self.test_scores, key=lambda x: x.date)
 
         # https://stackoverflow.com/a/4143837/3518046
-        behavior_lists = {} # todo: split into separate behavior and effort
+        behavior_lists = {} # todo: split into separate behavior and effort, and remember that we want the average now
         for behavior in self.behavior_efforts:
             behavior_lists.setdefault(behavior.enrollment_id, []).append(behavior)
 
@@ -82,9 +82,23 @@ class CategoryCalculator():
         #     df[df_counter] = behavior
         #     df_counter += 1
 
-        for key, value in test_lists.iteritems():
-            df_map[df_counter] = ('test', value.standardized_test_id)
-            df[df_counter] = value
+# todo: test for if a test has no entered scores
+        for key, test_scores in test_lists.iteritems():  # Dict
+            # set a mapping, so we can do a lookup later
+            df_map[df_counter] = ('test', test_scores[0].standardized_test_id)
+
+            # extract the data
+            dates = [test_val.date for test_val in test_scores]
+            scores = [test_val.score for test_val in test_scores]
+            test_series = pd.Series(data=scores, index=dates)
+
+            # put the data into our dataframe
+            df[df_counter] = test_series
+
+            # Now go over each test score and add it to the dataframe
+            # for test_val in test_scores: # List
+            #     df[test_val.date, df_counter] = test_val.score
+            #
             df_counter += 1
 
 
