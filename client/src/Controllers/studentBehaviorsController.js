@@ -1,13 +1,16 @@
 app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, behaviorService, studentService, data, terms, service, student) {
     $scope.location = $location;
 
+    // I'm displaying all classes in the report dropdown, I need to display all classes that are valid for the chosen term
+    // so populate with serires instead
+
     $scope.report = {};
 
     $scope.behaviorNote = {};
     $scope.editingNote = false;
 
     $scope.hasBehaviorService = false;
-    if(service !== null && service !== undefined && service.service_requirements !== null && service.service_requirements !== undefined) {
+    if (service !== null && service !== undefined && service.service_requirements !== null && service.service_requirements !== undefined) {
         $scope.hasBehaviorService = service.service_requirements.length > 0;
     }
 
@@ -19,6 +22,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
 
     $scope.sections = [];
     $scope.sectionsLookup = {};
+    $scope.sectionsLookupByTitle = {};
 
     $scope.terms = [];
     // each subarray represents term and has all sections in that term (array to preserve order, and term id not sequential)
@@ -40,23 +44,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
             // for now, sort sections alphabetically
             $scope.sections = _.sortBy(data.sections, 'title');
             $scope.sectionsLookup = _.indexBy(data.sections, 'id');
-
-            // classOptions for report
-            $scope.classOptions = [];
-            $scope.classOptions.push({
-                id: null,
-                title: "Average"
-            });
-            $scope.classOptions.push({
-                id: null,
-                title: "All Classes"
-            });
-            _.each($scope.sections, function(elem) {
-                $scope.classOptions.push({
-                    id: elem.id,
-                    title: elem.title
-                });
-            });
+            $scope.sectionsLookupByTitle = _.indexBy(data.sections, 'title');
         }
     }
     if (terms !== null && terms !== undefined && terms.terms !== null && terms.terms !== undefined) {
@@ -79,6 +67,29 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
     _.each($scope.sections, function(elem) {
         $scope.sectionsByTerm[$scope.termToSectionsByTerm[elem.term]].push(elem);
     });
+
+    /**
+     * Fills the class options for the behavior report
+     */
+    function getClassOptions() {
+        // classOptions for report
+        $scope.classOptions = [];
+        $scope.classOptions.push({
+            id: null,
+            title: "Average"
+        });
+        $scope.classOptions.push({
+            id: null,
+            title: "All Classes"
+        });
+        _.each($scope.sharedGraph.series, function(elem) {
+            $scope.classOptions.push({
+                // I just need the id for the corresponding class name, I'm just going to create a lookup at the start
+                id: $scope.sectionsLookupByTitle[elem].id,
+                title: elem
+            });
+        });
+    }
 
     function termsByDateRange(terms, startDate, endDate) {
         var includedTerms = [];
@@ -399,6 +410,8 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
 
                     iterDate.add(1, 'd');
                 }
+
+                getClassOptions();
             },
             function error(response) {
                 // notify the user
@@ -468,8 +481,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
     function updateInputScores() {
         var config = {
             include: ['enrollment.section.*', ],
-            filter: [
-                {
+            filter: [{
                     name: 'date',
                     val: $scope.inputDate.format('YYYY-MM-DD').toString(),
                 },
@@ -512,15 +524,17 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
 
         // update the date's comment
         var commentConfig = {
-            filter: [{ name: 'date', val: $scope.inputDate.format('YYYY-MM-DD').toString(), }, ],
+            filter: [{
+                name: 'date',
+                val: $scope.inputDate.format('YYYY-MM-DD').toString(),
+            }, ],
         };
 
         studentService.getBehaviorNotesForStudent($scope.student.id, commentConfig).then(
             function success(data) {
-                if(data.behavior_notes.length > 0) {
+                if (data.behavior_notes.length > 0) {
                     $scope.behaviorNote = data.behavior_notes[0];
-                }
-                else {
+                } else {
                     $scope.behaviorNote = {
                         date: $scope.inputDate.format('YYYY-MM-DD').toString(),
                         body: '',
@@ -540,7 +554,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
 
     $scope.toggleEditingNote = function(value) {
         $scope.editingNote = value;
-        if(!value) {
+        if (!value) {
             $scope.behaviorNote.body_temp = $scope.behaviorNote.body;
         }
     };
@@ -552,7 +566,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
             student: $scope.behaviorNote.student,
         };
 
-        if($scope.behaviorNote.id !== null && ($scope.behaviorNote.body_temp === null || $scope.behaviorNote.body_temp === undefined || $scope.behaviorNote.body_temp === '')) {
+        if ($scope.behaviorNote.id !== null && ($scope.behaviorNote.body_temp === null || $scope.behaviorNote.body_temp === undefined || $scope.behaviorNote.body_temp === '')) {
             studentService.deleteBehaviorNoteForStudent($scope.student.id, $scope.behaviorNote.id).then(
                 function success(data) {
                     $scope.behaviorNote = {
@@ -567,13 +581,12 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                     toastService.error('The server wasn\'t able to save the student behavior comment.');
                 }
             );
-        }
-        else if($scope.behaviorNote.id !== null) {
+        } else if ($scope.behaviorNote.id !== null) {
             newNote.id = $scope.behaviorNote.id;
 
             studentService.updateBehaviorNoteForStudent($scope.student.id, newNote.id, newNote).then(
                 function success(data) {
-                    $scope.behaviorNote           = data.behavior_note;
+                    $scope.behaviorNote = data.behavior_note;
                     $scope.behaviorNote.body_temp = data.behavior_note.body;
                 },
                 function error(response) {
@@ -581,11 +594,10 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                     toastService.error('The server wasn\'t able to save the student behavior comment.');
                 }
             );
-        }
-        else {
+        } else {
             studentService.addBehaviorNoteForStudent($scope.student.id, newNote).then(
                 function success(data) {
-                    $scope.behaviorNote           = data.behavior_note;
+                    $scope.behaviorNote = data.behavior_note;
                     $scope.behaviorNote.body_temp = data.behavior_note.body;
                 },
                 function error(response) {
@@ -753,6 +765,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
      * @param {object} dataGraph - parent graph
      */
     function fillGraphData(graph, dataGraph) {
+        // I can probably get the index of series and apply that to data, actually I don't think I can
         _.each(dataGraph.data[$scope.sectionToDataIndex[$scope.report.class.id]], function(elem) {
             graph.data[0].push(elem);
         });
@@ -763,20 +776,14 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
      */
     $scope.updateClassGraphs = function() {
         // this needs to be called on create report button as well
-        if ($scope.sectionToDataIndex.hasOwnProperty($scope.report.class.id) && $scope.report.class.title !== "All Classes" && $scope.report.class.title !== "Average") {
-            $scope.showClass = true;
+        $scope.showClass = $scope.report.class.title !== "All Classes" && $scope.report.class.title !== "Average";
+        if ($scope.showClass) {
             $scope.singleBehaviorGraph.data[0] = [];
             $scope.singleEffortGraph.data[0] = [];
             fillGraphData($scope.singleBehaviorGraph, $scope.behaviorGraph);
             fillGraphData($scope.singleEffortGraph, $scope.effortGraph);
-        } else if ($scope.report.class.title !== "All Classes" && $scope.report.class.title !== "Average") {
-            $scope.showClass = true;
-            $scope.singleBehaviorGraph.data[0] = [];
-            $scope.singleEffortGraph.data[0] = [];
-        } else {
-            $scope.showClass = false;
         }
-    }
+    };
 
     /**
      * Calculates the sums and counts for the report graphs
@@ -867,8 +874,8 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         doc.text(105 * scale, 25 * scale, 'Behavior and Effort Report', 'center');
         doc.setFontSize(18);
         var forMessage = $scope.report.class.title !== "Average" ?
-        'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + ' in ' + $scope.report.class.title:
-        forMessage = 'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + '\'s Average in All Classes';
+            'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + ' in ' + $scope.report.class.title :
+            forMessage = 'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + '\'s Average in All Classes';
         // for person's average in all classes
         doc.text(105 * scale, 33 * scale, forMessage, 'center');
         doc.text(105 * scale, 41 * scale, startDate + " to " + endDate, 'center');
@@ -880,7 +887,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         doc.addImage(effortImgData, 'JPEG', (105 - width / 2) * scale, 200 * scale, width * scale, height * scale);
 
         doc.addPage();
-        var columns = includeClassNames ? ["Date", "Class", "Behavior Score", "Effort Score"]: ["Date", "Behavior Score", "Effort Score"];
+        var columns = includeClassNames ? ["Date", "Class", "Behavior Score", "Effort Score"] : ["Date", "Behavior Score", "Effort Score"];
         var rows = [];
 
         for (var i = 0; i < behaviorReportGraph.data[0].length; i++) {
@@ -898,7 +905,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
             }
         }
 
-        doc.autoTable(columns, rows);
+        doc.autoTable(columns, rows, { showHeader: 'firstPage' });
         doc.save($scope.student.first_name + $scope.student.last_name + '.pdf');
 
         // clear report obj
