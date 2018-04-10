@@ -121,13 +121,14 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 students: function(studentService) {
                     return studentService.getStudents();
                 },
-                enrollments: function ($q, userService, enrollmentService) {
+                enrollmentData: function ($q, userService, enrollmentService) {
                     //TODO(gzuber): I don't like this in script.js...
                     var deferred = $q.defer();
                     userService.authVerify().then(
                         function success() {
                             var config = {
                                 filter: [{ name: 'section.teacher', val: userService.user.id, }, ],
+                                include: ['section.*', ],
                             };
                             enrollmentService.getStudentEnrollments(config).then(
                                 function success(data) {
@@ -143,6 +144,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                         }
                     );
                     return deferred.promise;
+                },
+                tests: function(testService) {
+                    return testService.getTests();
+                },
+                terms: function(termService) {
+                    return termService.getTerms();
                 },
                 auth: function(userService) {
                     return userService.authVerify();

@@ -305,7 +305,7 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
 
                 // everything succeeded -- yaaay
                 if(failed.length === 0 && commentsFailed.length === 0) {
-                    toastService.success('The server saved your behavior records!');
+                    toastService.success('Your behavior records were saved!');
                     return;
                 }
 

@@ -19,7 +19,13 @@
     width: 25%;
 }
 
-
 .input-behavior-msg {
     white-space: pre-line;
+}
+
+.input-tests-table-link:hover {
+    background-color: #d2ecf9;
+    color: #0c405a;
+    text-decoration: none;
+    cursor: pointer;
 }

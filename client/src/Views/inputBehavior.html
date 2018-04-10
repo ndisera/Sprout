@@ -51,7 +51,7 @@
             <div class="panel-wrapper">
                 <div class="panel panel-default no-bottom-margin input-behavior">
                     <div class="panel-heading">
-                        <h3 class="panel-title">{{ student.first_name }} {{ student.last_name }} ({{ student.student_id }})</h3>
+                        <h3 class="panel-title"><a ng-href="/student/{{ student.id }}">{{ student.first_name }} {{ student.last_name }} ({{ student.student_id }})</a></h3>
                     </div>
                     <div class="panel-body">
                         <div class="alert alert-info no-bottom-margin" ng-if="student.sections.length === 0">
