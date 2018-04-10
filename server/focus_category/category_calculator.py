@@ -1,4 +1,6 @@
 import random
+import pandas as pd
+from sklearn import linear_model
 
 
 class CategoryCalculator():
@@ -15,7 +17,6 @@ class CategoryCalculator():
             The instance will be destroyed
         Future focus student records will create a new instance of this class
     """
-
 
     def __init__(self, student, grades, attendances, behavior_efforts, test_scores):
         """
@@ -59,14 +60,35 @@ class CategoryCalculator():
         test_len = len(self.test_scores)
         # Make sure to check for no data down the line using the lengths
 
+        behavior_lists = sorted(self.behavior_efforts, key=lambda x: x.date)
+        test_lists = sorted(self.test_scores, key=lambda x: x.date)
 
         # https://stackoverflow.com/a/4143837/3518046
-        behavior_lists = {}
+        behavior_lists = {} # todo: split into separate behavior and effort
         for behavior in self.behavior_efforts:
             behavior_lists.setdefault(behavior.enrollment_id, []).append(behavior)
 
-        behavior_lists = sorted(self.behavior_efforts, key=lambda x: x.date)
-        # behavior past this point relies on the data being sorted by date.
+        test_lists = {}
+        for test in self.test_scores:
+            test_lists.setdefault(test.standardized_test_id, []).append(test)
+
+        # Make a map from a dataframe column id to a behavior/test/effort category
+        df_map = {}
+        df_counter = 0
+        df = pd.DataFrame()
+
+        # for key, value in behavior_lists:
+        #     df_map[df_counter] = ('behavior', behavior.enrollment_id)
+        #     df[df_counter] = behavior
+        #     df_counter += 1
+
+        for key, value in test_lists.iteritems():
+            df_map[df_counter] = ('test', value.standardized_test_id)
+            df[df_counter] = value
+            df_counter += 1
+
+
+
 
         #todo: enforce no duplicate progress and caution categories
 
@@ -121,3 +143,12 @@ class CategoryCalculator():
         :rtype: str
         """
         return focus
+
+    def filter_data_frame(self, begin_date, end_date, master_frame):
+        """
+        Constructs a data frame with the given data from the start date to the end date, inclusive
+        :param begin_date: the date to start the dataframe
+        :param end_date: the date to end the dataframe
+        :param master_frame: the dataframe containing all of the compiled information
+        :return: a pandas dataframe with only the requested date range
+        """
