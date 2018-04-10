@@ -7,13 +7,48 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
     $scope.students = students.students;
     $scope.studentsLookup = _.indexBy($scope.students, 'id');
 
+    /**
+     * Updates selectedTest and the student results
+     * @param {test} test - the test object to update with
+     */
     $scope.selectTest = function(test) {
         $scope.selectedTest = test;
         updateResults();
     };
 
+    /**
+     * Downloads the test report
+     */
     $scope.downloadReport = function() {
+        var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
+        var startDate = moment($scope.startDate).format('YYYY-MM-DD').toString();
+        var endDate = moment($scope.endDate).format('YYYY-MM-DD').toString();
+        var scale = 2.83465;
 
+        doc.setFontSize(30);
+        doc.text(105 * scale, 25 * scale, $scope.selectedTest.test_name + ' Report', 'center');
+        doc.setFontSize(18);
+        doc.text(105 * scale, 33 * scale, startDate + " to " + endDate, 'center');
+
+        var takenColumns = ["Date", "Name", "Student ID", "Score"];
+        var notTakenColumns = ["Name", "Student ID"];
+        var takenRows = [];
+        var notTakenRows = [];
+        var takenData = _.chain($scope.takenBy).sortBy('last_name').sortBy('testDate').value();
+        var notTakenData = _.chain($scope.notTakenBy).sortBy('last_name').sortBy('testDate').value();
+        _.each(takenData, function(elem) {
+            takenRows.push([elem.testDate, elem.first_name + " " + elem.last_name, elem.student_id, elem.testScore]);
+        });
+        _.each(notTakenData, function(elem) {
+            notTakenRows.push([elem.first_name + " " + elem.last_name, elem.student_id]);
+        });
+
+        doc.text(15 * scale, 45 * scale, "Taken:")
+        doc.autoTable(takenColumns, takenRows, { startY: 49 * scale, showHeader: 'firstPage', });
+        let first = doc.autoTable.previous;
+        doc.text(15 * scale, first.finalY + (12 * scale), "Not Taken:");
+        doc.autoTable(notTakenColumns, notTakenRows, { startY: first.finalY + (16 * scale), showHeader: 'firstPage', });
+        doc.save($scope.selectedTest.test_name + '.pdf');
     };
 
     /**
@@ -87,7 +122,7 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
                     }
                 });
                 // now convert lookup to array
-                for(var key in notTakenByLookup) {
+                for (var key in notTakenByLookup) {
                     $scope.notTakenBy.push(notTakenByLookup[key]);
                 }
 

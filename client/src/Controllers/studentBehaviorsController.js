@@ -905,7 +905,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
             }
         }
 
-        doc.autoTable(columns, rows);
+        doc.autoTable(columns, rows, { showHeader: 'firstPage' });
         doc.save($scope.student.first_name + $scope.student.last_name + '.pdf');
 
         // clear report obj
