@@ -39,6 +39,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 tests: function(testService) {
                     return testService.getTests();
                 },
+                students: function (studentService) {
+                    return studentService.getStudents();
+                },
             },
         })
 
