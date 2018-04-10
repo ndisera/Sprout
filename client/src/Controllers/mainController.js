@@ -56,6 +56,22 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             adminRequired: false,
         },
         {
+            title: "Tests",
+            glyph: "file",
+            href: "/tests",
+            click: $scope.clearSearch,
+            badgeList: [],
+            adminRequired: true,
+        },
+        {
+            title: "Services",
+            glyph: "list",
+            href: "/services",
+            click: $scope.clearSearch,
+            badgeList: [],
+            adminRequired: true,
+        },
+        {
             title: "Manage",
             glyph: "briefcase",
             href: "/manage",

@@ -28,6 +28,34 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             controller: 'loginController',
         })
 
+        // route tests query page
+        .when('/tests', {
+            templateUrl: 'html/tests.html',
+            controller: 'testsController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+                tests: function(testService) {
+                    return testService.getTests();
+                },
+                students: function (studentService) {
+                    return studentService.getStudents();
+                },
+            },
+        })
+
+        // route for the service page
+        .when('/services', {
+            templateUrl: 'html/services.html',
+            controller: 'servicesController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
+        })
+
         .when('/manage', {
             redirectTo: '/manage/cases',
         })
