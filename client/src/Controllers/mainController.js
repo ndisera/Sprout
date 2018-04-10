@@ -146,11 +146,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
         }
     });
 
-    // closes navbar when an element is clicked in tablet/mobile view
-    //$('.nav a').on('click', function () {
-        //$scope.closeNavbar();
-    //});
-
     /**
      * Navigates to student's page if name in navigation search bar is valid.
      */
@@ -194,28 +189,18 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             panelClass: 'notifications-low-grade',
             iconClass: 'fa-exclamation-triangle',
         },
+        3: {
+            panelClass: 'notifications-iep-goal',
+            iconClass: 'fa-chart-line',
+        },
     }
 
     $scope.notificationClass = function(notification) {
-       switch(notification.category) {
-           case 1:
-               return $scope.notificationsCategories[1].panelClass;
-               break;
-           case 2:
-               return $scope.notificationsCategories[2].panelClass;
-               break;
-       }
+        return $scope.notificationsCategories[notification.category].panelClass;
     };
 
     $scope.notificationIconClass = function(notification) {
-       switch(notification.category) {
-           case 1:
-               return $scope.notificationsCategories[1].iconClass;
-               break;
-           case 2:
-               return $scope.notificationsCategories[2].iconClass;
-               break;
-       }
+        return $scope.notificationsCategories[notification.category].iconClass;
     };
 
     $scope.notificationNavigate = function(notification) {
