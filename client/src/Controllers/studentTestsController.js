@@ -1,4 +1,4 @@
-app.controller("studentTestsController", function ($scope, $rootScope, $location, $routeParams, toastService, testService, studentData, testData, termData) {
+app.controller("studentTestsController", function ($scope, $rootScope, $location, $routeParams, toastService, testService, termService, studentData, testData, termData) {
     $scope.location = $location;
 
     $scope.student = studentData.student;
@@ -23,24 +23,24 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     }
 
     // find biggest current term
-    $scope.selectedTerm = null;
-    _.each($scope.terms, function(elem) {
-        if(moment() > elem.start_date && moment() < elem.end_date) {
-            // I have found a candidate
-            // but we want the biggest current term
-            if($scope.selectedTerm === null) {
-                $scope.selectedTerm = elem;
-            }
-            else {
-                // take the bigger one
-                var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
-                var newDelta = elem.end_date - elem.start_date;
-                if(newDelta > curDelta) {
-                    $scope.selectedTerm = elem;
-                }
-            }
-        }
-    });
+    $scope.selectedTerm = termService.getLargestCurrentTerm();
+    //_.each($scope.terms, function(elem) {
+        //if(moment() > elem.start_date && moment() < elem.end_date) {
+            //// I have found a candidate
+            //// but we want the biggest current term
+            //if($scope.selectedTerm === null) {
+                //$scope.selectedTerm = elem;
+            //}
+            //else {
+                //// take the bigger one
+                //var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
+                //var newDelta = elem.end_date - elem.start_date;
+                //if(newDelta > curDelta) {
+                    //$scope.selectedTerm = elem;
+                //}
+            //}
+        //}
+    //});
 
     // set default date range to range of current term
     if($scope.selectedTerm !== null) {

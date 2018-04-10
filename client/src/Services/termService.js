@@ -131,7 +131,7 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
         },
 
         /**
-         * get largest, current term
+         * get largest current term
          *
          * @param {array[terms]} terms - list of terms
          * @return {term} largest (date range) current term, null if none current
@@ -141,7 +141,7 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
             _.each(terms, function(elem) {
                 var startDate = moment(elem.start_date);
                 var endDate = moment(elem.end_date);
-                if(moment() > startDate && moment() < endDate) {
+                if(moment() >= startDate && moment() <= endDate) {
                     // I have found a candidate
                     // but we want the biggest current term
                     if(selectedTerm === null) {
@@ -168,14 +168,20 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
          * returns a list of all current (active) terms based on today's date.
          *
          * @param {array[terms]} terms - list of terms
+         * @param {moment} date - optional date to use to determine current terms
          * @return {array[terms]} transformed list of all current terms
          */
-        getAllCurrentTerms: function(terms) {
+        getAllCurrentTerms: function(terms, date) {
+            var compareDate = moment();
+            if(date instanceof moment) {
+                compareDate = moment(date);
+            }
+
             var currentTerms = [];
             _.each(terms, function(elem) {
                 var startDate = moment(elem.start_date);
                 var endDate = moment(elem.end_date);
-                if(moment() > startDate && moment() < endDate) {
+                if(compareDate >= startDate && compareDate <= endDate) {
                     // found one
                     currentTerms.push(elem);
                 }
