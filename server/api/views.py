@@ -72,79 +72,6 @@ class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
 
 
-def get_all_allowed_students(user):
-    """
-    Return a queryset containing all the students this user should have access to data for
-
-    A user should be able to access:
-        - All students for whom they are case manager
-        - All students in their taught classes
-    """
-    # Students who this user manages
-    manages = Q(case_manager=user)
-    # Students in a class this user teaches
-    teaches = Q(enrollment__section__teacher=user)
-
-    valid_students = Student.objects.filter(teaches | manages)
-    return valid_students
-
-
-def get_all_allowed_sections(user):
-    """
-    Return a queryset containing all the sections this user should have access to data for
-
-    A user should be able to access:
-        - All sections for in which a student whom the user manages is enrolled
-        - All sections taught by the user
-        - All sections in the same term in which a student enrolled in a taught section is enrolled
-    """
-    if user.is_superuser:
-        return Section.objects.all()
-
-    # Sections for managed students
-    manages = Q(enrollment__student__case_manager=user)
-    # Sections taught by the user
-    teaches = Q(teacher=user)
-
-    # Sections in the same term in which a student enrolled in a taught section is enrolled
-    valid_enrollments = get_all_allowed_enrollments(user)
-    related_teaches = Q(enrollment__in=valid_enrollments)
-
-    valid_sections = Section.objects.filter(manages | teaches | related_teaches).distinct()
-    return valid_sections
-
-
-def get_all_allowed_enrollments(user):
-    """
-    Return a queryset of all enrollments this user should have access to data for
-
-    A user should be able to access:
-        - All enrollments, past and present, for a student for whom the user is a case manager
-        - All enrollments in any taught section
-        - All enrollments for any student in a taught section for the same term as that section
-    """
-    if user.is_superuser:
-        return Enrollment.objects.all()
-
-    # Enrollments belonging to students the user manages
-    manages = Q(student__case_manager=user)
-    # Enrollments belonging to sections the user teaches
-    teaches = Q(section__teacher=user)
-
-    taught_terms = [section.term for section in Section.objects.filter(teacher=user)]
-    # The teacher of another section in the same term in which the student is enrolled
-    other_teacher = Q(pk__in=[])
-    for term in taught_terms:
-        term_sections = Section.objects.filter(term=term)
-        # Get all the enrollments in any section from this term
-        term_enrollments = Enrollment.objects.filter(section__in=term_sections)
-        # Get all the students taught by this user this term
-        term_taught_students = Student.objects.filter(enrollment__in=term_enrollments.filter(section__teacher=user))
-        # Get all the enrollments of those students for this term
-        other_teacher = other_teacher | Q(student__in=term_taught_students, section__term=term)
-    return Enrollment.objects.filter(teaches | manages | other_teacher).distinct()
-
-
 class ProfilePictureViewSet(mixins.CreateModelMixin,
                             mixins.RetrieveModelMixin,
                             mixins.ListModelMixin,
@@ -480,7 +407,7 @@ class SectionViewSet(NestedDynamicViewSet):
         """
         user = self.request.user
         if queryset is None:
-            queryset = get_all_allowed_sections(user)
+            queryset = user.get_all_allowed_sections()
 
         return queryset
 
@@ -534,7 +461,7 @@ class EnrollmentViewSet(NestedDynamicViewSet):
         """
         user = self.request.user
         if queryset is None:
-            queryset = get_all_allowed_enrollments(user)
+            queryset = user.get_all_allowed_enrollments()
             
         return queryset
 
@@ -603,7 +530,7 @@ class BehaviorViewSet(NestedDynamicViewSet):
             return queryset
 
         # Get all valid enrollments
-        valid_enrollments = get_all_allowed_enrollments(user)
+        valid_enrollments = user.get_all_allowed_enrollments()
         # Filter for records in those enrollments
         queryset = queryset.filter(enrollment__in=valid_enrollments)
 
@@ -642,7 +569,7 @@ class BehaviorNoteViewSet(NestedDynamicViewSet):
         if user.is_superuser:
             return queryset
 
-        valid_students = get_all_allowed_students(user)
+        valid_students = user.get_all_allowed_students()
         # Filter for records for those students
         queryset = queryset.filter(student__in=valid_students)
 
@@ -682,7 +609,7 @@ class AttendanceRecordViewSet(NestedDynamicViewSet):
             return queryset
 
         # Get all valid enrollments
-        valid_enrollments = get_all_allowed_enrollments(user)
+        valid_enrollments = user.get_all_allowed_enrollments()
         # Filter for records in those enrollments
         queryset = queryset.filter(enrollment__in=valid_enrollments)
 
@@ -742,7 +669,7 @@ class StandardizedTestScoreViewSet(NestedDynamicViewSet):
         if user.is_superuser:
             return queryset
 
-        valid_students = get_all_allowed_students(user)
+        valid_students = user.get_all_allowed_students()
         queryset = queryset.filter(student__in=valid_students)
 
         return queryset
@@ -811,7 +738,7 @@ class AssignmentViewSet(NestedDynamicViewSet):
         if user.is_superuser:
             return queryset
 
-        valid_sections = get_all_allowed_sections(user)
+        valid_sections = user.get_all_allowed_sections()
         # Filter for records in those sections
         queryset = queryset.filter(section__in=valid_sections)
 
@@ -871,7 +798,7 @@ class GradeViewSet(NestedDynamicViewSet):
             # The superuser is allowed to view everything
             return queryset
 
-        valid_enrollments = get_all_allowed_enrollments(user)
+        valid_enrollments = user.get_all_allowed_enrollments()
         queryset.filter(assignment__section__enrollment__in=valid_enrollments)
         return queryset
 
@@ -925,7 +852,7 @@ class FinalGradeViewSet(NestedDynamicViewSet):
             return queryset
 
         # Get all valid enrollments
-        valid_enrollments = get_all_allowed_enrollments(user)
+        valid_enrollments = user.get_all_allowed_enrollments()
         # Filter for records in those enrollments
         queryset = queryset.filter(enrollment__in=valid_enrollments)
 
@@ -1272,7 +1199,7 @@ class IEPGoalViewSet(NestedDynamicViewSet):
         if user.is_superuser:
             return queryset
 
-        valid_students = get_all_allowed_students(user)
+        valid_students = user.get_all_allowed_students()
         # Filter for records for those students
         queryset = queryset.filter(student__in=valid_students)
 
@@ -1312,7 +1239,7 @@ class IEPGoalDatapointViewSet(NestedDynamicViewSet):
         if user.is_superuser:
             return queryset
 
-        valid_students = get_all_allowed_students(user)
+        valid_students = user.get_all_allowed_students()
         # Filter for records for those students
         queryset = queryset.filter(goal__student__in=valid_students)
 
@@ -1351,7 +1278,7 @@ class IEPGoalNoteViewSet(NestedDynamicViewSet):
         if user.is_superuser:
             return queryset
 
-        valid_students = get_all_allowed_students(user)
+        valid_students = user.get_all_allowed_students()
         # Filter for records for those students
         queryset = queryset.filter(goal__student__in=valid_students)
 
@@ -1391,7 +1318,7 @@ class ServiceRequirementViewSet(NestedDynamicViewSet):
         if user.is_superuser:
             return queryset
 
-        valid_students = get_all_allowed_students(user)
+        valid_students = user.get_all_allowed_students()
         # Filter for records for those students
         queryset = queryset.filter(student__in=valid_students)
 
