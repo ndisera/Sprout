@@ -46,20 +46,10 @@ class CategoryCalculator():
         :return: a category to be included with the FocusStudent object
         :rtype: str
         """
-        # The constructors for the data that I can use
-        # grades = [grade for grade in Grade.objects.filter(student=representation['student'])]
-        # attendances = []  # Attendances not currently tracked by Sprout
-        # behavior_efforts = [record for record in Behavior.objects.filter(enrollment__student=representation['student'])]
-        # test_scores = [score for score in StandardizedTestScore.objects.filter(student=representation['student'])]
-
         # separator character is 2 underscores
 
         # name__StartDate__EndDate__specificId
         # ex) test__2018-02-21__2018-02-28__1
-        rand_val = random.randint(0, 2)
-        behavior_len = len(self.behavior_efforts)
-        test_len = len(self.test_scores)
-        # Make sure to check for no data down the line using the lengths
 
         # https://stackoverflow.com/a/4143837/3518046
         behavior_lists = {} # todo: split into separate behavior and effort, and remember that we want the average now
@@ -69,20 +59,14 @@ class CategoryCalculator():
         test_lists = {}
         for test in self.test_scores:
             test_lists.setdefault(test.standardized_test_id, []).append(test)
-            
 
         # Make a map from a dataframe column id to a behavior/test/effort category
         df_map = {}
         df_counter = 0
         df = pd.DataFrame()
 
-        # for key, value in behavior_lists:
-        #     df_map[df_counter] = ('behavior', behavior.enrollment_id)
-        #     df[df_counter] = behavior
-        #     df_counter += 1
-
-# todo: test for if a test has no entered scores
-        for key, test_scores in test_lists.iteritems():  # Dict
+        # Tests
+        for test_scores in test_lists.itervalues():  # Dict
             # set a mapping, so we can do a lookup later
             df_map[df_counter] = ('test', test_scores[0].standardized_test_id)
 
@@ -99,10 +83,16 @@ class CategoryCalculator():
             df = df.reindex(index=new_df_indexes)
             # put the data into our dataframe
             df[df_counter] = test_series
-
             df_counter += 1
-            # This is the one!!!!!  Converts dates into days elapsed since the first day
-            # map(lambda x: x.days, (df.index.values - df.index[0]))
+
+        # Behaviors/efforts
+
+        # Grades
+
+        # Attendances, maybe not. It doesn't lend itself to a view of progress that meshes well with a graph
+
+        # This is the one!!!!!  Converts dates into days elapsed since the first day
+        # map(lambda x: x.days, (df.index.values - df.index[0]))
 
         # Do linear regression on the test scores
         # Independent variables: test scores
@@ -111,19 +101,29 @@ class CategoryCalculator():
         #   of a particular test. We want to choose that test to display
         #   More intuitively, the y axis is the independent variable: score. The x axis is the dependent variable: time
 
-        X = map(lambda x: x.days, (df.index.values - df.index[0])) # convert dates into days elapsed
+        X = map(lambda x: x.days, (df.index.values - df.index[0]))  # convert dates into days elapsed
+        X = sm.add_constant(X)  # Add constant to allow fitting the y-intercept
 
-        for curr_dataset in df:
-            y = curr_dataset  # todo: do each value individually and see if there's a difference
-            model = sm.OLS(y, X, missing='drop').fit()
+        # list of tuples containing (df column, start date, end date, r-squared value, and coefficient)
+        results_dic = []
 
-            print model.summary()
+        for i in range(0, len(df.index), 3):  # Step size of 3 when shrinking data down
+            for curr_dataset in df:
+                y = df[curr_dataset]  # todo: do each value individually and see if there's a difference
+                model = sm.OLS(y[i:], X[i:], missing='drop').fit()
 
+                # Store the information
+                results_dic.append((curr_dataset, df.index[i], df.last_valid_index(), model.rsquared, model.params[1]))
 
+        # Select the progress category by choosing the run with the highest r^2 value
+        display_result = max(results_dic, key=lambda x: x[4])
+        display_category = df_map[display_result[0]][0]
+        display_start = display_result[1]
+        display_end = display_result[2]
+        display_id = df_map[display_result[0]][1]
 
-        #todo: enforce no duplicate progress and caution categories
+        return display_category + '__' + str(display_start) + '__' + str(display_end) + '__' + str(display_id)
 
-        self.progress_category_choice = rand_val #todo: fix superhacky stuff
 
         if rand_val == 0:
             if test_len != 0:
