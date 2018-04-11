@@ -1,6 +1,7 @@
 import random
 import pandas as pd
 from sklearn import linear_model
+import statsmodels.api as sm
 
 
 class CategoryCalculator():
@@ -89,17 +90,50 @@ class CategoryCalculator():
 
             # extract the data
             dates = [test_val.date for test_val in test_scores]
+            dates_index = pd.Index(data=dates)
             scores = [test_val.score for test_val in test_scores]
-            test_series = pd.Series(data=scores, index=dates)
+            test_series = pd.Series(data=scores, index=dates_index)
 
+            # union the two indexes together to 'merge' the lists
+            new_df_indexes = df.index.union(dates_index)
+
+            # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
+            df = df.reindex(index=new_df_indexes)
             # put the data into our dataframe
             df[df_counter] = test_series
 
-            # Now go over each test score and add it to the dataframe
-            # for test_val in test_scores: # List
-            #     df[test_val.date, df_counter] = test_val.score
-            #
             df_counter += 1
+            # df[0] = df[0] - 5
+            # df[0] = df[0].apply(lambda x: print x)
+            # df[0] = df[0].apply(lambda x: x - 5)
+            # startTime = df.index[0]
+            # df['elapsed'] = df.index - df.index[0]
+            # This is the one!!!!!
+            # map(lambda x: x.days, (df.index.values - df.index[0]))
+
+        # Do linear regression on the test scores
+        # Independent variables: test scores
+        # Dependent variable: date
+        #   The rationale behind this is that we want to predict if a student will do better or worse on a date because
+        #   of a particular test. We want to choose that test to display
+        #   More intuitively, the y axis is the independent variable: score. The x axis is the dependent variable: time
+
+        lm = linear_model.LinearRegression()
+        X = (df.index - df.index[0]).days
+        y = df # todo: do each value individually and see if there's a difference
+        model = lm.fit(X,y)
+
+        # r_squared = lm.score(X, y)
+        #
+        # r_squared_alt = model.score()
+
+
+        # X = [date_time.df.index
+        # y = df
+        # model = lm.fit(X, y)
+        #
+        # r_squared = lm.score(X,y)
+
 
 
 
