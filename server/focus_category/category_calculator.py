@@ -61,17 +61,17 @@ class CategoryCalculator():
         test_len = len(self.test_scores)
         # Make sure to check for no data down the line using the lengths
 
-        behavior_lists = sorted(self.behavior_efforts, key=lambda x: x.date)
-        test_lists = sorted(self.test_scores, key=lambda x: x.date)
-
         # https://stackoverflow.com/a/4143837/3518046
         behavior_lists = {} # todo: split into separate behavior and effort, and remember that we want the average now
         for behavior in self.behavior_efforts:
             behavior_lists.setdefault(behavior.enrollment_id, []).append(behavior)
+        behavior_lists = sorted(self.behavior_efforts, key=lambda x: x.date)
 
         test_lists = {}
         for test in self.test_scores:
             test_lists.setdefault(test.standardized_test_id, []).append(test)
+        test_lists = sorted(self.test_scores, key=lambda x: x.date)
+
 
         # Make a map from a dataframe column id to a behavior/test/effort category
         df_map = {}
@@ -103,12 +103,7 @@ class CategoryCalculator():
             df[df_counter] = test_series
 
             df_counter += 1
-            # df[0] = df[0] - 5
-            # df[0] = df[0].apply(lambda x: print x)
-            # df[0] = df[0].apply(lambda x: x - 5)
-            # startTime = df.index[0]
-            # df['elapsed'] = df.index - df.index[0]
-            # This is the one!!!!!
+            # This is the one!!!!!  Converts dates into days elapsed since the first day
             # map(lambda x: x.days, (df.index.values - df.index[0]))
 
         # Do linear regression on the test scores
@@ -118,23 +113,13 @@ class CategoryCalculator():
         #   of a particular test. We want to choose that test to display
         #   More intuitively, the y axis is the independent variable: score. The x axis is the dependent variable: time
 
-        lm = linear_model.LinearRegression()
-        X = (df.index - df.index[0]).days
-        y = df # todo: do each value individually and see if there's a difference
-        model = lm.fit(X,y)
+        X = map(lambda x: x.days, (df.index.values - df.index[0])) # convert dates into days elapsed
 
-        # r_squared = lm.score(X, y)
-        #
-        # r_squared_alt = model.score()
+        for curr_dataset in df:
+            y = curr_dataset  # todo: do each value individually and see if there's a difference
+            model = sm.OLS(y, X, missing='drop').fit()
 
-
-        # X = [date_time.df.index
-        # y = df
-        # model = lm.fit(X, y)
-        #
-        # r_squared = lm.score(X,y)
-
-
+            print model.summary()
 
 
 
