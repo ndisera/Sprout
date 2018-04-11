@@ -289,11 +289,12 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      * @param {boolean} passwordReset - true for reset, false for grant access
      */
     $scope.attemptPasswordReset = function (passwordReset) {
-        userService.resetPassword($scope.user.email).then(
+        // use selected teacher's email
+        userService.resetPassword($scope.teacherV.email).then(
             function success(response) {
-                var message = passwordReset ? "An email containing instructions to reset this teacher's password has been sent to {{ $scope.user.email }}."
-                : "An email to grant access to this teacher has been sent to {{ $scope.user.email }}.";
-                toastService.success(message);
+                var message = passwordReset ? "An email containing instructions to reset this teacher's password has been sent to "
+                : "An email to grant access to this teacher has been sent to ";
+                toastService.success(message + $scope.teacherV.email + ".");
             }, function error(response) {
                 setErrorMessage(response);
                 toastService.error("There was an error trying to send an email to this teacher." + errorResponse());
