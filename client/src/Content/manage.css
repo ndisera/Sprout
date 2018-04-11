@@ -130,4 +130,8 @@
         margin-top: -5px;
         margin-bottom: 20px;
     }
+
+    .button-bottom-space {
+        margin-bottom: 5px;
+    }
 }

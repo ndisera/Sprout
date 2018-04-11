@@ -283,4 +283,21 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         }
         $scope.errorMessage = $scope.errorMessage.join(" ");
     }
+
+    /**
+     * Attempts to send a password reset link to email
+     * @param {boolean} passwordReset - true for reset, false for grant access
+     */
+    $scope.attemptPasswordReset = function (passwordReset) {
+        userService.resetPassword($scope.user.email).then(
+            function success(response) {
+                var message = passwordReset ? "An email containing instructions to reset this teacher's password has been sent to {{ $scope.user.email }}."
+                : "An email to grant access to this teacher has been sent to {{ $scope.user.email }}.";
+                toastService.success(message);
+            }, function error(response) {
+                setErrorMessage(response);
+                toastService.error("There was an error trying to send an email to this teacher." + errorResponse());
+            }
+        );
+    };
 });
