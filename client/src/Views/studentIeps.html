@@ -1,7 +1,7 @@
 <div ng-include="'html/studentTabs.html'"></div>
 <div class="row">
     <div class="col-xs-12">
-        <div id="student-ieps-select-manipulate">
+        <div id="student-ieps-select-manipulate" ng-if="isSuperUser || isCaseManager">
             <button class="btn btn-success btn-manipulate" type="button" ng-click="toggleAddIep(true)" ng-show="!addingIep">
                 <span class="glyphicon glyphicon-plus"></span>
             </button>
@@ -9,7 +9,7 @@
                 <span class="glyphicon glyphicon-remove"></span>
             </button>
         </div>
-        <div id="student-ieps-select" class="select-full-width input-group" ng-show="ieps.length > 0" ng-class="{ 'adding': addingIep, }">
+        <div id="student-ieps-select" class="select-full-width input-group" ng-show="ieps.length > 0" ng-class="{ 'full-width': (!isSuperUser && !isCaseManager), }">
             <span class="input-group-addon">Goal</span>
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedIep.title }} <span class="caret"></span></button>
@@ -87,7 +87,7 @@
                             </form>
                         </div>
                         <div class="btn-manipulate-row">
-                            <button class="btn btn-primary" ng-if="!iep.editing" ng-click="toggleEditIep(iep, true)">
+                            <button class="btn btn-primary" ng-if="!iep.editing && (isSuperUser || isCaseManager)" ng-click="toggleEditIep(iep, true)">
                                 <span class="glyphicon glyphicon-pencil"></span>
                             </button>
                         </div>

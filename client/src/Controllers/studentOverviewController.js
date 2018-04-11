@@ -1,4 +1,4 @@
-app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, studentService, termService, termData, enrollmentData, userData, studentData, parentContactData) {
+app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, userService, studentService, termService, termData, enrollmentData, userData, studentData, parentContactData) {
     $scope.location = $location;
 
     $scope.newStudentImage = null;
@@ -16,6 +16,12 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
     $scope.selectedTerm = null;
     var currentTerms = [];
     var currentTermsLookup = {};
+
+    $scope.isSuperUser = userService.user.isSuperUser;
+    $scope.isCaseManager = false;
+    if($scope.student.case_manager === userService.user.id) {
+        $scope.isCaseManager = true;
+    }
 
     if(termData.terms !== null && termData.terms !== undefined) {
         $scope.terms       = termService.transformAndSortTerms(termData.terms);

@@ -868,6 +868,10 @@ ul.dropdown-menu > li > a:hover {
     cursor: pointer;
 }
 
+.glyphicon-big-button.not-clickable {
+    cursor: default;
+}
+
 .glyphicon-ok-sign.glyphicon-big-button {
     color: #57bc90;
 }
@@ -876,12 +880,20 @@ ul.dropdown-menu > li > a:hover {
     color: #41a479;
 }
 
+.glyphicon-ok-sign.glyphicon-big-button.not-clickable:hover {
+    color: #57bc90;
+}
+
 .glyphicon-remove-sign.glyphicon-big-button {
     color: #d9534f;
 }
 
 .glyphicon-remove-sign.glyphicon-big-button:hover {
     color: #c9302c;
+}
+
+.glyphicon-remove-sign.glyphicon-big-button.not-clickable:hover {
+    color: #d9534f;
 }
 
 .btn-manipulate-row {

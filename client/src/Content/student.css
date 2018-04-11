@@ -216,6 +216,10 @@
     background-color: #eee;
 }
 
+.student-behaviors-comment-header.full-width {
+    width: 100% !important;
+}
+
 .student-behaviors-comment-header.editing {
     width: calc(100% - 100px);
 }
@@ -332,6 +336,10 @@
 #student-ieps-select {
     display: inline-block;
     width: calc(100% - 50px);
+}
+
+#student-ieps-select.full-width {
+    width: 100% !important;
 }
 
 #student-ieps-edit-form .form-group {

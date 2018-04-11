@@ -7,8 +7,10 @@
                     <div class="row">
                         <div class="table-container">
                             <div class="table-cell">
-                                <span class="glyphicon glyphicon-ok-sign glyphicon-big-button" ng-if="service.fulfilled" ng-click="markFulfilled(service, false)" ng-class="{ 'student-services-glyph-fix': service.editing, }"></span>
-                                <span class="glyphicon glyphicon-remove-sign glyphicon-big-button" ng-if="!service.fulfilled" ng-click="markFulfilled(service, true)" ng-class="{ 'student-services-glyph-fix-remove': service.editing, }"></span>
+                                <span class="glyphicon glyphicon-ok-sign glyphicon-big-button" ng-if="service.fulfilled && (isSuperUser || isCaseManager)" ng-click="markFulfilled(service, false)" ng-class="{ 'student-services-glyph-fix': service.editing, }"></span>
+                                <span class="glyphicon glyphicon-remove-sign glyphicon-big-button" ng-if="!service.fulfilled && (isSuperUser || isCaseManager)" ng-click="markFulfilled(service, true)" ng-class="{ 'student-services-glyph-fix-remove': service.editing, }"></span>
+                                <span class="glyphicon glyphicon-ok-sign glyphicon-big-button not-clickable" ng-if="service.fulfilled && (!isSuperUser && !isCaseManager)"></span>
+                                <span class="glyphicon glyphicon-remove-sign glyphicon-big-button not-clickable" ng-if="!service.fulfilled && (!isSuperUser && !isCaseManager)"></span>
                             </div>
                             <div class="table-cell full-width">
                                 <form class="form-horizontal" name="editServiceForm{{$index}}" ng-submit="saveService(service)">
@@ -45,7 +47,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" ng-hide="!service.fulfilled && (!isSuperUser && !isCaseManager)">
                                         <label class="control-label col-sm-2">Fulfilled: </label>
                                         <div class="col-sm-10">
                                             <div ng-show="service.fulfilled && !service.editing">
@@ -91,7 +93,7 @@
                         </div>
                     </div>
                     <div class="btn-manipulate-row">
-                        <button class="btn btn-primary" ng-if="!service.editing" ng-click="toggleEditService(service)">
+                        <button class="btn btn-primary" ng-if="!service.editing && (isSuperUser || isCaseManager)" ng-click="toggleEditService(service)">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </button>
                     </div>
@@ -100,7 +102,7 @@
         </div>
     </div>
 </div>
-<div id="student-services-add-btn" class="pull-right" ng-if="!adding" ng-class="{ 'btn-manipulate-row-bottom': services.length > 0, }">
+<div id="student-services-add-btn" class="pull-right" ng-if="!adding && (isSuperUser || isCaseManager)" ng-class="{ 'btn-manipulate-row-bottom': services.length > 0, }">
     <button class="btn btn-success btn-manipulate" type="button" data-toggle="tooltip" title="Add Service" ng-click="toggleAdd(true)">
         <span class="glyphicon glyphicon-plus"></span>
     </button>
