@@ -1,6 +1,13 @@
-app.controller("studentIepsController", function($scope, $rootScope, $location, $routeParams, toastService, studentService, student, ieps) {
+app.controller("studentIepsController", function($scope, $rootScope, $location, $routeParams, toastService, userService, studentService, student, ieps) {
     $scope.location = $location;
     $scope.student = student.student;
+
+    // permissions
+    $scope.isSuperUser = userService.user.isSuperUser;
+    $scope.isCaseManager = false;
+    if($scope.student.case_manager === userService.user.id) {
+        $scope.isCaseManager = true;
+    }
 
     $scope.ieps        = [];
     $scope.selectedIep = {};

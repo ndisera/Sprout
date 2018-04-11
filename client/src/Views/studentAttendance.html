@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="alert alert-info no-bottom-margin" role="alert">
-                <span><b>Tip:</b> It looks like this student doesn't have any attendance records.</span>
+                <span><b>Tip:</b> It looks like this student either isn't enrolled in any classes for this date, or you aren't one of this student's teachers for this term.</span>
             </div>
         </div>
     </div>
@@ -44,7 +44,7 @@
     </div>
     <div ng-if="classGraph.data.length === 0" class="voffset4">
         <div class="alert alert-info">
-            <span><b>Info:</b> It looks like there aren't any tardies or absences for this date range.</span>
+            <span><b>Info:</b> It looks like this student either isn't enrolled in any classes for this date, or you aren't one of this student's teachers for this term.</span>
         </div>
     </div>
     <div ng-if="classGraph.data.length > 0" class="voffset4">
