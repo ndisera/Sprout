@@ -122,14 +122,8 @@ app.controller("inputTestsController", function ($scope, $location, $q, toastSer
                 return;
             }
 
-            //TODO(gzuber): fix
-            var temp = dateString;
-            //if(Math.floor((Math.random() * 10) + 1) > 4) {
-                //temp = '';
-            //}
-
             var entry = {
-                date: temp,
+                date: dateString,
                 standardized_test: test.id,
                 score: elem.score_temp,
                 student: elem.id,

@@ -158,11 +158,6 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
                 // need to save
                 var entry = copyObj(section.behavior, behaviorKeys);
 
-                //TODO(gzuber): remove
-                //if(Math.floor((Math.random() * 10) + 1) > 4) {
-                    //entry.effort = '';
-                //}
-
                 if(entry.id === null) {
                     toPost.push(entry);
                 }
@@ -183,11 +178,6 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
             }
 
             var entry = copyObj(student.comment, commentKeys);
-
-            //TODO(gzuber): remove
-            //if(Math.floor((Math.random() * 10) + 1) > 4) {
-                //entry.date = '';
-            //}
 
             if(entry.id === null) {
                 commentsToPost.push(entry);
