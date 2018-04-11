@@ -273,15 +273,7 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      * @param {response} response - response containing data and error message.
      */
     function setErrorMessage(response) {
-        $scope.errorMessage = [];
-        for (var property in response.data) {
-            if (response.data.hasOwnProperty(property)) {
-                for (var i = 0; i < response.data[property].length; i++) {
-                    $scope.errorMessage.push(response.data[property][i]);
-                }
-            }
-        }
-        $scope.errorMessage = $scope.errorMessage.join(" ");
+        $scope.errorMessage = response.data;
     }
 
     /**
