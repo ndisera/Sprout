@@ -371,17 +371,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         })
 
         // route for the input scores page
-        .when('/input', {
-            templateUrl: 'html/scoresInput.html',
-            controller: 'scoresInputController',
-            resolve: {
-                auth: function(userService) {
-                    return userService.authVerify();
-                },
-            },
-        })
-
-        // route for the input scores page
         .when('/notifications', {
             templateUrl: 'html/notifications.html',
             controller: 'notificationsController',
