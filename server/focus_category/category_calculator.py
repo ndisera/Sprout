@@ -65,13 +65,11 @@ class CategoryCalculator():
         behavior_lists = {} # todo: split into separate behavior and effort, and remember that we want the average now
         for behavior in self.behavior_efforts:
             behavior_lists.setdefault(behavior.enrollment_id, []).append(behavior)
-        behavior_lists = sorted(self.behavior_efforts, key=lambda x: x.date)
 
         test_lists = {}
         for test in self.test_scores:
             test_lists.setdefault(test.standardized_test_id, []).append(test)
-        test_lists = sorted(self.test_scores, key=lambda x: x.date)
-
+            
 
         # Make a map from a dataframe column id to a behavior/test/effort category
         df_map = {}
