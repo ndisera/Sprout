@@ -1,5 +1,6 @@
 from dynamic_rest.serializers import DynamicModelSerializer, WithDynamicModelSerializerMixin
 from dynamic_rest.fields import DynamicRelationField
+from api.forms import *
 from api.models import *
 import api.fields
 from rest_framework import serializers
@@ -380,6 +381,7 @@ class SproutPasswordResetSerializer(PasswordResetSerializer):
     """
     Specify a custom HTML template for our password reset emails
     """
+    password_reset_form_class = SproutPasswordResetForm
 
     def get_email_options(self):
 
