@@ -86,6 +86,31 @@ class CategoryCalculator():
             df_counter += 1
 
         # Behaviors/efforts
+        for behaviors_efforts in behavior_lists.itervalues():
+            # Set a mapping
+            behavior_counter = df_counter
+            effort_counter = df_counter + 1
+            df_map[behavior_counter] = ('behavior', behaviors_efforts[0].enrollment_id)
+            df_map[effort_counter] = ('effort', behaviors_efforts[0].enrollment_id)
+
+            # extract the data
+            dates = [b_e_val.date for b_e_val in behaviors_efforts]
+            dates_index = pd.Index(data=dates)
+            behaviors = [b_e_val.behavior for b_e_val in behaviors_efforts]
+            behavior_series = pd.Series(data=behaviors, index=dates_index)
+            efforts = [b_e_val.effort for b_e_val in behaviors_efforts]
+            effort_series = pd.Series(data=efforts, index=dates_index)
+
+            # union the two indexes together to 'merge' the lists
+            new_df_indexes = df.index.union(dates_index)
+
+            # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
+            df = df.reindex(index=new_df_indexes)
+            # put the data into our dataframe
+            df[behavior_counter] = behavior_series
+            df[effort_counter] = effort_series
+
+            df_counter += 2
 
         # Grades
 
