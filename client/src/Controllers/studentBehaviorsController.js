@@ -1,4 +1,4 @@
-app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, behaviorService, studentService, data, terms, service, student) {
+app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, userService, behaviorService, studentService, data, terms, service, student) {
     $scope.location = $location;
 
     // I'm displaying all classes in the report dropdown, I need to display all classes that are valid for the chosen term
@@ -31,6 +31,13 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
     $scope.termToSectionsByTerm = {};
     // will give index into graph's data array if given section id
     $scope.sectionToDataIndex = {};
+
+    $scope.isSuperUser = userService.user.isSuperUser;
+    $scope.isCaseManager = false;
+    if($scope.student.case_manager === userService.user.id) {
+        $scope.isCaseManager = true;
+    }
+
 
     if (data !== null && data !== undefined) {
         if (data.enrollments !== null && data.enrollments !== undefined) {
