@@ -4,8 +4,8 @@
         <div class="select-full-width input-group">
             <span class="input-group-addon">Case Manager</span>
             <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle full-width" data-toggle="dropdown">
-                    {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span>
+                <button type="button" class="btn btn-default dropdown-toggle full-width" data-toggle="dropdown" ng-disabled="!isSuperUser">
+                    {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret" ng-show="isSuperUser"></span>
                 </button>
                 <ul class="dropdown-menu">
                     <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)" ng-class="{ 'active': entry.pk === caseManager.pk, }">
@@ -49,7 +49,7 @@
                         </div>
                     </form>
                     <div class="btn-manipulate-row">
-                        <button class="btn btn-primary" ng-if="!editing" ng-click="toggleEdit(true)">
+                        <button class="btn btn-primary" ng-if="!editing && (isSuperUser || isCaseManager)" ng-click="toggleEdit(true)">
                             <span class="glyphicon glyphicon-pencil"></span>
                         </button>
                     </div>
@@ -63,7 +63,11 @@
                 </div>
                 <div class="panel-body">
                     <div class="alert alert-info" role="alert" ng-show="parentContactInfo.length === 0 && !addingParentContactInfo">
-                        <span><b>Tip:</b> It looks like this student doesn't have any parent contact info. You can add an entry by pressing the <span class="glyphicon glyphicon-plus"></span> button below.</span>
+                        <span>
+                            <b>Tip:</b>
+                            It looks like this student doesn't have any parent contact info. 
+                            <span ng-if="(isSuperUser || isCaseManager)">You can add an entry by pressing the <span class="glyphicon glyphicon-plus"></span> button below.</span>
+                        </span>
                     </div>
                     <div class="panel panel-default student-overview-parent-panel" ng-repeat="entry in parentContactInfo">
                         <div class="panel-heading">
@@ -90,7 +94,7 @@
                                 </div>
                                 <div>
                                     <div class="btn-manipulate-row">
-                                        <button class="btn btn-primary" type="button" ng-if="!entry.editing" ng-click="toggleEditParentContactInfo(entry, true)">
+                                        <button class="btn btn-primary" type="button" ng-if="!entry.editing && (isSuperUser || isCaseManager)" ng-click="toggleEditParentContactInfo(entry, true)">
                                             <span class="glyphicon glyphicon-pencil"></span>
                                         </button>
                                     </div>
@@ -160,7 +164,7 @@
                         </div>
                     </div>
                     <div class="btn-manipulate-row student-overview-parent-spacer">
-                        <button class="btn btn-success" ng-if="!addingParentContactInfo" ng-click="toggleAddParentContactInfo(true)">
+                        <button class="btn btn-success" ng-if="!addingParentContactInfo && (isSuperUser || isCaseManager)" ng-click="toggleAddParentContactInfo(true)">
                             <span class="glyphicon glyphicon-plus"></span>
                         </button>
                     </div>
@@ -190,7 +194,7 @@
                         <span><b>Info:</b> It looks like this school doesn't have any terms yet. Speak to your admin to add one.</span>
                     </div>
                     <div class="alert alert-info no-bottom-margin voffset3" ng-if="terms.length > 0 && termSections.length === 0">
-                        <span><b>Info:</b> It looks like this student isn't enrolled in any classes for this term.</span>
+                        <span><b>Info:</b> It looks like this student either isn't enrolled in any classes for this term, or you aren't one of this student's teachers for this term.</span>
                     </div>
                     <div class="table-responsive voffset3" ng-show="terms.length > 0 && termSections.length > 0">
                         <table ng-if="sections.length > 0" class="table">
@@ -213,7 +217,7 @@
                 </div>
             </div>
         </div>
-        <div class="panel-wrapper voffset3">
+        <div class="panel-wrapper voffset3" ng-if="isSuperUser || isCaseManager">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Student Photo</h3>

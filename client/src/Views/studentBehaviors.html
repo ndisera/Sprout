@@ -2,7 +2,7 @@
 <div ng-if="!hasBehaviorService" class="row">
     <div class="col-xs-12">
         <div id="student-behaviors-service-warning" class="alert alert-warning" role="alert">
-            <span><b>Warning:</b> This student doesn't have a Behavior Service. If this student did in the past, you may view that history here. If not, please add a Behavior Service to this student before recording Behavior and Effort.</span>
+            <span><b>Warning:</b> This student doesn't have a Behavior Service. If this student did in the past, you may view that history here. If not, you can add a Behavior Service to this student in order to start recording Behavior and Effort.</span>
         </div>
     </div>
 </div>
@@ -74,7 +74,11 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="alert alert-info no-bottom-margin" role="alert">
-                <span><b>Tip:</b> It looks like this student isn't enrolled in any classes. Speak to an admin to add a class to this student's schedule.</span>
+                <span>
+                    <b>Tip:</b>
+                    It looks like this student isn't enrolled in any classes.
+                    <span ng-if="!isSuperUser">Speak to an admin to add a class to this student's schedule.</span>
+                </span>
             </div>
         </div>
     </div>
@@ -144,12 +148,12 @@
             </div>
         </div>
     </div>
-    <div class="row voffset3">
+    <div class="row voffset3" ng-if="hasBehaviorService">
         <div class="col-xs-12">
             <div class="panel-wrapper">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Input Behavior Scores</h3>
+                        <h3 class="panel-title"><span ng-show="isSuperUser || isCaseManager">Input </span>Behavior Data</h3>
                     </div>
                     <div class="panel-body">
                         <div class="input-group">
@@ -158,7 +162,7 @@
                         </div>
                         <div class="voffset3">
                             <div class="alert alert-info no-bottom-margin" ng-if="scoresInput.length === 0">
-                                <span><b>Info:</b> It looks like this student isn't enrolled in any classes for this date.</span>
+                                <span><b>Info:</b> It looks like this student either isn't enrolled in any classes for this date, or you aren't one of this student's teachers for this term.</span>
                             </div>
                             <table class="table table-responsive" ng-if="scoresInput.length !== 0">
                                 <thead>
@@ -172,10 +176,14 @@
                                     <tr ng-repeat="entry in scoresInput">
                                         <td>{{ entry.title }}</td>
                                         <td>
-                                            <select ng-model="entry.curBehavior" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'behavior')"></select>
+                                            <select ng-if="isSuperUser || isCaseManager" ng-model="entry.curBehavior" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'behavior')">
+                                            </select>
+                                            <span ng-if="!isSuperUser && !isCaseManager">{{ entry.behavior }}</span>
                                         </td>
                                         <td>
-                                            <select ng-model="entry.curEffort" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'effort')"></select>
+                                            <select ng-if="isSuperUser || isCaseManager" ng-model="entry.curEffort" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'effort')">
+                                            </select>
+                                            <span ng-if="!isSuperUser && !isCaseManager">{{ entry.effort }}</span>
                                         </td>
                                     </tr>
 
@@ -186,10 +194,10 @@
                         <div class="voffset4" ng-if="scoresInput.length !== 0">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <div class="student-behaviors-comment-header" ng-class="{ 'editing': editingNote, }">
+                                    <div class="student-behaviors-comment-header" ng-class="{ 'editing': editingNote, 'full-width': (!isSuperUser && !isCaseManager), }">
                                         <h4>Comment on Today's Behavior</h4>
                                     </div>
-                                    <div class="student-behaviors-comment-btns" ng-if="!editingNote">
+                                    <div class="student-behaviors-comment-btns" ng-if="!editingNote && (isSuperUser || isCaseManager)">
                                         <button class="btn btn-primary btn-manipulate" type="button" ng-click="toggleEditingNote(true)" ng-show="true">
                                             <span class="glyphicon glyphicon-pencil"></span>
                                         </button>

@@ -3,6 +3,12 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
 
     $scope.student = student.student;
 
+    $scope.isSuperUser = userService.user.isSuperUser;
+    $scope.isCaseManager = false;
+    if($scope.student.case_manager === userService.user.id) {
+        $scope.isCaseManager = true;
+    }
+
     $scope.services       = [];
     $scope.newService     = {};
 
