@@ -5,7 +5,7 @@
             <button type="button" ng-disabled="takenBy.length === 0 && notTakenBy.length === 0" ng-click="downloadReport()"
                 class="btn btn-primary">Download Report</button>
         </div>
-        <div id="test-select" class="select-full-width input-group" ng-class="{ 'adding': addingIep, }">
+        <div id="test-select" class="select-full-width input-group">
             <span class="input-group-addon">Test</span>
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTest.test_name }} <span class="caret"></span></button>
