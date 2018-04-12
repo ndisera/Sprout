@@ -540,25 +540,6 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
-     * Gets services
-     * @param {object} config - config object for query parameters (see queryService)
-     * @return {promise} promise that will resolve with data or reject with response code.
-     */
-    function getServices (config) {
-        var query = queryService.generateQuery(config);
-        var deferred = $q.defer();
-        $http({
-            method: 'GET',
-            url: 'https://' + $rootScope.backend + '/services' + query,
-        }).then(function success(response) {
-            deferred.resolve(response.data);
-        }, function error(response) {
-            deferred.reject(response);
-        });
-        return deferred.promise;
-    }
-
-    /**
      * Get ieps for a specific student
      * @param {number} studentId - ID of the student
      * @param {object} config - config object for query parameters (see queryService)
@@ -854,7 +835,6 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         addServiceForStudent: addServiceForStudent,
         updateServiceForStudent: updateServiceForStudent,
         deleteServiceForStudent: deleteServiceForStudent,
-        getServices: getServices,
         getIepsForStudent: getIepsForStudent,
         getIepForStudent: getIepForStudent,
         addIepForStudent: addIepForStudent,

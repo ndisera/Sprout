@@ -1,4 +1,4 @@
-app.controller("servicesController", function($scope, $rootScope, $location, toastService, studentService, userService) {
+app.controller("servicesController", function($scope, $rootScope, $location, toastService, serviceService, userService) {
     $scope.location = $location;
     $scope.results = [];
     $scope.serviceOptions = [];
@@ -56,7 +56,7 @@ app.controller("servicesController", function($scope, $rootScope, $location, toa
             }],
         };
 
-        studentService.getServices(config).then(
+        serviceService.getServices(config).then(
             function success(data) {
                 // I was going to use one array and filter it but maybe it's easiest to just keep three arrays
                 $scope.students = data.students != null ? data.students : [];
