@@ -1,0 +1,31 @@
+.input-behavior-date, .input-tests-group {
+    display: inline-block;
+    width: calc(100% - 65px);
+}
+
+.panel.input-behavior .panel-title {
+    font-size: 20px;
+}
+
+.student-behaviors-comment-header.input-behavior {
+    width: 100%;
+}
+
+.student-behaviors-comment-textarea.input-behavior {
+    min-height: unset;
+}
+
+.input-behavior-col {
+    width: 25%;
+}
+
+.input-behavior-msg {
+    white-space: pre-line;
+}
+
+.input-tests-table-link:hover {
+    background-color: #d2ecf9;
+    color: #0c405a;
+    text-decoration: none;
+    cursor: pointer;
+}
