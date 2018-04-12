@@ -1,4 +1,4 @@
-app.controller("servicesController", function($scope, $rootScope, $location, toastService, studentService) {
+app.controller("servicesController", function($scope, $rootScope, $location, toastService, studentService, userService) {
     $scope.location = $location;
     $scope.results = [];
     $scope.serviceOptions = [];
@@ -107,7 +107,28 @@ app.controller("servicesController", function($scope, $rootScope, $location, toa
      * Downloads the service report
      */
     $scope.downloadReport = function() {
+        var currentDate = moment().format('YYYY-MM-DD').toString();
+        var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
+        var scale = 2.83465;
 
+        doc.setFontSize(30);
+        var title = $scope.selectedFulType.id === 1 ? '' : $scope.selectedFulType.type + ' ';
+        doc.text(105 * scale, 25 * scale, title + $scope.selectedService.name + ' Service Report', 'center');
+        doc.setFontSize(12);
+        doc.text(105 * scale, 33 * scale, "Generated on " + currentDate + " by " + userService.user.firstName + " " + userService.user.lastName, 'center');
+        doc.setFontSize(18);
+
+        var columns = ["Name", "Student ID"];
+        var rows = [];
+
+        var rowData = _.sortBy($scope.results, 'last_name');
+        _.each(rowData, function(elem) {
+            rows.push([elem.first_name + " " + elem.last_name, elem.student_id]);
+        });
+
+        doc.text(15 * scale, 42 * scale, "Students:")
+        doc.autoTable(columns, rows, { startY: 46 * scale, showHeader: 'firstPage', });
+        doc.save($scope.selectedService.name + ' ' + title + currentDate + '.pdf');
     };
 
     /**

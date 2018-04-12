@@ -1,4 +1,4 @@
-app.controller("testsController", function($scope, $rootScope, $location, toastService, testService, tests, students) {
+app.controller("testsController", function($scope, $rootScope, $location, toastService, testService, tests, students, userService) {
     $scope.location = $location;
 
     $scope.takenBy = [];
@@ -20,6 +20,7 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
      * Downloads the test report
      */
     $scope.downloadReport = function() {
+        var currentDate = moment().format('YYYY-MM-DD').toString();
         var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
         var startDate = moment($scope.startDate).format('YYYY-MM-DD').toString();
         var endDate = moment($scope.endDate).format('YYYY-MM-DD').toString();
@@ -29,6 +30,9 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
         doc.text(105 * scale, 25 * scale, $scope.selectedTest.test_name + ' Report', 'center');
         doc.setFontSize(18);
         doc.text(105 * scale, 33 * scale, startDate + " to " + endDate, 'center');
+        doc.setFontSize(12);
+        doc.text(105 * scale, 41 * scale, "Generated on " + currentDate + " by " + userService.user.firstName + " " + userService.user.lastName, 'center');
+        doc.setFontSize(18);
 
         var takenColumns = ["Date", "Name", "Student ID", "Score"];
         var notTakenColumns = ["Name", "Student ID"];
@@ -43,12 +47,12 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
             notTakenRows.push([elem.first_name + " " + elem.last_name, elem.student_id]);
         });
 
-        doc.text(15 * scale, 45 * scale, "Taken:")
-        doc.autoTable(takenColumns, takenRows, { startY: 49 * scale, showHeader: 'firstPage', });
+        doc.text(15 * scale, 50 * scale, "Taken:")
+        doc.autoTable(takenColumns, takenRows, { startY: 54 * scale, showHeader: 'firstPage', });
         let first = doc.autoTable.previous;
         doc.text(15 * scale, first.finalY + (12 * scale), "Not Taken:");
         doc.autoTable(notTakenColumns, notTakenRows, { startY: first.finalY + (16 * scale), showHeader: 'firstPage', });
-        doc.save($scope.selectedTest.test_name + '.pdf');
+        doc.save($scope.selectedTest.test_name + ' ' + currentDate + '.pdf');
     };
 
     /**
