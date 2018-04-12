@@ -514,7 +514,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
      * Set listener for route change errors (user is not auth-ed)
      */
     $rootScope.$on('$routeChangeError', function(event, next, current, rejection) {
-        console.log(rejection);
         // log out the user
         userService.logout();
 
