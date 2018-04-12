@@ -430,3 +430,9 @@
 .fc-unthemed td.fc-today {
     background: #dbf0e7;
 }
+
+.hidden-graph {
+    opacity: 0.0;
+    height: 500px;
+    width: 1000px;
+}

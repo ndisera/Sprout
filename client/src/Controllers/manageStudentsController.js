@@ -1,4 +1,4 @@
-app.controller("manageStudentsController", function($scope, $rootScope, $location, toastService, students, studentService) {
+app.controller("manageStudentsController", function($scope, $rootScope, $location, toastService, students, studentService, schools) {
     $scope.location = $location;
 
     var studentTask = "view/edit";
@@ -7,7 +7,15 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
     $scope.studentD = {};
     $scope.newStudent = {};
     $scope.studentInfo = studentService.studentInfo;
-    $scope.gradeLevels = ["K", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    var lowerGradeLevel = schools.school_settings[0].grade_range_lower;
+    var upperGradeLevel = schools.school_settings[0].grade_range_upper;
+    $scope.gradeLevels = [];
+    for (var i = lowerGradeLevel; i <= upperGradeLevel; i++) {
+        $scope.gradeLevels.push(i);
+    }
+    if ($scope.gradeLevels[0] === 0) {
+        $scope.gradeLevels[0] = "K";
+    }
 
     /**
      * Returns the display value for a student's grade level
@@ -70,10 +78,13 @@ app.controller("manageStudentsController", function($scope, $rootScope, $locatio
      */
     $scope.addStudent = function() {
         $scope.newStudent.birthdate = moment($scope.newStudent.birthdate).format('YYYY-MM-DD').toString();
-        if ($scope.newStudent.grade_level === "K") {
+        $scope.newStudent.grade_level = $scope.newStudent.grade_display;
+        if ($scope.newStudent.grade_display === "K") {
             $scope.newStudent.grade_level = 0;
         }
-        var studentPromise = studentService.addStudent($scope.newStudent);
+        var newStudent = Object.assign({}, $scope.newStudent);
+        delete newStudent.grade_display;
+        var studentPromise = studentService.addStudent(newStudent);
         studentPromise.then(function success(data) {
             $scope.newStudent = {};
             toastService.success("New student has been added.")
