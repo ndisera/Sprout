@@ -83,6 +83,9 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
             title: "All Classes"
         });
         _.each($scope.sharedGraph.series, function(elem) {
+            if (elem === "") {
+                return;
+            }
             $scope.classOptions.push({
                 // I just need the id for the corresponding class name, I'm just going to create a lookup at the start
                 id: $scope.sectionsLookupByTitle[elem].id,
@@ -354,14 +357,13 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                 var j = 0;
                 for (var i = 0; i < dateDiff + 1; i++) {
                     $scope.sharedGraph.labels[i] = iterDate.format('MM/DD').toString();
-
+                    // for calculating average
+                    var behaviorCount = 0;
+                    var behaviorSum = 0;
+                    var effortCount = 0;
+                    var effortSum = 0;
                     if (data.behaviors[j]) {
                         var behaviorDate = moment(data.behaviors[j].date);
-                        // for calculating average
-                        var behaviorCount = 0;
-                        var behaviorSum = 0;
-                        var effortCount = 0;
-                        var effortSum = 0;
                         while (behaviorDate.diff(iterDate, 'd') === 0) {
                             // have to check for nulls before incrementing the total and calculating the average
                             var enrollment = $scope.enrollmentsLookup[data.behaviors[j].enrollment];
@@ -384,28 +386,27 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                             }
                             behaviorDate = moment(data.behaviors[j].date);
                         }
+                    }
+                    $scope.behaviorAvgInfo[i] = {
+                        count: behaviorCount,
+                        sum: behaviorSum
+                    };
+                    $scope.effortAvgInfo[i] = {
+                        count: effortCount,
+                        sum: effortSum
+                    };
 
-                        // at this point if the count isn't 0, store avg info
-                        $scope.behaviorAvgInfo[i] = {
-                            count: behaviorCount,
-                            sum: behaviorSum
-                        };
-                        $scope.effortAvgInfo[i] = {
-                            count: effortCount,
-                            sum: effortSum
-                        };
+                    // at this point if the count isn't 0, store avg info
+                    if (behaviorCount > 0) {
+                        $scope.avgBehaviorGraph.data[0][i] = behaviorSum / behaviorCount;
+                    } else {
+                        $scope.avgBehaviorGraph.data[0][i] = null;
+                    }
 
-                        if (behaviorCount > 0) {
-                            $scope.avgBehaviorGraph.data[0][i] = behaviorSum / behaviorCount;
-                        } else {
-                            $scope.avgBehaviorGraph.data[0][i] = null;
-                        }
-
-                        if (effortCount > 0) {
-                            $scope.avgEffortGraph.data[0][i] = effortSum / effortCount;
-                        } else {
-                            $scope.avgEffortGraph.data[0][i] = null;
-                        }
+                    if (effortCount > 0) {
+                        $scope.avgEffortGraph.data[0][i] = effortSum / effortCount;
+                    } else {
+                        $scope.avgEffortGraph.data[0][i] = null;
                     }
 
                     iterDate.add(1, 'd');

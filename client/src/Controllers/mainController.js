@@ -57,7 +57,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
         },
         {
             title: "Reports",
-            glyph: "file",
+            glyph: "list-alt",
             href: "/reports",
             click: $scope.clearSearch,
             badgeList: [],
