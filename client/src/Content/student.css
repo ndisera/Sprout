@@ -402,3 +402,9 @@
 #student-services-add-btn.btn-manipulate-row-bottom {
     margin-top: 20px;
 }
+
+.hidden-graph {
+    opacity: 0.0;
+    height: 500px;
+    width: 1000px;
+}

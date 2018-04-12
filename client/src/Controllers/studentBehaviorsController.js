@@ -223,7 +223,65 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         legend: {
             display: false,
         }
-    }
+    };
+
+    $scope.hiddenAvgGraphOptions = {
+        elements: {
+            line: {
+                fill: false,
+            },
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            xAxes: [{
+                ticks: {
+                    fontSize: 16
+                }
+            }],
+            yAxes: [{
+                display: true,
+                ticks: {
+                    min: 0,
+                    stepSize: 1,
+                    max: 5,
+                    fontSize: 16
+                }
+            }]
+        },
+        legend: {
+            display: false,
+        }
+    };
+
+    $scope.hiddenGraphOptions = {
+        elements: {
+            line: {
+                fill: false,
+            },
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            xAxes: [{
+                ticks: {
+                    fontSize: 16
+                }
+            }],
+            yAxes: [{
+                display: true,
+                ticks: {
+                    min: 0,
+                    stepSize: 1,
+                    max: 5,
+                    fontSize: 16
+                }
+            }]
+        },
+        legend: {
+            display: true,
+        }
+    };
 
     // start off the two graphs with empty datasets
     $scope.behaviorGraph = {
@@ -765,6 +823,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         if ($scope.report.class != null) {
             $scope.updateClassGraphs();
         }
+        $scope.modalOpen = true;
     };
 
     /**
@@ -784,7 +843,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
      */
     $scope.updateClassGraphs = function() {
         // this needs to be called on create report button as well
-        $scope.showClass = $scope.report.class.title !== "All Classes" && $scope.report.class.title !== "Average";
+        $scope.showClass = $scope.report.class != null && $scope.report.class.title !== "All Classes" && $scope.report.class.title !== "Average";
         if ($scope.showClass) {
             $scope.singleBehaviorGraph.data[0] = [];
             $scope.singleEffortGraph.data[0] = [];
@@ -878,10 +937,8 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         doc.addImage(sproutImageData, 'PNG', 15, 15, 80, 70.4);
         */
 
-        // 568x150 (height won't change)
-        // About 700 looks to be max for width
-        var width = behaviorCanvas.width * 0.26;
-        var height = behaviorCanvas.height * 0.26;
+        var width = 180;
+        var height = 90;
         var scale = 2.83465;
         var currentDate = moment().format('YYYY-MM-DD').toString();
 
@@ -897,12 +954,10 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         doc.setFontSize(12);
         doc.text(105 * scale, 49 * scale, "Generated on " + currentDate + " by " + userService.user.firstName + " " + userService.user.lastName, 'center');
         doc.setFontSize(18);
-        doc.text(105 * scale, 84 * scale, 'Behavior', 'center');
-        doc.text(105 * scale, 92 * scale, 'Average: ' + behaviorAvg, 'center');
-        doc.addImage(behaviorImgData, 'JPEG', (105 - width / 2) * scale, 100 * scale, width * scale, height * scale);
-        doc.text(105 * scale, 184 * scale, 'Effort', 'center');
-        doc.text(105 * scale, 192 * scale, 'Average: ' + effortAvg, 'center');
-        doc.addImage(effortImgData, 'JPEG', (105 - width / 2) * scale, 200 * scale, width * scale, height * scale);
+        doc.text(105 * scale, 64 * scale, 'Behavior - Average: ' + behaviorAvg, 'center');
+        doc.addImage(behaviorImgData, 'JPEG', (105 - width / 2) * scale, 72 * scale, width * scale, height * scale);
+        doc.text(105 * scale, 174 * scale, 'Effort - Average: ' + effortAvg, 'center');
+        doc.addImage(effortImgData, 'JPEG', (105 - width / 2) * scale, 182 * scale, width * scale, height * scale);
 
         doc.addPage();
         var columns = includeClassNames ? ["Date", "Class", "Behavior Score", "Effort Score"] : ["Date", "Behavior Score", "Effort Score"];
@@ -930,6 +985,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         $scope.report = {};
 
         // close modal here since data-dismiss isn't working
+        $scope.modalOpen = false;
         $('#generateReportModal').modal('toggle');
     };
 
@@ -951,4 +1007,5 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
     $scope.graphDisplayOptions = ["Average", "All Classes"];
     $scope.behaviorGraphSelection = "All Classes";
     $scope.effortGraphSelection = "All Classes";
+    $scope.modalOpen = false;
 });
