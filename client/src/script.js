@@ -23,6 +23,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
 
     $routeProvider
 
+        // login and password related routes
         .when('/login', {
             templateUrl: 'html/login.html',
             controller: 'loginController',
@@ -64,6 +65,96 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/services.html',
             controller: 'servicesController',
             resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
+        })
+
+        // mass entry related routes
+        .when('/input', {
+            redirectTo: '/input/behavior',
+        })
+
+        .when('/input/behavior', {
+            templateUrl: 'html/inputBehavior.html',
+            controller: 'inputBehaviorController',
+            resolve: {
+                studentData: function($q, $rootScope, userService, serviceService) {
+                    var deferred = $q.defer();
+                    userService.authVerify().then(
+                        function success() {
+                            var config = {
+                                filter: [{ name: 'type', val: $rootScope.serviceNameToType['Behavior'], }, ],
+                                include: ['student.*'],
+                            };
+
+                            // only get students I case manage if I'm not an admin
+                            if(!userService.user.isSuperUser) {
+                                config.filter.push({ name: 'student.case_manager', val: userService.user.id, });
+                            }
+
+                            serviceService.getServices(config).then(
+                                function success(data) {
+                                    deferred.resolve(data);
+                                },
+                                function error(response) {
+                                    deferred.reject(response);
+                                }
+                            );
+                        },
+                        function error(response) {
+                            deferred.reject(response);
+                        }
+                    );
+                    return deferred.promise;
+                },
+                terms: function(termService) {
+                    return termService.getTerms();
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
+        })
+
+        .when('/input/tests', {
+            templateUrl: 'html/inputTests.html',
+            controller: 'inputTestsController',
+            resolve: {
+                students: function(studentService) {
+                    return studentService.getStudents();
+                },
+                enrollmentData: function ($q, userService, enrollmentService) {
+                    //TODO(gzuber): I don't like this in script.js...
+                    var deferred = $q.defer();
+                    userService.authVerify().then(
+                        function success() {
+                            var config = {
+                                filter: [{ name: 'section.teacher', val: userService.user.id, }, ],
+                                include: ['section.*', ],
+                            };
+                            enrollmentService.getStudentEnrollments(config).then(
+                                function success(data) {
+                                    deferred.resolve(data);
+                                },
+                                function error(response) {
+                                    deferred.reject(response);
+                                }
+                            );
+                        },
+                        function error(response) {
+                            deferred.reject(response);
+                        }
+                    );
+                    return deferred.promise;
+                },
+                tests: function(testService) {
+                    return testService.getTests();
+                },
+                terms: function(termService) {
+                    return termService.getTerms();
+                },
                 auth: function(userService) {
                     return userService.authVerify();
                 },
@@ -259,13 +350,13 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                             var deferreds = [];
 
                             var enrollmentConfig = {
-                                filter: [ { name: 'section.teacher.pk', val: userService.user.id, }, ],
+                                filter: [{ name: 'section.teacher.pk', val: userService.user.id, }, ],
                                 include: ['student.*', 'section.*', ],
                             };
                             deferreds.push(enrollmentService.getStudentEnrollments(enrollmentConfig));
 
                             var studentConfig = {
-                                filter: [ { name: 'case_manager', val: userService.user.id, }, ],
+                                filter: [{ name: 'case_manager', val: userService.user.id, }, ],
                             };
                             deferreds.push(studentService.getStudents(studentConfig));
 
@@ -284,17 +375,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                     return deferred.promise;
                 },
             }
-        })
-
-        // route for the input scores page
-        .when('/input', {
-            templateUrl: 'html/scoresInput.html',
-            controller: 'scoresInputController',
-            resolve: {
-                auth: function(userService) {
-                    return userService.authVerify();
-                },
-            },
         })
 
         // route for the input scores page
@@ -521,7 +601,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
      * Set listener for route change errors (user is not auth-ed)
      */
     $rootScope.$on('$routeChangeError', function(event, next, current, rejection) {
-        console.log(rejection);
         // log out the user
         userService.logout();
 

@@ -56,6 +56,14 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             adminRequired: false,
         },
         {
+            title: "Input Scores",
+            glyph: "pencil",
+            href: "/input",
+            click: $scope.clearSearch,
+            badgeList: [],
+            adminRequired: false,
+        },
+        {
             title: "Reports",
             glyph: "list-alt",
             href: "/reports",
@@ -79,20 +87,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             badgeList: [],
             adminRequired: true,
         },
-        //{
-            //title: "Scores Input",
-            //glyph: "pencil",
-            //href: "/input",
-            //click: $scope.clearSearch,
-            //badgeList: [],
-        //},
-        //{
-            //title: "Notifications",
-            //glyph: "bell",
-            //href: "/notifications",
-            //click: $scope.clearSearch,
-            //badgeList: userService.notificationData.relevantItems,
-        //},
         {
             title: "Settings",
             glyph: "cog",

@@ -403,6 +403,34 @@
     margin-top: 20px;
 }
 
+.calendar-container {
+    width: 100%;
+}
+
+@media (max-width: 767px) {
+    .doughnut-height {
+        height: 275px;
+    }
+
+    .fc-right {
+        display: none;
+    }
+
+    .fc-center {
+        float: right;
+    }
+}
+
+@media (min-width: 768px) {
+    .doughnut-height {
+        height: 225px;
+    }
+}
+
+.fc-unthemed td.fc-today {
+    background: #dbf0e7;
+}
+
 .hidden-graph {
     opacity: 0.0;
     height: 500px;

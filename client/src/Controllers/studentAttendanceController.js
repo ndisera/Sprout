@@ -1,4 +1,4 @@
-app.controller("studentAttendanceController", function($scope, $rootScope, $routeParams, $location, toastService, data, student) {
+app.controller("studentAttendanceController", function($scope, $rootScope, $window, uiCalendarConfig, $routeParams, $location, toastService, data, student) {
     $scope.location = $location;
     $scope.student = student.student;
     $scope.sections = data.sections; // doing this just for length in html
@@ -19,10 +19,19 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
     $scope[graphStartDateKey] = moment().startOf('month');
     $scope[graphEndDateKey] = moment();
 
+    function convertStringToNumber(str) {
+        var total = 0;
+        for(var i = 0; i < str.length; ++i) {
+            total += str.charCodeAt(i);
+        }
+        return total;
+    }
+
     // calendar settings
     $scope.uiConfig = {
         calendar: {
-            handleWindowResize: false,
+            //handleWindowResize: false,
+            defaultView: $window.innerWidth < 768 ? 'listWeek' : 'month',
             height: 500,
             header: {
                 left: 'today prev,next',
@@ -30,6 +39,13 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
                 right: 'month,basicWeek,basicDay,listWeek'
             },
             editable: false,
+            themeSystem: 'bootstrap3',
+            eventRender: function(event, element) {
+                element.attr('data-toggle', 'tooltip');
+                element.attr('data-container','body');
+                element.prop('title', event.title);
+                element.tooltip();
+            },
             // does the little panel that doesn't work well the window size is smaller
             //eventLimit: 2,
         }
@@ -98,12 +114,17 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
         _.each($scope.attendance, function(elem) {
             var className = $scope.sectionsLookup[$scope.enrollmentsLookup[elem.enrollment].section].title;
             var message = elem.description;
+            var color = $rootScope.colors[convertStringToNumber(elem.short_code) % ($rootScope.colors.length - 1)];
+            var textColor = '#fff';
+            var borderColor = tinycolor(color).clone().setAlpha(0.5).toRgbString();
+            var backgroundColor = tinycolor(color).clone().setAlpha(1).toRgbString();
             $scope.events.push({
                 title: className + ": " + message,
-                start: elem.date.substring(0, 10),
-                color: '#337ab7',
-                // color: '#57bc90',
-                // color: '#45B9BD',
+                start: moment(elem.date).format('YYYY-MM-DD').toString(),
+                //color: '#337ab7',
+                textColor: textColor,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
             });
         });
         $scope.eventSources = [$scope.events];
@@ -179,4 +200,12 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $rout
 
         updateGraphs();
     };
+
+    $scope.adjustCalendarOnResize = function() {
+        if($window.innerWidth < 768) {
+            uiCalendarConfig.calendars.attendanceCalendar.fullCalendar('changeView', 'listWeek');
+        }
+    }
+
+    angular.element($window).bind('resize', $scope.adjustCalendarOnResize);
 });
