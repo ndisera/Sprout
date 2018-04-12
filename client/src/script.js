@@ -38,8 +38,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             controller: 'passwordResetConfirmController',
         })
 
+        .when('/reports', {
+            redirectTo: '/reports/tests',
+        })
+
         // route tests query page
-        .when('/tests', {
+        .when('/reports/tests', {
             templateUrl: 'html/tests.html',
             controller: 'testsController',
             resolve: {
@@ -56,7 +60,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         })
 
         // route for the service page
-        .when('/services', {
+        .when('/reports/services', {
             templateUrl: 'html/services.html',
             controller: 'servicesController',
             resolve: {
@@ -80,6 +84,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 students: function (studentService) {
                     return studentService.getStudents();
+                },
+                schools: function(schoolService) {
+                    return schoolService.getSchools();
                 },
             }
         })

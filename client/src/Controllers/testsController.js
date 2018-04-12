@@ -141,6 +141,13 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
     }
 
     /**
+     * Navigates to student's test page
+     */
+    $scope.viewStudent = function(id) {
+        $location.path('/student/' + id + '/tests');
+    };
+
+    /**
      * Filter used for students who've taken the selected test
      * @param {student} student - student to be filtered.
      */
@@ -174,4 +181,7 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
         }
         return false;
     };
+
+    // initialization
+    $scope.selectTest($scope.tests[0]);
 });
