@@ -22,16 +22,18 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
     $scope.downloadReport = function() {
         var currentDate = moment().format('YYYY-MM-DD').toString();
         var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
+        doc.addFont("Report-Font", "Report Font", 'normal');
+        doc.setFont('Times', 'normal');
         var startDate = moment($scope.startDate).format('YYYY-MM-DD').toString();
         var endDate = moment($scope.endDate).format('YYYY-MM-DD').toString();
         var scale = 2.83465;
 
         doc.setFontSize(30);
-        doc.text(105 * scale, 25 * scale, $scope.selectedTest.test_name + ' Report', 'center');
+        doc.text(15 * scale, 25 * scale, $scope.selectedTest.test_name + ' Report');
         doc.setFontSize(18);
-        doc.text(105 * scale, 33 * scale, startDate + " to " + endDate, 'center');
+        doc.text(15 * scale, 33 * scale, startDate + " to " + endDate);
         doc.setFontSize(12);
-        doc.text(105 * scale, 41 * scale, "Generated on " + currentDate + " by " + userService.user.firstName + " " + userService.user.lastName, 'center');
+        doc.text(15 * scale, 41 * scale, "Generated on " + currentDate + " by " + userService.user.firstName + " " + userService.user.lastName);
         doc.setFontSize(18);
 
         var takenColumns = ["Date", "Name", "Student ID", "Score"];
@@ -47,12 +49,19 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
             notTakenRows.push([elem.first_name + " " + elem.last_name, elem.student_id]);
         });
 
-        doc.text(15 * scale, 50 * scale, "Taken:")
-        doc.autoTable(takenColumns, takenRows, { startY: 54 * scale, showHeader: 'firstPage', });
+        doc.text(15 * scale, 54 * scale, "Taken:")
+        doc.autoTable(takenColumns, takenRows, {
+            startY: 58 * scale,
+            showHeader: 'firstPage',
+        });
+        doc.setFont('Times', 'normal');
         let first = doc.autoTable.previous;
         doc.text(15 * scale, first.finalY + (12 * scale), "Not Taken:");
-        doc.autoTable(notTakenColumns, notTakenRows, { startY: first.finalY + (16 * scale), showHeader: 'firstPage', });
-        doc.save($scope.selectedTest.test_name + ' ' + currentDate + '.pdf');
+        doc.autoTable(notTakenColumns, notTakenRows, {
+            startY: first.finalY + (16 * scale),
+            showHeader: 'firstPage',
+        });
+        doc.save($scope.selectedTest.test_name + '_' + currentDate + '.pdf');
     };
 
     /**
@@ -187,5 +196,7 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
     };
 
     // initialization
-    $scope.selectTest($scope.tests[0]);
+    if ($scope.tests.length > 0) {
+        $scope.selectTest($scope.tests[0]);
+    }
 });

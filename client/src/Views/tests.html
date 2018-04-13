@@ -1,104 +1,112 @@
 <div ng-include="'html/reportsTabs.html'"></div>
-<div class="row">
+<div class="row" ng-if="tests.length === 0">
     <div class="col-xs-12">
-        <div id="student-ieps-select-manipulate">
-            <button type="button" ng-disabled="takenBy.length === 0 && notTakenBy.length === 0" ng-click="downloadReport()"
-                class="btn btn-primary">Download Report</button>
-        </div>
-        <div id="test-select" class="select-full-width input-group">
-            <span class="input-group-addon">Test</span>
-            <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTest.test_name }} <span class="caret"></span></button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                    <li ng-repeat="entry in tests" ng-click="selectTest(entry)" ng-class="{ 'active': entry.id === selectedTest.id, }">
-                        <a>{{ entry.test_name }}  <span ng-if="entry.id === selectedTest.id" class="glyphicon glyphicon-ok"></span></a>
-                    </li>
-                </ul>
-            </div>
+        <div class="alert alert-info" role="alert">
+            <span><b>Tip:</b> It looks like you school hasn't created any standardized tests yet. Speak to your admin about adding one.</span>
         </div>
     </div>
 </div>
-<div class="row voffset2">
-    <div class="col-xs-12 col-sm-6">
-        <div class="input-group">
-            <span class="input-group-addon">From</span>
-            <input type="text" id="startDate" class="form-control" date-time ng-model="startDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="dateRangeChange" max-date="endDate" watch-direct-changes="true">
-        </div>
-    </div>
-    <div class="col-xs-12 col-sm-6 student-mobile-spacer">
-        <div class="input-group">
-            <span class="input-group-addon">To</span>
-            <input type="text" id="endDate" class="form-control" date-time ng-model="endDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="dateRangeChange" min-date="startDate" watch-direct-changes="true">
-        </div>
-    </div>
-</div>
-<div class="panel-wrapper voffset4">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Taken By</h3>
-        </div>
-        <div class="panel-body">
-            <div class="alert alert-info no-bottom-margin" ng-show="takenBy.length === 0">
-                <span><b>Info:</b> It looks like there aren't any students that took the test in this date range.</span>
+<div ng-if="tests.length > 0">
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="student-ieps-select-manipulate">
+                <button type="button" ng-disabled="takenBy.length === 0 && notTakenBy.length === 0" ng-click="downloadReport()" class="btn btn-primary">Download Report</button>
             </div>
-            <div ng-hide="takenBy.length === 0">
-                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="taken" name="taken" ng-model="takenSearch">
-                </br>
-                <div class="table-responsive scrollableTableDiv table-select">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Student ID</th>
-                                <th>Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="student in takenBy | filter:takenFilter | orderBy:['testDate','last_name'] track by $index" ng-click="viewStudent(student.id)">
-                                <td>{{ student.testDate }}
-                                <td>{{ student.first_name }}</td>
-                                <td>{{ student.last_name }}</td>
-                                <td>{{ student.student_id }}</td>
-                                <td>{{ student.testScore }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div id="test-select" class="select-full-width input-group">
+                <span class="input-group-addon">Test</span>
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTest.test_name }} <span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li ng-repeat="entry in tests" ng-click="selectTest(entry)" ng-class="{ 'active': entry.id === selectedTest.id, }">
+                            <a>{{ entry.test_name }}  <span ng-if="entry.id === selectedTest.id" class="glyphicon glyphicon-ok"></span></a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<div class="panel-wrapper voffset4">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Not Taken By</h3>
-        </div>
-        <div class="panel-body">
-            <div class="alert alert-info no-bottom-margin" ng-show="notTakenBy.length === 0">
-                <span><b>Info:</b> It looks like there aren't any students that haven't taken the test in this date range.</span>
+    <div class="row voffset2">
+        <div class="col-xs-12 col-sm-6">
+            <div class="input-group">
+                <span class="input-group-addon">From</span>
+                <input type="text" id="startDate" class="form-control" date-time ng-model="startDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="dateRangeChange" max-date="endDate" watch-direct-changes="true">
             </div>
-            <div ng-hide="notTakenBy.length === 0">
-                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="notTaken" name="notTaken" ng-model="notTakenSearch">
-                </br>
-                <div class="table-responsive scrollableTableDiv table-select">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Student ID</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="student in notTakenBy | filter:notTakenFilter | orderBy:'last_name'" ng-click="viewStudent(student.id)">
-                                <td>{{ student.first_name }}</td>
-                                <td>{{ student.last_name }}</td>
-                                <td>{{ student.student_id }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        </div>
+        <div class="col-xs-12 col-sm-6 student-mobile-spacer">
+            <div class="input-group">
+                <span class="input-group-addon">To</span>
+                <input type="text" id="endDate" class="form-control" date-time ng-model="endDate" view="date" min-view="date" format="YYYY-MM-DD" date-change="dateRangeChange" min-date="startDate" watch-direct-changes="true">
+            </div>
+        </div>
+    </div>
+    <div class="panel-wrapper voffset4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Taken By</h3>
+            </div>
+            <div class="panel-body">
+                <div class="alert alert-info no-bottom-margin" ng-show="takenBy.length === 0">
+                    <span><b>Info:</b> It looks like there aren't any students that took the test in this date range.</span>
+                </div>
+                <div ng-hide="takenBy.length === 0">
+                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="taken" name="taken" ng-model="takenSearch">
+                    </br>
+                    <div class="table-responsive scrollableTableDiv table-select">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Student ID</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="student in takenBy | filter:takenFilter | orderBy:['testDate','last_name'] track by $index" ng-click="viewStudent(student.id)">
+                                    <td>{{ student.testDate }}
+                                        <td>{{ student.first_name }}</td>
+                                        <td>{{ student.last_name }}</td>
+                                        <td>{{ student.student_id }}</td>
+                                        <td>{{ student.testScore }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-wrapper voffset4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Not Taken By</h3>
+            </div>
+            <div class="panel-body">
+                <div class="alert alert-info no-bottom-margin" ng-show="notTakenBy.length === 0">
+                    <span><b>Info:</b> It looks like there aren't any students that haven't taken the test in this date range.</span>
+                </div>
+                <div ng-hide="notTakenBy.length === 0">
+                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="notTaken" name="notTaken" ng-model="notTakenSearch">
+                    </br>
+                    <div class="table-responsive scrollableTableDiv table-select">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Student ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="student in notTakenBy | filter:notTakenFilter | orderBy:'last_name'" ng-click="viewStudent(student.id)">
+                                    <td>{{ student.first_name }}</td>
+                                    <td>{{ student.last_name }}</td>
+                                    <td>{{ student.student_id }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
