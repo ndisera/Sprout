@@ -123,3 +123,38 @@
     background-color: #f2dede;
     color: #a94442;
 }
+
+.focus-student-empty-graph {
+    display: table;
+    width: 100%;
+    height: 200px;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+
+.focus-student-empty-graph.progress {
+    background-color: #dbf0e7;
+    color: #33805e;
+    border: 2px dashed #33805e;
+}
+
+.focus-student-empty-graph.caution {
+    background-color: #f2dede;
+    color: #a94442;
+    border: 2px dashed #a94442;
+}
+
+.focus-student-empty-graph > h4 {
+    display: table-cell;
+    vertical-align: middle;
+
+}
+
+
+
+
+
+
+
+
+

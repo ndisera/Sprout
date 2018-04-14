@@ -3,6 +3,12 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
 
     $scope.student = student.student;
 
+    $scope.isSuperUser = userService.user.isSuperUser;
+    $scope.isCaseManager = false;
+    if($scope.student.case_manager === userService.user.id) {
+        $scope.isCaseManager = true;
+    }
+
     $scope.services       = [];
     $scope.newService     = {};
 
@@ -33,6 +39,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
         elem.title_temp                 = elem.title;
         elem.description_temp           = elem.description;
         elem.fulfilled_description_temp = elem.fulfilled_description;
+        elem.type_temp                  = elem.type;
 
         addTeacherToService(elem);
     });
@@ -59,6 +66,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             fulfilled_date: service.fulfilled_date,
             fulfilled_description: service.fulfilled_description,
             fulfilled_user: service.fulfilled_user,
+            type: service.type,
         };
     }
 
@@ -74,6 +82,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             fulfilled_date: null,
             fulfilled_user: null,
             fulfilled_description: '',
+            type: '',
         };
     }
 
@@ -85,6 +94,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             service.title_temp                 = service.title;
             service.description_temp           = service.description;
             service.fulfilled_description_temp = service.fulfilled_description;
+            service.type_temp                  = service.type;
         }
     };
 
@@ -114,6 +124,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
 
         toSave.title       = service.title_temp;
         toSave.description = service.description_temp;
+        toSave.type        = service.type_temp;
 
         studentService.updateServiceForStudent(service.student, service.id, toSave).then(
             function success(data) {
@@ -126,6 +137,8 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
                 service.fulfilled_description      = data.service_requirement.fulfilled_description;
                 service.fulfilled_description_temp = data.service_requirement.fulfilled_description;
                 service.fulfilled_user             = data.service_requirement.fulfilled_user;
+                service.type                       = data.service_requirement.type;
+                service.type_temp                  = data.service_requirement.type;
 
                 addTeacherToService(service);
 
@@ -135,7 +148,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the service requirement.');
-            },
+            }
         );
     };
 
@@ -166,7 +179,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the service requirement.');
-            },
+            }
         );
     };
 
@@ -180,7 +193,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             },
             function error(data) {
                 toastService.error('The server wasn\'t able to delete the service.');
-            },
+            }
         );
     };
 
@@ -204,10 +217,11 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
         studentService.addServiceForStudent($scope.student.id, toSave).then(
             function success(data) {
                 var newService = data.service_requirement;
-                newService.editing = false;
-                newService.title_temp = newService.title;
+                newService.editing                    = false;
+                newService.title_temp                 = newService.title;
                 newService.description_temp           = newService.description;
                 newService.fulfilled_description_temp = newService.fulfilled_description;
+                newService.type_temp                  = newService.type;
 
                 addTeacherToService(newService);
 
@@ -216,7 +230,7 @@ app.controller("studentServicesController", function($scope, $rootScope, $locati
             },
             function error(data) {
                 toastService.error('The server wasn\'t able to save your new service.');
-            },
+            }
         );
     };
 

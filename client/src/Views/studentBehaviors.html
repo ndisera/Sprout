@@ -1,4 +1,11 @@
 <div ng-include="'html/studentTabs.html'"></div>
+<div ng-if="!hasBehaviorService" class="row">
+    <div class="col-xs-12">
+        <div id="student-behaviors-service-warning" class="alert alert-warning" role="alert">
+            <span><b>Warning:</b> This student doesn't have a Behavior Service. If this student did in the past, you may view that history here. If not, you can add a Behavior Service to this student in order to start recording Behavior and Effort.</span>
+        </div>
+    </div>
+</div>
 <div ng-if="sections.length > 0" class="row">
     <div class="col-xs-12">
         <button ng-click="openReportForm()" class="btn btn-primary pull-right focus-top-button" type="button">Generate Report</button>
@@ -8,15 +15,47 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header grey modal-wrapper">
-                <button type="button" class="close" data-dismiss="modal" ng-click="test = false">&times;</button>
+                <button type="button" class="close" data-dismiss="modal" ng-click="modalOpen = false">&times;</button>
                 <h4 class="modal-title">Create Behavior and Effort Report for {{ student.first_name }} {{ student.last_name }}</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" name="reportForm" ng-submit="generateReport()">
                     <div class="form-group">
-                        <label class="control-label col-sm-2" for="reportClass">Class:</label>
-                        <div class="col-sm-10">
+                        <label class="control-label col-sm-1" for="reportClass">Class:</label>
+                        <div class="col-sm-11">
                             <select required ng-model="report.class" ng-options="x.title for x in classOptions" id="reportClass" name="reportClass" class="form-control" ng-change="updateClassGraphs()"></select>
+                        </div>
+                        <div ng-if="report.class.title != null">
+                            <div class="voffset3 col-xs-12 centerText">
+                                <p><b>Behavior</b></p>
+                            </div>
+                            <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'Average'">
+                                <canvas id="preview_student_avg_behavior" class="chart chart-line" chart-data="avgBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="avgBehaviorGraph.options" chart-click="onClick">
+                            </canvas>
+                            </div>
+                            <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'All Classes'">
+                                <canvas id="preview_student_behavior" class="chart chart-line" chart-data="behaviorGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="behaviorGraph.options" chart-click="onClick">
+                            </canvas>
+                            </div>
+                            <div class="student-behaviors-report-graph col-xs-12" ng-if="showClass" id="classBehaviorContainer">
+                                <canvas id="preview_student_class_behavior" class="chart chart-line" chart-data="singleBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="singleBehaviorGraph.options">
+                            </canvas>
+                            </div>
+                            <div class="voffset3 col-xs-12 centerText">
+                                <p><b>Effort</b></p>
+                            </div>
+                            <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'Average'">
+                                <canvas id="preview_student_avg_effort" class="chart chart-line" chart-data="avgEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="avgEffortGraph.options" chart-click="onClick">
+                            </canvas>
+                            </div>
+                            <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'All Classes'">
+                                <canvas id="preview_student_effort" class="chart chart-line" chart-data="effortGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="effortGraph.options" chart-click="onClick">
+                            </canvas>
+                            </div>
+                            <div class="student-behaviors-report-graph col-xs-12" ng-if="showClass">
+                                <canvas id="preview_student_class_effort" class="chart chart-line" chart-data="singleEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="singleEffortGraph.options">
+                            </canvas>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -35,7 +74,11 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="alert alert-info no-bottom-margin" role="alert">
-                <span><b>Tip:</b> It looks like this student isn't enrolled in any classes. Speak to an admin to add a class to this student's schedule.</span>
+                <span>
+                    <b>Tip:</b>
+                    It looks like this student isn't enrolled in any classes.
+                    <span ng-if="!isSuperUser">Speak to an admin to add a class to this student's schedule.</span>
+                </span>
             </div>
         </div>
     </div>
@@ -60,43 +103,20 @@
             <div class="panel-wrapper">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">All Classes Average Behavior</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="student-behaviors-graph">
-                            <canvas id="student_avg_behavior" class="chart chart-line" chart-data="avgBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="avgBehaviorGraph.options" chart-click="onClick">
-                            </canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="panel-wrapper">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">All Classes Average Effort </h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="student-behaviors-graph">
-                            <canvas id="student_avg_effort" class="chart chart-line" chart-data="avgEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="avgEffortGraph.options" chart-click="onClick">
-                            </canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row voffset4">
-        <div class="col-lg-6">
-            <div class="panel-wrapper">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
                         <h3 class="panel-title">Behavior</h3>
                     </div>
                     <div class="panel-body">
-                        <div class="student-behaviors-graph">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <select required ng-model="behaviorGraphSelection" ng-options="x for x in graphDisplayOptions" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="student-behaviors-graph voffset2" ng-if="behaviorGraphSelection === 'All Classes'">
                             <canvas id="student_behavior" class="chart chart-line" chart-data="behaviorGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="behaviorGraph.options" chart-click="onClick">
+                            </canvas>
+                        </div>
+                        <div class="student-behaviors-graph voffset2" ng-if="behaviorGraphSelection === 'Average'">
+                            <canvas id="student_avg_behavior" class="chart chart-line" chart-data="avgBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="avgBehaviorGraph.options" chart-click="onClick">
                             </canvas>
                         </div>
                     </div>
@@ -110,8 +130,17 @@
                         <h3 class="panel-title">Effort</h3>
                     </div>
                     <div class="panel-body">
-                        <div class="student-behaviors-graph">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <select required ng-model="effortGraphSelection" ng-options="x for x in graphDisplayOptions" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="student-behaviors-graph voffset2" ng-if="effortGraphSelection === 'All Classes'">
                             <canvas id="student_effort" class="chart chart-line" chart-data="effortGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="effortGraph.options" chart-click="onClick">
+                            </canvas>
+                        </div>
+                        <div class="student-behaviors-graph voffset2" ng-if="effortGraphSelection === 'Average'">
+                            <canvas id="student_avg_effort" class="chart chart-line" chart-data="avgEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="avgEffortGraph.options" chart-click="onClick">
                             </canvas>
                         </div>
                     </div>
@@ -119,12 +148,12 @@
             </div>
         </div>
     </div>
-    <div class="row voffset3">
+    <div class="row voffset3" ng-if="hasBehaviorService">
         <div class="col-xs-12">
             <div class="panel-wrapper">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Input Behavior Scores</h3>
+                        <h3 class="panel-title"><span ng-show="isSuperUser || isCaseManager">Input </span>Behavior Data</h3>
                     </div>
                     <div class="panel-body">
                         <div class="input-group">
@@ -133,11 +162,8 @@
                         </div>
                         <div class="voffset3">
                             <div class="alert alert-info no-bottom-margin" ng-if="scoresInput.length === 0">
-                                <span><b>Info:</b> It looks like this student isn't enrolled in any classes for this date.</span>
+                                <span><b>Info:</b> It looks like this student either isn't enrolled in any classes for this date, or you aren't one of this student's teachers for this term.</span>
                             </div>
-                            <!--<div class="student-behaviors-no-input-classes" ng-show="scoresInput.length === 0">-->
-                            <!--<h4 class="centerText">No Enrolled Classes</h4>-->
-                            <!--</div>-->
                             <table class="table table-responsive" ng-if="scoresInput.length !== 0">
                                 <thead>
                                     <tr>
@@ -150,15 +176,48 @@
                                     <tr ng-repeat="entry in scoresInput">
                                         <td>{{ entry.title }}</td>
                                         <td>
-                                            <select ng-model="entry.curBehavior" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'behavior')"></select>
+                                            <select ng-if="isSuperUser || isCaseManager" ng-model="entry.curBehavior" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'behavior')">
+                                            </select>
+                                            <span ng-if="!isSuperUser && !isCaseManager">{{ entry.behavior }}</span>
                                         </td>
                                         <td>
-                                            <select ng-model="entry.curEffort" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'effort')"></select>
+                                            <select ng-if="isSuperUser || isCaseManager" ng-model="entry.curEffort" ng-options="x.value as x.display for x in inputOptions" ng-change="saveScore(entry, 'effort')">
+                                            </select>
+                                            <span ng-if="!isSuperUser && !isCaseManager">{{ entry.effort }}</span>
                                         </td>
                                     </tr>
 
                                 </tbody>
                             </table>
+                        </div>
+                        <!-- behavior comment -->
+                        <div class="voffset4" ng-if="scoresInput.length !== 0">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="student-behaviors-comment-header" ng-class="{ 'editing': editingNote, 'full-width': (!isSuperUser && !isCaseManager), }">
+                                        <h4>Comment on Today's Behavior</h4>
+                                    </div>
+                                    <div class="student-behaviors-comment-btns" ng-if="!editingNote && (isSuperUser || isCaseManager)">
+                                        <button class="btn btn-primary btn-manipulate" type="button" ng-click="toggleEditingNote(true)" ng-show="true">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                        </button>
+                                    </div>
+                                    <div class="student-behaviors-comment-btns" ng-if="editingNote">
+                                        <button class="btn btn-success btn-manipulate" type="button" ng-click="saveNote()" ng-show="true">
+                                            <span class="glyphicon glyphicon-ok"></span>
+                                        </button>
+                                        <button class="btn btn-default btn-manipulate" type="button" ng-click="toggleEditingNote(false)" ng-show="true">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row voffset3">
+                                <div class="col-xs-12">
+                                    <div class="student-behaviors-comment-textarea-fake" ng-show="!editingNote"><span>{{ behaviorNote.body }}</span></div>
+                                    <textarea class="student-behaviors-comment-textarea" ng-model="behaviorNote.body_temp" ng-show="editingNote"></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -166,18 +225,30 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-lg-6">
-        <div class="student-behaviors-graph" ng-show="test">
-            <canvas id="student_class_behavior" class="chart chart-line" chart-data="singleBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="singleBehaviorGraph.options">
+<div ng-include="'html/bottomSpacer.html'"></div>
+<div ng-if="report.class.title != null && modalOpen">
+    <div class="hidden-graph" ng-if="report.class.title === 'Average'">
+        <canvas id="report_student_avg_behavior" class="chart chart-line" chart-data="avgBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="hiddenAvgGraphOptions" chart-click="onClick">
     </canvas>
-        </div>
     </div>
-    <div class="col-lg-6">
-        <div class="student-behaviors-graph" ng-show="test">
-            <canvas id="student_class_effort" class="chart chart-line" chart-data="singleEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="singleEffortGraph.options">
+    <div class="hidden-graph" ng-if="report.class.title === 'All Classes'">
+        <canvas id="report_student_behavior" class="chart chart-line" chart-data="behaviorGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="hiddenGraphOptions" chart-click="onClick">
     </canvas>
-        </div>
+    </div>
+    <div class="hidden-graph" ng-if="showClass">
+        <canvas id="report_student_class_behavior" class="chart chart-line" chart-data="singleBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="hiddenGraphOptions">
+    </canvas>
+    </div>
+    <div class="hidden-graph" ng-if="report.class.title === 'Average'">
+        <canvas id="report_student_avg_effort" class="chart chart-line" chart-data="avgEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="hiddenAvgGraphOptions" chart-click="onClick">
+    </canvas>
+    </div>
+    <div class="hidden-graph" ng-if="report.class.title === 'All Classes'">
+        <canvas id="report_student_effort" class="chart chart-line" chart-data="effortGraph.data" chart-labels="sharedGraph.labels" chart-series="sharedGraph.series" chart-options="hiddenGraphOptions" chart-click="onClick">
+    </canvas>
+    </div>
+    <div class="hidden-graph" ng-if="showClass">
+        <canvas id="report_student_class_effort" class="chart chart-line" chart-data="singleEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="hiddenGraphOptions">
+    </canvas>
     </div>
 </div>
-<div ng-include="'html/bottomSpacer.html'"></div>

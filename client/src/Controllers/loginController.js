@@ -1,4 +1,5 @@
 app.controller('loginController', function ($scope, $rootScope, $location, userService, studentService) {
+    $scope.location = $location;
 
     // array for all errors to display to user
     $scope.errors = [];
@@ -69,6 +70,8 @@ app.controller('loginController', function ($scope, $rootScope, $location, userS
             displayErrors("Email and password must not be blank.");
             return;
         }
+
+        $scope.email = $scope.email.toLowerCase();
 
         userService.login($scope.email, $scope.password).then(
             function success(response) {

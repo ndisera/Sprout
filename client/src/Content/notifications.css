@@ -13,7 +13,7 @@
 
 #notifications-container {
     z-index: 3;
-    position: absolute;
+    position: fixed;
     top: 50px;
     right: 10px;
     width: 330px;
@@ -237,6 +237,22 @@
 
 .notifications-low-grade .notifications-content-icon {
     color: #d9534f;
+}
+
+.notifications-iep-goal.panel-wrapper {
+    border-color: #8860d0;
+}
+
+.notifications-iep-goal .notifications-panel:hover {
+    background-color: #f0ebf9;
+}
+
+.notifications-iep-goal .notifications-panel:hover .notifications-remove-icon {
+    background-color: #f0ebf9;
+}
+
+.notifications-iep-goal .notifications-content-icon {
+    color: #8860d0;
 }
 
 .notifications-panel:hover .notifications-remove-icon:hover, .notifications-remove-icon:hover, .notifications-remove-icon:focus {

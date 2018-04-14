@@ -75,10 +75,11 @@
                                                 </div>
                                             </span>
                                             <div class="input-group-btn fake-btn">
-                                                <span class="input-group-text">{{ focusStudent.progress_graph.category.displayName }}</span>
+                                                <span class="input-group-text" ng-if="!focusStudent.progress_graph.emptyGraph">{{ focusStudent.progress_graph.category.displayName }}</span>
+                                                <span class="input-group-text" ng-if="focusStudent.progress_graph.emptyGraph">Insufficient Data</span>
                                             </div>
                                         </div>
-                                        <a ng-href="/student/{{ focusStudent.student }}{{ focusStudent.progress_graph.category.href }}">
+                                        <a ng-href="/student/{{ focusStudent.student }}{{ focusStudent.progress_graph.category.href }}" ng-if="!focusStudent.progress_graph.emptyGraph">
                                             <div class="col-sm-12 focus-graph">
                                                 <canvas class="chart chart-line"
                                                         chart-data="focusStudent.progress_graph.data"
@@ -90,6 +91,9 @@
                                                 </canvas>
                                             </div>
                                         </a>
+                                        <div class="focus-student-empty-graph progress" ng-if="focusStudent.progress_graph.emptyGraph">
+                                            <h4>As more data is added for the student, these categories will be filled.</h4>
+                                        </div>
                                     </div>
                                     <div class="col-sm-4 centerText">
                                         <div id="focus-student-select" class="input-group">
@@ -100,10 +104,11 @@
                                                 </div>
                                             </span>
                                             <div class="input-group-btn fake-btn">
-                                                <span class="input-group-text">{{ focusStudent.caution_graph.category.displayName }}</span>
+                                                <span class="input-group-text" ng-if="!focusStudent.caution_graph.emptyGraph">{{ focusStudent.caution_graph.category.displayName }}</span>
+                                                <span class="input-group-text" ng-if="focusStudent.caution_graph.emptyGraph">Insufficient Data</span>
                                             </div>
                                         </div>
-                                        <a ng-href="/student/{{ focusStudent.student }}{{ focusStudent.caution_graph.category.href }}">
+                                        <a ng-href="/student/{{ focusStudent.student }}{{ focusStudent.caution_graph.category.href }}" ng-if="!focusStudent.caution_graph.emptyGraph">
                                             <div class="col-sm-12 focus-graph">
                                                 <canvas class="chart chart-line"
                                                         chart-data="focusStudent.caution_graph.data"
@@ -115,6 +120,9 @@
                                                 </canvas>
                                             </div>
                                         </a>
+                                        <div class="focus-student-empty-graph caution" ng-if="focusStudent.caution_graph.emptyGraph">
+                                            <h4>As more data is added for the student, these categories will be filled.</h4>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

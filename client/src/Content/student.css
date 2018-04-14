@@ -24,6 +24,43 @@
     width: 1px;
 }
 
+.student-overview-parent-panel {
+    margin-bottom: 30px;
+    border: none;
+}
+
+.student-overview-parent-panel > .panel-heading {
+    padding: 15px;
+    background: linear-gradient(to right, #0b3c5d, #105989);
+    border: none;
+}
+
+.student-overview-parent-panel > .panel-heading > .panel-title {
+    font-size: 23px;
+    color: #eee;
+}
+
+.student-overview-parent-panel > .panel-body {
+    border: 1px solid #ccc;
+    border-top: none;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.student-overview-parent-panel .parent-info {
+    font-size: 18px;
+}
+
+.student-overview-parent-panel .parent-info .fa-certificate {
+    margin-left: 10px;
+    margin-bottom: -2px;
+    color: #5ab9ea;
+}
+
+.student-overview-parent-spacer {
+    margin-top: 10px;
+}
+
 #student-overview-image-preview {
     text-align: right;
 }
@@ -156,8 +193,59 @@
     text-align: center;
 }
 
+#student-behaviors-service-warning {
+    margin-bottom: 15px;
+}
+
 .student-behaviors-graph {
     height: 300px;
+}
+.student-behaviors-report-graph {
+    height: 150px;
+}
+
+.student-behaviors-comment-btns {
+    float: right;
+}
+
+.student-behaviors-comment-header {
+    display: inline-block;
+    width: calc(100% - 50px);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #eee;
+}
+
+.student-behaviors-comment-header.full-width {
+    width: 100% !important;
+}
+
+.student-behaviors-comment-header.editing {
+    width: calc(100% - 100px);
+}
+
+.student-behaviors-comment-header > h4 {
+    font-size: 15px;
+    font-weight: normal;
+    margin: 10px 0px 10px 10px;
+    color: #555;
+}
+
+.student-behaviors-comment-textarea {
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px 15px;
+}
+
+.student-behaviors-comment-textarea-fake {
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px 15px;
+    white-space: pre-line;
 }
 
 .student-services-panel .form-control-static {
@@ -250,6 +338,10 @@
     width: calc(100% - 50px);
 }
 
+#student-ieps-select.full-width {
+    width: 100% !important;
+}
+
 #student-ieps-edit-form .form-group {
     margin-right: 0px;
     margin-left: 0px;
@@ -311,3 +403,36 @@
     margin-top: 20px;
 }
 
+.calendar-container {
+    width: 100%;
+}
+
+@media (max-width: 767px) {
+    .doughnut-height {
+        height: 275px;
+    }
+
+    .fc-right {
+        display: none;
+    }
+
+    .fc-center {
+        float: right;
+    }
+}
+
+@media (min-width: 768px) {
+    .doughnut-height {
+        height: 225px;
+    }
+}
+
+.fc-unthemed td.fc-today {
+    background: #dbf0e7;
+}
+
+.hidden-graph {
+    opacity: 0.0;
+    height: 500px;
+    width: 1000px;
+}

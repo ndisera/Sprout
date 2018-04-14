@@ -7,6 +7,11 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
     $scope.studentSearch = {
         text: "",
     };
+    // // flags for gracefully handling no data from the backend
+    // $scope.focusCategoryData = true;
+    // $scope.progressCategoryData = true;
+    // $scope.cautionCategoryData = true;
+
 
     // categories must be populated before setting up students
     // add any static categories here
@@ -27,9 +32,9 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
     ];
     // add on dynamic categories
     _.each(testData.standardized_tests, function(elem) {
-        $scope.focusCategories.push({ 
-            category: 'test', 
-            displayName: elem.test_name, 
+        $scope.focusCategories.push({
+            category: 'test',
+            displayName: elem.test_name,
             specificID: elem.id,
             uniqueId: 'test' + elem.id,
             href: '/tests',
@@ -93,7 +98,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
 
     /**
      * copies a focus student record. creates a new
-     * object that contains a focus student record in 
+     * object that contains a focus student record in
      * a format that the server will accept.
      */
     function copyFocusStudent(focusStudent) {
@@ -137,22 +142,22 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
         focus: [
             {
                 borderColor: $rootScope.colors[1].setAlpha(0.7).toRgbString(),
-                pointBackgroundColor: $rootScope.colors[1].setAlpha(0.7).toRgbString(), 
-                backgroundColor: $rootScope.colors[1].setAlpha(0.2).toRgbString(), 
+                pointBackgroundColor: $rootScope.colors[1].setAlpha(0.7).toRgbString(),
+                backgroundColor: $rootScope.colors[1].setAlpha(0.2).toRgbString(),
             },
         ],
         progress: [
             {
                 borderColor: $rootScope.colors[0].setAlpha(0.7).toRgbString(),
-                pointBackgroundColor: $rootScope.colors[0].setAlpha(0.7).toRgbString(), 
-                backgroundColor: $rootScope.colors[0].setAlpha(0.2).toRgbString(), 
+                pointBackgroundColor: $rootScope.colors[0].setAlpha(0.7).toRgbString(),
+                backgroundColor: $rootScope.colors[0].setAlpha(0.2).toRgbString(),
             },
         ],
         caution: [
             {
                 borderColor: tinycolor('#d9534f').setAlpha(0.7).toRgbString(),
-                pointBackgroundColor: tinycolor('#d9534f').setAlpha(0.7).toRgbString(), 
-                backgroundColor: tinycolor('#d9534f').setAlpha(0.2).toRgbString(), 
+                pointBackgroundColor: tinycolor('#d9534f').setAlpha(0.7).toRgbString(),
+                backgroundColor: tinycolor('#d9534f').setAlpha(0.2).toRgbString(),
             },
         ],
     };
@@ -191,6 +196,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
             },
             datasetOverride: {
             },
+            emptyGraph: true, //flag for displaying helpful text instead of an empty graph
         };
     }
 
@@ -199,6 +205,8 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
 
     // updates 1 particular graph. makes backend calls to get graph-dependent info
     function updateFocusGraph(studentId, category, graph) {
+        graph.emptyGraph = false;
+
         var splitString = category.split('__');
         var type = splitString[0];
         var start = splitString[1];
@@ -212,12 +220,12 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
 
     /**
      * Calls the appropriate service for the category and fills the requested graph
-     * @param currentGraph - the graph to update
+     * @param graph - the graph to update
      * @param category - the category of the graph (test scores, behavior, effort...)
      * @param beginDate - the start date of the data to put into the graph
      * @param endDate - the end date of the data to put into the graph
-     * @param studentID - the id of the student
-     * @param specificID - an id specific to the graph being requested. Typically something like the class or assignment id
+     * @param studentId - the id of the student
+     * @param specificId - an id specific to the graph being requested. Typically something like the class or assignment id
      * */
     function serviceCaller(graph, category, beginDate, endDate, studentId, specificId) {
         var graphStart = moment(beginDate);
@@ -226,6 +234,15 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
         // calculate how many entries of data our graph will have
         var dateDiff = graphEnd.diff(graphStart, 'd');
 
+        if (category === "none"){
+            // Clear graph labels and data
+            graph.labels = [];
+            graph.data = [];
+
+            //set flag indicating that no data was found
+            graph.emptyGraph = true;
+            return;
+        }
         if (category === "behavior" || category === "effort") {
             /**
              * Average Behavior/Effort
@@ -305,7 +322,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
             var config = {
                 filter: [
                     { name: 'student', val: studentId, },
-                    { name: 'date.range', val: beginDate, }, 
+                    { name: 'date.range', val: beginDate, },
                     { name: 'date.range', val: endDate, },
                     { name: 'standardized_test', val: specificId, },
                 ],
@@ -365,7 +382,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                 },
                 function error(response) {
                     toastService.error('The server wasn\'t able to get test scores for "' + studentsLookup[studentId].first_name + ' ' + studentsLookup[studentId].last_name + '"');
-                },
+                }
             );
         } else if (category === "grades") {
             console.log("Grades category does not exist yet");
@@ -606,7 +623,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
             function error(response) {
                 // notify the user
                 toastService.error('The server wasn\'t able to save the new "Focus Category."');
-            },
+            }
         );
     };
 });

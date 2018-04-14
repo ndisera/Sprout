@@ -157,13 +157,17 @@ a {
 }
 
 #topbar .btn-group {
-    margin-top: -2px;
+    margin-top: 4px;
 }
 
 #topbar .btn-group > .btn {
-    padding: 4px 0px 4px 12px;
+    padding: 4px 6px 4px 6px;
     border: none;
     background: none;
+}
+
+.bell-margin {
+    margin-right:-6px;
 }
 
 #topbar .btn-group > .btn > .badge {
@@ -178,7 +182,7 @@ a {
 #topbar .topbar-user {
     display: inline-block;
     margin-top: 10px;
-    margin-right: 10px;
+    margin-right: 9px;
 }
 
 #topbar-hamburger-btn {
@@ -588,6 +592,10 @@ ul.dropdown-menu > li > a:hover {
     color: #126087;
 }
 
+.alert.alert-info.fc-today:before {
+    content: none;
+}
+
 .alert.alert-info {
     background-color: #d2ecf9;
     border-color: #8ed0f0;
@@ -864,6 +872,10 @@ ul.dropdown-menu > li > a:hover {
     cursor: pointer;
 }
 
+.glyphicon-big-button.not-clickable {
+    cursor: default;
+}
+
 .glyphicon-ok-sign.glyphicon-big-button {
     color: #57bc90;
 }
@@ -872,12 +884,20 @@ ul.dropdown-menu > li > a:hover {
     color: #41a479;
 }
 
+.glyphicon-ok-sign.glyphicon-big-button.not-clickable:hover {
+    color: #57bc90;
+}
+
 .glyphicon-remove-sign.glyphicon-big-button {
     color: #d9534f;
 }
 
 .glyphicon-remove-sign.glyphicon-big-button:hover {
     color: #c9302c;
+}
+
+.glyphicon-remove-sign.glyphicon-big-button.not-clickable:hover {
+    color: #d9534f;
 }
 
 .btn-manipulate-row {
@@ -978,7 +998,7 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
     font-weight: 100;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-anchor: middle;
-    alignment-baseline: middle;
+    dominant-baseline: middle;
 }
 
 .input-group-dropdown > .input-group-addon {
@@ -1000,4 +1020,27 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
 .picture-frame {
     display: inline-block;
     overflow: hidden;
+}
+
+.progress {
+    margin-bottom: 0px;
+}
+
+.progress-bar {
+    background-color: #57bc90;
+}
+
+.progress-bar.failed {
+    background-color: #d9534f;
+}
+
+input[type="checkbox"].feedback-checkbox {
+    margin-top: 12px;
+}
+
+.feedback-textarea {
+    min-height: 80px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }

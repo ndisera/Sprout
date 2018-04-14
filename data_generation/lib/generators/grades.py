@@ -9,7 +9,7 @@ import sys
 from lib.services.authorization import AuthorizationService
 from lib.services.assignment import Assignment, AssignmentService
 from lib.services.enrollment import EnrollmentService
-from lib.services.grades import GradesService, Grade
+from lib.services.grades import GradesService, Grade, FinalGrade
 from lib.services.term import TermService
 from lib.services.section import SectionService
 
@@ -33,6 +33,18 @@ class GradesGenerator():
             sections.add(enrollment.section)
 
         return students, sections
+
+    def determine_letter_grade(self, score):
+        if score > 90:
+            return 'A'
+        elif score > 80:
+            return 'B'
+        elif score > 70:
+            return 'C'
+        elif score > 60:
+            return 'D'
+        else:
+            return 'I'
 
     def generate_assignments(self, num):
         """
@@ -82,7 +94,9 @@ class GradesGenerator():
                                         due_date=str(date),
                                         score_min=score_min,
                                         score_max=score_max,
-                                        id=None)
+                                        id=None,
+                                        import_id=None,
+                                        )
                 assignments.append(assignment)
 
             to_return[section.id] = assignments
@@ -115,8 +129,8 @@ class GradesGenerator():
             for assignment in assignments:
                 # randomly decide if it's missing
                 missing_modifier = random.randint(0, 9)
-                if missing_modifier > 8:
-                    continue
+                # if missing_modifier > 8:
+                    # continue
 
                 to_return[enrollment.id][section][assignment.id] = []
 
@@ -135,20 +149,80 @@ class GradesGenerator():
                                 minute=datetime.datetime.now().minute, 
                                 second=datetime.datetime.now().second, 
                                 microsecond=datetime.datetime.now().microsecond)
-                    if late_modifier > 8:
+                    if missing_modifier > 8:
+                        handin = handin - datetime.timedelta(days=1)
+                    elif late_modifier > 8:
                         handin = handin + datetime.timedelta(days=1)
                     else:
                         handin = handin - datetime.timedelta(days=1)
 
                     score = random.randint(assignment.score_min, assignment.score_max)
+                    letter_grade = self.determine_letter_grade(score)
+
                     grade = Grade(assignment=assignment.id,
                                   score=score,
                                   student=student,
                                   handin_datetime=str(handin),
+                                  late=(late_modifier > 8 and missing_modifier <= 8),
+                                  missing=(missing_modifier > 8),
+                                  grade=letter_grade,
                                   id=None)
                     grades.append(grade)
 
                 to_return[enrollment.id][section][assignment.id] = grades
+
+        return to_return
+
+    def generate_final_grades(self):
+        """
+        Generate final_grades for each current enrollment
+
+        :param num:
+        :return: Dictionary of studentID -> list[FinalGrade]
+        """
+        to_return = {}
+
+        enrollments = self.enrollmentService.get_enrollments()
+
+        assignment_cache = {}
+
+        for enrollment in enrollments:
+            section = enrollment.section
+            student = enrollment.student
+
+            if student not in to_return:
+                to_return[student] = []
+
+            # get the assignments for this section
+            assignments = None
+            if section in assignment_cache:
+                assignments = assignment_cache[section]
+            else:
+                assignments = self.assignmentService.get_assignments(section=enrollment.section)
+                assignment_cache[section] = assignments
+
+            assignment_by_id = {}
+            for assignment in assignments:
+                assignment_by_id[assignment.id] = assignment
+
+            # get all grades for the student in the section
+            filters = { 'assignment.section': section, }
+            grades = self.gradeService.get_grades(student=student, params=filters)
+
+            point_total = 0
+            for grade in grades:
+                assignment = assignment_by_id[grade.assignment]
+                point_total += (grade.score - assignment.score_min) / assignment.score_max
+
+            # calculate student's grade
+            final_percent = 0
+            if len(assignments) > 0:
+                # truncate crazy decimals
+                final_percent_int = int((point_total / len(assignments)) * 10000)
+                final_percent = float(final_percent_int) / 100
+            letter_grade = self.determine_letter_grade(final_percent)
+
+            to_return[student].append(FinalGrade(id=None, enrollment=enrollment.id, final_percent=final_percent, letter_grade=letter_grade))
 
         return to_return
 

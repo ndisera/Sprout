@@ -1,4 +1,4 @@
-app.controller("studentTestsController", function ($scope, $rootScope, $location, $routeParams, toastService, testService, studentData, testData, termData) {
+app.controller("studentTestsController", function ($scope, $rootScope, $location, $routeParams, toastService, testService, termService, studentData, testData, termData) {
     $scope.location = $location;
 
     $scope.student = studentData.student;
@@ -23,24 +23,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     }
 
     // find biggest current term
-    $scope.selectedTerm = null;
-    _.each($scope.terms, function(elem) {
-        if(moment() > elem.start_date && moment() < elem.end_date) {
-            // I have found a candidate
-            // but we want the biggest current term
-            if($scope.selectedTerm === null) {
-                $scope.selectedTerm = elem;
-            }
-            else {
-                // take the bigger one
-                var curDelta = $scope.selectedTerm.end_date - $scope.selectedTerm.start_date;
-                var newDelta = elem.end_date - elem.start_date;
-                if(newDelta > curDelta) {
-                    $scope.selectedTerm = elem;
-                }
-            }
-        }
-    });
+    $scope.selectedTerm = termService.getLargestCurrentTerm($scope.terms);
 
     // set default date range to range of current term
     if($scope.selectedTerm !== null) {
@@ -135,7 +118,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
                 test.graph.data   = [];
                 test.graph.labels = [];
                 test.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
-                test.graph.labels.push(_.times(dateDiff + 1, _.constant(null)));
+                test.graph.labels = _.times(dateDiff + 1, _.constant(null));
 
                 // iterate through each date, setting data as necessary
                 var iterDate = $scope.graphStartDate.clone();
@@ -165,7 +148,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to get the requested test scores.');
-            },
+            }
         );
 
     }
@@ -245,7 +228,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the test score.');
-            },
+            }
         );
     };
 
@@ -256,7 +239,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to delete the test score.');
-            },
+            }
         );
     };
 
@@ -282,7 +265,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
             },
             function error(response) {
 
-            },
+            }
         );
     };
 

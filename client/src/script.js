@@ -23,9 +23,142 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
 
     $routeProvider
 
+        // login and password related routes
         .when('/login', {
             templateUrl: 'html/login.html',
             controller: 'loginController',
+        })
+
+        .when('/password/reset', {
+            templateUrl: 'html/passwordReset.html',
+            controller: 'passwordResetController',
+        })
+
+        .when('/password/reset/confirm/:id/:token', {
+            templateUrl: 'html/passwordResetConfirm.html',
+            controller: 'passwordResetConfirmController',
+        })
+
+        .when('/reports', {
+            redirectTo: '/reports/tests',
+        })
+
+        // route tests query page
+        .when('/reports/tests', {
+            templateUrl: 'html/tests.html',
+            controller: 'testsController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+                tests: function(testService) {
+                    return testService.getTests();
+                },
+                students: function (studentService) {
+                    return studentService.getStudents();
+                },
+            },
+        })
+
+        // route for the service page
+        .when('/reports/services', {
+            templateUrl: 'html/services.html',
+            controller: 'servicesController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
+        })
+
+        // mass entry related routes
+        .when('/input', {
+            redirectTo: '/input/behavior',
+        })
+
+        .when('/input/behavior', {
+            templateUrl: 'html/inputBehavior.html',
+            controller: 'inputBehaviorController',
+            resolve: {
+                studentData: function($q, $rootScope, userService, serviceService) {
+                    var deferred = $q.defer();
+                    userService.authVerify().then(
+                        function success() {
+                            var config = {
+                                filter: [{ name: 'type', val: $rootScope.serviceNameToType['Behavior'], }, ],
+                                include: ['student.*'],
+                            };
+
+                            // only get students I case manage if I'm not an admin
+                            if(!userService.user.isSuperUser) {
+                                config.filter.push({ name: 'student.case_manager', val: userService.user.id, });
+                            }
+
+                            serviceService.getServices(config).then(
+                                function success(data) {
+                                    deferred.resolve(data);
+                                },
+                                function error(response) {
+                                    deferred.reject(response);
+                                }
+                            );
+                        },
+                        function error(response) {
+                            deferred.reject(response);
+                        }
+                    );
+                    return deferred.promise;
+                },
+                terms: function(termService) {
+                    return termService.getTerms();
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
+        })
+
+        .when('/input/tests', {
+            templateUrl: 'html/inputTests.html',
+            controller: 'inputTestsController',
+            resolve: {
+                students: function(studentService) {
+                    return studentService.getStudents();
+                },
+                enrollmentData: function ($q, userService, enrollmentService) {
+                    //TODO(gzuber): I don't like this in script.js...
+                    var deferred = $q.defer();
+                    userService.authVerify().then(
+                        function success() {
+                            var config = {
+                                filter: [{ name: 'section.teacher', val: userService.user.id, }, ],
+                                include: ['section.*', ],
+                            };
+                            enrollmentService.getStudentEnrollments(config).then(
+                                function success(data) {
+                                    deferred.resolve(data);
+                                },
+                                function error(response) {
+                                    deferred.reject(response);
+                                }
+                            );
+                        },
+                        function error(response) {
+                            deferred.reject(response);
+                        }
+                    );
+                    return deferred.promise;
+                },
+                tests: function(testService) {
+                    return testService.getTests();
+                },
+                terms: function(termService) {
+                    return termService.getTerms();
+                },
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
         })
 
         .when('/manage', {
@@ -37,11 +170,14 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/manageStudents.html',
             controller: 'manageStudentsController',
             resolve: {
+                auth: function (userService) {
+                    return userService.authVerify(true);
+                },
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
-                auth: function (userService) {
-                    return userService.authVerify();
+                schools: function(schoolService) {
+                    return schoolService.getSchools();
                 },
             }
         })
@@ -51,11 +187,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/manageTeachers.html',
             controller: 'manageTeachersController',
             resolve: {
+                auth: function (userService) {
+                    return userService.authVerify(true);
+                },
                 userData: function(userService) {
                     return userService.getUsers();
-                },
-                auth: function (userService) {
-                    return userService.authVerify();
                 },
                 termsInfo: function(termService) {
                     return termService.getTerms({
@@ -70,14 +206,14 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/manageCases.html',
             controller: 'manageCasesController',
             resolve: {
+                auth: function (userService) {
+                    return userService.authVerify(true);
+                },
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
                 userData: function(userService) {
                     return userService.getUsers();
-                },
-                auth: function (userService) {
-                    return userService.authVerify();
                 },
             }
         })
@@ -87,6 +223,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             templateUrl: 'html/manageClasses.html',
             controller: 'manageClassesController',
             resolve: {
+                auth: function(userService) {
+                    return userService.authVerify(true);
+                },
                 students: function (studentService) {
                     return studentService.getStudents();
                 },
@@ -95,9 +234,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 sections: function (sectionService) {
                     return sectionService.getSections();
-                },
-                auth: function(userService) {
-                    return userService.authVerify();
                 },
                 termsInfo: function(termService) {
                     return termService.getTerms({
@@ -129,7 +265,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             controller: 'schoolSettingsController',
             resolve: {
                 auth: function(userService) {
-                    return userService.authVerify();
+                    return userService.authVerify(true);
                 },
                 holidays: function(holidayService) {
                     return holidayService.getHolidays();
@@ -200,7 +336,13 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             controller: 'profileStudentsController',
             controllerAs: 'control',
             resolve: {
-                data: function ($q, userService, enrollmentService, studentService) {
+                students: function(studentService) {
+                    return studentService.getStudents();
+                },
+                terms: function(termService) {
+                    return termService.getTerms();
+                },
+                data: function($q, userService, enrollmentService, studentService) {
                     //TODO(gzuber): I don't like this in script.js...
                     var deferred = $q.defer();
                     userService.authVerify().then(
@@ -208,13 +350,13 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                             var deferreds = [];
 
                             var enrollmentConfig = {
-                                filter: [ { name: 'section.teacher.pk', val: userService.user.id, }, ],
+                                filter: [{ name: 'section.teacher.pk', val: userService.user.id, }, ],
                                 include: ['student.*', 'section.*', ],
                             };
                             deferreds.push(enrollmentService.getStudentEnrollments(enrollmentConfig));
 
                             var studentConfig = {
-                                filter: [ { name: 'case_manager', val: userService.user.id, }, ],
+                                filter: [{ name: 'case_manager', val: userService.user.id, }, ],
                             };
                             deferreds.push(studentService.getStudents(studentConfig));
 
@@ -228,22 +370,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                         },
                         function error(response) {
                             deferred.reject(response);
-                        },
+                        }
                     );
                     return deferred.promise;
                 },
             }
-        })
-
-        // route for the input scores page
-        .when('/input', {
-            templateUrl: 'html/scoresInput.html',
-            controller: 'scoresInputController',
-            resolve: {
-                auth: function(userService) {
-                    return userService.authVerify();
-                },
-            },
         })
 
         // route for the input scores page
@@ -263,12 +394,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                                 },
                                 function error(response) {
                                     deferred.reject(response);
-                                },
+                                }
                             );
                         },
                         function error(response) {
                             deferred.reject(response);
-                        },
+                        }
                     );
                     return deferred.promise;
                 },
@@ -299,6 +430,12 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 studentData: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
+                },
+                parentContactData: function(studentService, $route) {
+                    return studentService.getParentContactInfoForStudent($route.current.params.id);
+                },
+                school: function(schoolService) {
+                    return schoolService.getSchools();
                 },
                 auth: function(userService) {
                     return userService.authVerify();
@@ -345,6 +482,11 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 },
                 student: function(studentService, $route) {
                     return studentService.getStudent($route.current.params.id);
+                },
+                service: function(studentService, $rootScope, $route) {
+                    return studentService.getServicesForStudent($route.current.params.id, {
+                        filter: [{ name: 'type', val: $rootScope.serviceNameToType['Behavior'], }],
+                    });
                 },
                 auth: function(userService) {
                     return userService.authVerify();
@@ -429,7 +571,17 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 auth: function(userService) {
                     return userService.authVerify();
                 },
-            }
+            },
+        })
+
+        .when('/feedback', {
+            templateUrl: 'html/feedback.html',
+            controller: 'feedbackController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
         })
 
         .otherwise({ redirectTo: '/profile/focus' });
@@ -461,8 +613,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     /**
      * Set listener for route change errors (user is not auth-ed)
      */
-    $rootScope.$on('$routeChangeError', function(event, next, current) {
-        console.log(userService.user);
+    $rootScope.$on('$routeChangeError', function(event, next, current, rejection) {
         // log out the user
         userService.logout();
 
@@ -470,6 +621,27 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
         $location.path('/login').replace();
 
         // notify user
+        if(rejection !== null && rejection !== undefined && rejection.data !== null && rejection.data !== undefined) {
+            if(rejection.data.message !== null && rejection.data.message !== undefined) {
+                // tried to access admin priviledged page
+                if(rejection.status === 200 && rejection.data.message === 'Token valid') {
+                    toastService.error('You are not authorized to view that page.');
+                    return;
+                }
+            }
+            if(rejection.data.detail !== null && rejection.data.detail !== undefined) {
+                // went to sprout for the first time
+                if(rejection.data.detail === "Authentication credentials were not provided.") {
+                    return;
+                }
+                // token expired
+                if(rejection.data.detail === "Signature has expired.") {
+                    toastService.info('Your session has timed out. Please log in again.');
+                    return;
+                }
+            }
+        }
+        // catch-all
         toastService.error('There was an error with the server. Please log back in.');
     });
 
@@ -501,6 +673,44 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     // set chartjs default colors
     Chart.defaults.global.colors = _.map($rootScope.colors, function(elem) { return elem.toHexString(); });
 
+    /*** GLOBAL ENUM RELATED SETUP ***/
+    $rootScope.serviceTypeToName = {
+        '0': 'Behavior',
+        '1': 'Psych',
+        '2': 'Speech Therapy',
+        '3': 'Occupational Therapy',
+        '4': 'Physical Therapy',
+        '5': 'Adaptive PE',
+        '6': 'Transportation',
+        '7': 'ESY',
+        '8': 'Personal Health Care',
+        '9': 'Audiological',
+        '10': 'Vision',
+        '11': 'Math',
+        '12': 'Reading',
+        '13': 'Writing',
+        '14': 'Academic Support',
+        '15': 'Transition',
+    };
+
+    $rootScope.serviceNameToType = {
+        'Behavior': '0',
+        'Psych': '1',
+        'Speech Therapy': '2',
+        'Occupational Therapy': '3',
+        'Physical Therapy': '4',
+        'Adaptive PE': '5',
+        'Transportation': '6',
+        'ESY': '7',
+        'Personal Health Care': '8',
+        'Audiological': '9',
+        'Vision': '10',
+        'Math': '11',
+        'Reading': '12',
+        'Writing': '13',
+        'Academic Support': '14',
+        'Transition': '15',
+    };
 
     /*** STUDENT PICTURE RELATED SETUP ***/
 
@@ -540,7 +750,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                     function success(picture) {
                         $rootScope.currentStudent.id = next.params.id;
                         $rootScope.currentStudent.picture = picture;
-                    },
+                    }
                 );
             }
         }

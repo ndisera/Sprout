@@ -199,7 +199,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
-     * Add picture to student profile 
+     * Add picture to student profile
      * @param {number} studentId - ID of the student
      * @param {picture} picture - the picture object. ex: { 'file': 'base64_encoded_string', }
      * @return {promise} promise that will resolve with data or reject with response code.
@@ -219,7 +219,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
-     * Delete picture from student profile 
+     * Delete picture from student profile
      * @param {number} studentId - ID of the student
      * @param {picture} pictureId - the ID of the picture
      * @return {promise} promise that will resolve with data or reject with response code.
@@ -229,6 +229,87 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         $http({
             method: 'DELETE',
             url: 'https://' + $rootScope.backend + '/students/' + studentId + '/picture/' + pictureId,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Get a student's parent contact info
+     * @param {number} studentId - ID of the student
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with the base64 encoded image string OR null,
+     *                   or reject with response
+     */
+    function getParentContactInfoForStudent(studentId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/parent-contact-info' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Add parent contact info for student
+     * @param {number} studentId - ID of the student
+     * @param {ParentContactInfo} parentContactInfoObj - the parent contact info object
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function addParentContactInfoForStudent(studentId, parentContactInfoObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/parent-contact-info',
+            data: parentContactInfoObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Update parent contact info for student
+     * @param {number} studentId - ID of the student
+     * @param {number} parentContactInfoId - ID of the parent contact info entry
+     * @param {ParentContactInfo} parentContactInfoObj - the parent contact info object
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function updateParentContactInfoForStudent(studentId, parentContactInfoId, parentContactInfoObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/parent-contact-info/' + parentContactInfoId,
+            data: parentContactInfoObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Delete parent contact info for student
+     * @param {number} studentId - ID of the student
+     * @param {number} parentContactInfoId - ID of the parent contact info entry
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function deleteParentContactInfoForStudent(studentId, parentContactInfoId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/parent-contact-info/' + parentContactInfoId,
         }).then(function success(response) {
             deferred.resolve(response.data);
         }, function error(response) {
@@ -249,6 +330,106 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         $http({
             method: 'GET',
             url: 'https://' + $rootScope.backend + '/students/' + studentId + '/grades' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Get final grades for a specific student
+     * @param {number} studentId - ID of the student
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function getFinalGradesForStudent(studentId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/final-grades' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Get behavior notes for a specific student
+     * @param {number} studentId - ID of the student
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function getBehaviorNotesForStudent(studentId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/behavior-notes/' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Add an behavior note for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {behaviorNote} behaviorNoteObj - the behavior note object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function addBehaviorNoteForStudent(studentId, behaviorNoteObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/behavior-notes/',
+            data: behaviorNoteObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Update specific behavior note for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} behaviorNoteId - the behavior note's id.
+     * @param {service} behaviorNoteObj - the behavior note object.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function updateBehaviorNoteForStudent(studentId, behaviorNoteId, behaviorNoteObj) {
+        var deferred = $q.defer();
+        $http({
+            method: 'PUT',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/behavior-notes/' + behaviorNoteId,
+            data: behaviorNoteObj,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    }
+
+    /**
+     * Delete specific behavior note for a specific student
+     * @param {number} studentId - the student's id.
+     * @param {number} behaviorNoteId - the behavior note's id.
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    function deleteBehaviorNoteForStudent(studentId, behaviorNoteId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'DELETE',
+            url: 'https://' + $rootScope.backend + '/students/' + studentId + '/behavior-notes/' + behaviorNoteId,
         }).then(function success(response) {
             deferred.resolve(response.data);
         }, function error(response) {
@@ -640,6 +821,15 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
         addStudentPicture: addStudentPicture,
         deleteStudentPicture: deleteStudentPicture,
         getGradesForStudent: getGradesForStudent,
+        getParentContactInfoForStudent: getParentContactInfoForStudent,
+        addParentContactInfoForStudent: addParentContactInfoForStudent,
+        updateParentContactInfoForStudent: updateParentContactInfoForStudent,
+        deleteParentContactInfoForStudent: deleteParentContactInfoForStudent,
+        getFinalGradesForStudent: getFinalGradesForStudent,
+        getBehaviorNotesForStudent: getBehaviorNotesForStudent,
+        addBehaviorNoteForStudent: addBehaviorNoteForStudent,
+        updateBehaviorNoteForStudent: updateBehaviorNoteForStudent,
+        deleteBehaviorNoteForStudent: deleteBehaviorNoteForStudent,
         getServicesForStudent: getServicesForStudent,
         getServiceForStudent: getServiceForStudent,
         addServiceForStudent: addServiceForStudent,

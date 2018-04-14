@@ -1,0 +1,76 @@
+<div ng-include="'html/reportsTabs.html'"></div>
+<div class="row">
+    <div class="col-xs-12">
+        <button ng-click="downloadReport()" class="btn btn-primary pull-right focus-top-button" type="button">Download Report</button>
+    </div>
+</div>
+<div class="row voffset3">
+    <div class="col-sm-6 student-mobile-spacer">
+        <div class="select-full-width input-group">
+            <span class="input-group-addon">Service</span>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ng-class="{ 'disabled': selectedService === null, }">
+                    <span>{{ selectedService.name }} </span>
+                    <span class="caret"></span></button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li ng-repeat="entry in serviceOptions" ng-click="selectService(entry)" ng-class="{ 'active': entry.type === selectedService.type, }">
+                        <a>{{ entry.name }}  <span ng-if="entry.type === selectedService.type" class="glyphicon glyphicon-ok"></span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 student-mobile-spacer">
+        <div class="select-full-width input-group">
+            <span class="input-group-addon">Fulfillment</span>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ng-class="{ 'disabled': selectedFulType === null, }">
+                    <span>{{ selectedFulType.type }} </span>
+                    <span class="caret"></span></button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li ng-repeat="entry in fulTypes" ng-click="selectFulType(entry)" ng-class="{ 'active': entry.id === selectedFulType.id, }">
+                        <a>{{ entry.type }}  <span ng-if="entry.id === selectedFulType.id" class="glyphicon glyphicon-ok"></span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel-wrapper voffset4">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Students</h3>
+        </div>
+        <div class="panel-body">
+            <div class="alert alert-info no-bottom-margin" ng-show="results.length === 0">
+                <span><b>Info:</b> It looks like there aren't any students with
+                    <span ng-if="selectedFulType.id === 1">a</span>
+                    <span ng-if="selectedFulType.id === 2">a fulfilled</span>
+                    <span ng-if="selectedFulType.id === 3">an unfulfilled</span> service requirement of this type</span>
+            </div>
+            <div ng-hide="results.length === 0">
+                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="results" name="results" ng-model="resultsSearch">
+                </br>
+                <div class="table-responsive scrollableTableDiv table-select">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Student ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="student in results | filter:studentsFilter | orderBy:'last_name'" ng-click="viewStudent(student.id)">
+                                <td>{{ student.first_name }}</td>
+                                <td>{{ student.last_name }}</td>
+                                <td>{{ student.student_id }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-include="'html/bottomSpacer.html'"></div>

@@ -273,14 +273,24 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      * @param {response} response - response containing data and error message.
      */
     function setErrorMessage(response) {
-        $scope.errorMessage = [];
-        for (var property in response.data) {
-            if (response.data.hasOwnProperty(property)) {
-                for (var i = 0; i < response.data[property].length; i++) {
-                    $scope.errorMessage.push(response.data[property][i]);
-                }
-            }
-        }
-        $scope.errorMessage = $scope.errorMessage.join(" ");
+        $scope.errorMessage = response.data;
     }
+
+    /**
+     * Attempts to send a password reset link to email
+     * @param {boolean} passwordReset - true for reset, false for grant access
+     */
+    $scope.attemptPasswordReset = function (passwordReset) {
+        // use selected teacher's email
+        userService.resetPassword($scope.teacherV.email).then(
+            function success(response) {
+                var message = passwordReset ? "An email containing instructions to reset this teacher's password has been sent to "
+                : "An email to grant access to this teacher has been sent to ";
+                toastService.success(message + $scope.teacherV.email + ".");
+            }, function error(response) {
+                setErrorMessage(response);
+                toastService.error("There was an error trying to send an email to this teacher." + errorResponse());
+            }
+        );
+    };
 });

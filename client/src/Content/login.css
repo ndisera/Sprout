@@ -52,6 +52,10 @@
     text-align: left;
 }
 
+#login-top-label.password-confirm, #login-bottom-label.password-confirm {
+    min-width: 120px;
+}
+
 #login-top-input {
     border-bottom-width: 1px;
     box-shadow: inset 0 1px 0px rgba(0,0,0,.075);
@@ -74,6 +78,13 @@
     border-color: #CCC;
 }
 
+.login-link {
+    color: #eee;
+}
+
+.login-link:hover {
+    color: #eee;
+}
 
 .ng-fade {
   transition: opacity 0.25s linear;

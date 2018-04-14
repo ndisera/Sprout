@@ -112,6 +112,83 @@ app.factory("termService", function ($rootScope, $http, $q, queryService) {
                 deferred.reject(response);
             });
             return deferred.promise;
-        }
+        },
+
+        /**
+         * transform terms by making their dates moments
+         * and sort them so the most current is first
+         *
+         * @param {array[terms]} terms - list of terms
+         * @return {array[terms]} sorted list of transformed terms
+         */
+        transformAndSortTerms: function(terms) {
+            _.each(terms, function(elem) {
+                elem.start_date = moment(elem.start_date);
+                elem.end_date   = moment(elem.end_date);
+            });
+            // sort so most current first
+            return _.sortBy(terms, function(elem) { return -elem.start_date; });
+        },
+
+        /**
+         * get largest current term
+         *
+         * @param {array[terms]} terms - list of terms
+         * @return {term} largest (date range) current term, null if none current
+         */
+        getLargestCurrentTerm: function(terms) {
+            var selectedTerm = null;
+            _.each(terms, function(elem) {
+                var startDate = moment(elem.start_date);
+                var endDate = moment(elem.end_date);
+                if(moment() >= startDate && moment() <= endDate) {
+                    // I have found a candidate
+                    // but we want the biggest current term
+                    if(selectedTerm === null) {
+                        selectedTerm = elem;
+                    }
+                    else {
+                        var selectedStartDate = moment(selectedTerm.start_date);
+                        var selectedEndDate   = moment(selectedTerm.end_date);
+                        var candidateStartDate = moment(elem.start_date);
+                        var candidateEndDate   = moment(elem.end_date);
+                        // take the bigger one
+                        var curDelta = selectedEndDate - selectedStartDate;
+                        var newDelta = candidateEndDate - candidateStartDate;
+                        if(newDelta > curDelta) {
+                            selectedTerm = elem;
+                        }
+                    }
+                }
+            });
+            return selectedTerm;
+        },
+
+        /**
+         * returns a list of all current (active) terms based on today's date.
+         *
+         * @param {array[terms]} terms - list of terms
+         * @param {moment} date - optional date to use to determine current terms
+         * @return {array[terms]} transformed list of all current terms
+         */
+        getAllCurrentTerms: function(terms, date) {
+            var compareDate = moment();
+            if(date instanceof moment) {
+                compareDate = moment(date);
+            }
+
+            var currentTerms = [];
+            _.each(terms, function(elem) {
+                var startDate = moment(elem.start_date);
+                var endDate = moment(elem.end_date);
+                if(compareDate >= startDate && compareDate <= endDate) {
+                    // found one
+                    currentTerms.push(elem);
+                }
+            });
+            return currentTerms;
+        },
+
+
     };
 });

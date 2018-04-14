@@ -4,8 +4,8 @@
         <div class="select-full-width input-group">
             <span class="input-group-addon">Case Manager</span>
             <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle full-width" data-toggle="dropdown">
-                    {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret"></span>
+                <button type="button" class="btn btn-default dropdown-toggle full-width" data-toggle="dropdown" ng-disabled="!isSuperUser">
+                    {{ caseManager.first_name }} {{ caseManager.last_name }} <span class="caret" ng-show="isSuperUser"></span>
                 </button>
                 <ul class="dropdown-menu">
                     <li ng-repeat="entry in caseManagers" ng-click="selectCaseManager(entry)" ng-class="{ 'active': entry.pk === caseManager.pk, }">
@@ -30,8 +30,11 @@
                                     <p class="form-control-static" ng-if="!editing">{{ property.value }}</p>
                                 </div>
                                 <div ng-if="editing">
-                                    <input class="form-control" ng-if="editing && property.key !== 'birthdate'" type="text" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
-                                    <input class="form-control" ng-if="editing && property.key === 'birthdate'" type="text" date-time name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
+                                    <div ng-switch="property.key">
+                                        <input class="form-control" ng-switch-when="birthdate" type="text" date-time name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
+                                        <select class="form-control" ng-switch-when="grade_level" name="editStudentFormInput{{$index}}" ng-model="property.curValue" ng-options="x as x for x in gradeLevels track by x" required></select>
+                                        <input class="form-control" ng-switch-default type="text" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -49,8 +52,123 @@
                         </div>
                     </form>
                     <div class="btn-manipulate-row">
-                        <button class="btn btn-primary" ng-if="!editing" ng-click="toggleEdit(true)">
+                        <button class="btn btn-primary" ng-if="!editing && (isSuperUser || isCaseManager)" ng-click="toggleEdit(true)">
                             <span class="glyphicon glyphicon-pencil"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-wrapper voffset4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Parent Contact Info</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-info" role="alert" ng-show="parentContactInfo.length === 0 && !addingParentContactInfo">
+                        <span>
+                            <b>Tip:</b>
+                            It looks like this student doesn't have any parent contact info. 
+                            <span ng-if="(isSuperUser || isCaseManager)">You can add an entry by pressing the <span class="glyphicon glyphicon-plus"></span> button below.</span>
+                        </span>
+                    </div>
+                    <div class="panel panel-default student-overview-parent-panel" ng-repeat="entry in parentContactInfo">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <b>{{ entry.first_name }}</b> {{ entry.last_name }} <span ng-if="entry.relationship !== null && entry.relationship !== ''">({{ entry.relationship }})</span>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="parent-info" ng-show="!entry.editing">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <span><b>Phone:</b> {{ entry.phone }}</span><span class="fas fa-certificate" ng-if="entry.preferred_method_of_contact === 'Phone'"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <span><b>Email:</b> {{ entry.email }}</span><span class="fas fa-certificate" ng-if="entry.preferred_method_of_contact === 'Email'"></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <span><b>Preferred Time:</b> {{ entry.preferred_time }}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="btn-manipulate-row">
+                                        <button class="btn btn-primary" type="button" ng-if="!entry.editing && (isSuperUser || isCaseManager)" ng-click="toggleEditParentContactInfo(entry, true)">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <form class="form-horizontal" name="editParentContactInfo{{$index}}" ng-submit="saveParentContactInfo(entry)" ng-show="entry.editing">
+                                <div class="form-group" ng-repeat="property in parentContactInfoProperties">
+                                    <label class="control-label col-xs-12 col-sm-4">{{ property.title }}:</label>
+                                    <div class="col-sm-8">
+                                        <div ng-switch="property.type">
+                                            <input ng-switch-when="text" class="form-control" type="text" name="editParentContactInfoForm{{$index}}" ng-model="entry[property.key + '_temp']" ng-required="property.required"/>
+                                            <input ng-switch-when="email" class="form-control" type="email" name="editParentContactInfoForm{{$index}}" ng-model="entry[property.key + '_temp']" ng-required="property.required"/>
+                                            <select ng-switch-when="select" class="form-control" ng-model="entry[property.key + '_temp']" name="editParentContactInfoForm{{$index}}" ng-options="{{ property.options }}" ng-required="property.required">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group no-bottom-margin">
+                                    <div class="col-xs-12">
+                                        <div class="btn-manipulate-row">
+                                            <button class="btn btn-danger delete-left" type="button" ng-click="deleteParentContactInfo(entry)">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </button>
+                                            <button class="btn btn-success" type="submit" ng-disabled="editParentContactInfo{{$index}}.$invalid">
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            </button>
+                                            <button class="btn btn-default" type="button" ng-click="toggleEditParentContactInfo(entry, false)">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="panel-wrapper voffset4" ng-show="addingParentContactInfo">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Add New Contact Info</h3>
+                            </div>
+                            <div class="panel-body">
+                                <form class="form-horizontal" name="addParentContactInfoForm" ng-submit="addParentContactInfo(entry)">
+                                    <div class="form-group" ng-repeat="property in parentContactInfoProperties">
+                                        <label class="control-label col-xs-12 col-sm-4">{{ property.title }}:</label>
+                                        <div class="col-sm-8">
+                                            <div ng-switch="property.type">
+                                                <input ng-switch-when="text" class="form-control" type="text" name="addParentContactInfoForm{{$index}}" ng-model="newParentContactInfo[property.key]" ng-required="property.required">
+                                                <input ng-switch-when="email" class="form-control" type="text" name="addParentContactInfoForm{{$index}}" ng-model="newParentContactInfo[property.key]" ng-required="property.required">
+                                                <select ng-switch-when="select" class="form-control" ng-model="newParentContactInfo[property.key]" name="addParentContactInfoForm{{$index}}" ng-options="{{ property.options }}" ng-required="property.required"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group no-bottom-margin">
+                                        <div class="col-xs-12">
+                                            <div class="btn-manipulate-row">
+                                                <button class="btn btn-success" type="submit" ng-disabled="addParentContactInfoForm.$invalid">
+                                                    <span class="glyphicon glyphicon-ok"></span>
+                                                </button>
+                                                <button class="btn btn-default" type="button" ng-click="toggleAddParentContactInfo(false)">
+                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-manipulate-row student-overview-parent-spacer">
+                        <button class="btn btn-success" ng-if="!addingParentContactInfo && (isSuperUser || isCaseManager)" ng-click="toggleAddParentContactInfo(true)">
+                            <span class="glyphicon glyphicon-plus"></span>
                         </button>
                     </div>
                 </div>
@@ -79,7 +197,7 @@
                         <span><b>Info:</b> It looks like this school doesn't have any terms yet. Speak to your admin to add one.</span>
                     </div>
                     <div class="alert alert-info no-bottom-margin voffset3" ng-if="terms.length > 0 && termSections.length === 0">
-                        <span><b>Info:</b> It looks like this student isn't enrolled in any classes for this term.</span>
+                        <span><b>Info:</b> It looks like this student either isn't enrolled in any classes for this term, or you aren't one of this student's teachers for this term.</span>
                     </div>
                     <div class="table-responsive voffset3" ng-show="terms.length > 0 && termSections.length > 0">
                         <table ng-if="sections.length > 0" class="table">
@@ -91,7 +209,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="section in sections | filter:{ term: selectedTerm.id, }">
+                                <tr ng-repeat="section in termSections">
                                     <td>{{ section.period }}</td>
                                     <td>{{ section.title }}</td>
                                     <td>{{ teachers[section.teacher].first_name }} {{ teachers[section.teacher].last_name }}</td>
@@ -102,7 +220,7 @@
                 </div>
             </div>
         </div>
-        <div class="panel-wrapper voffset3">
+        <div class="panel-wrapper voffset3" ng-if="isSuperUser || isCaseManager">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Student Photo</h3>

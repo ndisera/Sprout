@@ -60,6 +60,7 @@ class AttendanceGenerator():
                     date=str(datetime.datetime.combine(date, midnight)),
                     short_code=short_code,
                     description=description,
+                    id=None,
                 )
                 attendances.append(record)
 
