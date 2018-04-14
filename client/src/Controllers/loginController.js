@@ -71,6 +71,8 @@ app.controller('loginController', function ($scope, $rootScope, $location, userS
             return;
         }
 
+        $scope.email = $scope.email.toLowerCase();
+
         userService.login($scope.email, $scope.password).then(
             function success(response) {
                 $location.path('');

@@ -1036,3 +1036,26 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
     display: inline-block;
     overflow: hidden;
 }
+
+.progress {
+    margin-bottom: 0px;
+}
+
+.progress-bar {
+    background-color: #57bc90;
+}
+
+.progress-bar.failed {
+    background-color: #d9534f;
+}
+
+input[type="checkbox"].feedback-checkbox {
+    margin-top: 12px;
+}
+
+.feedback-textarea {
+    min-height: 80px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

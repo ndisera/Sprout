@@ -398,6 +398,7 @@ class SproutPasswordResetSerializer(PasswordResetSerializer):
 
         opts = {}
         opts['email_template_name'] = 'registration/sprout_password_reset_email.html'
+        opts['subject_template_name'] = 'registration/sprout_password_reset_email_subject.html'
         opts['domain_override'] = frontend_host
 
         return opts
@@ -576,3 +577,9 @@ class ServiceRequirementSerializer(DynamicModelSerializer):
                 raise serializers.ValidationError(errors)
 
         return data
+
+class FeedbackSerializer(DynamicModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = '__all__'
+    user = DynamicRelationField('SproutUserSerializer')

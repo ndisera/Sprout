@@ -35,6 +35,7 @@ router.register('standardized_test_scores', viewset=StandardizedTestScoreViewSet
 students_router = router.register('students', viewset=StudentViewSet, base_name='Students')
 router.register('terms', viewset=TermViewSet, base_name='terms')
 users_router = router.register('users', viewset=SproutUserViewSet, base_name="Users")
+router.register('feedback', viewset=FeedbackViewSet, base_name='Feedback')
 
 # Add nested route for assignments as /sections/{pk}/assignments
 assignments_router = sections_router.register('assignments', viewset=AssignmentViewSet, base_name='section-assignments', parents_query_lookups=['section'])

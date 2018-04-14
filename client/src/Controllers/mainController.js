@@ -96,6 +96,14 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             adminRequired: false,
         },
         {
+            title: "Feedback",
+            glyph: "comment",
+            href: "/feedback",
+            click: $scope.clearSearch,
+            badgeList: [],
+            adminRequired: false,
+        },
+        {
             title: "Logout",
             glyph: "log-out",
             href: "/login",
