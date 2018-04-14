@@ -5,6 +5,7 @@ import statsmodels.api as sm
 
 
 class CategoryCalculator():
+    # todo: wrap everything in a try catch. This code should NEVER error out
     """
     Everything necessary to calculate a focus student's Progress and Caution categories
 
@@ -52,9 +53,9 @@ class CategoryCalculator():
         # ex) test__2018-02-21__2018-02-28__1
 
         # https://stackoverflow.com/a/4143837/3518046
-        behavior_lists = {} # todo: split into separate behavior and effort, and remember that we want the average now
+        behavior_effort_lists = {} # todo: split into separate behavior and effort, and remember that we want the average now
         for behavior in self.behavior_efforts:
-            behavior_lists.setdefault(behavior.enrollment_id, []).append(behavior)
+            behavior_effort_lists.setdefault(behavior.enrollment_id, []).append(behavior)
 
         test_lists = {}
         for test in self.test_scores:
@@ -65,7 +66,7 @@ class CategoryCalculator():
         df_counter = 0
         df = pd.DataFrame()
 
-        # Tests
+        ### Tests
         for test_scores in test_lists.itervalues():  # Dict
             # set a mapping, so we can do a lookup later
             df_map[df_counter] = ('test', test_scores[0].standardized_test_id)
@@ -76,7 +77,7 @@ class CategoryCalculator():
             scores = [test_val.score for test_val in test_scores]
             test_series = pd.Series(data=scores, index=dates_index)
 
-            # union the two indexes together to 'merge' the lists
+            # union the two indexes together to 'merge/interweave' the lists
             new_df_indexes = df.index.union(dates_index)
 
             # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
@@ -85,32 +86,95 @@ class CategoryCalculator():
             df[df_counter] = test_series
             df_counter += 1
 
-        # Behaviors/efforts
-        for behaviors_efforts in behavior_lists.itervalues():
-            # Set a mapping
-            behavior_counter = df_counter
-            effort_counter = df_counter + 1
-            df_map[behavior_counter] = ('behavior', behaviors_efforts[0].enrollment_id)
-            df_map[effort_counter] = ('effort', behaviors_efforts[0].enrollment_id)
+        ### Behaviors/efforts
+
+        # Preprocess the data to take the average
+        behavior_df = pd.DataFrame()
+        effort_df = pd.DataFrame()
+        b_e_counter = 0
+
+        for behaviors_efforts in behavior_effort_lists.itervalues():
+            # for each thing in the list,
+            # check to see if that date is already in the series
+            # if not, add it
+            # if yes, take the average
 
             # extract the data
-            dates = [b_e_val.date for b_e_val in behaviors_efforts]
+            dates = [score.date for score in behaviors_efforts]
             dates_index = pd.Index(data=dates)
-            behaviors = [b_e_val.behavior for b_e_val in behaviors_efforts]
-            behavior_series = pd.Series(data=behaviors, index=dates_index)
-            efforts = [b_e_val.effort for b_e_val in behaviors_efforts]
-            effort_series = pd.Series(data=efforts, index=dates_index)
+            behaviors = [score.behavior for score in behaviors_efforts]
+            behaviors_series = pd.Series(data=behaviors, index=dates_index)
+            efforts = [score.effort for score in behaviors_efforts]
+            efforts_series = pd.Series(data=efforts, index=dates_index)
 
-            # union the two indexes together to 'merge' the lists
-            new_df_indexes = df.index.union(dates_index)
+            # union the two indexes together to 'merge/interweave' the lists
+            new_be_df_indexes = behavior_df.index.union(dates_index)
 
-            # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
-            df = df.reindex(index=new_df_indexes)
-            # put the data into our dataframe
-            df[behavior_counter] = behavior_series
-            df[effort_counter] = effort_series
+            # reindex our dataframes. Otherwise, the new data will be stuck in limbo and never considered
+            behavior_df = behavior_df.reindex(index=new_be_df_indexes)
+            effort_df = effort_df.reindex(index=new_be_df_indexes)
+            # put the data into our dataframes
+            behavior_df[b_e_counter] = behaviors_series
+            effort_df[b_e_counter] = efforts_series
+            b_e_counter += 1
 
-            df_counter += 2
+        # take the means
+        behavior_means = behavior_df.mean(axis=1)
+        effort_means = effort_df.mean(axis=1)
+
+        # add the means into the master dataframe
+        # union the two indexes together to 'merge/interweave' the lists
+        new_df_indexes = df.index.union(behavior_means.index).union(effort_means.index)
+
+        # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
+        df = df.reindex(index=new_df_indexes)
+        # put the data into our dataframe
+        df[df_counter] = behavior_means[0]
+        df_counter += 1
+        df[df_counter] = effort_means[0]
+        df_counter += 1
+
+
+            # for score in behaviors_efforts.itervalues():
+            #     current_date = score.date
+            #     current_behavior = score.behavior
+            #     current_effort = score.effort
+            #
+            #     # behavior preprocessing
+            #     if behavior_series.index.contains(current_date):
+            #         # average
+            #     else :
+            #         # insert
+            #         behavior_series.add()
+            #
+            #     # effort preprocessing
+
+        # todo: Remember that the behavior/effort score displayed on the focus page is the average of the scores
+        # for behaviors_efforts in behavior_effort_lists.itervalues():
+        #     # Set a mapping
+        #     behavior_counter = df_counter
+        #     effort_counter = df_counter + 1
+        #     df_map[behavior_counter] = ('behavior', behaviors_efforts[0].enrollment_id)
+        #     df_map[effort_counter] = ('effort', behaviors_efforts[0].enrollment_id)
+        #
+        #     # extract the data
+        #     dates = [b_e_val.date for b_e_val in behaviors_efforts]
+        #     dates_index = pd.Index(data=dates)
+        #     behaviors = [b_e_val.behavior for b_e_val in behaviors_efforts]
+        #     behavior_series = pd.Series(data=behaviors, index=dates_index)
+        #     efforts = [b_e_val.effort for b_e_val in behaviors_efforts]
+        #     effort_series = pd.Series(data=efforts, index=dates_index)
+        #
+        #     # union the two indexes together to 'merge' the lists
+        #     new_df_indexes = df.index.union(dates_index)
+        #
+        #     # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
+        #     df = df.reindex(index=new_df_indexes)
+        #     # put the data into our dataframe
+        #     df[behavior_counter] = behavior_series
+        #     df[effort_counter] = effort_series
+        #
+        #     df_counter += 2
 
         # Grades
 
@@ -132,6 +196,8 @@ class CategoryCalculator():
         # list of tuples containing (df column, start date, end date, r-squared value, and coefficient)
         results_dic = []
 
+        # todo: start from the present and work our way back. Stop when we see something that looks good enough
+        # todo: don't even consider something if the most recent dqatapoint is more than 2 weeks old
         for i in range(0, len(df.index), 3):  # Step size of 3 when shrinking data down
             for curr_dataset in df:
                 y = df[curr_dataset]  # todo: do each value individually and see if there's a difference
