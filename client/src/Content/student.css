@@ -424,7 +424,15 @@
 }
 
 .fc-unthemed td.fc-today {
-    background: #dbf0e7;
+    background: #d1ffda;
+}
+
+.fc-toolbar .fc-state-active, .fc-toolbar .ui-state-active {
+    z-index: 0;
+}
+
+.fc-list-item-time {
+    display: none;
 }
 
 .hidden-graph {

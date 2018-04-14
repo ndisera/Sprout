@@ -1,4 +1,4 @@
-app.controller("manageClassesController", function($scope, $rootScope, $location, toastService, students, userData, sections, studentService, sectionService, enrollmentService, termsInfo) {
+app.controller("manageClassesController", function($scope, $rootScope, $location, toastService, students, userData, sections, studentService, sectionService, enrollmentService, termsInfo, termService) {
     $scope.location = $location;
 
     // anywhere 's' or 't' was previously used for 'students' and 'teachers', 'c' will be used for 'classes'
@@ -20,6 +20,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.sectionD = {};
     $scope.newSection = {};
     $scope.sections = sections.sections;
+    var currentTerms = termService.getAllCurrentTerms(termsInfo.terms);
+    var currentTermsLookup = _.indexBy(currentTerms, 'id');
     // lookup needs to be based off of id not fullname
     $scope.students = _.indexBy(students.students, 'id');
     $scope.teachers = userData.sprout_users;
@@ -31,8 +33,20 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.editValidTeacher = false;
     $scope.editingAll = true;
     $scope.viewSectionTerm = {
-        name: "All Terms"
+        name: "All Current Terms"
     };
+
+    /**
+     * Refills currentSections.
+     */
+    function fillCurrentSections() {
+        $scope.currentSections = [];
+        _.each($scope.sections, function(elem) {
+            if (currentTermsLookup.hasOwnProperty(elem.term)) {
+                $scope.currentSections.push(elem);
+            }
+        });
+    }
 
     /**
      * Toggles the section edit
@@ -63,6 +77,8 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * @param {object} term - the term selected.
      */
     $scope.selectTerm = function(term) {
+        // proabably easiest to ng-if with sections and currentSections
+        // just update currentSections as well if I have to, don't think I need a lookup for it...
         $scope.viewSectionTerm = term;
     }
 
@@ -119,8 +135,6 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         }
     }
 
-    getDisplayPeriods();
-
     /**
      * Make sure teacher text is an actual teacher.
      * @param {string} task - the type of task selected.
@@ -128,26 +142,28 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
     $scope.checkValidTeacher = function(task, teacher) {
         switch (task) {
             case "add":
-                if($('#cteacher2 select.polyfilling').length === 0) {
+                if ($('#cteacher2 select.polyfilling').length === 0) {
                     if ($scope.addTeacher != null) {
                         $scope.addValidTeacher = _.has($scope.teachersLookup, $scope.addTeacher.toUpperCase());
                     }
-                }
-                else {
+                } else {
                     var pk = parseInt($('#cteacher2 select.polyfilling').find(':selected').attr('pk'));
-                    $scope.addValidTeacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }) !== null;
+                    $scope.addValidTeacher = _.find($scope.teachers, function(elem) {
+                        return elem.pk === pk;
+                    }) !== null;
                 }
                 break;
             case "edit":
                 $scope.cTeacher = teacher;
-                if($('#cteacher select.polyfilling').length === 0) {
+                if ($('#cteacher select.polyfilling').length === 0) {
                     if ($scope.cTeacher != null) {
                         $scope.editValidTeacher = _.has($scope.teachersLookup, $scope.cTeacher.toUpperCase());
                     }
-                }
-                else {
+                } else {
                     var pk = parseInt($('#cteacher select.polyfilling').find(':selected').attr('pk'));
-                    $scope.editValidTeacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }) !== null;
+                    $scope.editValidTeacher = _.find($scope.teachers, function(elem) {
+                        return elem.pk === pk;
+                    }) !== null;
                 }
                 break;
             default:
@@ -206,24 +222,24 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      * Updates the selected section with the newly edited field.
      */
     $scope.saveCEdit = function() {
-        if($('#cteacher select.polyfilling').length === 0) {
+        if ($('#cteacher select.polyfilling').length === 0) {
             if ($scope.cTeacher != null) {
                 $scope.sectionE.teacher = $scope.teachersLookup[$scope.cTeacher.toUpperCase()];
             } else {
                 $scope.sectionE.teacher = null;
             }
-        }
-        else {
+        } else {
             var pk = parseInt($('#cteacher select.polyfilling').find(':selected').attr('pk'));
-            $scope.sectionE.teacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }).pk;
+            $scope.sectionE.teacher = _.find($scope.teachers, function(elem) {
+                return elem.pk === pk;
+            }).pk;
         }
 
         $scope.sectionE.term = $scope.cTerm.id;
         // added to prevent error in console
-        if($scope.cPeriod !== null && $scope.cPeriod !== undefined) {
+        if ($scope.cPeriod !== null && $scope.cPeriod !== undefined) {
             $scope.sectionE.schedule_position = $scope.cPeriod.period;
-        }
-        else {
+        } else {
             $scope.sectionE.schedule_position = null;
         }
         // save with sectionE
@@ -246,6 +262,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     $scope.sectionsLookup[upper] = Object.assign({}, $scope.sectionE);
                 }
             }
+            fillCurrentSections();
             // do I actually have to do this?
             $scope.cPeriod = $scope.periodArraysLookup[$scope.termsLookup[$scope.sectionE.term].id][$scope.sectionE.schedule_position - 1];
             //$scope.cTeacher = $scope.teacherIdLookup[$scope.sectionV.teacher];
@@ -261,14 +278,15 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
      */
     $scope.addSection = function() {
 
-        if($('#cteacher2 select.polyfilling').length === 0) {
+        if ($('#cteacher2 select.polyfilling').length === 0) {
             if ($scope.addTeacher != null && $scope.addTeacher !== "") {
                 $scope.newSection.teacher = $scope.teachersLookup[$scope.addTeacher.toUpperCase()];
             }
-        }
-        else {
+        } else {
             var pk = parseInt($('#cteacher2 select.polyfilling').find(':selected').attr('pk'));
-            $scope.newSection.teacher = _.find($scope.teachers, function(elem) { return elem.pk === pk; }).pk;
+            $scope.newSection.teacher = _.find($scope.teachers, function(elem) {
+                return elem.pk === pk;
+            }).pk;
         }
 
         $scope.newSection.term = $scope.newSectionTerm.id;
@@ -286,6 +304,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
             $scope.sections.push(data.section);
             var lookupName = data.section.title;
             $scope.sectionsLookup[lookupName.toUpperCase()] = data.section;
+            fillCurrentSections();
             $scope.addSectionForm.$setPristine();
         }, function error(response) {
             setErrorMessage(response);
@@ -307,6 +326,7 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
                     delete $scope.sectionsLookup[upper];
                 }
             }
+            fillCurrentSections();
             var id = $scope.sectionD.id;
             $scope.sectionD = {};
             $scope.displaySectionInfo = false;
@@ -486,6 +506,10 @@ app.controller("manageClassesController", function($scope, $rootScope, $location
         }
         return false;
     }
+
+    // initialization
+    fillCurrentSections();
+    getDisplayPeriods();
 });
 
 // orderby for class roster students

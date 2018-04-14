@@ -1,12 +1,10 @@
 <div ng-include="'html/reportsTabs.html'"></div>
 <div class="row">
     <div class="col-xs-12">
-        <button ng-click="downloadReport()" class="btn btn-primary pull-right focus-top-button" type="button">Download Report</button>
-    </div>
-</div>
-<div class="row voffset3">
-    <div class="col-sm-6 student-mobile-spacer">
-        <div class="select-full-width input-group">
+        <div id="student-ieps-select-manipulate">
+            <button type="button" ng-disabled="students.length === 0" ng-click="downloadReport()" class="btn btn-primary">Download Report</button>
+        </div>
+        <div id="test-select" class="select-full-width input-group">
             <span class="input-group-addon">Service</span>
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ng-class="{ 'disabled': selectedService === null, }">
@@ -20,36 +18,18 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-6 student-mobile-spacer">
-        <div class="select-full-width input-group">
-            <span class="input-group-addon">Fulfillment</span>
-            <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ng-class="{ 'disabled': selectedFulType === null, }">
-                    <span>{{ selectedFulType.type }} </span>
-                    <span class="caret"></span></button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                    <li ng-repeat="entry in fulTypes" ng-click="selectFulType(entry)" ng-class="{ 'active': entry.id === selectedFulType.id, }">
-                        <a>{{ entry.type }}  <span ng-if="entry.id === selectedFulType.id" class="glyphicon glyphicon-ok"></span></a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
 </div>
-<div class="panel-wrapper voffset4">
+<div class="panel-wrapper voffset3">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">Students</h3>
+            <h3 class="panel-title">Fulfilled</h3>
         </div>
         <div class="panel-body">
-            <div class="alert alert-info no-bottom-margin" ng-show="results.length === 0">
-                <span><b>Info:</b> It looks like there aren't any students with
-                    <span ng-if="selectedFulType.id === 1">a</span>
-                    <span ng-if="selectedFulType.id === 2">a fulfilled</span>
-                    <span ng-if="selectedFulType.id === 3">an unfulfilled</span> service requirement of this type</span>
+            <div class="alert alert-info no-bottom-margin" ng-if="fulfilledStudents.length === 0">
+                <span><b>Info:</b> It looks like there aren't any students with a fulfilled service requirement of this type.</span>
             </div>
-            <div ng-hide="results.length === 0">
-                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="results" name="results" ng-model="resultsSearch">
+            <div ng-if="fulfilledStudents.length > 0">
+                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="fulfilled" name="fulfilled" ng-model="fulfilledSearch">
                 </br>
                 <div class="table-responsive scrollableTableDiv table-select">
                     <table class="table table-hover">
@@ -61,7 +41,41 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="student in results | filter:studentsFilter | orderBy:'last_name'" ng-click="viewStudent(student.id)">
+                            <tr ng-repeat="student in fulfilledStudents | filter:fulfilledFilter | orderBy:'last_name'" ng-click="viewStudent(student.id)">
+                                <td>{{ student.first_name }}</td>
+                                <td>{{ student.last_name }}</td>
+                                <td>{{ student.student_id }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel-wrapper voffset3">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Unfulfilled</h3>
+        </div>
+        <div class="panel-body">
+            <div class="alert alert-info no-bottom-margin" ng-if="unfulfilledStudents.length === 0">
+                <span><b>Info:</b> It looks like there aren't any students with an unfulfilled service requirement of this type.</span>
+            </div>
+            <div ng-if="unfulfilledStudents.length > 0">
+                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="unfulfilled" name="unfulfilled" ng-model="unfulfilledSearch">
+                </br>
+                <div class="table-responsive scrollableTableDiv table-select">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Student ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="student in unfulfilledStudents | filter:unfulfilledFilter | orderBy:'last_name'" ng-click="viewStudent(student.id)">
                                 <td>{{ student.first_name }}</td>
                                 <td>{{ student.last_name }}</td>
                                 <td>{{ student.student_id }}</td>

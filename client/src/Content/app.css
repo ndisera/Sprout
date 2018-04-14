@@ -30,6 +30,21 @@
     background-color: #57bc90;
 }
 
+.tooltip {
+    z-index: 1;
+}
+
+.tooltip.in {
+    opacity: 1;
+}
+
+.tooltip.top .tooltip-inner {
+    background-color: #0b3c5d;
+}
+.tooltip.top .tooltip-arrow {
+      border-top-color: #0b3c5d;
+}
+
 html, body {
     height: 100%;
     width: 100%;
