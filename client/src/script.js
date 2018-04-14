@@ -434,7 +434,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 parentContactData: function(studentService, $route) {
                     return studentService.getParentContactInfoForStudent($route.current.params.id);
                 },
-                schoolSettings: function(schoolService) {
+                school: function(schoolService) {
                     return schoolService.getSchools();
                 },
                 auth: function(userService) {

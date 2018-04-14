@@ -1,11 +1,11 @@
-app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, userService, studentService, termService, termData, enrollmentData, userData, studentData, parentContactData, schoolSettings) {
+app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, userService, studentService, termService, termData, enrollmentData, userData, studentData, parentContactData, school) {
     $scope.location = $location;
 
     // school settings should have 1 entry
     $scope.gradeLevels = [];
-    //var schoolSettings = null;
-    if(schoolSettings && schoolSettings.school_settings) {
-        schoolSettings = schoolSettings.school_settings[0];
+    var schoolSetting = null;
+    if(school && school.school_settings) {
+        schoolSettings = school.school_settings[0];
         for(var i = schoolSettings.grade_range_lower; i <= schoolSettings.grade_range_upper; ++i) {
             $scope.gradeLevels.push(i);
         }
