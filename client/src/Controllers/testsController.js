@@ -3,7 +3,7 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
 
     $scope.takenBy = [];
     $scope.notTakenBy = [];
-    $scope.tests = tests.standardized_tests;
+    $scope.tests = _.sortBy(tests.standardized_tests, 'test_name');
     $scope.students = students.students;
     $scope.studentsLookup = _.indexBy($scope.students, 'id');
 

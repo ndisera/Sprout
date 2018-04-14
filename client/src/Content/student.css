@@ -432,8 +432,11 @@
 }
 
 .fc-toolbar .fc-state-active, .fc-toolbar .ui-state-active {
-    /* to get rid of bug where button appears above notifications (if unthemed, not bootstrap3) */
-    z-index: 0 !important;
+    z-index: 0;
+}
+
+.fc-list-item-time {
+    display: none;
 }
 
 .hidden-graph {

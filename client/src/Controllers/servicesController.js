@@ -7,22 +7,11 @@ app.controller("servicesController", function($scope, $rootScope, $location, toa
             name: $rootScope.serviceTypeToName[key]
         });
     }
-    $scope.selectedService = $scope.serviceOptions[0];
 
-    $scope.fulTypes = [{
-            id: 1,
-            type: "Any"
-        },
-        {
-            id: 2,
-            type: "Fulfilled"
-        },
-        {
-            id: 3,
-            type: "Unfulfilled"
-        }
-    ];
-    $scope.selectedFulType = $scope.fulTypes[0];
+    // sort it
+    $scope.serviceOptions = _.sortBy($scope.serviceOptions, 'name');
+
+    $scope.selectedService = $scope.serviceOptions[3];
 
     /**
      * Sets service and updates the results
