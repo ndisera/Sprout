@@ -58,6 +58,7 @@
                                     chart-series="test.graph.series"
                                     chart-labels="test.graph.labels"
                                     chart-options="test.graph.options"
+                                    chart-dataset-override="test.graph.datasetOverride"
                                     chart-colors="test.graph.colors">
                             </canvas>
                         </div>
@@ -97,7 +98,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="editable-row" ng-repeat="score in test.scores" ng-click="toggleEditScore(score, true)">
+                                        <tr class="editable-row" ng-repeat="score in test.scores" ng-click="toggleEditScore(score, true)" ng-class="{ 'achieved': score.score >= test.proficient_score, }">
                                             <td class="student-tiny-col" ng-show="!score.editing">{{ score.date.format('YYYY-MM-DD') }}</td>
                                             <td ng-show="!score.editing">{{ score.score }}</td>
                                             <td class="student-min-col vertical-align-mid" ng-show="!score.editing">

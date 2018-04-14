@@ -662,8 +662,8 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     $rootScope.colors = [
         tinycolor('#57bc90'), // green
         tinycolor('#5ab9ea'), // light blue
-        tinycolor('#0b3c5d'), // prussian blue
         tinycolor('#8860d0'), // purple
+        tinycolor('#0b3c5d'), // prussian blue
         tinycolor('#963484'), // purple red
         tinycolor('#d9b310'), // gold leaf
         tinycolor('#ff3b3f'), // watermelon

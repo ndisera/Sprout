@@ -41,13 +41,15 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
         elem.editing = false;
         resetNewScore(elem);
 
-        var borderColor = $rootScope.colors[(elem.id - 1) % $rootScope.colors.length].setAlpha(0.7).toRgbString();
-        var backgroundColor = $rootScope.colors[(elem.id - 1) % $rootScope.colors.length].setAlpha(0.2).toRgbString();
-        var pointBackgroundColor = $rootScope.colors[(elem.id - 1) % $rootScope.colors.length].setAlpha(0.7).toRgbString();
+        var colorIndex = ((elem.id - 1) % ($rootScope.colors.length - 1)) + 1;
+
+        var borderColor = tinycolor($rootScope.colors[colorIndex]).clone().setAlpha(0.7).toRgbString();
+        var backgroundColor = tinycolor($rootScope.colors[colorIndex]).clone().setAlpha(0.2).toRgbString();
+        var pointBackgroundColor = tinycolor($rootScope.colors[colorIndex]).clone().setAlpha(0.7).toRgbString();
         elem.graph = {
             data: [],
             labels: [],
-            series: [ elem.test_name, ],
+            series: [ elem.test_name, 'Proficient', ],
             options: {
                 elements: {
                     line: {
@@ -78,11 +80,24 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
                     display: false
                 },
             },
+            datasetOverride: [
+                {
+                },
+                {
+                    fill: false,
+                    borderDash: [ 10, 5, ],
+                },
+            ],
             colors: [
                 {
                     borderColor: borderColor,
                     pointBackgroundColor: pointBackgroundColor,
                     backgroundColor: backgroundColor,
+                },
+                {
+                    borderColor: tinycolor($rootScope.colors[0]).clone().setAlpha(1).toRgbString(),
+                    pointBackgroundColor: tinycolor($rootScope.colors[0]).clone().setAlpha(0.7).toRgbString(),
+                    backgroundColor: tinycolor($rootScope.colors[0]).clone().setAlpha(0.2).toRgbString(),
                 },
             ],
         };
@@ -108,43 +123,11 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
 
                 // prepare scores
                 _.each(test.scores, function(elem) {
-                    elem.editing = false;
                     elem.date    = moment(elem.date);
                     resetScore(elem);
                 });
-                
-                var dateDiff = $scope.graphEndDate.diff($scope.graphStartDate, 'd');
 
-                test.graph.data   = [];
-                test.graph.labels = [];
-                test.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
-                test.graph.labels = _.times(dateDiff + 1, _.constant(null));
-
-                // iterate through each date, setting data as necessary
-                var iterDate = $scope.graphStartDate.clone();
-                var j = 0;
-                for(var i = 0; i < dateDiff + 1; i++) {
-                    test.graph.labels[i] = iterDate.format('MM/DD').toString();
-
-                    if(test.scores[j]) {
-                        var testDate = moment(test.scores[j].date);
-                        var average = 0;
-                        var count = 0;
-                        while(testDate.diff(iterDate, 'd') === 0) {
-                            average += test.scores[j].score;
-                            count++;
-
-                            j++;
-                            if(j >= test.scores.length) { break; }
-                            testDate = moment(test.scores[j].date);
-                        }
-                        if(count > 0) {
-                            // have to access at index '0' because of chartjs series
-                            test.graph.data[0][i] = average / count;
-                        }
-                    }
-                    iterDate.add(1, 'd');
-                }
+                buildGraph(test);
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to get the requested test scores.');
@@ -160,6 +143,52 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
         _.each($scope.tests, function(elem) {
             updateGraph(elem);
         });
+    }
+
+    function buildGraph(test) {
+        // make sure the scores are sorted by date
+        test.scores = _.sortBy(test.scores, function(elem) { return elem.date; });
+
+        var dateDiff = $scope.graphEndDate.diff($scope.graphStartDate, 'd');
+
+        test.graph.data   = [];
+        test.graph.labels = [];
+        test.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
+        test.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
+        test.graph.labels = _.times(dateDiff + 1, _.constant(null));
+
+        // iterate through each date, setting data as necessary
+        var iterDate = $scope.graphStartDate.clone();
+        var j = 0;
+        for(var i = 0; i < dateDiff + 1; i++) {
+            test.graph.labels[i] = iterDate.format('MM/DD').toString();
+
+            if(test.scores[j]) {
+                var testDate = moment(test.scores[j].date);
+                var average = 0;
+                var count = 0;
+                while(testDate.diff(iterDate, 'd') === 0) {
+                    average += test.scores[j].score;
+                    count++;
+
+                    j++;
+                    if(j >= test.scores.length) { break; }
+                    testDate = moment(test.scores[j].date);
+                }
+                if(count > 0) {
+                    // have to access at index '0' because of chartjs series
+                    test.graph.data[0][i] = average / count;
+                }
+            }
+            iterDate.add(1, 'd');
+        }
+
+        if(test.proficient_score) {
+            test.graph.data[1][0] = test.proficient_score;
+            test.graph.data[1][test.graph.data[1].length - 1] = test.proficient_score;
+            test.graph.options.legend.display = true;
+        }
+
     }
 
     function copyScore(score) {
@@ -182,6 +211,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     function resetScore(score) {
         score.date_temp  = score.date.clone();
         score.score_temp = score.score;
+        score.editing    = false;
     }
 
     $scope.toggleEditTest = function(test, value) {
@@ -217,6 +247,12 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     };
 
     $scope.saveScore = function(test, score) {
+        var found = _.findIndex(test.scores, function(elem) { return elem.date.format('YYYY-MM-DD').toString() === score.date_temp.format('YYYY-MM-DD').toString(); });
+        if(found > -1) {
+            toastService.error('A student can only have one score per day for a test.');
+            return;
+        }
+
         var newScore = copyScore(score);
 
         newScore.date  = score.date_temp.format('YYYY-MM-DD').toString();
@@ -224,7 +260,11 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
 
         testService.updateTestScore(score.id, newScore).then(
             function success(data) {
-                updateGraph(test);
+                score.date       = moment(newScore.date);
+                score.score      = newScore.score;
+                score.score_temp = newScore.score;
+                score.editing    = false;
+                buildGraph(test);
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the test score.');
@@ -235,7 +275,11 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     $scope.deleteScore = function(test, score) {
         testService.deleteTestScore(score.id).then(
             function success(data) {
-                updateGraph(test);
+                var index = _.findIndex(test.scores, function(elem) { return elem.id === score.id; });
+                if(index > -1) {
+                    test.scores.splice(index, 1);
+                }
+                buildGraph(test);
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to delete the test score.');
@@ -244,6 +288,12 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     };
 
     $scope.addScore = function(test) {
+        var found = _.findIndex(test.scores, function(elem) { return elem.date.format('YYYY-MM-DD').toString() === test.newScore.date.format('YYYY-MM-DD').toString(); });
+        if(found > -1) {
+            toastService.error('A student can only have one score per day for a test.');
+            return;
+        }
+
         var newScore = copyScore(test.newScore);
 
         newScore.date              = newScore.date.format('YYYY-MM-DD').toString();
@@ -253,7 +303,11 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
         testService.addTestScore(newScore).then(
             function success(data) {
                 if(test.newScore.date > $scope.graphStartDate && test.newScore.date < $scope.graphEndDate) {
-                    updateGraph(test);
+                    var score  = data.standardized_test_score;
+                    score.date = moment(score.date);
+                    resetScore(score);
+                    test.scores.push(score);
+                    buildGraph(test);
                 }
                 else {
                     toastService.success('Your test score was added successfully. In order to see it, change the date range to include ' + data.standardized_test_score.date + '.');
