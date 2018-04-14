@@ -158,38 +158,22 @@ class SproutUser(AbstractBaseUser):
         # Enrollments belonging to sections the user teaches
         teaches = Q(section__teacher=self)
 
-        # Get all valid terms
-        valid_terms = self.get_all_allowed_terms()
+        # Filter all terms which the user teaches a class
+        taught_terms = Term.objects.filter(section__teacher=self)
+
         # The teacher of another section in the same term in which the student is enrolled
         other_teacher = Q(pk__in=[])
-        for term in valid_terms:
-            term_sections = Section.objects.filter(term=term)
+        for term in taught_terms:
+            overlapping_terms = term.get_overlapping_terms()
+            # Get all sections from this term or its overlaps
+            term_sections = Section.objects.filter(term__in=overlapping_terms)
             # Get all the enrollments in any section from this term
             term_enrollments = Enrollment.objects.filter(section__in=term_sections)
             # Get all the students taught by this user this term
             term_taught_students = Student.objects.filter(enrollment__in=term_enrollments.filter(section__teacher=self))
             # Get all the enrollments of those students for this term
-            other_teacher = other_teacher | Q(student__in=term_taught_students, section__term=term)
+            other_teacher = other_teacher | Q(student__in=term_taught_students, section__term__in=overlapping_terms)
         return Enrollment.objects.filter(teaches | manages | other_teacher).distinct()
-
-    def get_all_allowed_terms(self):
-        """
-        Return a queryset of all terms this user should have access to data for
-
-        A user should be able to access:
-            - All terms in which they teach a class
-            - Any terms which overlap any other term in which they teach a class
-        """
-        if self.is_superuser:
-            return Term.objects.all()
-
-        # Filter all terms which the user teaches a class
-        taught_terms = Term.objects.filter(section__teacher=self)
-        # Additionally allow viewing terms with overlap with a taught term
-        overlapping_terms = Q(section__teacher=self) # Start with only taught terms
-        for term in taught_terms:
-            overlapping_terms = overlapping_terms | Q(end_date__range=[str(term.start_date), str(term.end_date)])
-        return Term.objects.filter(overlapping_terms).distinct()
 
 
 class ProfilePicture(models.Model):
@@ -400,6 +384,13 @@ class Term(AdminWriteMixin, models.Model):
         """
         notifications = Notification.objects.filter(date=self.end_date).delete()
         super(Term, self).delete(**kwargs)
+
+    def get_overlapping_terms(self):
+        """
+        Return a queryset of all terms which overlap with this one
+        """
+        overlapping_terms = Q(end_date__range=[str(self.start_date), str(self.end_date)]) | Q(start_date__range=[str(self.start_date), str(self.end_date)])
+        return Term.objects.filter(overlapping_terms).distinct()
 
 
 class Holiday(AdminWriteMixin, models.Model):
