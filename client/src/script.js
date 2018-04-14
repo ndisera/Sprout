@@ -571,7 +571,17 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 auth: function(userService) {
                     return userService.authVerify();
                 },
-            }
+            },
+        })
+
+        .when('/feedback', {
+            templateUrl: 'html/feedback.html',
+            controller: 'feedbackController',
+            resolve: {
+                auth: function(userService) {
+                    return userService.authVerify();
+                },
+            },
         })
 
         .otherwise({ redirectTo: '/profile/focus' });
