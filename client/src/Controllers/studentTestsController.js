@@ -49,7 +49,7 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
         elem.graph = {
             data: [],
             labels: [],
-            series: [ elem.test_name, 'Proficient', ],
+            series: [ elem.test_name, 'Proficiency', ],
             options: {
                 elements: {
                     line: {
