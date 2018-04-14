@@ -1,4 +1,4 @@
-app.controller("inputBehaviorController", function ($scope, $location, $q, toastService, termService, enrollmentService, behaviorService, studentService, studentData, terms) {
+app.controller("inputBehaviorController", function ($scope, $location, $q, $timeout, toastService, termService, enrollmentService, behaviorService, studentService, studentData, terms) {
     $scope.location = $location;
 
     $scope.behaviorDate = moment();
@@ -21,6 +21,10 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
 
     $scope.behaviorDateChange = function(varName, date) {
         $scope.behaviorDate = date;
+
+        if($scope.students.length === 0) {
+            return;
+        }
 
         currentTerms = termService.getAllCurrentTerms(terms, $scope.behaviorDate);
 
@@ -200,9 +204,7 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
          *     3. display appropriate error messages
          *         a. a toast if all succeeded
          *         b. a toast if all failed
-         *         c. two alerts with a comprehension list of what failed and what didn't if there's a mix
-         *
-         * None of this is necessary and should probably be deleted.
+         *         c. an alert with a comprehension list of what failed if only some failed
          */
 
         // promise to wait until everything is done
@@ -214,33 +216,47 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
         var commentsFailed    = [];
         var commentsSucceeded = [];
 
+        $scope.saving = true;
+        $scope.savingFailed = false;
+        var saveProgress = 0;
+        var saveProgressTotal = toPost.length + toPut.length + commentsToPost.length + commentsToPut.length;
+        $scope.saveProgressPercent = 0;
+
+        var updateSaveProgress = function(succeeded) {
+            saveProgress++;
+            $scope.saveProgressPercent = (saveProgress / saveProgressTotal) * 100;
+            if(!succeeded) { $scope.savingFailed = true; }
+        };
+
         // save records
-        if(toPost.length > 0) {
-            _.each(toPost, function(req) {
-                var deferred = $q.defer();
-                behaviorService.addBehavior(req).then(
-                    function success(data) {
-                        succeeded.push(req);
-                        deferred.resolve();
-                    },
-                    function error(response) {
-                        failed.push(req);
-                        deferred.resolve();
-                    }
-                );
-                promises.push(deferred.promise);
-            });
-        }
+        _.each(toPost, function(req) {
+            var deferred = $q.defer();
+            behaviorService.addBehavior(req).then(
+                function success(data) {
+                    succeeded.push(req);
+                    updateSaveProgress(true);
+                    deferred.resolve();
+                },
+                function error(response) {
+                    failed.push(req);
+                    updateSaveProgress(false);
+                    deferred.resolve();
+                }
+            );
+            promises.push(deferred.promise);
+        });
 
         _.each(toPut, function(req) { 
             var deferred = $q.defer();
             behaviorService.updateBehavior(req.id, req).then(
                 function success(data) {
                     succeeded.push(req);
+                    updateSaveProgress(true);
                     deferred.resolve();
                 },
                 function error(response) {
                     failed.push(req);
+                    updateSaveProgress(false);
                     deferred.resolve();
                 }
             );
@@ -253,10 +269,12 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
             studentService.updateBehaviorNoteForStudent(req.student, req.id, req).then(
                 function success(data) {
                     commentsSucceeded.push(req);
+                    updateSaveProgress(true);
                     deferred.resolve();
                 },
                 function error(response) {
                     commentsFailed.push(req);
+                    updateSaveProgress(false);
                     deferred.resolve();
                 }
             );
@@ -268,10 +286,12 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
             studentService.addBehaviorNoteForStudent(req.student, req).then(
                 function success(data) {
                     commentsSucceeded.push(req);
+                    updateSaveProgress(true);
                     deferred.resolve();
                 },
                 function error(response) {
                     commentsFailed.push(req);
+                    updateSaveProgress(false);
                     deferred.resolve();
                 }
             );
@@ -281,7 +301,8 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
         // wait for everything to finish
         $q.all(promises)
             .then(function(data) {
-                $scope.successString = null;
+                $timeout(function() { $scope.saving = false; }, 3000);
+
                 $scope.errorString   = null;
 
                 // everything failed
@@ -300,21 +321,6 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
                 }
 
                 // here's where it gets rough
-                
-                // go through successful records and bucket them by student
-                var successStudentBuckets = {};
-                _.each(succeeded, function(elem) {
-                    if(_.has(enrollmentsLookup, elem.enrollment)) {
-                        var studentId = enrollmentsLookup[elem.enrollment].student;
-                        if(!successStudentBuckets[studentId]) {
-                            successStudentBuckets[studentId] = {};
-                        }
-                        if(!successStudentBuckets[studentId].records) {
-                            successStudentBuckets[studentId].records = [];
-                        }
-                        successStudentBuckets[studentId].records.push(elem);
-                    }
-                });
 
                 // go through failed records and bucket them by student
                 var errorStudentBuckets = {};
@@ -331,18 +337,6 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
                     }
                 });
 
-                // go through successful comments and bucket them by student
-                _.each(commentsSucceeded, function(elem) {
-                    var studentId = elem.student;
-                    if(!successStudentBuckets[studentId]) {
-                        successStudentBuckets[studentId] = {};
-                    }
-                    if(!successStudentBuckets[studentId].comments) {
-                        successStudentBuckets[studentId].comments = [];
-                    }
-                    successStudentBuckets[studentId].comments.push(elem);
-                });
-
                 // go through failed comments and bucket them by student
                 _.each(commentsFailed, function(elem) {
                     var studentId = elem.student;
@@ -355,24 +349,10 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, toast
                     errorStudentBuckets[studentId].comments.push(elem);
                 });
 
-                // build a string telling the user, for each record/comment that succeeded...
+                // build a string telling the user, for each record/comment that failed...
                 // 1. the student the record belongs to
-                // 2. the comment succeeded
+                // 2. the comment failed 
                 // 3. the section the record belongs to
-                $scope.successString = 'The server was able to save the following records...\n';
-                _.each(_.keys(successStudentBuckets), function(elem) {
-                    var student = studentsLookup[elem];
-                    $scope.successString += '\n' + student.first_name + ' ' + student.last_name + ':\n';
-                    if(successStudentBuckets[elem].comments && successStudentBuckets[elem].comments.length > 0){
-                        $scope.successString += 'Behavior Comment.\n';
-                    }
-                    _.each(successStudentBuckets[elem].records, function(req) {
-                        var section = sectionsLookup[enrollmentsLookup[req.enrollment].section];
-                        $scope.successString += section.title + ' Record.\n';
-                    });
-                });
-
-                // build the same string but for failed
                 $scope.errorString = 'The server was unable to save the following records...\n';
                 _.each(_.keys(errorStudentBuckets), function(elem) {
                     var student = studentsLookup[elem];
