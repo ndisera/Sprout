@@ -1,4 +1,4 @@
-app.controller("inputTestsController", function ($scope, $location, $q, toastService, userService, termService, testService, studentService, students, enrollmentData, tests, terms) {
+app.controller("inputTestsController", function ($scope, $location, $q, $timeout, toastService, userService, termService, testService, studentService, students, enrollmentData, tests, terms) {
     $scope.location = $location;
 
     $scope.testDate = moment();
@@ -129,6 +129,11 @@ app.controller("inputTestsController", function ($scope, $location, $q, toastSer
                 student: elem.id,
             };
 
+            //TODO(gzuber): remove
+            if((Math.floor(Math.random() * 10) + 1) > 4) {
+                entry.date = '';
+            }
+
             if(elem.score_id !== null) {
                 entry.id = elem.score_id;
                 toPut.push(entry);
@@ -147,15 +152,29 @@ app.controller("inputTestsController", function ($scope, $location, $q, toastSer
         var succeeded = [];
         var failed    = [];
 
+        $scope.saving = true;
+        $scope.savingFailed = false;
+        var saveProgress = 0;
+        var saveProgressTotal = toPost.length + toPut.length;
+        $scope.saveProgressPercent = 0;
+
+        var updateSaveProgress = function(succeeded) {
+            saveProgress++;
+            $scope.saveProgressPercent = (saveProgress / saveProgressTotal) * 100;
+            if(!succeeded) { $scope.savingFailed = true; }
+        };
+
         _.each(toPost, function(elem) {
             var deferred = $q.defer();
             testService.addTestScore(elem).then(
                 function success(data) {
                     succeeded.push(elem);
+                    updateSaveProgress(true);
                     deferred.resolve();
                 },
                 function error(response) {
                     failed.push(elem);
+                    updateSaveProgress(false);
                     deferred.resolve();
                 }
             );
@@ -167,10 +186,12 @@ app.controller("inputTestsController", function ($scope, $location, $q, toastSer
             testService.updateTestScore(elem.id, elem).then(
                 function success(data) {
                     succeeded.push(elem);
+                    updateSaveProgress(true);
                     deferred.resolve();
                 },
                 function error(response) {
                     failed.push(elem);
+                    updateSaveProgress(false);
                     deferred.resolve();
                 }
             );
@@ -179,7 +200,8 @@ app.controller("inputTestsController", function ($scope, $location, $q, toastSer
 
         $q.all(promises)
             .then(function(data) {
-                $scope.successString = null;
+                $timeout(function() { $scope.saving = false; }, 3000);
+
                 $scope.errorString   = null;
 
                 // we failed everything
@@ -197,12 +219,6 @@ app.controller("inputTestsController", function ($scope, $location, $q, toastSer
                 }
 
                 // we have a mix...
-                $scope.successString = 'The server was able to save the following test scores...\n';
-                _.each(succeeded, function(elem) {
-                    var student = studentsLookup[elem.student];
-                    $scope.successString += student.first_name + ' ' + student.last_name + '\'s Test Score.\n';
-                });
-
                 $scope.errorString = 'The server was unable to save the following test scores...\n';
                 _.each(failed, function(elem) {
                     var student = studentsLookup[elem.student];
@@ -213,6 +229,10 @@ app.controller("inputTestsController", function ($scope, $location, $q, toastSer
 
     // reset all user changes to students. think of this as a hard reset
     function resetStudents(scores) {
+        if($scope.students.length === 0) {
+            return;
+        }
+
         _.each($scope.students, function(elem) {
             elem.score      = null;
             elem.score_temp = null;
@@ -258,7 +278,7 @@ app.controller("inputTestsController", function ($scope, $location, $q, toastSer
 
     if($scope.tests.length > 0) {
         $scope.selectedTest = $scope.tests[0];
+        $scope.testDateChange('', $scope.testDate);
+        $scope.selectGroup($scope.groups[0]);
     }
-    $scope.testDateChange('', $scope.testDate);
-    $scope.selectGroup($scope.groups[0]);
 });

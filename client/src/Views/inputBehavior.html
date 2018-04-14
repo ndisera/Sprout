@@ -22,13 +22,15 @@
             </button>
         </div>
     </div>
-    <div class="row voffset3" ng-show="successString !== null && errorString !== null">
-        <div class="col-xs-12 col-sm-6">
-            <div class="alert alert-success" role="alert">
-                <p class="input-behavior-msg">{{ successString }}</p>
+    <div class="row voffset3" ng-show="saving">
+        <div class="col-xs-12">
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ saveProgressPercent }}%;" ng-class="{ 'failed': savingFailed, }"></div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-6">
+    </div>
+    <div class="row voffset3" ng-show="errorString !== null">
+        <div class="col-xs-12">
             <div class="alert alert-danger" role="alert">
                 <p class="input-behavior-msg">{{ errorString }}</p>
             </div>
@@ -51,41 +53,47 @@
             <div class="panel-wrapper">
                 <div class="panel panel-default no-bottom-margin input-behavior">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><a ng-href="/student/{{ student.id }}">{{ student.first_name }} {{ student.last_name }} ({{ student.student_id }})</a></h3>
+                        <h3 class="panel-title"><a ng-href="/student/{{ student.id }}/behaviors">{{ student.first_name }} {{ student.last_name }} ({{ student.student_id }})</a></h3>
                     </div>
                     <div class="panel-body">
                         <div class="alert alert-info no-bottom-margin" ng-if="student.sections.length === 0">
                             <span><b>Info:</b> It looks like this student isn't enrolled in any classes for this date.</span>
                         </div>
-                        <table class="table table-responsive" ng-if="student.sections.length > 0">
-                            <thead>
-                                <tr>
-                                    <th>Class</th>
-                                    <th>Behavior</th>
-                                    <th>Effort</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="section in student.sections">
-                                    <td>{{ section.title }}</td>
-                                    <td class="input-behavior-col">
-                                        <select ng-model="section.behavior.behavior_temp" ng-options="x.value as x.display for x in inputOptions"></select>
-                                    </td>
-                                    <td class="input-behavior-col">
-                                        <select ng-model="section.behavior.effort_temp" ng-options="x.value as x.display for x in inputOptions"></select>
-                                    </td>
-                                </tr>
+                        <div class="table-responsive">
+                            <table class="table" ng-if="student.sections.length > 0">
+                                <thead>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Current Behavior</th>
+                                        <th>Behavior</th>
+                                        <th>Current Effort</th>
+                                        <th>Effort</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="section in student.sections">
+                                        <td>{{ section.title }}</td>
+                                        <td>{{ section.behavior.behavior }}</td>
+                                        <td>
+                                            <select ng-model="section.behavior.behavior_temp" ng-options="x.value as x.display for x in inputOptions"></select>
+                                        </td>
+                                        <td>{{ section.behavior.effort }}</td>
+                                        <td>
+                                            <select ng-model="section.behavior.effort_temp" ng-options="x.value as x.display for x in inputOptions"></select>
+                                        </td>
+                                    </tr>
 
-                            </tbody>
-                        </table>
-                        <div class="row voffset3">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row voffset3" ng-if="student.sections.length > 0">
                             <div class="col-xs-12">
                                 <div class="student-behaviors-comment-header input-behavior">
                                     <h4>Comment on Today's Behavior</h4>
                                 </div>
                             </div>
                         </div>
-                        <div class="row voffset3">
+                        <div class="row voffset3" ng-if="student.sections.length > 0">
                             <div class="col-xs-12">
                                 <textarea class="student-behaviors-comment-textarea input-behavior" ng-model="student.comment.body_temp"></textarea>
                             </div>

@@ -8,7 +8,16 @@
         </div>
     </div>
 </div>
-<div ng-if="students.length > 0">
+<div ng-if="tests.length === 0">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-info no-bottom-margin" role="alert">
+                <span><b>Tip:</b>It looks like your school doesn't have any standardized tests setup. Speak to your admin to add one.</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div ng-if="students.length > 0 && tests.length > 0">
     <div class="row">
         <div class="col-xs-12 col-sm-6">
             <div class="select-full-width input-group">
@@ -50,13 +59,15 @@
             </button>
         </div>
     </div>
-    <div class="row voffset3" ng-show="successString !== null && errorString !== null">
-        <div class="col-xs-12 col-sm-6">
-            <div class="alert alert-success" role="alert">
-                <p class="input-behavior-msg">{{ successString }}</p>
+    <div class="row voffset3" ng-show="saving">
+        <div class="col-xs-12">
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ saveProgressPercent }}%;" ng-class="{ 'failed': savingFailed, }"></div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-6">
+    </div>
+    <div class="row voffset3" ng-show="errorString !== null">
+        <div class="col-xs-12">
             <div class="alert alert-danger" role="alert">
                 <p class="input-behavior-msg">{{ errorString }}</p>
             </div>
@@ -79,29 +90,31 @@
                             <span>No Matching Students</span>
                         </div>
                         <form name="inputTestsForm">
-                            <table class="table table-responsive voffset3" ng-show="studentFilterResults.length > 0">
-                                <thead>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                        <th>Student ID</th>
-                                        <th>Current Score</th>
-                                        <th>New Score</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="student in ($parent.studentFilterResults = ( students | filter:studentFilter))">
-                                        <td ng-click="location.path('/student/' + student.id)" class="input-tests-table-link">{{ student.first_name}}</td>
-                                        <td>{{ student.last_name }}</td>
-                                        <td>{{ student.student_id }}</td>
-                                        <td>{{ student.score }}</td>
-                                        <td>
-                                            <input type="number" class="form-control" ng-model="student.score_temp" ng-min="selectedTest.min_score" ng-max="selectedTest.max_score"></input>
-                                        </td>
-                                    </tr>
+                            <div class="table-responsive voffset3" ng-show="studentFilterResults.length > 0">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Student ID</th>
+                                            <th>Current Score</th>
+                                            <th>New Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="student in ($parent.studentFilterResults = ( students | filter:studentFilter))">
+                                            <td ng-click="location.path('/student/' + student.id + '/tests')" class="input-tests-table-link">{{ student.first_name}}</td>
+                                            <td>{{ student.last_name }}</td>
+                                            <td>{{ student.student_id }}</td>
+                                            <td>{{ student.score }}</td>
+                                            <td>
+                                                <input type="number" class="form-control" ng-model="student.score_temp" ng-min="selectedTest.min_score" ng-max="selectedTest.max_score"></input>
+                                            </td>
+                                        </tr>
 
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </form>
                     </div>
                 </div>
