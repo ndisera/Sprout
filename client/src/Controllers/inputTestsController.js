@@ -129,11 +129,6 @@ app.controller("inputTestsController", function ($scope, $location, $q, $timeout
                 student: elem.id,
             };
 
-            //TODO(gzuber): remove
-            if((Math.floor(Math.random() * 10) + 1) > 4) {
-                entry.date = '';
-            }
-
             if(elem.score_id !== null) {
                 entry.id = elem.score_id;
                 toPut.push(entry);
