@@ -243,4 +243,9 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
         });
     });
 
+    // for report tables
+    jsPDF.autoTableSetDefaults({
+        headerStyles: {fillColor: [87, 188, 144]},
+    });
+
 });
