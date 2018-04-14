@@ -577,3 +577,9 @@ class ServiceRequirementSerializer(DynamicModelSerializer):
                 raise serializers.ValidationError(errors)
 
         return data
+
+class FeedbackSerializer(DynamicModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = '__all__'
+    user = DynamicRelationField('SproutUserSerializer')

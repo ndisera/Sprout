@@ -1349,3 +1349,46 @@ class ServiceRequirementViewSet(NestedDynamicViewSet):
             student_field,
             fulfilled_user_field,
         ])
+
+class FeedbackViewSet(NestedDynamicViewSet):
+    """
+    allows interaction with the set of "Feedback" instances
+
+    list:
+    gets all feedback.
+
+    create:
+    add feedback. requires a body
+
+    retrieve:
+    gets the feedback specified by the id path param.
+
+    update:
+    update the parameters of a recorded feedback
+
+    partial_update:
+    update the parameters of a recorded feedback specified by path param.
+    does not require all values.
+
+    delete:
+    delete a specified feedback specified by the path param.
+    """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = FeedbackSerializer
+    queryset = Feedback.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        Feedback should only be visible to superusers
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(FeedbackViewSet, self).get_queryset()
+        if not user.is_superuser:
+            return queryset.filter(user=user.pk)
+        return queryset
+
+    """ define custom schema for documentation """
+    schema = AutoSchema()
+
+

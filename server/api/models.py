@@ -761,3 +761,17 @@ class ServiceRequirement(models.Model):
 
     def __str__(self):
         return self.__repr__()
+
+class Feedback(models.Model):
+    """
+    Feedback 
+    Represents feedback from a user.
+    """
+    user = models.ForeignKey(SproutUser, null=True, on_delete=models.SET(get_sentinel_user),
+                                help_text="User who submitted the feedback")
+    created = models.DateTimeField(auto_now_add=True)
+    body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                             help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+    class Meta:
+        ordering = ('created',)
