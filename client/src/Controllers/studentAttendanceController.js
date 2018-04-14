@@ -39,7 +39,7 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
                 right: 'month,basicWeek,basicDay,listWeek'
             },
             editable: false,
-            themeSystem: 'bootstrap3',
+            // themeSystem: 'bootstrap3',
             eventRender: function(event, element) {
                 element.attr('data-toggle', 'tooltip');
                 element.attr('data-container','body');
@@ -47,7 +47,7 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
                 element.tooltip();
             },
             // does the little panel that doesn't work well the window size is smaller
-            //eventLimit: 2,
+            eventLimit: true,
         }
     };
 
@@ -114,14 +114,14 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
         _.each($scope.attendance, function(elem) {
             var className = $scope.sectionsLookup[$scope.enrollmentsLookup[elem.enrollment].section].title;
             var message = elem.description;
-            var color = $rootScope.colors[convertStringToNumber(elem.short_code) % ($rootScope.colors.length - 1)];
+            var color = $rootScope.calendarColors[convertStringToNumber(elem.short_code) % ($rootScope.calendarColors.length - 1)];
             var textColor = '#fff';
             var borderColor = tinycolor(color).clone().setAlpha(0.5).toRgbString();
             var backgroundColor = tinycolor(color).clone().setAlpha(1).toRgbString();
             $scope.events.push({
                 title: className + ": " + message,
                 start: moment(elem.date).format('YYYY-MM-DD').toString(),
-                //color: '#337ab7',
+                // color: '#337ab7',
                 textColor: textColor,
                 borderColor: borderColor,
                 backgroundColor: backgroundColor,
