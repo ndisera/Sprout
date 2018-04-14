@@ -193,7 +193,7 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 userData: function(userService) {
                     return userService.getUsers();
                 },
-                termsInfo: function(termService) {
+                termData: function(termService) {
                     return termService.getTerms({
                         include: ['settings.schedule.*']
                     });
