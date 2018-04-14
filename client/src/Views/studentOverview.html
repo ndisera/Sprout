@@ -30,8 +30,11 @@
                                     <p class="form-control-static" ng-if="!editing">{{ property.value }}</p>
                                 </div>
                                 <div ng-if="editing">
-                                    <input class="form-control" ng-if="editing && property.key !== 'birthdate'" type="text" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
-                                    <input class="form-control" ng-if="editing && property.key === 'birthdate'" type="text" date-time name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
+                                    <div ng-switch="property.key">
+                                        <input class="form-control" ng-switch-when="birthdate" type="text" date-time name="editStudentFormInput{{$index}}" ng-model="property.curValue" view="year" min-view="date" format="YYYY-MM-DD" required>
+                                        <select class="form-control" ng-switch-when="grade_level" name="editStudentFormInput{{$index}}" ng-model="property.curValue" ng-options="x as x for x in gradeLevels track by x" required></select>
+                                        <input class="form-control" ng-switch-default type="text" name="editStudentFormInput{{$index}}" ng-model="property.curValue" required>
+                                    </div>
                                 </div>
                             </div>
                         </div>
