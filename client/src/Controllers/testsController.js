@@ -22,7 +22,6 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
     $scope.downloadReport = function() {
         var currentDate = moment().format('YYYY-MM-DD').toString();
         var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
-        doc.addFont("Report-Font", "Report Font", 'normal');
         doc.setFont('Times', 'normal');
         var startDate = moment($scope.startDate).format('YYYY-MM-DD').toString();
         var endDate = moment($scope.endDate).format('YYYY-MM-DD').toString();
@@ -50,17 +49,11 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
         });
 
         doc.text(15 * scale, 54 * scale, "Taken:")
-        doc.autoTable(takenColumns, takenRows, {
-            startY: 58 * scale,
-            showHeader: 'firstPage',
-        });
+        doc.autoTable(takenColumns, takenRows, { startY: 58 * scale, showHeader: 'firstPage'});
         doc.setFont('Times', 'normal');
         let first = doc.autoTable.previous;
         doc.text(15 * scale, first.finalY + (12 * scale), "Not Taken:");
-        doc.autoTable(notTakenColumns, notTakenRows, {
-            startY: first.finalY + (16 * scale),
-            showHeader: 'firstPage',
-        });
+        doc.autoTable(notTakenColumns, notTakenRows, { startY: first.finalY + (16 * scale), showHeader: 'firstPage'});
         doc.save($scope.selectedTest.test_name + '_' + currentDate + '.pdf');
     };
 

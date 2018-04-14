@@ -30,11 +30,6 @@
     background-color: #57bc90;
 }
 
-@font-face {
-  font-family: "Report Font";
-  src: url("../fonts/sourcesanspro-light-webfont.woff");
-}
-
 html, body {
     height: 100%;
     width: 100%;

@@ -928,7 +928,6 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         var effortImgData = effortCanvas.toDataURL("image/jpeg", 1.0);
 
         var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
-        doc.addFont("Report-Font", "Report Font", 'normal');
         doc.setFont('Times', 'normal');
         var startDate = moment($scope.graphStartDate).format('YYYY-MM-DD').toString();
         var endDate = moment($scope.graphEndDate).format('YYYY-MM-DD').toString();

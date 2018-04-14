@@ -658,14 +658,14 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
     ];
 
     $rootScope.calendarColors = [
-        tinycolor('#337ab7'), // blue
+        tinycolor('#ffc67c'), // orange
         tinycolor('#5ab9ea'), // light blue
         tinycolor('#ff6d70'), // light red
         tinycolor('#a877ff'), // light purple
         tinycolor('#ff84e8'), // purple red
         tinycolor('#ede971'), // goldish
         tinycolor('#57bc90'), // green
-        tinycolor('#ffc67c'), // orange
+        tinycolor('#337ab7'), // blue
     ];
 
     // set chartjs default colors
