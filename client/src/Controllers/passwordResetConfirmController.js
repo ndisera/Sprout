@@ -90,6 +90,11 @@ app.controller('passwordResetConfirmController', function ($scope, $rootScope, $
 
                     _.each(_.keys(obj), function(key) {
                         if(_.has(response.data, key)) {
+                            // replace a bad error message with a more descriptive one
+                            var errorIdx = _.indexOf(response.data[key], 'This password is too common.');
+                            if(errorIdx > -1) {
+                                response.data[key][errorIdx] = 'Your password must be at least 8 characters long and contain at least one number or symbol.';
+                            }
                             errors.push(response.data[key]);
                         }
                     });
