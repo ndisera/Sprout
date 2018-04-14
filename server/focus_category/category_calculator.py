@@ -129,54 +129,14 @@ class CategoryCalculator():
         # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
         df = df.reindex(index=new_df_indexes)
         # put the data into our dataframe
+        df_map[df_counter] = ('behavior', 0)  # specific id of 0 because we're dealing with the average, not a class
         df[df_counter] = behavior_means[0]
         df_counter += 1
+        df_map[df_counter] = ('effort', 0)
         df[df_counter] = effort_means[0]
         df_counter += 1
 
-
-            # for score in behaviors_efforts.itervalues():
-            #     current_date = score.date
-            #     current_behavior = score.behavior
-            #     current_effort = score.effort
-            #
-            #     # behavior preprocessing
-            #     if behavior_series.index.contains(current_date):
-            #         # average
-            #     else :
-            #         # insert
-            #         behavior_series.add()
-            #
-            #     # effort preprocessing
-
-        # todo: Remember that the behavior/effort score displayed on the focus page is the average of the scores
-        # for behaviors_efforts in behavior_effort_lists.itervalues():
-        #     # Set a mapping
-        #     behavior_counter = df_counter
-        #     effort_counter = df_counter + 1
-        #     df_map[behavior_counter] = ('behavior', behaviors_efforts[0].enrollment_id)
-        #     df_map[effort_counter] = ('effort', behaviors_efforts[0].enrollment_id)
-        #
-        #     # extract the data
-        #     dates = [b_e_val.date for b_e_val in behaviors_efforts]
-        #     dates_index = pd.Index(data=dates)
-        #     behaviors = [b_e_val.behavior for b_e_val in behaviors_efforts]
-        #     behavior_series = pd.Series(data=behaviors, index=dates_index)
-        #     efforts = [b_e_val.effort for b_e_val in behaviors_efforts]
-        #     effort_series = pd.Series(data=efforts, index=dates_index)
-        #
-        #     # union the two indexes together to 'merge' the lists
-        #     new_df_indexes = df.index.union(dates_index)
-        #
-        #     # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
-        #     df = df.reindex(index=new_df_indexes)
-        #     # put the data into our dataframe
-        #     df[behavior_counter] = behavior_series
-        #     df[effort_counter] = effort_series
-        #
-        #     df_counter += 2
-
-        # Grades
+        ### Grades
 
         # Attendances, maybe not. It doesn't lend itself to a view of progress that meshes well with a graph
 
