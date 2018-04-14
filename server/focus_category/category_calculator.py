@@ -1,3 +1,4 @@
+import datetime
 import random
 import pandas as pd
 from sklearn import linear_model
@@ -53,13 +54,18 @@ class CategoryCalculator():
         # ex) test__2018-02-21__2018-02-28__1
 
         # https://stackoverflow.com/a/4143837/3518046
-        behavior_effort_lists = {} # todo: split into separate behavior and effort, and remember that we want the average now
+        behavior_effort_lists = {}
         for behavior in self.behavior_efforts:
             behavior_effort_lists.setdefault(behavior.enrollment_id, []).append(behavior)
 
         test_lists = {}
         for test in self.test_scores:
             test_lists.setdefault(test.standardized_test_id, []).append(test)
+
+        # grades are separated by class (section_id)
+        grades_lists = {}
+        for grade in self.grades:
+            grades_lists.setdefault(grade.assignment.section_id, []).append(grade)
 
         # Make a map from a dataframe column id to a behavior/test/effort category
         df_map = {}
@@ -137,6 +143,25 @@ class CategoryCalculator():
         df_counter += 1
 
         ### Grades
+        for grade_scores in grades_lists.itervalues():  # Dict
+            # set a mapping, so we can do a lookup later
+            df_map[df_counter] = ('grade', grade_scores[0].assignment.section_id)
+            # todo: implement this on the frontend
+
+            # extract the data
+            dates = [grade_val.handin_datetime for grade_val in grade_scores]
+            dates_index = pd.Index(data=dates)
+            scores = [grade_val.score for grade_val in grade_scores]
+            grade_series = pd.Series(data=scores, index=dates_index)
+
+            # union the two indexes together to 'merge/interweave' the lists
+            new_df_indexes = df.index.union(dates_index)
+
+            # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
+            df = df.reindex(index=new_df_indexes)
+            # put the data into our dataframe
+            df[df_counter] = grade_series
+            df_counter += 1
 
         # Attendances, maybe not. It doesn't lend itself to a view of progress that meshes well with a graph
 
@@ -150,14 +175,15 @@ class CategoryCalculator():
         #   of a particular test. We want to choose that test to display
         #   More intuitively, the y axis is the independent variable: score. The x axis is the dependent variable: time
 
-        X = map(lambda x: x.days, (df.index.values - df.index[0]))  # convert dates into days elapsed
+        # convert dates into days elapsed since today
+        X = map(lambda x: x.days, (df.index.values - datetime.datetime.now()))
         X = sm.add_constant(X)  # Add constant to allow fitting the y-intercept
 
         # list of tuples containing (df column, start date, end date, r-squared value, and coefficient)
         results_dic = []
 
         # todo: start from the present and work our way back. Stop when we see something that looks good enough
-        # todo: don't even consider something if the most recent dqatapoint is more than 2 weeks old
+        # todo: don't even consider something if the most recent datapoint is more than 2 weeks old
         for i in range(0, len(df.index), 3):  # Step size of 3 when shrinking data down
             for curr_dataset in df:
                 y = df[curr_dataset]  # todo: do each value individually and see if there's a difference
@@ -175,7 +201,7 @@ class CategoryCalculator():
 
         return display_category + '__' + str(display_start) + '__' + str(display_end) + '__' + str(display_id)
 
-
+        # todo: I'm keeping these around for reference, but delete these when everything is done
         if rand_val == 0:
             if test_len != 0:
                 return 'test__2018-01-01__2018-03-08__' + str(self.test_scores[test_len - 1].standardized_test_id)
@@ -226,11 +252,3 @@ class CategoryCalculator():
         """
         return focus
 
-    def filter_data_frame(self, begin_date, end_date, master_frame):
-        """
-        Constructs a data frame with the given data from the start date to the end date, inclusive
-        :param begin_date: the date to start the dataframe
-        :param end_date: the date to end the dataframe
-        :param master_frame: the dataframe containing all of the compiled information
-        :return: a pandas dataframe with only the requested date range
-        """
