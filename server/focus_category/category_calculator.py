@@ -149,7 +149,7 @@ class CategoryCalculator():
             # todo: implement this on the frontend
 
             # extract the data
-            dates = [grade_val.handin_datetime for grade_val in grade_scores]
+            dates = [grade_val.handin_datetime.date() for grade_val in grade_scores]
             dates_index = pd.Index(data=dates)
             scores = [grade_val.score for grade_val in grade_scores]
             grade_series = pd.Series(data=scores, index=dates_index)
@@ -176,7 +176,7 @@ class CategoryCalculator():
         #   More intuitively, the y axis is the independent variable: score. The x axis is the dependent variable: time
 
         # convert dates into days elapsed since today
-        X = map(lambda x: x.days, (df.index.values - datetime.datetime.now()))
+        X = map(lambda x: x.days, (df.index.values - datetime.datetime.now().date()))
         X = sm.add_constant(X)  # Add constant to allow fitting the y-intercept
 
         # list of tuples containing (df column, start date, end date, r-squared value, and coefficient)
