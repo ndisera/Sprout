@@ -26,6 +26,7 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
         var startDate = moment($scope.startDate).format('YYYY-MM-DD').toString();
         var endDate = moment($scope.endDate).format('YYYY-MM-DD').toString();
         var scale = 2.83465;
+        doc.addImage($rootScope.logoImgData, 'JPEG', 180 * scale, 15 * scale, 15 * scale, 15 * scale);
 
         doc.setFontSize(30);
         doc.text(15 * scale, 25 * scale, $scope.selectedTest.test_name + ' Report');

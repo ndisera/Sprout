@@ -69,6 +69,7 @@ app.controller("servicesController", function($scope, $rootScope, $location, toa
         var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
         doc.setFont('Times', 'normal');
         var scale = 2.83465;
+        doc.addImage($rootScope.logoImgData, 'JPEG', 180 * scale, 15 * scale, 15 * scale, 15 * scale);
 
         doc.setFontSize(30);
         doc.text(15 * scale, 25 * scale, $scope.selectedService.name + ' Service Report');

@@ -1,4 +1,4 @@
-app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, userService, behaviorService, studentService, data, terms, service, student) {
+app.controller("studentBehaviorsController", function($scope, $rootScope, $routeParams, $location, toastService, userService, behaviorService, studentService, data, terms, service, student) {
     $scope.location = $location;
 
     // I'm displaying all classes in the report dropdown, I need to display all classes that are valid for the chosen term
@@ -936,6 +936,8 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         var height = 90;
         var scale = 2.83465;
         var currentDate = moment().format('YYYY-MM-DD').toString();
+
+        doc.addImage($rootScope.logoImgData, 'JPEG', 180 * scale, 15 * scale, 15 * scale, 15 * scale);
 
         doc.setFontSize(30);
         doc.text(15 * scale, 25 * scale, 'Behavior and Effort Report');
