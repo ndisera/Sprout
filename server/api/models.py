@@ -6,12 +6,16 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 
 import api.constants as constants
 from api.mixins import AdminWriteMixin
 
 from grade_notification_calculator.calculator import GradeNotificationCalculator
 
+import datetime
 import os
 
 def get_sentinel_user():
@@ -272,6 +276,38 @@ class ParentContactInfo(models.Model):
                                   help_text="Preferred method of contact")
     preferred_time = models.CharField(blank=True, null=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                   help_text="Preferred time of day to contact")
+
+
+class Notification(models.Model):
+    """
+    Notification
+    Represent and store a notification which should be displayed to a User
+    """
+    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this notification")
+    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                            help_text="Longer description of this notification")
+    date = models.DateTimeField(blank=False,
+                                help_text="Date this notification is 'due'")
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE,
+                                help_text="Student to whom this notification refers")
+    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE,
+                             help_text="User who should be notified")
+    partial_link = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                help_text="Partial string of an API call, combined with student to create a URL from this notification")
+    unread = models.BooleanField(blank=False, default=True)
+    category = models.IntegerField(blank=False,
+                                   help_text="Machine-readable category of this notification. See api/constants.py")
+    # Give the notification a generic foreign key to any other model, so notifications can be based on anything
+    # Note that the foreign models must have a GenericRelation 'field' -- see Grade for an example
+    content_type = models.ForeignKey(ContentType, blank=True, null=True, on_delete=models.CASCADE,
+                                help_text="An external data model to which this notification relates, if relevant")
+    object_id = models.PositiveIntegerField(blank=True, null=True, )
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        # Do we want to enforce any uniqueness for notifications?
+        ordering = ('date', 'user',)
 
 
 class SchoolSettings(AdminWriteMixin, models.Model):
@@ -598,10 +634,13 @@ class Grade(models.Model):
                                 help_text="Student being graded")
     score = models.FloatField(blank=False, verbose_name="Assignment score")
     handin_datetime = models.DateTimeField(blank=False)
-    late = models.BooleanField(blank=False, help_text="Whether the assignment was late")
-    missing = models.BooleanField(blank=False, help_text="Whether the assignment is missing")
+    late = models.BooleanField(blank=False, default=False, help_text="Whether the assignment was late")
+    missing = models.BooleanField(blank=False, default=False, help_text="Whether the assignment is missing")
     grade = models.CharField(blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                 help_text="Letter grade received")
+
+    # Allow a generic relation to notifications so there can be a Notification related to this Grade
+    notifications = GenericRelation(Notification, content_type_field='content_type', object_id_field='object_id')
 
     class Meta:
         unique_together = (('assignment', 'student', 'handin_datetime'),)
@@ -622,6 +661,7 @@ class Grade(models.Model):
                                                  behavior_efforts=behavior_effors,
                                                  test_scores=test_scores)
         notifications = calculator.get_notifications(self)
+        super(Grade, self).save(**kwargs)
         for notification in notifications:
             try:
                 Notification.objects.get(**notification)
@@ -630,8 +670,8 @@ class Grade(models.Model):
                                             partial_link="/grades",
                                             unread=True,
                                             category=constants.NotificationCategories.GRADE,
+                                            content_object=self,
                                             **notification)
-        super(Grade, self).save(**kwargs)
 
 
 class FinalGrade(models.Model):
@@ -647,32 +687,6 @@ class FinalGrade(models.Model):
                                         help_text="The weighted final grade for this enrollment")
     letter_grade = models.CharField(null=True, max_length=3,
                                     help_text="A codified representation of the grade, such as A-F or 1-5")
-
-
-class Notification(models.Model):
-    """
-    Notification
-    Represent and store a notification which should be displayed to a User
-    """
-    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                             help_text="Short name of this notification")
-    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                            help_text="Longer description of this notification")
-    date = models.DateTimeField(blank=False,
-                                help_text="Date this notification is 'due'")
-    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE,
-                                help_text="Student to whom this notification refers")
-    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE,
-                             help_text="User who should be notified")
-    partial_link = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                                help_text="Partial string of an API call, combined with student to create a URL from this notification")
-    unread = models.BooleanField(blank=False, default=False)
-    category = models.IntegerField(blank=False,
-                                   help_text="Machine-readable category of this notification. See api/constants.py")
-
-    class Meta:
-        # Do we want to enforce any uniqueness for notifications?
-        ordering = ('date', 'user',)
 
 
 class FocusStudent(models.Model):
