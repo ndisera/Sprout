@@ -157,10 +157,6 @@ a {
     border-bottom-left-radius: 4px;
 }
 
-#topbar-search #search-measure {
-    white-space: pre;
-}
-
 #topbar-search button {
     padding: 4px 12px;
     border-top-left-radius: 0px;
@@ -178,6 +174,12 @@ a {
 #topbar-search .results-list .list-group .list-group-item.header {
     font-size: 25px;
     font-weight: 500;
+}
+
+#topbar-search .results-list .list-group .list-group-item.active {
+    background-color: #11527d;
+    border: none;
+    border-left: 7px solid #57bc90;
 }
 
 #topbar select.polyfilling {

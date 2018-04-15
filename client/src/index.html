@@ -191,7 +191,7 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-12 col-sm-8">
-                            <form id="topbar-search" ng-submit="">
+                            <form id="topbar-search" ng-submit="navigateToStudent()">
                                 <div class="input-group">
                                     <input id="search-placeholder" type="text" autocomplete="off" class="form-control" placeholder="{{ searchPlaceHolder }}"/>
                                     <input id="search-input" 
@@ -202,7 +202,7 @@
                                            ng-trim="false" 
                                            ng-focus="focusSearch($event, true)" 
                                            ng-blur="focusSearch($event, false)" 
-                                           ng-keyup="searchKeyUp($event)" 
+                                           ng-keydown="searchKeyDown($event)" 
                                            ng-change="updateSearch()" 
                                            ng-model="searchString"/>
                                     <div class="input-group-btn">
@@ -212,15 +212,27 @@
                                     </div>
                                     <div class="results-list" ng-show="showSearchResults">
                                         <ul class="list-group">
-                                            <li class="list-group-item header">Students</li>
+                                            <li class="list-group-item header" ng-show="studentResults.length > 0">Students</li>
                                             <a class="list-group-item" 
-                                               ng-href="/student/{{ s.id }}" 
-                                               ng-repeat="s in ($parent.studentFilterResults = ( studentInfo.students | filter: studentFilter | limitTo:3))">
-                                        <!--<tr ng-repeat="student in ($parent.studentFilterResults = ( students | filter:studentFilter))">-->
-                                                {{ s.first_name }} {{ s.last_name }}
+                                               ng-href="{{ s.href }}" 
+                                               ng-class="{ 'active': s.id === activeSearchLink.id && activeSearchLink.type === searchLinkTypes['student'], }"
+                                               ng-repeat="s in studentResults | limitTo:3">
+                                                {{ s.title }}
                                             </a>
-                                            <li class="list-group-item header">Student Pages</li>
-                                            <li class="list-group-item header">Other Pages</li>
+                                            <li class="list-group-item header" ng-show="studentPagesResults.length > 0">Student Pages</li>
+                                            <a class="list-group-item" 
+                                               ng-href="{{ s.href }}" 
+                                               ng-class="{ 'active': s.id === activeSearchLink.id && activeSearchLink.type === searchLinkTypes['studentPage'], }"
+                                               ng-repeat="s in studentPagesResults | limitTo:3">
+                                                {{ s.title }}
+                                            </a>
+                                            <li class="list-group-item header" ng-show="otherPagesResults.length > 0">Other Pages</li>
+                                            <a class="list-group-item" 
+                                               ng-href="{{ s.href }}" 
+                                               ng-class="{ 'active': s.id === activeSearchLink.id && activeSearchLink.type === searchLinkTypes['otherPage'], }"
+                                               ng-repeat="s in otherPagesResults | limitTo:3">
+                                                {{ s.title }}
+                                            </a>
                                         </ul>
                                     </div>
                                 </div>

@@ -9,15 +9,25 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
 
     $scope.notifications = userService.notificationData.relevantItems;
 
-    //TODO(gzuber): fix
-    //$scope.showSearchResults = true;
-    $scope.showSearchResults = true;
+    $scope.searchString          = '';
+    $scope.activeSearchLinkIndex = 0;
 
+    var defaultSearchPlaceholder = 'Search...';
+    $scope.searchPlaceHolder = defaultSearchPlaceholder;
+
+    $scope.showSearchResults = false;
+
+    var maxResults = 3;
     var widthOfSpace = 2.8125;
-
     var keyCodes = {
         up: 38,
         down: 40,
+    };
+
+    $scope.searchLinkTypes = {
+        student: 0,
+        studentPage: 1,
+        otherPage: 2,
     };
 
     $scope.activeSearchLink = {
@@ -25,62 +35,129 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
         type: null,
     };
 
-    $scope.studentPages = {
-        'tests': {
+    $scope.studentPages = [
+        {
+            uniqueKey: 0,
+            str: 'tests',
             href: '/tests',
+            title: 'Test Scores',
         },
-        'grades': {
+        {
+            uniqueKey: 1,
+            str: 'grades',
             href: '/grades',
+            title: 'Grades',
         },
-        'attendances': {
+        {
+            uniqueKey: 2,
+            str: 'attendances',
             href: '/attendance',
+            title: 'Attendance',
         },
-        'behaviors': {
+        {
+            uniqueKey: 3,
+            str: 'behaviors',
             href: '/behaviors',
+            title: 'Behavior',
         },
-        'ieps': {
+        {
+            uniqueKey: 4,
+            str: 'ieps',
             href: '/ieps',
+            title: 'IEP',
         },
-        'goals': {
+        {
+            uniqueKey: 4,
+            str: 'goals',
             href: '/ieps',
+            title: 'IEP Goals',
         },
-        'services': {
+        {
+            uniqueKey: 5,
+            str: 'services',
             href: '/services',
+            title: 'Service Requirements',
         },
-    };
+    ];
 
-    $scope.otherPages = {
-        'home': {
+    $scope.otherPages = [
+        {
+            uniqueKey: 0,
+            str: 'home',
             href: '/profile/focus',
+            title: 'Home',
         },
-        'profile': {
+        {
+            uniqueKey: 0,
+            str: 'profile',
             href: '/profile/focus',
+            title: 'My Profile',
         },
-        'focus': {
+        {
+            uniqueKey: 0,
+            str: 'focus',
             href: '/profile/focus',
+            title: 'My Focus Students',
         },
-        'students': {
+        {
+            uniqueKey: 1,
+            str: 'students',
             href: '/profile/students',
+            title: 'My Students',
         },
-        'inputs': {
+        {
+            uniqueKey: 2,
+            str: 'inputs',
+            href: '/input',
+            title: 'Input Scores',
+        },
+        {
+            uniqueKey: 3,
+            str: 'behaviors',
             href: '/input/behavior',
+            title: 'Input Behavior Scores',
         },
-        'behaviors': {
-            href: '/input/behavior',
-        },
-        'tests': {
+        {
+            uniqueKey: 4,
+            str: 'tests',
             href: '/input/tests',
+            title: 'Input Test Scores',
         },
-        'ieps': {
-            href: '/ieps',
+        {
+            uniqueKey: 5,
+            str: 'reports',
+            href: '/reports',
+            title: 'Generate Reports',
         },
-        'goals': {
-            href: '/ieps',
+        {
+            uniqueKey: 6,
+            str: 'tests',
+            href: '/reports/tests',
+            title: 'Generate Test Reports',
         },
-        'services': {
-            href: '/services',
+        {
+            uniqueKey: 7,
+            str: 'services',
+            href: '/reports/services',
+            title: 'Generate Service Reports',
         },
-    };
+        {
+            uniqueKey: 8,
+            str: 'settings',
+            href: '/settings/user',
+            title: 'My Settings',
+        },
+        {
+            uniqueKey: 9,
+            str: 'feedback',
+            href: '/feedback',
+            title: 'Provide Feedback',
+        },
+    ];
+
+    $scope.studentResults      = [];
+    $scope.studentPagesResults = [];
+    $scope.otherPagesResults   = [];
 
     /**
      * Toggles the sidebar
@@ -100,54 +177,257 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
      * Clears the main navigation search bar.
      */
     $scope.clearSearch = function () {
-        $scope.studentName = "";
+        $scope.searchString = '';
+        $scope.focusSearch(null, false);
+        $('#search-input').blur();
     };
 
     $scope.focusSearch = function(event, focused) {
-        // TODO(gzuber): fix
-        //$scope.showSearchResults = focused;
-        $scope.showSearchResults = true;
+        $scope.showSearchResults = focused;
+        if(focused) {
+            $scope.updateSearch();
+        }
+        else {
+            $scope.activeSearchLink = {
+                id: null,
+                type: null,
+            };
+            $scope.searchPlaceHolder = defaultSearchPlaceholder;
+        }
     };
 
     $scope.updateSearch = function() {
-        $scope.searchPlaceHolder = getPlaceholder($scope.searchString);
+        var searchStrings = $scope.searchString.split(' ');
+        _.each(searchStrings, function(elem) { elem = elem.toLowerCase(); });
 
+        var studentSet = {};
+
+        $scope.studentResults      = [];
+        $scope.studentPagesResults = [];
+        $scope.otherPagesResults   = [];
+
+        // search full name first, should be top of list
+        _.each($scope.studentInfo.students, function(elem) {
+            var fullName = elem.first_name + ' ' + elem.last_name;
+            fullName = fullName.toLowerCase();
+            if(fullName.includes($scope.searchString.toLowerCase())) {
+                $scope.studentResults.push({
+                    id: elem.id,
+                    first_name: elem.first_name,
+                    last_name: elem.last_name,
+                    title: elem.first_name + ' ' + elem.last_name + ' (' + elem.student_id + ')',
+                    href: '/student/' + elem.id,
+                });
+
+                // mark that it's in the results already
+                studentSet[elem.id] = { studentPages: {}, };
+            }
+        });
+
+        // next search first or last name with split search results
+        _.each(searchStrings, function(elem) {
+            var matchingStudents = _.filter($scope.studentInfo.students, function(student) {
+                var firstName = student.first_name.includes(elem);
+                var lastName = student.last_name.includes(elem);
+                var studentId = student.student_id.includes(elem);
+                var birthdate = student.birthdate.includes(elem);
+
+                return (firstName || lastName || studentId || birthdate);
+            });
+
+            // add everything that matched
+            _.each(matchingStudents, function(student) {
+                if(!studentSet[student.id]) {
+                    $scope.studentResults.push({
+                        id: student.id,
+                        first_name: elem.first_name,
+                        last_name: elem.last_name,
+                        title: student.first_name + ' ' + student.last_name + ' (' + student.student_id + ')',
+                        href: '/student/' + student.id,
+                    });
+                    studentSet[student.id] = { studentPages: {}, };
+                }
+            });
+        });
+
+        // now check for matching student page strings
+        _.each(searchStrings, function(elem) {
+            var matchingPages = [];
+            _.each($scope.studentPages, function(page) {
+                if(page.str.includes(elem)) {
+                    matchingPages.push(page);
+                }
+            });
+
+            var id = 0;
+            // for each student, for each student page match, push a matching "student page" result
+            _.each($scope.studentResults, function(student) {
+                _.each(matchingPages, function(page) {
+                    if(!studentSet[student.id].studentPages[page.uniqueKey]) {
+                        $scope.studentPagesResults.push({
+                            id: id,
+                            student: student.id,
+                            title: student.first_name + ' ' + student.last_name + '\'s ' + page.title + ' page',
+                            href: '/student/' + student.id + page.href,
+                        });
+                        studentSet[student.id].studentPages[page.uniqueKey] = true;
+                        id++;
+                    }
+                });
+            });
+        });
+
+        var otherPagesSet = {};
+        var id = 0;
+        // now check for site-wide pages
+        _.each(searchStrings, function(elem) {
+            _.each($scope.otherPages, function(page) {
+                if(!otherPagesSet[page.uniqueKey] && page.str.includes(elem)) {
+                    $scope.otherPagesResults.push({
+                        id: id,
+                        title: page.title,
+                        href: page.href,
+                    });
+                    otherPagesSet[page.uniqueKey] = true;
+                    id++;
+                }
+            });
+        });
+
+        // now select the active link
+        if($scope.studentResults.length > 0) {
+            $scope.activeSearchLink = $scope.studentResults[0];
+            $scope.activeSearchLink.type = $scope.searchLinkTypes['student'];
+        }
+        else if($scope.studentPagesResults.length > 0) {
+            $scope.activeSearchLink = $scope.studentPagesResults[0];
+            $scope.activeSearchLink.type = $scope.searchLinkTypes['studentPage'];
+        }
+        else if($scope.otherPagesResults.length > 0) {
+            $scope.activeSearchLink = $scope.otherPagesResults[0];
+            $scope.activeSearchLink.type = $scope.searchLinkTypes['otherPage'];
+        }
+        else {
+            $scope.activeSearchLink = {
+                id: null,
+                type: null,
+            };
+        }
+
+        $scope.searchPlaceHolder     = getPlaceholder($scope.searchString);
+        $scope.activeSearchLinkIndex = 0;
     };
 
-    $scope.searchKeyUp = function(event) {
+    $scope.navigateToStudent = function() {
+        $location.path($scope.activeSearchLink.href);
+        $scope.clearSearch();
+    };
+
+    function getLastResult(arr, max) {
+        if(arr.length < max) {
+            return arr[arr.length - 1];
+        }
+        else {
+            return arr[max - 1];
+        }
+    }
+
+    $scope.searchKeyDown = function(event) {
         var keyCode = event.keyCode;
+
+        var updateActiveSearchLink = function(link, type, idx) {
+            $scope.activeSearchLink = link;
+            $scope.activeSearchLink.type = $scope.searchLinkTypes[type];
+            $scope.activeSearchLinkIndex = idx;
+            $scope.searchPlaceHolder = getPlaceholder($scope.searchString);
+        };
+
         if(keyCode === keyCodes.up) {
             event.preventDefault();
-            console.log($scope.studentFilterResults);
+
+            if($scope.activeSearchLinkIndex === 0) {
+                return;
+            }
+
+            $scope.activeSearchLinkIndex--;
+
+            var iterIndex     = 0;
+            var studentsToAdd = $scope.studentResults.length > maxResults ? maxResults : $scope.studentResults.length;
+            for(var i = 0; i < studentsToAdd; ++i) {
+                if(iterIndex === $scope.activeSearchLinkIndex) {
+                    updateActiveSearchLink($scope.studentResults[i], 'student', $scope.activeSearchLinkIndex);
+                    return;
+                }
+                iterIndex++;
+            }
+
+            var studentPagesToAdd = $scope.studentPagesResults.length > maxResults ? maxResults : $scope.studentPagesResults.length;
+            for(var i = 0; i < studentPagesToAdd; ++i) {
+                if(iterIndex === $scope.activeSearchLinkIndex) {
+                    updateActiveSearchLink($scope.studentPagesResults[i], 'studentPage', $scope.activeSearchLinkIndex);
+                    return;
+                }
+                iterIndex++;
+            }
+
+            var otherPagesToAdd = $scope.otherPagesResults.length > maxResults ? maxResults : $scope.otherPagesResults.length;
+            for(var i = 0; i < otherPagesToAdd; ++i) {
+                if(iterIndex === $scope.activeSearchLinkIndex) {
+                    updateActiveSearchLink($scope.otherPagesResults[i], 'otherPage', $scope.activeSearchLinkIndex);
+                    return;
+                }
+                iterIndex++;
+            }
         }
-        else if(keyCode === keyCode.down) {
+        else if(keyCode === keyCodes.down) {
             event.preventDefault();
-            console.log($scope.studentFilterResults);
+
+            var temp = $scope.activeSearchLinkIndex + 1;
+
+            var iterIndex     = 0;
+            var studentsToAdd = $scope.studentResults.length > maxResults ? maxResults : $scope.studentResults.length;
+            for(var i = 0; i < studentsToAdd; ++i) {
+                if(iterIndex === temp) {
+                    updateActiveSearchLink($scope.studentResults[i], 'student', temp);
+                    return;
+                }
+                iterIndex++;
+            }
+
+            var studentPagesToAdd = $scope.studentPagesResults.length > maxResults ? maxResults : $scope.studentPagesResults.length;
+            for(var i = 0; i < studentPagesToAdd; ++i) {
+                if(iterIndex === temp) {
+                    updateActiveSearchLink($scope.studentPagesResults[i], 'studentPage', temp);
+                    return;
+                }
+                iterIndex++;
+            }
+
+            var otherPagesToAdd = $scope.otherPagesResults.length > maxResults ? maxResults : $scope.otherPagesResults.length;
+            for(var i = 0; i < otherPagesToAdd; ++i) {
+                if(iterIndex === temp) {
+                    updateActiveSearchLink($scope.otherPagesResults[i], 'otherPage', temp);
+                    return;
+                }
+                iterIndex++;
+            }
         }
+
     };
 
-    $scope.studentFilter = function(student) { 
-        if(_.find($scope.students, function(elem) { return elem.student_id.includes($scope.searchString);})) {
-            return true;
-        }
-        if($scope.searchString === null || $scope.searchString === undefined) {
-            return true;
-        }
-        var input = $scope.searchString.toUpperCase();
-        var fullname = student.first_name + " " + student.last_name;
-        if(student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
-            student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
-            fullname.toUpperCase().includes(input)) {
-            return true;
-        }
-        return false;
-    };
+    function getMaxResultsDisplayed() {
+        var studentsToAdd     = $scope.studentResults.length > maxResults ? maxResults : $scope.studentResults.length;
+        var studentPagesToAdd = $scope.studentPagesResults.length > maxResults ? maxResults : $scope.studentPagesResults.length;
+        var otherPagesToAdd   = $scope.otherPagesResults.length > maxResults ? maxResults : $scope.otherPagesResults.length;
+
+        return studentsToAdd + studentPagesToAdd + otherPagesToAdd;
+    }
 
     /**
      * calculates padding to make sure arrow comes after search string
      */
     function getPlaceholder(str) {
-        if(str === '') {
+        if($scope.activeSearchLink.id === null) {
             return '';
         }
 
@@ -165,7 +445,8 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
             placeholder += ' ';
             iter += widthOfSpace;
         }
-        placeholder += '     →';
+        
+        placeholder += '     →     ' + $scope.activeSearchLink.title;
         return placeholder;
     }
 
@@ -210,14 +491,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
             badgeList: [],
             adminRequired: false,
         },
-        // {
-        //     title: "Services",
-        //     glyph: "list",
-        //     href: "/services",
-        //     click: $scope.clearSearch,
-        //     badgeList: [],
-        //     adminRequired: false,
-        // },
         {
             title: "Manage",
             glyph: "briefcase",
@@ -389,5 +662,4 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
             scope.toggleNotifications(false);
         });
     });
-
 });
