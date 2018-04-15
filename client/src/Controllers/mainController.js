@@ -1,4 +1,4 @@
-app.controller('mainController', function ($scope, $rootScope, $location, $q, $document, userService, studentService) {
+app.controller('mainController', function ($scope, $rootScope, $location, $q, $timeout, userService, studentService) {
     $scope.location = $location;
 
     $scope.user = userService.user;
@@ -183,16 +183,20 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
     };
 
     $scope.focusSearch = function(event, focused) {
-        $scope.showSearchResults = focused;
         if(focused) {
             $scope.updateSearch();
+            $scope.showSearchResults = focused;
         }
         else {
-            $scope.activeSearchLink = {
-                id: null,
-                type: null,
-            };
-            $scope.searchPlaceHolder = defaultSearchPlaceholder;
+            $timeout(function() {
+                $scope.showSearchResults = focused;
+                $scope.activeSearchLink = {
+                    id: null,
+                    type: null,
+                };
+                $scope.searchPlaceHolder = defaultSearchPlaceholder;
+                $scope.searchString = '';
+            }, 250);
         }
     };
 
@@ -217,6 +221,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
                     last_name: elem.last_name,
                     title: elem.first_name + ' ' + elem.last_name + ' (' + elem.student_id + ')',
                     href: '/student/' + elem.id,
+                    type: $scope.searchLinkTypes['student'],
                 });
 
                 // mark that it's in the results already
@@ -244,6 +249,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
                         last_name: elem.last_name,
                         title: student.first_name + ' ' + student.last_name + ' (' + student.student_id + ')',
                         href: '/student/' + student.id,
+                        type: $scope.searchLinkTypes['student'],
                     });
                     studentSet[student.id] = { studentPages: {}, };
                 }
@@ -269,6 +275,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
                             student: student.id,
                             title: student.first_name + ' ' + student.last_name + '\'s ' + page.title + ' page',
                             href: '/student/' + student.id + page.href,
+                            type: $scope.searchLinkTypes['studentPage'],
                         });
                         studentSet[student.id].studentPages[page.uniqueKey] = true;
                         id++;
@@ -287,6 +294,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
                         id: id,
                         title: page.title,
                         href: page.href,
+                        type: $scope.searchLinkTypes['otherPage'],
                     });
                     otherPagesSet[page.uniqueKey] = true;
                     id++;
@@ -318,8 +326,13 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
         $scope.activeSearchLinkIndex = 0;
     };
 
-    $scope.navigateToStudent = function() {
-        $location.path($scope.activeSearchLink.href);
+    $scope.navigateToStudent = function(link) {
+        if(link) {
+            $location.path(link);
+        }
+        else {
+            $location.path($scope.activeSearchLink.href);
+        }
         $scope.clearSearch();
     };
 
@@ -332,12 +345,45 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $d
         }
     }
 
+    $scope.searchMouseOver = function(entry, type) {
+        $scope.activeSearchLink = entry;
+        $scope.searchPlaceHolder = getPlaceholder($scope.searchString);
+
+        // now I need to update the active search link index
+        var iterIndex     = 0;
+        var studentsToAdd = $scope.studentResults.length > maxResults ? maxResults : $scope.studentResults.length;
+        for(var i = 0; i < studentsToAdd; ++i) {
+            if(entry.id === $scope.studentResults[i].id && entry.type === $scope.studentResults[i].type) {
+                $scope.activeSearchLinkIndex = iterIndex;
+                return;
+            }
+            iterIndex++;
+        }
+
+        var studentPagesToAdd = $scope.studentPagesResults.length > maxResults ? maxResults : $scope.studentPagesResults.length;
+        for(var i = 0; i < studentPagesToAdd; ++i) {
+            if(entry.id === $scope.studentPagesResults[i].id && entry.type === $scope.studentPagesResults[i].type) {
+                $scope.activeSearchLinkIndex = iterIndex;
+                return;
+            }
+            iterIndex++;
+        }
+
+        var otherPagesToAdd = $scope.otherPagesResults.length > maxResults ? maxResults : $scope.otherPagesResults.length;
+        for(var i = 0; i < otherPagesToAdd; ++i) {
+            if(entry.id === $scope.otherPagesResults[i].id && entry.type === $scope.otherPagesResults[i].type) {
+                $scope.activeSearchLinkIndex = iterIndex;
+                return;
+            }
+            iterIndex++;
+        }
+    };
+
     $scope.searchKeyDown = function(event) {
         var keyCode = event.keyCode;
 
         var updateActiveSearchLink = function(link, type, idx) {
             $scope.activeSearchLink = link;
-            $scope.activeSearchLink.type = $scope.searchLinkTypes[type];
             $scope.activeSearchLinkIndex = idx;
             $scope.searchPlaceHolder = getPlaceholder($scope.searchString);
         };
