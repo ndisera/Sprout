@@ -214,7 +214,7 @@ class CategoryCalculator():
         ### Grades
         for grade_scores in grades_lists.itervalues():  # Dict
             # set a mapping, so we can do a lookup later
-            self.df_map[df_counter] = ('grade', grade_scores[0].assignment.section_id)
+            self.df_map[df_counter] = ('grades', grade_scores[0].assignment.section_id)
             # todo: implement this on the frontend
 
             # extract the data
@@ -254,9 +254,6 @@ class CategoryCalculator():
 
         # list of tuples containing (coefficient, df column, start date, end date, and r-squared value )
         self.analysis_results = []
-
-        # todo: start from the present and work our way back. Stop when we see something that looks good enough
-        # todo: don't even consider something if the most recent datapoint is more than 2 weeks old
 
         for curr_dataset in df:  # curr_dataset is an index of the column in the data set
             # If the most recent data point for a series is more than 2 weeks old, don't consider it for display
