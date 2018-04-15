@@ -159,8 +159,89 @@ a {
     height: 30px;
 }
 
+#topbar-search #search-placeholder {
+
+}
+
+#topbar-search #search-input {
+    position: absolute;
+    background: transparent;
+    width: calc(100% - 39px);
+    border: 1px solid transparent;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
 #topbar-search button {
     padding: 4px 12px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-left: none;
+}
+
+#topbar-search .results-list {
+    position: absolute;
+    top: 33px;
+    left: 0px;
+    width: 100%;
+}
+
+#topbar-search .results-list .list-group {
+    -webkit-box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
+    border: none;
+    border-radius: 4px;
+}
+
+#topbar-search .results-list .list-group .list-group-item:first-child {
+    border-top: none;
+}
+
+#topbar-search .results-list .list-group .list-group-item:last-child {
+    border-bottom: none;
+}
+
+#topbar-search .results-list .list-group .list-group-item {
+    border-left: none;
+    border-right: none;
+    background-color: transparent;
+    padding: 0px;
+}
+
+#topbar-search .results-list .list-group .list-group-item .list-group-item-inner {
+    border-left: 7px solid transparent;
+    background-color: white;
+    padding: 5px 5px 5px 10px;
+}
+
+#topbar-search .results-list .list-group .list-group-item:last-child .list-group-item-inner {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+#topbar-search .results-list .list-group .list-group-item.header {
+    font-size: 25px;
+    font-weight: 500;
+    padding: 5px 5px 5px 10px;
+    background-color: white;
+}
+
+#topbar-search .results-list .list-group .list-group-item.active .list-group-item-inner {
+    background-color: #11527d;
+    border: none;
+    border-left: 7px solid #57bc90;
+}
+
+#topbar-search .results-list .list-group .list-group-item.active {
+    border: 1px solid #ddd;
+    border-left: none;
+    border-right: none;
+}
+
+#topbar-search .results-list .list-group .list-group-item.header.no-results {
+    border-radius: 4px;
+    border-bottom: none;
+    border-top: none;
 }
 
 #topbar select.polyfilling {
