@@ -271,6 +271,36 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
         return deferred.promise;
     };
 
+    userService.incrementPageRank = function(userId, href) {
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + '/pagerank',
+            data: {
+                user: userId,
+                url: href,
+            },
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    userService.getPageRankings = function(userId, config) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + '/pagerank' + query,
+        }).then(function success(response) {
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
 
     /**
      * Get all user records

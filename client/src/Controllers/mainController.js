@@ -24,6 +24,8 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
         down: 40,
     };
 
+    var pageRanks = {};
+
     $scope.searchLinkTypes = {
         student: 0,
         studentPage: 1,
@@ -302,6 +304,28 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
             });
         });
 
+        // rank 'em
+        $scope.studentResults = _.sortBy($scope.studentResults, function(elem) {
+            var totalRank = pageRanks[elem.href] ? pageRanks[elem.href] : 0;
+            var partialHref = '/student/' + elem.id;
+            var pageSet = {};
+            _.each($scope.studentPages, function(page) {
+                if(!pageSet[page.uniqueKey]) {
+                    totalRank += pageRanks[partialHref + page.href] ? pageRanks[partialHref + page.href] : 0;
+                    pageSet[page.uniqueKey] = true;
+                }
+            });
+            return -totalRank;
+        });
+
+        $scope.studentPagesResults = _.sortBy($scope.studentPagesResults, function(elem) {
+            return pageRanks[elem.href] ? -pageRanks[elem.href] : 0;
+        });
+
+        $scope.otherPagesResults = _.sortBy($scope.otherPagesResults, function(elem) {
+            return pageRanks[elem.href] ? -pageRanks[elem.href] : 0;
+        });
+
         // now select the active link
         if($scope.studentResults.length > 0) {
             $scope.activeSearchLink = $scope.studentResults[0];
@@ -335,15 +359,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
         }
         $scope.clearSearch();
     };
-
-    function getLastResult(arr, max) {
-        if(arr.length < max) {
-            return arr[arr.length - 1];
-        }
-        else {
-            return arr[max - 1];
-        }
-    }
 
     $scope.searchMouseOver = function(entry, type) {
         $scope.activeSearchLink = entry;
@@ -461,14 +476,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
 
     };
 
-    function getMaxResultsDisplayed() {
-        var studentsToAdd     = $scope.studentResults.length > maxResults ? maxResults : $scope.studentResults.length;
-        var studentPagesToAdd = $scope.studentPagesResults.length > maxResults ? maxResults : $scope.studentPagesResults.length;
-        var otherPagesToAdd   = $scope.otherPagesResults.length > maxResults ? maxResults : $scope.otherPagesResults.length;
-
-        return studentsToAdd + studentPagesToAdd + otherPagesToAdd;
-    }
-
     /**
      * calculates padding to make sure arrow comes after search string
      */
@@ -495,6 +502,28 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
         placeholder += '     →     ' + $scope.activeSearchLink.title;
         return placeholder;
     }
+
+    /*** PAGE RANKING ***/
+
+    $rootScope.$on('$routeChangeSuccess', function(event, current, prev) {
+        if(userService.user.id !== null) {
+            userService.incrementPageRank(userService.user.id, $location.path());
+        }
+    });
+
+    var pageRankWatcher = $rootScope.$on('user:auth', function(event, data) {
+        if(data.type === 'login') {
+            userService.getPageRankings(userService.user.id).then(
+                function success(data) {
+                    _.each(data.page_ranks, function(elem) {
+                        pageRanks[elem.url] = elem.counter;
+                    });
+                    pageRankWatcher();
+                },
+                function error(response) {}
+            );
+        }
+    });
 
     /**
      * Logs user out
