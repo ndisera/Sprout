@@ -15,7 +15,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
     var defaultSearchPlaceholder = 'Search...';
     $scope.searchPlaceHolder = defaultSearchPlaceholder;
 
-    $scope.showSearchResults = true;
+    $scope.showSearchResults = false;
 
     $scope.maxResults = 4;
     var widthOfSpace = 2.8125;
