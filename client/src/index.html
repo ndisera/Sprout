@@ -213,6 +213,9 @@
                                     <div class="results-list" ng-show="showSearchResults">
                                         <ul class="list-group">
                                             <li class="list-group-item header" ng-show="studentResults.length > 0">Students</li>
+                                            <li class="list-group-item header no-results" ng-show="studentResults.length === 0 && studentPagesResults.length === 0 && otherPagesResults.length === 0">
+                                                No Results
+                                            </li>
                                             <a class="list-group-item" 
                                                ng-href="{{ s.href }}" 
                                                ng-mouseover="searchMouseOver(s, 'student')"
