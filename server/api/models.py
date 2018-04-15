@@ -13,7 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 import api.constants as constants
 from api.mixins import AdminWriteMixin
 
-from grade_notification_calculator.calculator import GradeNotificationCalculator
+from notification_calculators.calculator import GradeNotificationCalculator, BehaviorNotificationCalculator, TestScoreNotificationCalculator
 
 import datetime
 import os
@@ -546,6 +546,34 @@ class Behavior(models.Model):
         unique_together = (('enrollment', 'date'),)
         ordering = ('date',)
 
+    def save(self, **kwargs):
+        """
+        Check the new behavior, generating notifications if it is significantly outside of normal
+        """
+        my_student = self.enrollment.student
+        grades = Grade.objects.filter(student=my_student)
+        attendances = AttendanceRecord.objects.filter(enrollment__student=my_student)
+        behavior_effors = Behavior.objects.filter(enrollment__student=my_student)
+        test_scores = StandardizedTestScore.objects.filter(student=my_student)
+
+        calculator = BehaviorNotificationCalculator(student=my_student,
+                                                 grades=grades,
+                                                 attendances=attendances,
+                                                 behavior_efforts=behavior_effors,
+                                                 test_scores=test_scores)
+        notifications = calculator.get_notifications(self)
+        super(Behavior, self).save(**kwargs)
+        for notification in notifications:
+            try:
+                Notification.objects.get(**notification)
+            except Notification.DoesNotExist:
+                Notification.objects.create(user=my_student.case_manager,
+                                            partial_link="/grades",
+                                            unread=True,
+                                            category=constants.NotificationCategories.BEHAVIOR,
+                                            content_object=self,
+                                            **notification)
+
 
 class BehaviorNote(models.Model):
     """
@@ -595,6 +623,34 @@ class StandardizedTestScore(models.Model):
     class Meta:
         unique_together = (('standardized_test', 'date', 'student'),)
         ordering = ('date',)
+
+    def save(self, **kwargs):
+        """
+        Check the new score, generating notifications if it is significantly outside of normal
+        """
+        my_student = self.student
+        grades = Grade.objects.filter(student=my_student)
+        attendances = AttendanceRecord.objects.filter(enrollment__student=my_student)
+        behavior_effors = Behavior.objects.filter(enrollment__student=my_student)
+        test_scores = StandardizedTestScore.objects.filter(student=my_student)
+
+        calculator = BehaviorNotificationCalculator(student=my_student,
+                                                 grades=grades,
+                                                 attendances=attendances,
+                                                 behavior_efforts=behavior_effors,
+                                                 test_scores=test_scores)
+        notifications = calculator.get_notifications(self)
+        super(StandardizedTestScore, self).save(**kwargs)
+        for notification in notifications:
+            try:
+                Notification.objects.get(**notification)
+            except Notification.DoesNotExist:
+                Notification.objects.create(user=my_student.case_manager,
+                                            partial_link="/grades",
+                                            unread=True,
+                                            category=constants.NotificationCategories.TEST_SCORE,
+                                            content_object=self,
+                                            **notification)
 
 
 class Assignment(models.Model):
