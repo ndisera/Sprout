@@ -13,7 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 import api.constants as constants
 from api.mixins import AdminWriteMixin
 
-from notification_calculators.calculator import GradeNotificationCalculator, BehaviorNotificationCalculator, TestScoreNotificationCalculator
+from notification_calculators.calculator import GradeNotificationCalculator, BehaviorNotificationCalculator, TestScoreNotificationCalculator, AttendanceRecordNotificationCalculator
 
 import datetime
 import os
@@ -542,6 +542,9 @@ class Behavior(models.Model):
     behavior = models.IntegerField(blank=True, null=True)
     effort = models.IntegerField(blank=True, null=True)
 
+    # Allow a generic relation to notifications so there can be a Notification related to this Behavior
+    notifications = GenericRelation(Notification, content_type_field='content_type', object_id_field='object_id')
+
     class Meta:
         unique_together = (('enrollment', 'date'),)
         ordering = ('date',)
@@ -568,7 +571,7 @@ class Behavior(models.Model):
                 Notification.objects.get(**notification)
             except Notification.DoesNotExist:
                 Notification.objects.create(user=my_student.case_manager,
-                                            partial_link="/grades",
+                                            partial_link="/behaviors",
                                             unread=True,
                                             category=constants.NotificationCategories.BEHAVIOR,
                                             content_object=self,
@@ -606,8 +609,39 @@ class AttendanceRecord(models.Model):
     description = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                   help_text="Human-readable description of this attendance record")
 
+    # Allow a generic relation to notifications so there can be a Notification related to this AttendanceRecord
+    notifications = GenericRelation(Notification, content_type_field='content_type', object_id_field='object_id')
+
     class Meta:
         unique_together = [('enrollment', 'date'),]
+
+    def save(self, **kwargs):
+        """
+        Check the new attendance record, generating notifications if it is significantly outside of normal
+        """
+        my_student = self.enrollment.student
+        grades = Grade.objects.filter(student=my_student)
+        attendances = AttendanceRecord.objects.filter(enrollment__student=my_student)
+        behavior_effors = Behavior.objects.filter(enrollment__student=my_student)
+        test_scores = StandardizedTestScore.objects.filter(student=my_student)
+
+        calculator = AttendanceRecordNotificationCalculator(student=my_student,
+                                                            grades=grades,
+                                                            attendances=attendances,
+                                                            behavior_efforts=behavior_effors,
+                                                            test_scores=test_scores)
+        notifications = calculator.get_notifications(self)
+        super(AttendanceRecord, self).save(**kwargs)
+        for notification in notifications:
+            try:
+                Notification.objects.get(**notification)
+            except Notification.DoesNotExist:
+                Notification.objects.create(user=my_student.case_manager,
+                                            partial_link="/attendance",
+                                            unread=True,
+                                            category=constants.NotificationCategories.BEHAVIOR,
+                                            content_object=self,
+                                            **notification)
 
 
 class StandardizedTestScore(models.Model):
@@ -619,6 +653,9 @@ class StandardizedTestScore(models.Model):
     student = models.ForeignKey(Student, related_name="student", on_delete=models.CASCADE)
     date = models.DateField()
     score = models.IntegerField(blank=False, null=False)
+
+    # Allow a generic relation to notifications so there can be a Notification related to this Score
+    notifications = GenericRelation(Notification, content_type_field='content_type', object_id_field='object_id')
 
     class Meta:
         unique_together = (('standardized_test', 'date', 'student'),)
@@ -646,7 +683,7 @@ class StandardizedTestScore(models.Model):
                 Notification.objects.get(**notification)
             except Notification.DoesNotExist:
                 Notification.objects.create(user=my_student.case_manager,
-                                            partial_link="/grades",
+                                            partial_link="/tests",
                                             unread=True,
                                             category=constants.NotificationCategories.TEST_SCORE,
                                             content_object=self,

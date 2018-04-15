@@ -37,8 +37,7 @@ class GradeNotificationCalculator(AbstractNotificationCalculator):
     This class will be used as follows:
         A request will be made to the backend to save a grade record
             If a grade is being updated, it might be included in the list passed to the constructor
-        Otherwise, an instance of this class will be created, and:
-            get_notifications will be called
+        An instance of this class will be created, and get_notifications will be called
     """
 
     def get_notifications(self, grade):
@@ -58,10 +57,9 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
     Everything necessary to calculate a notification
 
     This class will be used as follows:
-        A request will be made to the backend to save a grade record
-            If a grade is being updated, it might be included in the list passed to the constructor
-        Otherwise, an instance of this class will be created, and:
-            get_notifications will be called
+        A request will be made to the backend to save a behavior record
+            If a behavior is being updated, it might be included in the list passed to the constructor
+        An instance of this class will be created, and get_notifications will be called
     """
 
     def get_notifications(self, behavior):
@@ -81,10 +79,31 @@ class TestScoreNotificationCalculator(AbstractNotificationCalculator):
     Everything necessary to calculate a notification
 
     This class will be used as follows:
-        A request will be made to the backend to save a grade record
-            If a grade is being updated, it might be included in the list passed to the constructor
-        Otherwise, an instance of this class will be created, and:
-            get_notifications will be called
+        A request will be made to the backend to save a test score record
+            If a test score is being updated, it might be included in the list passed to the constructor
+        An instance of this class will be created, and get_notifications will be called
+    """
+
+    def get_notifications(self, score):
+        """
+        Get notifications, if any, relating to this behavior object
+
+        :param score: The just-saved behavior object. Might be in self.behaviors if a behavior is being updated
+        :return: List of Notification objects, empty list if nothing interesting is discovered
+        """
+        to_return = []
+
+        return to_return
+
+
+class AttendanceRecordNotificationCalculator(AbstractNotificationCalculator):
+    """
+    Everything necessary to calculate a notification
+
+    This class will be used as follows:
+        A request will be made to the backend to save an attendance record
+            If a attendance is being updated, it might be included in the list passed to the constructor
+        An instance of this class will be created, and get_notifications will be called
     """
 
     def get_notifications(self, score):
