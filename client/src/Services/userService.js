@@ -496,19 +496,30 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
     userService.notificationData = {
         relevantItems: [],
         relevantOffset: {
-            value: 35,
+            value: 14,
             unit: 'd',
         }
     };
 
     /**
-     * Get all of a user's notifications
+     * Get all of a user's unread notifications that take place less than the relevant offset
      * @param {number} userId - ID of the user
-     * @param {object} config - config object for query parameters (see queryService)
      * @return {promise} promise that will resolve with data or reject with response code.
      */
-    userService.getAllNotificationsForUser = function(userId, config) {
-        var query = queryService.generateQuery(config);
+    userService.getAllRelevantNotificationsForUser = function(userId) {
+        var relevantDate = moment().add(userService.notificationData.relevantOffset.value, userService.notificationData.relevantOffset.unit);
+        var query = queryService.generateQuery({
+            filter: [
+                {
+                    name: 'date.lte', 
+                    val: relevantDate.format('YYYY-MM-DD').toString(),
+                },
+                {
+                    name: 'unread',
+                    val: 'true',
+                },
+            ],
+        });
         var deferred = $q.defer();
         $http({
             method: 'GET',
@@ -518,15 +529,34 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
             if(response !== null && response !== undefined) {
                 if(response.data !== null && response.data !== undefined) {
                     if(response.data.notifications !== null && response.data.notifications !== undefined) {
+                        // can't change the reference, so keep the same array
                         userService.notificationData.relevantItems.length = 0;
-                        var relevantDate = moment().add(userService.notificationData.relevantOffset.value, userService.notificationData.relevantOffset.unit);
-
-                        _.each(_.filter(response.data.notifications, function(elem) { return moment(elem.date) < relevantDate && elem.unread; }), function(elem) {
+                        _.each(response.data.notifications, function(elem) {
                             userService.notificationData.relevantItems.push(elem);
                         });
                     }
                 }
             }
+            deferred.resolve(response.data);
+        }, function error(response) {
+            deferred.reject(response);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * Get all of a user's notifications
+     * @param {number} userId - ID of the user
+     * @param {object} config - config object for query parameters (see queryService)
+     * @return {promise} promise that will resolve with data or reject with response code.
+     */
+    userService.getAllNotificationsForUser = function(userId) {
+        var query = queryService.generateQuery(config);
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: 'https://' + $rootScope.backend + '/users/' + userId + '/notifications' + query,
+        }).then(function success(response) {
             deferred.resolve(response.data);
         }, function error(response) {
             deferred.reject(response);
