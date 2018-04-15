@@ -13,7 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 import api.constants as constants
 from api.mixins import AdminWriteMixin
 
-from notification_calculators.calculator import GradeNotificationCalculator, BehaviorNotificationCalculator, TestScoreNotificationCalculator, AttendanceRecordNotificationCalculator
+from notification_calculators.notification_calculator import GradeNotificationCalculator, BehaviorNotificationCalculator, TestScoreNotificationCalculator, AttendanceRecordNotificationCalculator
 
 import datetime
 import os
