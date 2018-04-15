@@ -568,14 +568,14 @@ class Behavior(models.Model):
         super(Behavior, self).save(**kwargs)
         for notification in notifications:
             try:
-                Notification.objects.get(**notification)
+                Notification.objects.get(**notification._asdict())
             except Notification.DoesNotExist:
                 Notification.objects.create(user=my_student.case_manager,
                                             partial_link="/behaviors",
                                             unread=True,
                                             category=constants.NotificationCategories.BEHAVIOR,
                                             content_object=self,
-                                            **notification)
+                                            **notification._asdict())
 
 
 class BehaviorNote(models.Model):
@@ -634,14 +634,14 @@ class AttendanceRecord(models.Model):
         super(AttendanceRecord, self).save(**kwargs)
         for notification in notifications:
             try:
-                Notification.objects.get(**notification)
+                Notification.objects.get(**notification._asdict())
             except Notification.DoesNotExist:
                 Notification.objects.create(user=my_student.case_manager,
                                             partial_link="/attendance",
                                             unread=True,
                                             category=constants.NotificationCategories.BEHAVIOR,
                                             content_object=self,
-                                            **notification)
+                                            **notification._asdict())
 
 
 class StandardizedTestScore(models.Model):
@@ -680,14 +680,14 @@ class StandardizedTestScore(models.Model):
         super(StandardizedTestScore, self).save(**kwargs)
         for notification in notifications:
             try:
-                Notification.objects.get(**notification)
+                Notification.objects.get(**notification._asdict())
             except Notification.DoesNotExist:
                 Notification.objects.create(user=my_student.case_manager,
                                             partial_link="/tests",
                                             unread=True,
                                             category=constants.NotificationCategories.TEST_SCORE,
                                             content_object=self,
-                                            **notification)
+                                            **notification._asdict())
 
 
 class Assignment(models.Model):
@@ -757,14 +757,14 @@ class Grade(models.Model):
         super(Grade, self).save(**kwargs)
         for notification in notifications:
             try:
-                Notification.objects.get(**notification)
+                Notification.objects.get(**notification._asdict())
             except Notification.DoesNotExist:
                 Notification.objects.create(user=self.student.case_manager,
                                             partial_link="/grades",
                                             unread=True,
                                             category=constants.NotificationCategories.GRADE,
                                             content_object=self,
-                                            **notification)
+                                            **notification._asdict())
 
 
 class FinalGrade(models.Model):
