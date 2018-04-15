@@ -460,7 +460,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                                 var average = 0;
                                 var count = 0;
                                 while (assignmentDate.diff(iterDate, 'd') === 0) {
-                                    var currentAssignment = _.find(assignmentData.assignments, function(elem) {
+                                    var currentAssignment = _.find(assignmentsData.assignments, function(elem) {
                                         return elem.id === assignmentScores[j].assignment;
                                     });
                                     var assignmentMin = currentAssignment.score_min;
