@@ -3,7 +3,10 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="alert alert-info no-bottom-margin" role="alert">
-                <span><b>Tip:</b> It looks like this student isn't enrolled in any classes. Speak to an admin to add a class to this student's schedule.</span>
+                <span>
+                    <b>Tip:</b> It looks like this student isn't enrolled in any classes. 
+                    <span ng-show="!isSuperUser">Speak to an admin to add a class to this student's schedule.</span>
+                </span>
             </div>
         </div>
     </div>

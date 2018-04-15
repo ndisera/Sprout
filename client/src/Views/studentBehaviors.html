@@ -2,7 +2,10 @@
 <div ng-if="!hasBehaviorService" class="row">
     <div class="col-xs-12">
         <div id="student-behaviors-service-warning" class="alert alert-warning" role="alert">
-            <span><b>Warning:</b> This student doesn't have a Behavior Service. If this student did in the past, you may view that history here. If not, you can add a Behavior Service to this student in order to start recording Behavior and Effort.</span>
+            <span>
+                <b>Warning:</b> This student doesn't have a Behavior Service. If this student did in the past, you may view that history here. 
+                <span ng-show="isSuperUser || isCaseManager">If not, you can add a Behavior Service to this student in order to start recording Behavior and Effort.</span>
+            </span>
         </div>
     </div>
 </div>

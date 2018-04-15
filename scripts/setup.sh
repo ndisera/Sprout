@@ -32,9 +32,9 @@ deactivate
 popd
 
 # Install Haraka SMTP server
-pushd "${SCRIPT_PATH}"/../server/haraka-smtp
-npm install
-popd # End Haraka setup
+# pushd "${SCRIPT_PATH}"/../server/haraka-smtp
+# npm install
+# popd # End Haraka setup
 
 # FRONTEND SETUP
 # install the node dependencies

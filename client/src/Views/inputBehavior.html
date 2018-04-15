@@ -59,8 +59,8 @@
                         <div class="alert alert-info no-bottom-margin" ng-if="student.sections.length === 0">
                             <span><b>Info:</b> It looks like this student isn't enrolled in any classes for this date.</span>
                         </div>
-                        <div class="table-responsive">
-                            <table class="table" ng-if="student.sections.length > 0">
+                        <div class="table-responsive" ng-if="student.sections.length > 0">
+                            <table class="table">
                                 <thead>
                                     <tr>
                                         <th>Class</th>

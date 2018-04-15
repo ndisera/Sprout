@@ -222,3 +222,5 @@ DESCRIPTION_CHARFIELD_MAX_LENGTH = 1600
 
 # FRONTEND_DOMAIN = 'localhost:8001' # Define a domain and port if the frontend and backend run on different hosts
 FRONTEND_PORT = 8001 # Define only a port if the frontend and backend run on the same host but different ports
+
+USER_PAGE_RANK_TIMESPAN_DAYS = 14 # If a user has not visited a page in this amount of time, its rank is reset
