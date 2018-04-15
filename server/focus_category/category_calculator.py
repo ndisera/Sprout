@@ -35,11 +35,15 @@ class CategoryCalculator():
         self.behavior_efforts = behavior_efforts
         self.test_scores = test_scores
         self.no_data_string = "none______"
+        self.analysis_results = []
+        self.df_map = {}
 
         if len(behavior_efforts) != 0:
             random.seed(behavior_efforts[0].enrollment.student_id)  # We want consistent random behavior
         else:
             random.seed(21)  # Nothing should really be displayed after this point, but we want to be consistent
+
+        self.analyze_data() # do the data analysis at the very beginning
 
     def get_progress_category(self):
         """
@@ -48,6 +52,60 @@ class CategoryCalculator():
         :return: a category to be included with the FocusStudent object
         :rtype: str
         """
+
+        # Select the progress category by choosing the run with the highest r^2 value
+
+        # analysis result example:
+        # (model.params[1], curr_dataset,
+        # df.first_valid_index(), df.last_valid_index(),
+        # model.rsquared)
+
+        # return value example: 'test__2018-01-01__2018-03-08__specific-id'
+        if any(self.analysis_results):
+            display_result = max([x for x in self.analysis_results if x is not None], key=lambda x: x[0])
+            if display_result[0] > 0:
+                display_category = self.df_map[display_result[1]][0]
+                display_start = display_result[2]
+                display_end = display_result[3]
+                display_id = self.df_map[display_result[1]][1]
+                return display_category + '__' + str(display_start) + '__' + str(display_end) + '__' + str(display_id)
+
+        # default
+        return self.no_data_string
+
+    def get_caution_category(self):
+        """
+        Get the category which Sprout has identified the student doing poorly in
+
+        :return: a category to be included with the FocusStudent object
+        :rtype: str
+        """
+
+        # see the get_progress_category for data examples
+
+        if any(self.analysis_results):
+            display_result = min([x for x in self.analysis_results if x is not None], key=lambda x: x[0])
+            if display_result[0] < 0:
+                display_category = self.df_map[display_result[1]][0]
+                display_start = display_result[2]
+                display_end = display_result[3]
+                display_id = self.df_map[display_result[1]][1]
+                return display_category + '__' + str(display_start) + '__' + str(display_end) + '__' + str(display_id)
+
+        # default
+        return self.no_data_string
+
+    def prepare_focus_category(self, focus):
+        """
+        Convert the category the user has selected into the format expected by the frontend
+
+        :param focus: category string selected by the user
+        :return: prepared version of focus
+        :rtype: str
+        """
+        return focus
+
+    def analyze_data(self):
         # separator character is 2 underscores
 
         # name__StartDate__EndDate__specificId
@@ -70,14 +128,14 @@ class CategoryCalculator():
             grades_lists.setdefault(grade.assignment.section_id, []).append(grade)
 
         # Make a map from a dataframe column id to a behavior/test/effort category
-        df_map = {}
+        self.df_map = {}
         df_counter = 0
         df = pd.DataFrame()
 
         ### Tests
         for test_scores in test_lists.itervalues():  # Dict
             # set a mapping, so we can do a lookup later
-            df_map[df_counter] = ('test', test_scores[0].standardized_test_id)
+            self.df_map[df_counter] = ('test', test_scores[0].standardized_test_id)
 
             # extract the data
             dates = [test_val.date for test_val in test_scores]
@@ -121,7 +179,7 @@ class CategoryCalculator():
             behaviors_series = pd.Series(data=behaviors, index=dates_index)
             # efforts = [score.effort for score in behaviors_efforts]
             efforts = [score.effort / float(5)
-                         for score in behaviors_efforts]
+                       for score in behaviors_efforts]
             efforts_series = pd.Series(data=efforts, index=dates_index)
 
             # union the two indexes together to 'merge/interweave' the lists
@@ -146,17 +204,17 @@ class CategoryCalculator():
         # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
         df = df.reindex(index=new_df_indexes)
         # put the data into our dataframe
-        df_map[df_counter] = ('behavior', 0)  # specific id of 0 because we're dealing with the average, not a class
+        self.df_map[df_counter] = ('behavior', 0)  # specific id of 0 because we're dealing with the average, not a class
         df[df_counter] = behavior_means
         df_counter += 1
-        df_map[df_counter] = ('effort', 0)
+        self.df_map[df_counter] = ('effort', 0)
         df[df_counter] = effort_means
         df_counter += 1
 
         ### Grades
         for grade_scores in grades_lists.itervalues():  # Dict
             # set a mapping, so we can do a lookup later
-            df_map[df_counter] = ('grade', grade_scores[0].assignment.section_id)
+            self.df_map[df_counter] = ('grade', grade_scores[0].assignment.section_id)
             # todo: implement this on the frontend
 
             # extract the data
@@ -189,86 +247,59 @@ class CategoryCalculator():
         #   of a particular test. We want to choose that test to display
         #   More intuitively, the y axis is the independent variable: score. The x axis is the dependent variable: time
 
-        # convert dates into days elapsed since today
+        # convert dates into days elapsed before today
         current_date = datetime.now().date()
-        X = map(lambda x: x.days, (current_date - df.index.values))
+        X = map(lambda x: x.days, (df.index.values - current_date))
         X = sm.add_constant(X)  # Add constant to allow fitting the y-intercept
 
-        # list of tuples containing (df column, start date, end date, r-squared value, and coefficient)
-        results_dic = []
+        # list of tuples containing (coefficient, df column, start date, end date, and r-squared value )
+        self.analysis_results = []
 
         # todo: start from the present and work our way back. Stop when we see something that looks good enough
         # todo: don't even consider something if the most recent datapoint is more than 2 weeks old
-        for i in range(0, len(df.index), 3):  # Step size of 3 when shrinking data down
-            for curr_dataset in df:
-                # If the most recent data point for a series is more than 2 weeks old, don't consider it for display
-                last_data_timedelta = current_date = curr_dataset.last_valid_index()
-                if last_data_timedelta > timedelta(weeks=2):
+
+        for curr_dataset in df:  # curr_dataset is an index of the column in the data set
+            # If the most recent data point for a series is more than 2 weeks old, don't consider it for display
+            last_data_timedelta = current_date - df[curr_dataset].last_valid_index()
+            if last_data_timedelta > timedelta(weeks=2):
+                continue
+
+            positive_example = None
+            negative_example = None
+
+            for i in range(3, len(df.index), 3):  # Step size of 3 when expanding from present
+                # if we already have a positive and negative example, move on to the next dataset
+                if positive_example is not None and negative_example is not None:
+                    break
+
+                # get the most recent i dates
+                y = df[curr_dataset][(-1 * i):]
+
+                # We need to have at least 3 data points:
+                if y.notnull().sum() < 3:
                     continue
 
-                y = df[curr_dataset]  # todo: do each value individually and see if there's a difference
-                model = sm.OLS(y[i:], X[i:], missing='drop').fit()
+                model = sm.OLS(y, X[(-1 * i):], missing='drop').fit()
 
-                # Store the information needed to generate a results string
-                results_dic.append((curr_dataset, df.index[i], df.last_valid_index(), model.rsquared, model.params[1]))
+                # normalize our slope:
+                slope_norm = model.params[1] * (y.last_valid_index() - y.first_valid_index()).days
 
-        # Select the progress category by choosing the run with the highest r^2 value
-        display_result = max(results_dic, key=lambda x: x[4])
-        display_category = df_map[display_result[0]][0]
-        display_start = display_result[1]
-        display_end = display_result[2]
-        display_id = df_map[display_result[0]][1]
+                # store only the most recent positive and negative examples
+                # store the regression only if it passes a threshold: 10% slope (all our data is normalized)
+                if slope_norm >= 0.10:
+                    # only store one positive/negative example per data series
+                    if positive_example is None:
+                        positive_example = (slope_norm, curr_dataset,
+                                            y.first_valid_index(), y.last_valid_index(),
+                                            model.rsquared)
 
-        return display_category + '__' + str(display_start) + '__' + str(display_end) + '__' + str(display_id)
+                if slope_norm <= -0.10:
+                    if negative_example is None:
+                        negative_example = (slope_norm, curr_dataset,
+                                            y.first_valid_index(), y.last_valid_index(),
+                                            model.rsquared)
 
-        # todo: I'm keeping these around for reference, but delete these when everything is done
-        if rand_val == 0:
-            if test_len != 0:
-                return 'test__2018-01-01__2018-03-08__' + str(self.test_scores[test_len - 1].standardized_test_id)
-        if rand_val == 1:
-            if behavior_len != 0:
-                return 'behavior__2018-02-22__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
-        if rand_val == 2:
-            if behavior_len != 0:
-                return 'effort__2018-03-01__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
-
-        # We didn't find anything: return none
-        return self.no_data_string
-
-    def get_caution_category(self):
-        """
-        Get the category which Sprout has identified the student doing poorly in
-
-        :return: a category to be included with the FocusStudent object
-        :rtype: str
-        """
-        rand_val = random.randint(0, 2)
-        behavior_len = len(self.behavior_efforts)
-        test_len = len(self.test_scores)
-
-        if rand_val == self.progress_category_choice:
-            rand_val = (rand_val + 1) % 3
-
-        if rand_val == 0:
-            if test_len != 0:
-                return 'test__2018-01-01__2018-03-08__' + str(self.test_scores[test_len - 1].standardized_test_id)
-        if rand_val == 1:
-            if behavior_len != 0:
-                return 'behavior__2018-02-22__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
-        if rand_val == 2:
-            if behavior_len != 0:
-                return 'effort__2018-03-01__2018-03-08__' + str(self.behavior_efforts[behavior_len - 1].enrollment_id)
-
-        # We didn't find anything: return none
-        return self.no_data_string
-
-    def prepare_focus_category(self, focus):
-        """
-        Convert the category the user has selected into the format expected by the frontend
-
-        :param focus: category string selected by the user
-        :return: prepared version of focus
-        :rtype: str
-        """
-        return focus
+            # Store the information needed to generate a results string
+            self.analysis_results.append(positive_example)
+            self.analysis_results.append(negative_example)
 
