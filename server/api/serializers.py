@@ -10,6 +10,7 @@ from rest_auth.registration.serializers import RegisterSerializer
 from focus_category.category_calculator import CategoryCalculator
 from django.conf import settings
 
+import datetime
 
 class ProfilePictureSerializer(DynamicModelSerializer):
     file = api.fields.Base64ImageField(max_length=None, use_url=True)
