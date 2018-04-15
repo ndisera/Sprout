@@ -7,6 +7,9 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
     $scope.attendance = data.attendance_records;
     $scope.eventSources = [];
     $scope.events = [];
+    $scope.eventElements = [];
+
+    $scope.currentView = $window.innerWidth < 768 ? "listWeek" : "month";
 
     // order attendance by date
     $scope.sortedAttendance = _.sortBy($scope.attendance, 'date');
@@ -21,7 +24,7 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
 
     function convertStringToNumber(str) {
         var total = 0;
-        for(var i = 0; i < str.length; ++i) {
+        for (var i = 0; i < str.length; ++i) {
             total += str.charCodeAt(i);
         }
         return total;
@@ -39,15 +42,23 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
                 right: 'month,basicWeek,basicDay,listWeek'
             },
             editable: false,
-            themeSystem: 'bootstrap3',
+            // themeSystem: 'bootstrap3',
             eventRender: function(event, element) {
-                element.attr('data-toggle', 'tooltip');
-                element.attr('data-container','body');
-                element.prop('title', event.title);
-                element.tooltip();
+                $scope.eventElements.push({ el: element, title: event.title});
             },
-            // does the little panel that doesn't work well the window size is smaller
-            //eventLimit: 2,
+            viewRender: function(view, element) {
+                _.each($scope.eventElements, function(elem) {
+                    if (view.name === "month" || view.name === "basicWeek") {
+                        elem.el.attr('data-toggle', 'tooltip');
+                        elem.el.attr('data-container', 'body');
+                        elem.el.prop('title', elem.title);
+                        elem.el.tooltip();
+                    }
+                });
+                $scope.eventElements = [];
+            },
+            eventLimit: true,
+            allDaySlot: false
         }
     };
 
@@ -101,12 +112,6 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
         },
     };
 
-    // fill in the calendar
-    populateEvents();
-
-    // update the attendance charts
-    updateGraphs();
-
     /**
      * Sets up calendar events
      */
@@ -114,14 +119,14 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
         _.each($scope.attendance, function(elem) {
             var className = $scope.sectionsLookup[$scope.enrollmentsLookup[elem.enrollment].section].title;
             var message = elem.description;
-            var color = $rootScope.colors[convertStringToNumber(elem.short_code) % ($rootScope.colors.length - 1)];
+            var color = $rootScope.calendarColors[convertStringToNumber(elem.short_code) % ($rootScope.calendarColors.length - 1)];
             var textColor = '#fff';
             var borderColor = tinycolor(color).clone().setAlpha(0.5).toRgbString();
             var backgroundColor = tinycolor(color).clone().setAlpha(1).toRgbString();
             $scope.events.push({
                 title: className + ": " + message,
                 start: moment(elem.date).format('YYYY-MM-DD').toString(),
-                //color: '#337ab7',
+                // color: '#337ab7',
                 textColor: textColor,
                 borderColor: borderColor,
                 backgroundColor: backgroundColor,
@@ -191,21 +196,32 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
         $scope[varName] = newDate;
 
         // broadcast event to update min/max values
-        if(varName === graphStartDateKey) {
-            $scope.$broadcast('pickerUpdate', graphEndDateKey, { minDate: $scope[graphStartDateKey] });
-        }
-        else if(varName === graphEndDateKey) {
-            $scope.$broadcast('pickerUpdate', graphStartDateKey, { maxDate: $scope[graphEndDateKey] });
+        if (varName === graphStartDateKey) {
+            $scope.$broadcast('pickerUpdate', graphEndDateKey, {
+                minDate: $scope[graphStartDateKey]
+            });
+        } else if (varName === graphEndDateKey) {
+            $scope.$broadcast('pickerUpdate', graphStartDateKey, {
+                maxDate: $scope[graphEndDateKey]
+            });
         }
 
         updateGraphs();
     };
 
     $scope.adjustCalendarOnResize = function() {
-        if($window.innerWidth < 768) {
+        if ($window.innerWidth < 768) {
             uiCalendarConfig.calendars.attendanceCalendar.fullCalendar('changeView', 'listWeek');
         }
     }
 
     angular.element($window).bind('resize', $scope.adjustCalendarOnResize);
+
+    // initialization
+
+    // fill in the calendar
+    populateEvents();
+
+    // update the attendance charts
+    updateGraphs();
 });

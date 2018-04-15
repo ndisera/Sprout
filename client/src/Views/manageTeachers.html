@@ -127,26 +127,45 @@
         </div>
     </div>
     <div class="col-xs-12 col-sm-4 voffset3" ng-show="displayTEditInfo">
-        <div class="panel-wrapper">
+        <div class="panel-wrapper manipulate-panel-spacer">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Classes Taught</h3>
                 </div>
-                <div class="panel-body" ng-show="sections.length === 0">
-                    <div class="alert alert-info no-bottom-margin" ng-show="sections.length === 0">
-                        <span><b>Info:</b> It looks like this teacher doesn't have any classes</span>
+                <div class="panel-body">
+                    <div ng-show="terms.length > 0 && sections.length > 0">
+                        <div class="select-full-width input-group">
+                            <span class="input-group-addon">Term</span>
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ selectedTerm.name }} <span class="caret"></span></button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    <li ng-repeat="entry in terms" ng-click="selectTerm(entry)" ng-class="{ 'active': entry.id === selectedTerm.id, }">
+                                        <a>{{ entry.name }}  <span ng-if="entry.id === selectedTerm.id" class="glyphicon glyphicon-ok"></span></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="table-responsive voffset3">
+                            <table ng-if="sections.length > 0" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Period</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="section in termSections | orderBy:'title'">
+                                        <td>{{ section.title }}</td>
+                                        <td ng-if="section.schedule_position == null"></td>
+                                        <td ng-if="section.schedule_position != null">{{ section.period }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                <div class="manage-teachers-border-table table-responsive" ng-hide="sections.length === 0">
-                    <table class="table">
-                        <tbody>
-                            <tr ng-repeat="section in sections | orderBy:'title'">
-                                <td>&nbsp;&nbsp;{{ section.title }}</td>
-                                <td ng-if="section.schedule_position == null"></td>
-                                <td ng-if="section.schedule_position != null">&nbsp;&nbsp;{{ currentTermPeriods[section.schedule_position] }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="alert alert-info no-bottom-margin" ng-show="sections.length === 0">
+                        <span><b>Info:</b> It looks like this teacher doesn't have any classes.</span>
+                    </div>
                 </div>
             </div>
         </div>
