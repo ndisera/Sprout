@@ -138,10 +138,9 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
 
         # 1 means expected, -1 means this is an abnormality
 
-        # if the majority are abnormalities, trigger a notification
+        # if the last 3 are abnormalities, trigger a notification
         student_name = new_behavior.enrollment.student.first_name + " " + new_behavior.enrollment.student.last_name
-        # todo: ask for help from simon here
-        if sum(b_prediction_data) < 0:
+        if sum(b_prediction_data) <= -3:
             title = "Abnormal Behavior Scores"
             body = "Sprout has noticed an abnormal pattern of recent behavior scores for " + student_name + "."
             date = str(new_behavior.date)
@@ -149,7 +148,7 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
             notification = Notification(title, body, date, student)
             to_return.append(notification)
 
-        if sum(e_prediction_data) < 0:
+        if sum(e_prediction_data) <= -3:
             title = "Abnormal Effort Scores"
             body = "Sprout has noticed an abnormal pattern of recent effort scores for " + student_name + "."
             date = new_behavior.date
