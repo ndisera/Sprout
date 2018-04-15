@@ -1,18 +1,179 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager
 
 import api.constants as constants
 from api.mixins import AdminWriteMixin
-
-from sprout_user import SproutUser
 
 import os
 
 def get_sentinel_user():
     return get_user_model().objects.get_or_create(email='deleted_user',)[0]
+
+
+class SproutUserManager(BaseUserManager):
+    use_in_migrations = True
+
+    def _create_user(self, email, password, **extra_fields):
+        """
+        Creates and saves a SproutUser with the given email and password.
+        """
+        if not email:
+            raise ValueError('The given email must be set')
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(email, password, **extra_fields)
+
+
+class SproutUser(AbstractBaseUser):
+    """
+    SproutUser
+    Represent and store the account information of anyone who uses Sprout
+    """
+    email = models.EmailField(unique=True, blank=False)
+    is_superuser = models.BooleanField(default=False,
+                                       help_text="Whether this user should have all permissions")
+    is_staff = models.BooleanField(default=False,
+                                   help_text="Not used")
+    is_active = models.BooleanField(default=True,
+                                    help_text="Whether this account is active or not")
+
+    EMAIL_FIELD = 'email'
+    USERNAME_FIELD = AbstractBaseUser.get_email_field_name()
+
+    objects = SproutUserManager()
+
+    def __str__(self):
+        return self.__getattribute__(AbstractBaseUser.get_email_field_name())
+
+    @staticmethod
+    def has_write_permission(request):
+        """
+        Block normal users from modifying/creating users
+        """
+        user = request.user
+        return user.is_superuser
+
+    def has_object_write_permission(self, request):
+        return SproutUser.has_write_permission(request)
+
+    def has_object_update_permission(self, request):
+        """
+        Block normal users from modifying users other than themselves
+        """
+        user = request.user
+        if self == user:
+            return True
+        return user.is_superuser
+
+    def has_object_read_permission(self, request):
+        """
+        Any (authenticated) user can read all other user's basic information
+        """
+        user = request.user
+
+        return user.is_authenticated
+
+    def get_all_allowed_students(self):
+        """
+        Return a queryset containing all the students this user should have access to data for
+
+        A user should be able to access:
+            - All students for whom they are case manager
+            - All students in their taught classes
+        """
+        if self.is_superuser:
+            return Student.objects.all()
+
+        # Students who this user manages
+        manages = Q(case_manager=self)
+        # Students in a class this user teaches
+        teaches = Q(enrollment__section__teacher=self)
+
+        valid_students = Student.objects.filter(teaches | manages)
+        return valid_students
+
+    def get_all_allowed_sections(self):
+        """
+        Return a queryset containing all the sections this user should have access to data for
+
+        A user should be able to access:
+            - All sections for in which a student whom the user manages is enrolled
+            - All sections taught by the user
+            - All sections in the same term in which a student enrolled in a taught section is enrolled
+        """
+        if self.is_superuser:
+            return Section.objects.all()
+
+        # Sections for managed students
+        manages = Q(enrollment__student__case_manager=self)
+        # Sections taught by the user
+        teaches = Q(teacher=self)
+
+        # Sections in the same term in which a student enrolled in a taught section is enrolled
+        valid_enrollments = self.get_all_allowed_enrollments()
+        related_teaches = Q(enrollment__in=valid_enrollments)
+
+        valid_sections = Section.objects.filter(manages | teaches | related_teaches).distinct()
+        return valid_sections
+
+    def get_all_allowed_enrollments(self):
+        """
+        Return a queryset of all enrollments this user should have access to data for
+
+        A user should be able to access:
+            - All enrollments, past and present, for a student for whom the user is a case manager
+            - All enrollments in any taught section
+            - All enrollments for any student in a taught section for the same term as that section
+        """
+        if self.is_superuser:
+            return Enrollment.objects.all()
+
+        # Enrollments belonging to students the user manages
+        manages = Q(student__case_manager=self)
+        # Enrollments belonging to sections the user teaches
+        teaches = Q(section__teacher=self)
+
+        # Filter all terms which the user teaches a class
+        taught_terms = Term.objects.filter(section__teacher=self)
+
+        # The teacher of another section in the same term in which the student is enrolled
+        other_teacher = Q(pk__in=[])
+        for term in taught_terms:
+            overlapping_terms = term.get_overlapping_terms()
+            # Get all sections from this term or its overlaps
+            term_sections = Section.objects.filter(term__in=overlapping_terms)
+            # Get all the enrollments in any section from this term
+            term_enrollments = Enrollment.objects.filter(section__in=term_sections)
+            # Get all the students taught by this user this term
+            term_taught_students = Student.objects.filter(enrollment__in=term_enrollments.filter(section__teacher=self))
+            # Get all the enrollments of those students for this term
+            other_teacher = other_teacher | Q(student__in=term_taught_students, section__term__in=overlapping_terms)
+        return Enrollment.objects.filter(teaches | manages | other_teacher).distinct()
 
 
 class ProfilePicture(models.Model):
@@ -223,6 +384,13 @@ class Term(AdminWriteMixin, models.Model):
         """
         notifications = Notification.objects.filter(date=self.end_date).delete()
         super(Term, self).delete(**kwargs)
+
+    def get_overlapping_terms(self):
+        """
+        Return a queryset of all terms which overlap with this one
+        """
+        overlapping_terms = Q(end_date__range=[str(self.start_date), str(self.end_date)]) | Q(start_date__range=[str(self.start_date), str(self.end_date)])
+        return Term.objects.filter(overlapping_terms).distinct()
 
 
 class Holiday(AdminWriteMixin, models.Model):
@@ -593,3 +761,17 @@ class ServiceRequirement(models.Model):
 
     def __str__(self):
         return self.__repr__()
+
+class Feedback(models.Model):
+    """
+    Feedback 
+    Represents feedback from a user.
+    """
+    user = models.ForeignKey(SproutUser, null=True, on_delete=models.SET(get_sentinel_user),
+                                help_text="User who submitted the feedback")
+    created = models.DateTimeField(auto_now_add=True)
+    body = models.CharField(null=False, blank=False, max_length=settings.DESCRIPTION_CHARFIELD_MAX_LENGTH,
+                             help_text="Body of this note (max length {})".format(settings.DESCRIPTION_CHARFIELD_MAX_LENGTH))
+
+    class Meta:
+        ordering = ('created',)

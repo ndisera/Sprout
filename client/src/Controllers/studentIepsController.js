@@ -1,6 +1,13 @@
-app.controller("studentIepsController", function($scope, $rootScope, $location, $routeParams, toastService, studentService, student, ieps) {
+app.controller("studentIepsController", function($scope, $rootScope, $location, $routeParams, toastService, userService, studentService, student, ieps) {
     $scope.location = $location;
     $scope.student = student.student;
+
+    // permissions
+    $scope.isSuperUser = userService.user.isSuperUser;
+    $scope.isCaseManager = false;
+    if($scope.student.case_manager === userService.user.id) {
+        $scope.isCaseManager = true;
+    }
 
     $scope.ieps        = [];
     $scope.selectedIep = {};
@@ -203,17 +210,15 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                     if(data.iep_goal_datapoints !== null && data.iep_goal_datapoints !== undefined) {
                         iep.datapoints = data.iep_goal_datapoints;
                         _.each(iep.datapoints, function(e) {
-                            e.date = moment(e.date);
-                            e.date_temp = moment(e.date);
-                            e.value_temp = e.value;
-                            e.note_temp = e.note;
-                            e.editing = false;
+                            resetIepData(e);
                         });
-                        iep.datapoints = _.sortBy(iep.datapoints, 'date');
+                        //iep.datapoints = _.sortBy(iep.datapoints, 'date');
 
-                        var borderColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.7).toRgbString();
-                        var pointBackgroundColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.7).toRgbString();
-                        var backgroundColor = $rootScope.colors[iep.id % $rootScope.colors.length].setAlpha(0.2).toRgbString();
+                        var colorIndex = ((iep.id - 1) % ($rootScope.colors.length - 1)) + 1;
+
+                        var borderColor = tinycolor($rootScope.colors[colorIndex]).clone().setAlpha(0.7).toRgbString();
+                        var pointBackgroundColor = tinycolor($rootScope.colors[colorIndex]).clone().setAlpha(0.7).toRgbString();
+                        var backgroundColor = tinycolor($rootScope.colors[colorIndex]).clone().setAlpha(0.2).toRgbString();
 
                         iep.graph = {
                             labels: [],
@@ -258,9 +263,9 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                                     backgroundColor: backgroundColor,
                                 },
                                 {
-                                    borderColor: $rootScope.colors[0].setAlpha(1).toRgbString(),
-                                    pointBackgroundColor: $rootScope.colors[0].setAlpha(0.7).toRgbString(),
-                                    backgroundColor: $rootScope.colors[0].setAlpha(0.2).toRgbString(),
+                                    borderColor: tinycolor($rootScope.colors[0]).clone().setAlpha(1).toRgbString(),
+                                    pointBackgroundColor: tinycolor($rootScope.colors[0]).clone().setAlpha(0.7).toRgbString(),
+                                    backgroundColor: tinycolor($rootScope.colors[0]).clone().setAlpha(0.2).toRgbString(),
                                 },
                             ],
                         };
@@ -270,39 +275,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                         }
                         else {
                             iep.graph.show = true;
-
-                            //iep.graph.data = [[], ];
-
-                            // iterate through each date, setting data as necessary
-                            // can take first and last because it's sorted
-                            var iterDate = iep.datapoints[0].date.clone();
-                            var dateDiff = iep.datapoints[iep.datapoints.length - 1].date.diff(iep.datapoints[0].date, 'd');
-                            var j = 0;
-                            for(var i = 0; i < dateDiff + 1; i++) {
-                                iep.graph.labels[i] = iterDate.format('MM/DD').toString();
-                                iep.graph.data[0][i] = null;
-                                iep.graph.data[1][i] = null;
-
-                                if(iep.datapoints[j]) {
-                                    var date = moment(iep.datapoints[j].date);
-                                    var average = 0;
-                                    var averageCount = 0;
-                                    while(date.diff(iterDate, 'd') === 0) {
-                                        average += iep.datapoints[j].value;
-                                        averageCount++;
-
-                                        j++;
-                                        if(j >= iep.datapoints.length) { break; }
-                                        date = moment(iep.datapoints[j].date);
-                                    }
-
-                                    if(averageCount !== 0) {
-                                        iep.graph.data[0][i] = average / averageCount;
-                                    }
-                                }
-                                iterDate.add(1, 'd');
-                            }
-                            updateIepTarget(iep);
+                            buildIepGraph(iep);
                         }
                     }
                 }
@@ -338,6 +311,41 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         iep.graph.options.legend.display = (iep.quantitative_target !== null);
     }
 
+    function buildIepGraph(iep) {
+        iep.datapoints = _.sortBy(iep.datapoints, function(elem) { return elem.date; });
+
+        // iterate through each date, setting data as necessary
+        // can take first and last because it's sorted
+        var iterDate = iep.datapoints[0].date.clone();
+        var dateDiff = iep.datapoints[iep.datapoints.length - 1].date.diff(iep.datapoints[0].date, 'd');
+        var j = 0;
+        for(var i = 0; i < dateDiff + 1; i++) {
+            iep.graph.labels[i] = iterDate.format('MM/DD').toString();
+            iep.graph.data[0][i] = null;
+            iep.graph.data[1][i] = null;
+
+            if(iep.datapoints[j]) {
+                var date = moment(iep.datapoints[j].date);
+                var average = 0;
+                var averageCount = 0;
+                while(date.diff(iterDate, 'd') === 0) {
+                    average += iep.datapoints[j].value;
+                    averageCount++;
+
+                    j++;
+                    if(j >= iep.datapoints.length) { break; }
+                    date = moment(iep.datapoints[j].date);
+                }
+
+                if(averageCount !== 0) {
+                    iep.graph.data[0][i] = average / averageCount;
+                }
+            }
+            iterDate.add(1, 'd');
+        }
+        updateIepTarget(iep);
+    }
+
     function copyData(data) {
         return {
             goal: data.goal,
@@ -368,6 +376,14 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         };
     }
 
+    function resetIepData(e) {
+        e.date = moment(e.date);
+        e.date_temp = moment(e.date);
+        e.value_temp = e.value;
+        e.note_temp = e.note;
+        e.editing = false;
+    }
+
     $scope.addData = function(iep) {
         var toSave = copyData(iep.newData);
         if(toSave.note === undefined || toSave.note === '') {
@@ -383,9 +399,12 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
 
         studentService.addIepDataForStudent($scope.student.id, iep.id, toSave).then(
             function success(data) {
-                // take the cowards way out
-                // TODO(gzuber): stitch into existing graph?
-                $scope.updateIep(iep);
+                var datapoint = data.iep_goal_datapoint;
+                resetIepData(datapoint);
+                iep.datapoints.push(datapoint);
+
+                buildIepGraph(iep);
+
                 if(iep.addingData) {
                     $scope.toggleAddData(iep, false);
                 }
@@ -396,25 +415,28 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         );
     }
 
-    $scope.saveData = function(iep, data) {
-        var toSave = copyData(data);
+    $scope.saveData = function(iep, datapoint) {
+        var toSave = copyData(datapoint);
         if(toSave.note === undefined || toSave.note === '') {
             toSave.note = null;
         }
         else {
-            toSave.note = data.note_temp;
+            toSave.note = datapoint.note_temp;
         }
 
-        toSave.date = moment(data.date_temp).format('YYYY-MM-DD').toString();
-        toSave.value = data.value_temp;
+        toSave.date = moment(datapoint.date_temp).format('YYYY-MM-DD').toString();
+        toSave.value = datapoint.value_temp;
 
-        studentService.updateIepDataForStudent($scope.student.id, iep.id, data.id, toSave).then(
+        studentService.updateIepDataForStudent($scope.student.id, iep.id, datapoint.id, toSave).then(
             function success(data) {
-                $scope.updateIep(iep);
+                var newData = data.iep_goal_datapoint;
 
-                if(data.editing) {
-                    $scope.toggleEditData(data, false);
-                }
+                datapoint.date  = newData.date;
+                datapoint.value = newData.value;
+                datapoint.note  = newData.note;
+                resetIepData(datapoint);
+
+                buildIepGraph(iep);
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to save the measurement.');
@@ -422,10 +444,14 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         );
     }
 
-    $scope.deleteData = function(iep, data) {
-        studentService.deleteIepDataForStudent($scope.student.id, iep.id, data.id).then(
+    $scope.deleteData = function(iep, datapoint) {
+        studentService.deleteIepDataForStudent($scope.student.id, iep.id, datapoint.id).then(
             function success(data) {
-                $scope.updateIep(iep);
+                var index = _.findIndex(iep.datapoints, function(elem) { return elem.id === datapoint.id; });
+                if(index > -1) {
+                    iep.datapoints.splice(index, 1);
+                }
+                buildIepGraph(iep);
             },
             function error(response) {
                 toastService.error('The server wasn\'t able to delete the measurement.');

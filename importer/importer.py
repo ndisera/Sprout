@@ -425,7 +425,7 @@ if __name__ == "__main__":
                 new_entry = User(pk=None,
                                 is_active=None,
                                 is_superuser=None,
-                                email=row[csv_idx['email']],
+                                email=row[csv_idx['email']].lower(),
                                 first_name=row[csv_idx['first_name']],
                                 last_name=row[csv_idx['last_name']],
                                 import_id=row[csv_idx['import_id']])

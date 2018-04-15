@@ -1,5 +1,6 @@
 from dynamic_rest.serializers import DynamicModelSerializer, WithDynamicModelSerializerMixin
 from dynamic_rest.fields import DynamicRelationField
+from api.forms import *
 from api.models import *
 import api.fields
 from rest_framework import serializers
@@ -380,6 +381,7 @@ class SproutPasswordResetSerializer(PasswordResetSerializer):
     """
     Specify a custom HTML template for our password reset emails
     """
+    password_reset_form_class = SproutPasswordResetForm
 
     def get_email_options(self):
 
@@ -396,6 +398,7 @@ class SproutPasswordResetSerializer(PasswordResetSerializer):
 
         opts = {}
         opts['email_template_name'] = 'registration/sprout_password_reset_email.html'
+        opts['subject_template_name'] = 'registration/sprout_password_reset_email_subject.html'
         opts['domain_override'] = frontend_host
 
         return opts
@@ -574,3 +577,9 @@ class ServiceRequirementSerializer(DynamicModelSerializer):
                 raise serializers.ValidationError(errors)
 
         return data
+
+class FeedbackSerializer(DynamicModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = '__all__'
+    user = DynamicRelationField('SproutUserSerializer')

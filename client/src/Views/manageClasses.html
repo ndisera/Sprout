@@ -33,8 +33,8 @@
                                     <li ng-repeat="term in terms" ng-click="selectTerm(term)" ng-class="{ 'active': term.id === viewSectionTerm.id }">
                                         <a>{{ term.name }}  <span ng-if="term.id === viewSectionTerm.id" class="glyphicon glyphicon-ok"></span></a>
                                     </li>
-                                    <li ng-click="selectTerm({name: 'All Terms'})" ng-class="{ 'active': viewSectionTerm.name === 'All Terms' }">
-                                        <a>All Terms  <span ng-if="viewSectionTerm.name === 'All Terms'" class="glyphicon glyphicon-ok"></span></a>
+                                    <li ng-click="selectTerm({name: 'All Current Terms'})" ng-class="{ 'active': viewSectionTerm.name === 'All Current Terms' }">
+                                        <a>All Current Terms  <span ng-if="viewSectionTerm.name === 'All Current Terms'" class="glyphicon glyphicon-ok"></span></a>
                                     </li>
                                 </ul>
                             </div>
@@ -58,7 +58,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="section in sections | filter:{ term: viewSectionTerm.id } | filter:viewSectionFilter | orderBy:['schedule_position', 'title']" ng-click="viewSection(section)" class="pointer" ng-class="{ 'active': sectionV.id === section.id, }" ng-mouseover="hoverEdit = true"
+                            <tr ng-if="selectedTerm.name !== 'All Current Terms'" ng-repeat="section in sections | filter:{ term: viewSectionTerm.id } | filter:viewSectionFilter | orderBy:['schedule_position', 'title']" ng-click="viewSection(section)" class="pointer" ng-class="{ 'active': sectionV.id === section.id, }" ng-mouseover="hoverEdit = true"
+                                ng-mouseleave="hoverEdit = false">
+                                <td>{{ section.title }}</td>
+                                <td>{{ teacherIdLookup[section.teacher] }}</td>
+                                <td>{{ termsLookup[section.term].name }}</td>
+                                <td ng-if="section.schedule_position == null"></td>
+                                <td ng-if="section.schedule_position != null">{{ periodArraysLookup[termsLookup[section.term].id][section.schedule_position - 1].periodName }}</td>
+                                <td><span ng-show="hoverEdit" class="glyphicon glyphicon-pencil pencilEdit"></span></td>
+                                <td class="buttonColumn table-button-col">
+                                    <button class="btn btn-danger btn-xs" type="button" ng-click="setSectionD(section); $event.stopPropagation();">
+                                                <i class="glyphicon glyphicon-trash white"></i>
+                                            </button>
+                                </td>
+                            </tr>
+                            <tr ng-if="selectedTerm.name === 'All Current Terms'" ng-repeat="section in currentSections | filter:{ term: viewSectionTerm.id } | filter:viewSectionFilter | orderBy:['schedule_position', 'title']" ng-click="viewSection(section)" class="pointer" ng-class="{ 'active': sectionV.id === section.id, }" ng-mouseover="hoverEdit = true"
                                 ng-mouseleave="hoverEdit = false">
                                 <td>{{ section.title }}</td>
                                 <td>{{ teacherIdLookup[section.teacher] }}</td>

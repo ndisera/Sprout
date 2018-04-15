@@ -56,21 +56,29 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             adminRequired: false,
         },
         {
-            title: "Tests",
-            glyph: "file",
-            href: "/tests",
+            title: "Input Scores",
+            glyph: "pencil",
+            href: "/input",
             click: $scope.clearSearch,
             badgeList: [],
-            adminRequired: true,
+            adminRequired: false,
         },
         {
-            title: "Services",
-            glyph: "list",
-            href: "/services",
+            title: "Reports",
+            glyph: "list-alt",
+            href: "/reports",
             click: $scope.clearSearch,
             badgeList: [],
-            adminRequired: true,
+            adminRequired: false,
         },
+        // {
+        //     title: "Services",
+        //     glyph: "list",
+        //     href: "/services",
+        //     click: $scope.clearSearch,
+        //     badgeList: [],
+        //     adminRequired: false,
+        // },
         {
             title: "Manage",
             glyph: "briefcase",
@@ -79,24 +87,18 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             badgeList: [],
             adminRequired: true,
         },
-        //{
-            //title: "Scores Input",
-            //glyph: "pencil",
-            //href: "/input",
-            //click: $scope.clearSearch,
-            //badgeList: [],
-        //},
-        //{
-            //title: "Notifications",
-            //glyph: "bell",
-            //href: "/notifications",
-            //click: $scope.clearSearch,
-            //badgeList: userService.notificationData.relevantItems,
-        //},
         {
             title: "Settings",
             glyph: "cog",
             href: "/settings",
+            click: $scope.clearSearch,
+            badgeList: [],
+            adminRequired: false,
+        },
+        {
+            title: "Feedback",
+            glyph: "comment",
+            href: "/feedback",
             click: $scope.clearSearch,
             badgeList: [],
             adminRequired: false,
@@ -146,11 +148,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
         }
     });
 
-    // closes navbar when an element is clicked in tablet/mobile view
-    //$('.nav a').on('click', function () {
-        //$scope.closeNavbar();
-    //});
-
     /**
      * Navigates to student's page if name in navigation search bar is valid.
      */
@@ -194,28 +191,18 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             panelClass: 'notifications-low-grade',
             iconClass: 'fa-exclamation-triangle',
         },
+        3: {
+            panelClass: 'notifications-iep-goal',
+            iconClass: 'fa-chart-line',
+        },
     }
 
     $scope.notificationClass = function(notification) {
-       switch(notification.category) {
-           case 1:
-               return $scope.notificationsCategories[1].panelClass;
-               break;
-           case 2:
-               return $scope.notificationsCategories[2].panelClass;
-               break;
-       }
+        return $scope.notificationsCategories[notification.category].panelClass;
     };
 
     $scope.notificationIconClass = function(notification) {
-       switch(notification.category) {
-           case 1:
-               return $scope.notificationsCategories[1].iconClass;
-               break;
-           case 2:
-               return $scope.notificationsCategories[2].iconClass;
-               break;
-       }
+        return $scope.notificationsCategories[notification.category].iconClass;
     };
 
     $scope.notificationNavigate = function(notification) {
@@ -262,6 +249,11 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
         scope.$apply(function() {
             scope.toggleNotifications(false);
         });
+    });
+
+    // for report tables
+    jsPDF.autoTableSetDefaults({
+        headerStyles: {fillColor: [87, 188, 144]},
     });
 
 });

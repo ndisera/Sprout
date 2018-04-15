@@ -30,6 +30,21 @@
     background-color: #57bc90;
 }
 
+.tooltip {
+    z-index: 1;
+}
+
+.tooltip.in {
+    opacity: 1;
+}
+
+.tooltip.top .tooltip-inner {
+    background-color: #0b3c5d;
+}
+.tooltip.top .tooltip-arrow {
+      border-top-color: #0b3c5d;
+}
+
 html, body {
     height: 100%;
     width: 100%;
@@ -592,6 +607,10 @@ ul.dropdown-menu > li > a:hover {
     color: #126087;
 }
 
+.alert.alert-info.fc-today:before {
+    content: none;
+}
+
 .alert.alert-info {
     background-color: #d2ecf9;
     border-color: #8ed0f0;
@@ -868,6 +887,10 @@ ul.dropdown-menu > li > a:hover {
     cursor: pointer;
 }
 
+.glyphicon-big-button.not-clickable {
+    cursor: default;
+}
+
 .glyphicon-ok-sign.glyphicon-big-button {
     color: #57bc90;
 }
@@ -876,12 +899,20 @@ ul.dropdown-menu > li > a:hover {
     color: #41a479;
 }
 
+.glyphicon-ok-sign.glyphicon-big-button.not-clickable:hover {
+    color: #57bc90;
+}
+
 .glyphicon-remove-sign.glyphicon-big-button {
     color: #d9534f;
 }
 
 .glyphicon-remove-sign.glyphicon-big-button:hover {
     color: #c9302c;
+}
+
+.glyphicon-remove-sign.glyphicon-big-button.not-clickable:hover {
+    color: #d9534f;
 }
 
 .btn-manipulate-row {
@@ -1004,4 +1035,27 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
 .picture-frame {
     display: inline-block;
     overflow: hidden;
+}
+
+.progress {
+    margin-bottom: 0px;
+}
+
+.progress-bar {
+    background-color: #57bc90;
+}
+
+.progress-bar.failed {
+    background-color: #d9534f;
+}
+
+input[type="checkbox"].feedback-checkbox {
+    margin-top: 12px;
+}
+
+.feedback-textarea {
+    min-height: 80px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }

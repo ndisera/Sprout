@@ -1,9 +1,9 @@
-app.controller("testsController", function($scope, $rootScope, $location, toastService, testService, tests, students) {
+app.controller("testsController", function($scope, $rootScope, $location, toastService, testService, tests, students, userService) {
     $scope.location = $location;
 
     $scope.takenBy = [];
     $scope.notTakenBy = [];
-    $scope.tests = tests.standardized_tests;
+    $scope.tests = _.sortBy(tests.standardized_tests, 'test_name');
     $scope.students = students.students;
     $scope.studentsLookup = _.indexBy($scope.students, 'id');
 
@@ -20,15 +20,21 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
      * Downloads the test report
      */
     $scope.downloadReport = function() {
+        var currentDate = moment().format('YYYY-MM-DD').toString();
         var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
+        doc.setFont('Times', 'normal');
         var startDate = moment($scope.startDate).format('YYYY-MM-DD').toString();
         var endDate = moment($scope.endDate).format('YYYY-MM-DD').toString();
         var scale = 2.83465;
+        doc.addImage($rootScope.logoImgData, 'JPEG', 180 * scale, 15 * scale, 15 * scale, 15 * scale);
 
         doc.setFontSize(30);
-        doc.text(105 * scale, 25 * scale, $scope.selectedTest.test_name + ' Report', 'center');
+        doc.text(15 * scale, 25 * scale, $scope.selectedTest.test_name + ' Report');
         doc.setFontSize(18);
-        doc.text(105 * scale, 33 * scale, startDate + " to " + endDate, 'center');
+        doc.text(15 * scale, 33 * scale, startDate + " to " + endDate);
+        doc.setFontSize(12);
+        doc.text(15 * scale, 41 * scale, "Generated on " + currentDate + " by " + userService.user.firstName + " " + userService.user.lastName);
+        doc.setFontSize(18);
 
         var takenColumns = ["Date", "Name", "Student ID", "Score"];
         var notTakenColumns = ["Name", "Student ID"];
@@ -43,12 +49,13 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
             notTakenRows.push([elem.first_name + " " + elem.last_name, elem.student_id]);
         });
 
-        doc.text(15 * scale, 45 * scale, "Taken:")
-        doc.autoTable(takenColumns, takenRows, { startY: 49 * scale, showHeader: 'firstPage', });
+        doc.text(15 * scale, 54 * scale, "Taken:")
+        doc.autoTable(takenColumns, takenRows, { startY: 58 * scale, showHeader: 'firstPage'});
+        doc.setFont('Times', 'normal');
         let first = doc.autoTable.previous;
         doc.text(15 * scale, first.finalY + (12 * scale), "Not Taken:");
-        doc.autoTable(notTakenColumns, notTakenRows, { startY: first.finalY + (16 * scale), showHeader: 'firstPage', });
-        doc.save($scope.selectedTest.test_name + '.pdf');
+        doc.autoTable(notTakenColumns, notTakenRows, { startY: first.finalY + (16 * scale), showHeader: 'firstPage'});
+        doc.save($scope.selectedTest.test_name + '_' + currentDate + '.pdf');
     };
 
     /**
@@ -141,6 +148,13 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
     }
 
     /**
+     * Navigates to student's test page
+     */
+    $scope.viewStudent = function(id) {
+        $location.path('/student/' + id + '/tests');
+    };
+
+    /**
      * Filter used for students who've taken the selected test
      * @param {student} student - student to be filtered.
      */
@@ -174,4 +188,9 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
         }
         return false;
     };
+
+    // initialization
+    if ($scope.tests.length > 0) {
+        $scope.selectTest($scope.tests[0]);
+    }
 });

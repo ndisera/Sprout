@@ -199,7 +199,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
-     * Add picture to student profile 
+     * Add picture to student profile
      * @param {number} studentId - ID of the student
      * @param {picture} picture - the picture object. ex: { 'file': 'base64_encoded_string', }
      * @return {promise} promise that will resolve with data or reject with response code.
@@ -219,7 +219,7 @@ app.factory("studentService", function ($rootScope, $http, $q, $window, querySer
     }
 
     /**
-     * Delete picture from student profile 
+     * Delete picture from student profile
      * @param {number} studentId - ID of the student
      * @param {picture} pictureId - the ID of the picture
      * @return {promise} promise that will resolve with data or reject with response code.

@@ -18,9 +18,17 @@ if [ ! $? -eq 0 ]; then
   exit 1
 fi
 
-# set up the virtualenv
+# set up the backend virtualenv
 pushd "${SCRIPT_PATH}"/../server
 virtualenv env
+popd
+
+# setup the data_generation virtualenv
+pushd "${SCRIPT_PATH}"/../data_generation
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+deactivate
 popd
 
 # Install Haraka SMTP server

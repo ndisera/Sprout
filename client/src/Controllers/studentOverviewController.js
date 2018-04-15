@@ -1,5 +1,15 @@
-app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, studentService, termService, termData, enrollmentData, userData, studentData, parentContactData) {
+app.controller("studentOverviewController", function ($rootScope, $scope, $location, $routeParams, toastService, userService, studentService, termService, termData, enrollmentData, userData, studentData, parentContactData, school) {
     $scope.location = $location;
+
+    // school settings should have 1 entry
+    $scope.gradeLevels = [];
+    var schoolSetting = null;
+    if(school && school.school_settings) {
+        schoolSettings = school.school_settings[0];
+        for(var i = schoolSettings.grade_range_lower; i <= schoolSettings.grade_range_upper; ++i) {
+            $scope.gradeLevels.push(i);
+        }
+    }
 
     $scope.newStudentImage = null;
     $scope.newStudentImageCrop = null;
@@ -16,6 +26,12 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
     $scope.selectedTerm = null;
     var currentTerms = [];
     var currentTermsLookup = {};
+
+    $scope.isSuperUser = userService.user.isSuperUser;
+    $scope.isCaseManager = false;
+    if($scope.student.case_manager === userService.user.id) {
+        $scope.isCaseManager = true;
+    }
 
     if(termData.terms !== null && termData.terms !== undefined) {
         $scope.terms       = termService.transformAndSortTerms(termData.terms);
@@ -97,6 +113,12 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
             title: 'Birthday',
             value: moment($scope.student.birthdate).format('YYYY-MM-DD'),
             curValue: moment($scope.student.birthdate).format('YYYY-MM-DD'),
+        },
+        grade_level: {
+            key: 'grade_level',
+            title: 'Grade Level',
+            value: $scope.student.grade_level,
+            curValue: $scope.student.grade_level,
         },
     };
 
@@ -273,7 +295,7 @@ app.controller("studentOverviewController", function ($rootScope, $scope, $locat
     $scope.toggleAddParentContactInfo = function(value) {
         $scope.addingParentContactInfo = value;
         if(!value) {
-            resetNewParentContactInfo(entry);
+            resetNewParentContactInfo();
         }
     };
 

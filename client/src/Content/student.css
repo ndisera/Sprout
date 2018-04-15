@@ -183,10 +183,6 @@
     padding: 8px;
 }
 
-.student-tests-scrollable {
-    max-height: 300px;
-}
-
 .student-grades-box-content {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -214,6 +210,10 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #eee;
+}
+
+.student-behaviors-comment-header.full-width {
+    width: 100% !important;
 }
 
 .student-behaviors-comment-header.editing {
@@ -334,6 +334,10 @@
     width: calc(100% - 50px);
 }
 
+#student-ieps-select.full-width {
+    width: 100% !important;
+}
+
 #student-ieps-edit-form .form-group {
     margin-right: 0px;
     margin-left: 0px;
@@ -393,4 +397,53 @@
 
 #student-services-add-btn.btn-manipulate-row-bottom {
     margin-top: 20px;
+}
+
+.calendar-container {
+    width: 100%;
+}
+
+@media (max-width: 767px) {
+    .doughnut-height {
+        height: 275px;
+    }
+
+    .fc-right {
+        display: none;
+    }
+
+    .fc-center {
+        float: right;
+    }
+}
+
+@media (min-width: 768px) {
+    .doughnut-height {
+        height: 225px;
+    }
+}
+
+.fc-unthemed td.fc-today {
+    background: #d1ffda;
+}
+
+.fc-toolbar .fc-state-active, .fc-toolbar .ui-state-active {
+    z-index: 0;
+}
+
+.fc-list-item-time {
+    display: none;
+}
+
+.fc-state-default {
+    background-image: none;
+    background-repeat: none;
+    text-shadow: none;
+    box-shadow: none;
+}
+
+.hidden-graph {
+    opacity: 0.0;
+    height: 500px;
+    width: 1000px;
 }

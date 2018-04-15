@@ -1,4 +1,4 @@
-app.controller("studentBehaviorsController", function($scope, $routeParams, $location, toastService, behaviorService, studentService, data, terms, service, student) {
+app.controller("studentBehaviorsController", function($scope, $rootScope, $routeParams, $location, toastService, userService, behaviorService, studentService, data, terms, service, student) {
     $scope.location = $location;
 
     // I'm displaying all classes in the report dropdown, I need to display all classes that are valid for the chosen term
@@ -31,6 +31,13 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
     $scope.termToSectionsByTerm = {};
     // will give index into graph's data array if given section id
     $scope.sectionToDataIndex = {};
+
+    $scope.isSuperUser = userService.user.isSuperUser;
+    $scope.isCaseManager = false;
+    if($scope.student.case_manager === userService.user.id) {
+        $scope.isCaseManager = true;
+    }
+
 
     if (data !== null && data !== undefined) {
         if (data.enrollments !== null && data.enrollments !== undefined) {
@@ -83,6 +90,9 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
             title: "All Classes"
         });
         _.each($scope.sharedGraph.series, function(elem) {
+            if (elem === "") {
+                return;
+            }
             $scope.classOptions.push({
                 // I just need the id for the corresponding class name, I'm just going to create a lookup at the start
                 id: $scope.sectionsLookupByTitle[elem].id,
@@ -213,7 +223,65 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         legend: {
             display: false,
         }
-    }
+    };
+
+    $scope.hiddenAvgGraphOptions = {
+        elements: {
+            line: {
+                fill: false,
+            },
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            xAxes: [{
+                ticks: {
+                    fontSize: 16
+                }
+            }],
+            yAxes: [{
+                display: true,
+                ticks: {
+                    min: 0,
+                    stepSize: 1,
+                    max: 5,
+                    fontSize: 16
+                }
+            }]
+        },
+        legend: {
+            display: false,
+        }
+    };
+
+    $scope.hiddenGraphOptions = {
+        elements: {
+            line: {
+                fill: false,
+            },
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            xAxes: [{
+                ticks: {
+                    fontSize: 16
+                }
+            }],
+            yAxes: [{
+                display: true,
+                ticks: {
+                    min: 0,
+                    stepSize: 1,
+                    max: 5,
+                    fontSize: 16
+                }
+            }]
+        },
+        legend: {
+            display: true,
+        }
+    };
 
     // start off the two graphs with empty datasets
     $scope.behaviorGraph = {
@@ -354,14 +422,13 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                 var j = 0;
                 for (var i = 0; i < dateDiff + 1; i++) {
                     $scope.sharedGraph.labels[i] = iterDate.format('MM/DD').toString();
-
+                    // for calculating average
+                    var behaviorCount = 0;
+                    var behaviorSum = 0;
+                    var effortCount = 0;
+                    var effortSum = 0;
                     if (data.behaviors[j]) {
                         var behaviorDate = moment(data.behaviors[j].date);
-                        // for calculating average
-                        var behaviorCount = 0;
-                        var behaviorSum = 0;
-                        var effortCount = 0;
-                        var effortSum = 0;
                         while (behaviorDate.diff(iterDate, 'd') === 0) {
                             // have to check for nulls before incrementing the total and calculating the average
                             var enrollment = $scope.enrollmentsLookup[data.behaviors[j].enrollment];
@@ -384,28 +451,27 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
                             }
                             behaviorDate = moment(data.behaviors[j].date);
                         }
+                    }
+                    $scope.behaviorAvgInfo[i] = {
+                        count: behaviorCount,
+                        sum: behaviorSum
+                    };
+                    $scope.effortAvgInfo[i] = {
+                        count: effortCount,
+                        sum: effortSum
+                    };
 
-                        // at this point if the count isn't 0, store avg info
-                        $scope.behaviorAvgInfo[i] = {
-                            count: behaviorCount,
-                            sum: behaviorSum
-                        };
-                        $scope.effortAvgInfo[i] = {
-                            count: effortCount,
-                            sum: effortSum
-                        };
+                    // at this point if the count isn't 0, store avg info
+                    if (behaviorCount > 0) {
+                        $scope.avgBehaviorGraph.data[0][i] = behaviorSum / behaviorCount;
+                    } else {
+                        $scope.avgBehaviorGraph.data[0][i] = null;
+                    }
 
-                        if (behaviorCount > 0) {
-                            $scope.avgBehaviorGraph.data[0][i] = behaviorSum / behaviorCount;
-                        } else {
-                            $scope.avgBehaviorGraph.data[0][i] = null;
-                        }
-
-                        if (effortCount > 0) {
-                            $scope.avgEffortGraph.data[0][i] = effortSum / effortCount;
-                        } else {
-                            $scope.avgEffortGraph.data[0][i] = null;
-                        }
+                    if (effortCount > 0) {
+                        $scope.avgEffortGraph.data[0][i] = effortSum / effortCount;
+                    } else {
+                        $scope.avgEffortGraph.data[0][i] = null;
                     }
 
                     iterDate.add(1, 'd');
@@ -757,6 +823,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         if ($scope.report.class != null) {
             $scope.updateClassGraphs();
         }
+        $scope.modalOpen = true;
     };
 
     /**
@@ -776,7 +843,7 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
      */
     $scope.updateClassGraphs = function() {
         // this needs to be called on create report button as well
-        $scope.showClass = $scope.report.class.title !== "All Classes" && $scope.report.class.title !== "Average";
+        $scope.showClass = $scope.report.class != null && $scope.report.class.title !== "All Classes" && $scope.report.class.title !== "Average";
         if ($scope.showClass) {
             $scope.singleBehaviorGraph.data[0] = [];
             $scope.singleEffortGraph.data[0] = [];
@@ -861,30 +928,33 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         var effortImgData = effortCanvas.toDataURL("image/jpeg", 1.0);
 
         var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
+        doc.setFont('Times', 'normal');
         var startDate = moment($scope.graphStartDate).format('YYYY-MM-DD').toString();
         var endDate = moment($scope.graphEndDate).format('YYYY-MM-DD').toString();
 
-        // 568x150 (height won't change)
-        // About 700 looks to be max for width
-        var width = behaviorCanvas.width * 0.26;
-        var height = behaviorCanvas.height * 0.26;
+        var width = 180;
+        var height = 90;
         var scale = 2.83465;
+        var currentDate = moment().format('YYYY-MM-DD').toString();
+
+        doc.addImage($rootScope.logoImgData, 'JPEG', 180 * scale, 15 * scale, 15 * scale, 15 * scale);
 
         doc.setFontSize(30);
-        doc.text(105 * scale, 25 * scale, 'Behavior and Effort Report', 'center');
+        doc.text(15 * scale, 25 * scale, 'Behavior and Effort Report');
         doc.setFontSize(18);
         var forMessage = $scope.report.class.title !== "Average" ?
             'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + ' in ' + $scope.report.class.title :
             forMessage = 'For ' + $scope.student.first_name + ' ' + $scope.student.last_name + '\'s Average in All Classes';
         // for person's average in all classes
-        doc.text(105 * scale, 33 * scale, forMessage, 'center');
-        doc.text(105 * scale, 41 * scale, startDate + " to " + endDate, 'center');
-        doc.text(105 * scale, 84 * scale, 'Behavior', 'center');
-        doc.text(105 * scale, 92 * scale, 'Average: ' + behaviorAvg, 'center');
-        doc.addImage(behaviorImgData, 'JPEG', (105 - width / 2) * scale, 100 * scale, width * scale, height * scale);
-        doc.text(105 * scale, 184 * scale, 'Effort', 'center');
-        doc.text(105 * scale, 192 * scale, 'Average: ' + effortAvg, 'center');
-        doc.addImage(effortImgData, 'JPEG', (105 - width / 2) * scale, 200 * scale, width * scale, height * scale);
+        doc.text(15 * scale, 33 * scale, forMessage);
+        doc.text(15 * scale, 41 * scale, startDate + " to " + endDate);
+        doc.setFontSize(12);
+        doc.text(15 * scale, 49 * scale, "Generated on " + currentDate + " by " + userService.user.firstName + " " + userService.user.lastName);
+        doc.setFontSize(18);
+        doc.text(15 * scale, 64 * scale, 'Behavior - Average: ' + behaviorAvg);
+        doc.addImage(behaviorImgData, 'JPEG', (105 - width / 2) * scale, 72 * scale, width * scale, height * scale);
+        doc.text(15 * scale, 174 * scale, 'Effort - Average: ' + effortAvg);
+        doc.addImage(effortImgData, 'JPEG', (105 - width / 2) * scale, 182 * scale, width * scale, height * scale);
 
         doc.addPage();
         var columns = includeClassNames ? ["Date", "Class", "Behavior Score", "Effort Score"] : ["Date", "Behavior Score", "Effort Score"];
@@ -906,12 +976,14 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
         }
 
         doc.autoTable(columns, rows, { showHeader: 'firstPage' });
-        doc.save($scope.student.first_name + $scope.student.last_name + '.pdf');
+        var classTitle = $scope.report.class.title.split(' ').join('_');
+        doc.save($scope.student.first_name + '_' + $scope.student.last_name + '_' + classTitle + '_' + currentDate + '.pdf');
 
         // clear report obj
         $scope.report = {};
 
         // close modal here since data-dismiss isn't working
+        $scope.modalOpen = false;
         $('#generateReportModal').modal('toggle');
     };
 
@@ -933,4 +1005,5 @@ app.controller("studentBehaviorsController", function($scope, $routeParams, $loc
     $scope.graphDisplayOptions = ["Average", "All Classes"];
     $scope.behaviorGraphSelection = "All Classes";
     $scope.effortGraphSelection = "All Classes";
+    $scope.modalOpen = false;
 });

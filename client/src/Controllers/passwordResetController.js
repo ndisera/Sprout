@@ -59,6 +59,7 @@ app.controller('passwordResetController', function ($scope, $rootScope, $locatio
             return;
         }
 
+        $scope.email = $scope.email.toLowerCase();
         var savedEmail = $scope.email;
 
         userService.resetPassword($scope.email).then(
