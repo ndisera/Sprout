@@ -534,12 +534,6 @@ app.factory("userService", function ($rootScope, $http, $q, queryService) {
                         _.each(response.data.notifications, function(elem) {
                             userService.notificationData.relevantItems.push(elem);
                         });
-
-                        //var relevantDate = moment().add(userService.notificationData.relevantOffset.value, userService.notificationData.relevantOffset.unit);
-
-                        //_.each(_.filter(response.data.notifications, function(elem) { return moment(elem.date) < relevantDate && elem.unread; }), function(elem) {
-                            //userService.notificationData.relevantItems.push(elem);
-                        //});
                     }
                 }
             }

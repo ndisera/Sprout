@@ -1132,6 +1132,7 @@ input.ng-invalid:focus, select.ng-invalid:focus, input.invalid:focus {
 
 input[type="checkbox"].feedback-checkbox {
     margin-top: 12px;
+    margin-left: 15px;
 }
 
 .feedback-textarea {
