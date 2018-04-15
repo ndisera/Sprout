@@ -435,6 +435,13 @@
     display: none;
 }
 
+.fc-state-default {
+    background-image: none;
+    background-repeat: none;
+    text-shadow: none;
+    box-shadow: none;
+}
+
 .hidden-graph {
     opacity: 0.0;
     height: 500px;
