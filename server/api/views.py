@@ -67,7 +67,8 @@ def set_link(class_id, path, method, link):
     else:
         return link
 
-
+# Disable PATCH endpoints, since the frontend does not use them and PUT avoids data-trashing race conditions
+del mixins.UpdateModelMixin.partial_update
 class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
 
@@ -121,6 +122,38 @@ class ProfilePictureViewSet(mixins.CreateModelMixin,
     def perform_create(self, serializer):
         serializer.save()
         self.instance = serializer.instance
+
+
+class PageRankViewSet(NestedDynamicViewSet):
+    permission_classes = (IsAuthenticated, DRYObjectPermissions, )
+    serializer_class = PageRankSerializer
+    queryset = PageRank.objects.all()
+
+    def get_queryset(self, queryset=None):
+        """
+        A non-superuser should only be able to view their own PageRanks
+        """
+        user = self.request.user
+        if queryset is None:
+            queryset = super(PageRankViewSet, self).get_queryset()
+
+        if user.is_superuser:
+            return queryset
+
+        return queryset.filter(user=user)
+
+    name_user= 'user'
+    desc_user = "ID of the User to whom this ranking belongs"
+
+    user_field = coreapi.Field(name=name_user,
+                               required=True,
+                               location="form",
+                               description=desc_user,
+                               schema=coreschema.Integer(title=name_user))
+
+    schema = AutoSchema(manual_fields=[
+        user_field,
+    ])
 
 
 class StudentViewSet(NestedDynamicViewSet):

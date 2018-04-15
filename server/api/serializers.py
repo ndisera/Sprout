@@ -4,11 +4,13 @@ from api.forms import *
 from api.models import *
 import api.fields
 from rest_framework import serializers
+from rest_framework import validators
 from rest_auth.serializers import LoginSerializer, UserDetailsSerializer, PasswordResetSerializer
 from rest_auth.registration.serializers import RegisterSerializer
 from focus_category.category_calculator import CategoryCalculator
 from django.conf import settings
 
+import datetime
 
 class ProfilePictureSerializer(DynamicModelSerializer):
     file = api.fields.Base64ImageField(max_length=None, use_url=True)
@@ -16,6 +18,53 @@ class ProfilePictureSerializer(DynamicModelSerializer):
     class Meta:
         fields = '__all__'
         model = ProfilePicture
+
+
+class PageRankSerializer(DynamicModelSerializer):
+    user = DynamicRelationField('SproutUserSerializer')
+
+    class Meta:
+        fields = ('id', 'user', 'url', )
+        model = PageRank
+
+    def to_representation(self, instance):
+        """
+        Return this model plus the counter
+        """
+        representation = super(PageRankSerializer, self).to_representation(instance)
+        representation['counter'] = instance.counter
+        return representation
+
+    def run_validators(self, value):
+        """
+        Remove the unique-together validator so that we can get_or_create in .create
+        """
+        for validator in self.validators:
+            if isinstance(validator, validators.UniqueTogetherValidator):
+                self.validators.remove(validator)
+        super(PageRankSerializer, self).run_validators(value)
+
+    def create(self, validated_data):
+        """
+        Either create a new PageRank object or fetch the existing one, then reset the counter
+        if too long has passed, then increment the counter
+        """
+        instance, created = PageRank.objects.get_or_create(user=validated_data['user'],
+                                                           url=validated_data['url'],
+                                                           defaults={
+                                                               'date': datetime.date.today()
+                                                           }
+                                                           )
+        timedelta = datetime.timedelta(days=settings.USER_PAGE_RANK_TIMESPAN_DAYS)
+
+        if datetime.date.today() > instance.date + timedelta:
+            # Too much time has elapsed. Reset the counter.
+            instance.counter = 0
+
+        instance.counter += 1
+        instance.save()
+
+        return instance
 
 
 class StudentSerializer(DynamicModelSerializer):

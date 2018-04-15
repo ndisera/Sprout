@@ -194,7 +194,10 @@
                         </div>
                     </div>
                     <div class="alert alert-info no-bottom-margin" ng-if="terms.length === 0">
-                        <span><b>Info:</b> It looks like this school doesn't have any terms yet. Speak to your admin to add one.</span>
+                        <span>
+                            <b>Info:</b> It looks like this school doesn't have any terms yet. 
+                            <span ng-show="!isSuperUser">Speak to your admin to add one.</span>
+                        </span>
                     </div>
                     <div class="alert alert-info no-bottom-margin voffset3" ng-if="terms.length > 0 && termSections.length === 0">
                         <span><b>Info:</b> It looks like this student either isn't enrolled in any classes for this term, or you aren't one of this student's teachers for this term.</span>

@@ -380,35 +380,6 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
             }
         })
 
-        // route for the input scores page
-        .when('/notifications', {
-            templateUrl: 'html/notifications.html',
-            controller: 'notificationsController',
-            resolve: {
-                // need to make sure user in userService is set before calling
-                data: function ($q, userService) {
-                    //TODO(gzuber): I don't like this in script.js...
-                    var deferred = $q.defer();
-                    userService.authVerify().then(
-                        function success() {
-                            userService.getAllNotificationsForUser(userService.user.id).then(
-                                function success(data) {
-                                    deferred.resolve(data);
-                                },
-                                function error(response) {
-                                    deferred.reject(response);
-                                }
-                            );
-                        },
-                        function error(response) {
-                            deferred.reject(response);
-                        }
-                    );
-                    return deferred.promise;
-                },
-            },
-        })
-
         // routes for the student profile pages
         .when('/student/:id', {
             templateUrl: 'html/studentOverview.html',

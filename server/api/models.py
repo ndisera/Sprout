@@ -219,6 +219,62 @@ class SproutUserProfile(models.Model):
                                    help_text="User's Profile Picture")
 
 
+class PageRank(models.Model):
+    """
+    Keep track of which urls a user has visited most frequently in the recent past
+        - Counter is updated whenever the model is saved
+        - Counter is reset to 1 if the user hasn't visited the page in a period greater than
+            settings.USER_PAGE_RANK_TIMESPAN_DAYS
+    """
+    user = models.ForeignKey(SproutUser, blank=False, null=False, on_delete=models.CASCADE,
+                                help_text="User ranking this page")
+    url = models.CharField(blank=False, null=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                           help_text="Page which is being ranked")
+    counter = models.PositiveIntegerField(default=0,
+                                          help_text="Number of times this page has been used recently")
+    date = models.DateField(auto_now=True,
+                            help_text="Date the user last visited this url")
+
+    class Meta:
+        ordering=('user','id', )
+        unique_together = (('user', 'url', ), )
+
+    @staticmethod
+    def has_write_permission(request):
+        """
+        In general, users can spawn PageRank objects
+        """
+        # TODO: Stop users from writing other users' pageranks. Why should that be so hard?
+        return request.user.is_authenticated
+
+    def has_object_create_permission(self, request):
+        """
+        Non-superusers may only update their own PageRank objects
+        """
+        user = request.user
+        if user.is_superuser:
+            return user.is_superuser
+
+        return self.user == user
+
+    @staticmethod
+    def has_read_permission(request):
+        """
+        In general, users can read PageRank objects
+        """
+        return request.user.is_authenticated
+
+    def has_object_read_permission(self, request):
+        """
+        Non-superusers can only read their own PageRank objects
+        """
+        user = request.user
+        if user.is_superuser:
+            return user.is_superuser
+
+        return self.user == user
+
+
 class Student(models.Model):
     """
     Student
