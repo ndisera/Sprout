@@ -86,18 +86,22 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
         """
         to_return = []
 
-        # https://stackoverflow.com/a/4143837/3518046
         # only save a list if it's the same class as the new behavior score
-        behavior_effort_list = {}
+        behavior_effort_list = []
         for behavior in self.behavior_efforts:
             if behavior.enrollment_id == new_behavior.enrollment_id:
-                behavior_effort_list.setdefault(behavior.enrollment_id, []).append(behavior)
+                behavior_effort_list.append(behavior)
         # We should only ever have one list
-        behavior_effort_list = behavior_effort_list[new_behavior.enrollment_id]
+
+        # only continue with the learning if we have at least ten examples to train off of, and 3 to test
+        training_size = 10
+        prediction_size = 3
+        if len(behavior_effort_list) < training_size + prediction_size:
+            return to_return
 
         # extract the data
         dates = [score.date for score in behavior_effort_list]
-        date_offsets = [(current_date - datetime.now().date()).days for current_date in dates]
+        date_offsets = [(datetime.now().date() - current_date).days for current_date in dates]
         dates_index = pd.Index(data=date_offsets)
 
         behaviors = [score.behavior for score in behavior_effort_list]
@@ -108,45 +112,48 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
         # Save the lookup
         class_title = new_behavior.enrollment.section.title
 
-        # make new dataframes, fill them, and add them to a list
+        # make new dataframes, fill them, and drop any inequalities
         behavior_df = pd.DataFrame(data=behaviors_series, index=dates_index)
+        behavior_df = behavior_df.dropna()
         effort_df = pd.DataFrame(data=efforts_series, index=dates_index)
+        effort_df = effort_df.dropna()
+
 
         # Separate into train and predict
-        b_train_data = behavior_df[0][:-3]
-        b_test_data  = behavior_df[0][-3:]
-        e_train_data = effort_df[0][:-3]
-        e_test_data  = effort_df[0][-3:]
+        b_train_data = behavior_df[0][:-prediction_size]
+        b_test_data  = behavior_df[0][-prediction_size:]
+        e_train_data = effort_df[0][:-prediction_size]
+        e_test_data  = effort_df[0][-prediction_size:]
 
 
 
         # machine learnin'
         b_clf = svm.OneClassSVM(nu=0.1, kernel='rbf', gamma=0.1)
         b_clf.fit(b_train_data.reshape(-1, 1))
-        b_prediction_data = b_clf.predict(b_test_data.reshape(-1, 1))
+        b_prediction_data = b_clf.predict(b_test_data.values.reshape(-1, 1))
 
         e_clf = svm.OneClassSVM(nu=0.1, kernel='rbf', gamma=0.1)
         e_clf.fit(e_train_data.reshape(-1, 1))
-        e_prediction_data = b_clf.predict(e_test_data.reshape(-1, 1))
+        e_prediction_data = b_clf.predict(e_test_data.values.reshape(-1, 1))
 
         # 1 means expected, -1 means this is an abnormality
 
         # if the majority are abnormalities, trigger a notification
+        student_name = new_behavior.enrollment.student.first_name + " " + new_behavior.enrollment.student.last_name
+        # todo: ask for help from simon here
         if sum(b_prediction_data) < 0:
             title = "Abnormal Behavior Scores"
-            body = "Sprout has noticed an abnormal pattern of recent behavior scores for " + \
-                   new_behavior.enrollment.student.first_name + " " + new_behavior.enrollment.student.last_name + "."
-            date = new_behavior.date
-            student = new_behavior.enrollment.student.id
+            body = "Sprout has noticed an abnormal pattern of recent behavior scores for " + student_name + "."
+            date = str(new_behavior.date)
+            student = new_behavior.enrollment.student
             notification = Notification(title, body, date, student)
             to_return.append(notification)
 
         if sum(e_prediction_data) < 0:
             title = "Abnormal Effort Scores"
-            body = "Sprout has noticed an abnormal pattern of recent effort scores for " + \
-                   new_behavior.enrollment.student.first_name + " " + new_behavior.enrollment.student.last_name + "."
+            body = "Sprout has noticed an abnormal pattern of recent effort scores for " + student_name + "."
             date = new_behavior.date
-            student = new_behavior.enrollment.student.id
+            student = new_behavior.enrollment.student
             notification = Notification(title, body, date, student)
             to_return.append(notification)
 
