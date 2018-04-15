@@ -214,7 +214,6 @@ class CategoryCalculator():
             for grade_scores in grades_lists.itervalues():  # Dict
                 # set a mapping, so we can do a lookup later
                 self.df_map[df_counter] = ('grades', grade_scores[0].assignment.section_id)
-                # todo: implement this on the frontend
 
                 # extract the data
                 dates = [grade_val.handin_datetime.date() for grade_val in grade_scores]
@@ -281,15 +280,15 @@ class CategoryCalculator():
                     slope_norm = model.params[1] * (y.last_valid_index() - y.first_valid_index()).days
 
                     # store only the most recent positive and negative examples
-                    # store the regression only if it passes a threshold: 10% slope (all our data is normalized)
-                    if slope_norm >= 0.10:
+                    # store the regression only if it passes a threshold: 15% slope (all our data is normalized)
+                    if slope_norm >= 0.15:
                         # only store one positive/negative example per data series
                         if positive_example is None:
                             positive_example = (slope_norm, curr_dataset,
                                                 y.first_valid_index(), y.last_valid_index(),
                                                 model.rsquared)
 
-                    if slope_norm <= -0.10:
+                    if slope_norm <= -0.15:
                         if negative_example is None:
                             negative_example = (slope_norm, curr_dataset,
                                                 y.first_valid_index(), y.last_valid_index(),
