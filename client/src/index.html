@@ -191,16 +191,37 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-12 col-sm-8">
-                            <form id="topbar-search" ng-submit="tryNavigateToStudent()">
+                            <form id="topbar-search" ng-submit="">
                                 <div class="input-group">
-                                    <input type="text" autocomplete="off" class="form-control" placeholder="Search Students" list="student" name="student" ng-model="studentName">
-                                    <datalist id="student">
-                                        <option ng-repeat="s in studentInfo.students" value="{{s.first_name}} {{s.last_name}}">{{ s.first_name}} {{ s.last_name }}
-                                    </datalist>
+                                    <input id="search-placeholder" type="text" autocomplete="off" class="form-control" placeholder="{{ searchPlaceHolder }}"/>
+                                    <input id="search-input" 
+                                           type="text" 
+                                           autocomplete="off" 
+                                           class="form-control" 
+                                           name="student" 
+                                           ng-trim="false" 
+                                           ng-focus="focusSearch($event, true)" 
+                                           ng-blur="focusSearch($event, false)" 
+                                           ng-keyup="searchKeyUp($event)" 
+                                           ng-change="updateSearch()" 
+                                           ng-model="searchString"/>
                                     <div class="input-group-btn">
                                         <button class="btn btn-default" type="submit">
                                             <i class="glyphicon glyphicon-search"></i>
                                         </button>
+                                    </div>
+                                    <div class="results-list" ng-show="showSearchResults">
+                                        <ul class="list-group">
+                                            <li class="list-group-item header">Students</li>
+                                            <a class="list-group-item" 
+                                               ng-href="/student/{{ s.id }}" 
+                                               ng-repeat="s in ($parent.studentFilterResults = ( studentInfo.students | filter: studentFilter | limitTo:3))">
+                                        <!--<tr ng-repeat="student in ($parent.studentFilterResults = ( students | filter:studentFilter))">-->
+                                                {{ s.first_name }} {{ s.last_name }}
+                                            </a>
+                                            <li class="list-group-item header">Student Pages</li>
+                                            <li class="list-group-item header">Other Pages</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </form>

@@ -1,4 +1,4 @@
-app.controller('mainController', function ($scope, $rootScope, $location, $q, userService, studentService) {
+app.controller('mainController', function ($scope, $rootScope, $location, $q, $document, userService, studentService) {
     $scope.location = $location;
 
     $scope.user = userService.user;
@@ -8,6 +8,79 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
     $scope.showNotifications = false;
 
     $scope.notifications = userService.notificationData.relevantItems;
+
+    //TODO(gzuber): fix
+    //$scope.showSearchResults = true;
+    $scope.showSearchResults = true;
+
+    var widthOfSpace = 2.8125;
+
+    var keyCodes = {
+        up: 38,
+        down: 40,
+    };
+
+    $scope.activeSearchLink = {
+        id: null,
+        type: null,
+    };
+
+    $scope.studentPages = {
+        'tests': {
+            href: '/tests',
+        },
+        'grades': {
+            href: '/grades',
+        },
+        'attendances': {
+            href: '/attendance',
+        },
+        'behaviors': {
+            href: '/behaviors',
+        },
+        'ieps': {
+            href: '/ieps',
+        },
+        'goals': {
+            href: '/ieps',
+        },
+        'services': {
+            href: '/services',
+        },
+    };
+
+    $scope.otherPages = {
+        'home': {
+            href: '/profile/focus',
+        },
+        'profile': {
+            href: '/profile/focus',
+        },
+        'focus': {
+            href: '/profile/focus',
+        },
+        'students': {
+            href: '/profile/students',
+        },
+        'inputs': {
+            href: '/input/behavior',
+        },
+        'behaviors': {
+            href: '/input/behavior',
+        },
+        'tests': {
+            href: '/input/tests',
+        },
+        'ieps': {
+            href: '/ieps',
+        },
+        'goals': {
+            href: '/ieps',
+        },
+        'services': {
+            href: '/services',
+        },
+    };
 
     /**
      * Toggles the sidebar
@@ -29,6 +102,72 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
     $scope.clearSearch = function () {
         $scope.studentName = "";
     };
+
+    $scope.focusSearch = function(event, focused) {
+        // TODO(gzuber): fix
+        //$scope.showSearchResults = focused;
+        $scope.showSearchResults = true;
+    };
+
+    $scope.updateSearch = function() {
+        $scope.searchPlaceHolder = getPlaceholder($scope.searchString);
+
+    };
+
+    $scope.searchKeyUp = function(event) {
+        var keyCode = event.keyCode;
+        if(keyCode === keyCodes.up) {
+            event.preventDefault();
+            console.log($scope.studentFilterResults);
+        }
+        else if(keyCode === keyCode.down) {
+            event.preventDefault();
+            console.log($scope.studentFilterResults);
+        }
+    };
+
+    $scope.studentFilter = function(student) { 
+        if(_.find($scope.students, function(elem) { return elem.student_id.includes($scope.searchString);})) {
+            return true;
+        }
+        if($scope.searchString === null || $scope.searchString === undefined) {
+            return true;
+        }
+        var input = $scope.searchString.toUpperCase();
+        var fullname = student.first_name + " " + student.last_name;
+        if(student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
+            student.last_name.toUpperCase().includes(input) || student.birthdate.toUpperCase().includes(input) ||
+            fullname.toUpperCase().includes(input)) {
+            return true;
+        }
+        return false;
+    };
+
+    /**
+     * calculates padding to make sure arrow comes after search string
+     */
+    function getPlaceholder(str) {
+        if(str === '') {
+            return '';
+        }
+
+        if(!$scope.searchMeasure) {
+            $scope.searchMeasure = $('<span style="white-space: pre;">').hide().appendTo(document.body);
+        }
+
+        $scope.searchMeasure.text(str);
+
+        var width = $scope.searchMeasure.width();
+        var placeholder = '';
+
+        var iter = 0;
+        while(iter < width) {
+            placeholder += ' ';
+            iter += widthOfSpace;
+        }
+        placeholder += '     →';
+        return placeholder;
+    }
 
     /**
      * Logs user out
