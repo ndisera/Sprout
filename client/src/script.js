@@ -328,6 +328,9 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 testData: function(testService) {
                     return testService.getTests();
                 },
+                sectionData: function (sectionService) {
+                    return sectionService.getSections();
+                },
             }
         })
 

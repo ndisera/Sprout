@@ -6,10 +6,16 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 
 import api.constants as constants
 from api.mixins import AdminWriteMixin
 
+from notification_calculators.notification_calculator import GradeNotificationCalculator, BehaviorNotificationCalculator, TestScoreNotificationCalculator, AttendanceRecordNotificationCalculator
+
+import datetime
 import os
 
 def get_sentinel_user():
@@ -328,6 +334,38 @@ class ParentContactInfo(models.Model):
                                   help_text="Preferred time of day to contact")
 
 
+class Notification(models.Model):
+    """
+    Notification
+    Represent and store a notification which should be displayed to a User
+    """
+    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                             help_text="Short name of this notification")
+    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                            help_text="Longer description of this notification")
+    date = models.DateTimeField(blank=False,
+                                help_text="Date this notification is 'due'")
+    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE,
+                                help_text="Student to whom this notification refers")
+    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE,
+                             help_text="User who should be notified")
+    partial_link = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
+                                help_text="Partial string of an API call, combined with student to create a URL from this notification")
+    unread = models.BooleanField(blank=False, default=True)
+    category = models.IntegerField(blank=False,
+                                   help_text="Machine-readable category of this notification. See api/constants.py")
+    # Give the notification a generic foreign key to any other model, so notifications can be based on anything
+    # Note that the foreign models must have a GenericRelation 'field' -- see Grade for an example
+    content_type = models.ForeignKey(ContentType, blank=True, null=True, on_delete=models.CASCADE,
+                                help_text="An external data model to which this notification relates, if relevant")
+    object_id = models.PositiveIntegerField(blank=True, null=True, )
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        # Do we want to enforce any uniqueness for notifications?
+        ordering = ('date', 'user',)
+
+
 class SchoolSettings(AdminWriteMixin, models.Model):
     """
     SchoolSettings
@@ -560,9 +598,40 @@ class Behavior(models.Model):
     behavior = models.IntegerField(blank=True, null=True)
     effort = models.IntegerField(blank=True, null=True)
 
+    # Allow a generic relation to notifications so there can be a Notification related to this Behavior
+    notifications = GenericRelation(Notification, content_type_field='content_type', object_id_field='object_id')
+
     class Meta:
         unique_together = (('enrollment', 'date'),)
         ordering = ('date',)
+
+    def save(self, **kwargs):
+        """
+        Check the new behavior, generating notifications if it is significantly outside of normal
+        """
+        my_student = self.enrollment.student
+        grades = Grade.objects.filter(student=my_student)
+        attendances = AttendanceRecord.objects.filter(enrollment__student=my_student)
+        behavior_effors = Behavior.objects.filter(enrollment__student=my_student)
+        test_scores = StandardizedTestScore.objects.filter(student=my_student)
+
+        calculator = BehaviorNotificationCalculator(student=my_student,
+                                                 grades=grades,
+                                                 attendances=attendances,
+                                                 behavior_efforts=behavior_effors,
+                                                 test_scores=test_scores)
+        notifications = calculator.get_notifications(self)
+        super(Behavior, self).save(**kwargs)
+        for notification in notifications:
+            try:
+                Notification.objects.get(**notification._asdict())
+            except Notification.DoesNotExist:
+                Notification.objects.create(user=my_student.case_manager,
+                                            partial_link="/behaviors",
+                                            unread=True,
+                                            category=constants.NotificationCategories.BEHAVIOR,
+                                            content_object=self,
+                                            **notification._asdict())
 
 
 class BehaviorNote(models.Model):
@@ -596,8 +665,39 @@ class AttendanceRecord(models.Model):
     description = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                   help_text="Human-readable description of this attendance record")
 
+    # Allow a generic relation to notifications so there can be a Notification related to this AttendanceRecord
+    notifications = GenericRelation(Notification, content_type_field='content_type', object_id_field='object_id')
+
     class Meta:
         unique_together = [('enrollment', 'date'),]
+
+    def save(self, **kwargs):
+        """
+        Check the new attendance record, generating notifications if it is significantly outside of normal
+        """
+        my_student = self.enrollment.student
+        grades = Grade.objects.filter(student=my_student)
+        attendances = AttendanceRecord.objects.filter(enrollment__student=my_student)
+        behavior_effors = Behavior.objects.filter(enrollment__student=my_student)
+        test_scores = StandardizedTestScore.objects.filter(student=my_student)
+
+        calculator = AttendanceRecordNotificationCalculator(student=my_student,
+                                                            grades=grades,
+                                                            attendances=attendances,
+                                                            behavior_efforts=behavior_effors,
+                                                            test_scores=test_scores)
+        notifications = calculator.get_notifications(self)
+        super(AttendanceRecord, self).save(**kwargs)
+        for notification in notifications:
+            try:
+                Notification.objects.get(**notification._asdict())
+            except Notification.DoesNotExist:
+                Notification.objects.create(user=my_student.case_manager,
+                                            partial_link="/attendance",
+                                            unread=True,
+                                            category=constants.NotificationCategories.BEHAVIOR,
+                                            content_object=self,
+                                            **notification._asdict())
 
 
 class StandardizedTestScore(models.Model):
@@ -610,9 +710,40 @@ class StandardizedTestScore(models.Model):
     date = models.DateField()
     score = models.IntegerField(blank=False, null=False)
 
+    # Allow a generic relation to notifications so there can be a Notification related to this Score
+    notifications = GenericRelation(Notification, content_type_field='content_type', object_id_field='object_id')
+
     class Meta:
         unique_together = (('standardized_test', 'date', 'student'),)
         ordering = ('date',)
+
+    def save(self, **kwargs):
+        """
+        Check the new score, generating notifications if it is significantly outside of normal
+        """
+        my_student = self.student
+        grades = Grade.objects.filter(student=my_student)
+        attendances = AttendanceRecord.objects.filter(enrollment__student=my_student)
+        behavior_effors = Behavior.objects.filter(enrollment__student=my_student)
+        test_scores = StandardizedTestScore.objects.filter(student=my_student)
+
+        calculator = TestScoreNotificationCalculator(student=my_student,
+                                                 grades=grades,
+                                                 attendances=attendances,
+                                                 behavior_efforts=behavior_effors,
+                                                 test_scores=test_scores)
+        notifications = calculator.get_notifications(self)
+        super(StandardizedTestScore, self).save(**kwargs)
+        for notification in notifications:
+            try:
+                Notification.objects.get(**notification._asdict())
+            except Notification.DoesNotExist:
+                Notification.objects.create(user=my_student.case_manager,
+                                            partial_link="/tests",
+                                            unread=True,
+                                            category=constants.NotificationCategories.TEST_SCORE,
+                                            content_object=self,
+                                            **notification._asdict())
 
 
 class Assignment(models.Model):
@@ -652,14 +783,44 @@ class Grade(models.Model):
                                 help_text="Student being graded")
     score = models.FloatField(blank=False, verbose_name="Assignment score")
     handin_datetime = models.DateTimeField(blank=False)
-    late = models.BooleanField(blank=False, help_text="Whether the assignment was late")
-    missing = models.BooleanField(blank=False, help_text="Whether the assignment is missing")
+    late = models.BooleanField(blank=False, default=False, help_text="Whether the assignment was late")
+    missing = models.BooleanField(blank=False, default=False, help_text="Whether the assignment is missing")
     grade = models.CharField(blank=True, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
                                 help_text="Letter grade received")
+
+    # Allow a generic relation to notifications so there can be a Notification related to this Grade
+    notifications = GenericRelation(Notification, content_type_field='content_type', object_id_field='object_id')
 
     class Meta:
         unique_together = (('assignment', 'student', 'handin_datetime'),)
         ordering = ('assignment',)
+
+    def save(self, **kwargs):
+        """
+        Check the new grade, generating notifications if it is significantly outside of normal
+        """
+        grades = Grade.objects.filter(student=self.student)
+        attendances = AttendanceRecord.objects.filter(enrollment__student=self.student)
+        behavior_effors = Behavior.objects.filter(enrollment__student=self.student)
+        test_scores = StandardizedTestScore.objects.filter(student=self.student)
+
+        calculator = GradeNotificationCalculator(student=self.student,
+                                                 grades=grades,
+                                                 attendances=attendances,
+                                                 behavior_efforts=behavior_effors,
+                                                 test_scores=test_scores)
+        notifications = calculator.get_notifications(self)
+        super(Grade, self).save(**kwargs)
+        for notification in notifications:
+            try:
+                Notification.objects.get(**notification._asdict())
+            except Notification.DoesNotExist:
+                Notification.objects.create(user=self.student.case_manager,
+                                            partial_link="/grades",
+                                            unread=True,
+                                            category=constants.NotificationCategories.GRADE,
+                                            content_object=self,
+                                            **notification._asdict())
 
 
 class FinalGrade(models.Model):
@@ -675,32 +836,6 @@ class FinalGrade(models.Model):
                                         help_text="The weighted final grade for this enrollment")
     letter_grade = models.CharField(null=True, max_length=3,
                                     help_text="A codified representation of the grade, such as A-F or 1-5")
-
-
-class Notification(models.Model):
-    """
-    Notification
-    Represent and store a notification which should be displayed to a User
-    """
-    title = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                             help_text="Short name of this notification")
-    body = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                            help_text="Longer description of this notification")
-    date = models.DateTimeField(blank=False,
-                                help_text="Date this notification is 'due'")
-    student = models.ForeignKey(Student, blank=False, on_delete=models.CASCADE,
-                                help_text="Student to whom this notification refers")
-    user = models.ForeignKey(SproutUser, blank=False, on_delete=models.CASCADE,
-                             help_text="User who should be notified")
-    partial_link = models.CharField(blank=False, max_length=settings.DEFAULT_MAX_CHARFIELD_LENGTH,
-                                help_text="Partial string of an API call, combined with student to create a URL from this notification")
-    unread = models.BooleanField(blank=False, default=False)
-    category = models.IntegerField(blank=False,
-                                   help_text="Machine-readable category of this notification. See api/constants.py")
-
-    class Meta:
-        # Do we want to enforce any uniqueness for notifications?
-        ordering = ('date', 'user',)
 
 
 class FocusStudent(models.Model):

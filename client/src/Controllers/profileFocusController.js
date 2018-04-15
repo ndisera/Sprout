@@ -1,5 +1,6 @@
-app.controller("profileFocusController", function ($scope, $rootScope, $q, $location, toastService, studentData, focusData, testData,
-                                                    userService, testService, behaviorService) {
+app.controller("profileFocusController", function ($scope, $rootScope, $q, $location, toastService,
+                                                   studentData, focusData, testData, sectionData,
+                                                   sectionService, studentService, userService, testService, behaviorService) {
     $scope.location = $location;
 
     $scope.editing = false;
@@ -19,17 +20,18 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
         {
             // category gets passed to UpdateFocusGraphs, along with the specificID.
             category: 'behavior',
-            displayName: 'Behavior',
+            displayName: 'Average Behavior',
             uniqueId: 'behavior',
             href: '/behaviors',
         },
         {
             category: 'effort',
-            displayName: 'Effort',
+            displayName: 'Average Effort',
             uniqueId: 'effort',
             href: '/behaviors',
         },
     ];
+
     // add on dynamic categories
     _.each(testData.standardized_tests, function(elem) {
         $scope.focusCategories.push({
@@ -38,6 +40,15 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
             specificID: elem.id,
             uniqueId: 'test' + elem.id,
             href: '/tests',
+        });
+    });
+    _.each(sectionData.sections, function(elem) {
+        $scope.focusCategories.push({
+            category: 'grades',
+            displayName: elem.title,
+            specificID: elem.id,
+            uniqueId: 'grades' + elem.id,
+            href: '/grades',
         });
     });
 
@@ -128,6 +139,9 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
             return type;
         }
         else if(type === 'test') {
+            return type + id.toString();
+        }
+        else if(type === 'grades') {
             return type + id.toString();
         }
         else {
@@ -270,8 +284,8 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                     graph.options.scales.yAxes[0].ticks.min = 1;
                     graph.options.scales.yAxes[0].ticks.max = 5;
 
-                    // make sure to display the legend
-                    graph.options.legend.display = true;
+                    // don't display the legend
+                    graph.options.legend.display = false;
 
                     // account for weekends
                     graph.options.spanGaps = false;
@@ -385,7 +399,96 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                 }
             );
         } else if (category === "grades") {
-            console.log("Grades category does not exist yet");
+            /**
+             * Grades for a class
+             * Uses the specificID for the section ID
+             */
+            var section = _.find(sectionData.sections, function(elem) { return elem.id === specificId; });
+
+            sectionService.getAssignmentsForSection(section.id).then(
+              function success(assignmentsData) {
+                  if (assignmentsData.assignments.length === 0) {
+                      return;
+                  }
+
+                  // get all the grades for this class
+                  var gradesConfig = {
+                      filter: [
+                          {name: 'handin_datetime.range', val: beginDate + "T00:00:00.0",},
+                          {name: 'handin_datetime.range', val: endDate + "T23:59:59.0",},
+                          {name: 'assignment.section', val: section.id,},
+                      ],
+                      sort: ['handin_datetime',],
+                  };
+
+                  //copied from the studentGradesController
+                  studentService.getGradesForStudent(studentId, gradesConfig).then(
+                    function success(data) {
+                        var assignmentScores = data.grades;
+
+                        //set the y-axis bounds
+                        graph.options.scales.yAxes[0].ticks.min = 0;
+                        graph.options.scales.yAxes[0].ticks.max = 100; //percentage
+
+                        // don't need the legend
+                        graph.options.legend.display = false;
+
+                        //set the series name to the class name
+                        graph.series[0] = section.title;
+
+                        //other options for the graph
+                        graph.options.scales.xAxes = [{
+                            ticks: {
+                                autoSkipPadding: 15
+                            }
+                        }];
+
+                        graph.data = [];
+                        graph.labels = [];
+                        graph.data.push(_.times(dateDiff + 1, _.constant(null)));
+                        graph.labels.push(_.times(dateDiff + 1, _.constant(null)));
+
+
+                        // iterate through each date, setting data as necessary
+                        var iterDate = graphStart.clone();
+                        var j = 0;
+                        for (var i = 0; i < dateDiff + 1; i++) {
+                            graph.labels[i] = iterDate.format('MM/DD').toString();
+
+                            if (assignmentScores[j]) {
+                                var assignmentDate = moment(assignmentScores[j].handin_datetime);
+                                var average = 0;
+                                var count = 0;
+                                while (assignmentDate.diff(iterDate, 'd') === 0) {
+                                    var currentAssignment = _.find(assignmentData.assignments, function(elem) {
+                                        return elem.id === assignmentScores[j].assignment;
+                                    });
+                                    var assignmentMin = currentAssignment.score_min;
+                                    var assignmentMax = currentAssignment.score_max;
+                                    average += 100 * (assignmentScores[j].score - assignmentMin) / (assignmentMax - assignmentMin);
+                                    count++;
+
+                                    j++;
+                                    if (j >= assignmentScores.length) {
+                                        break;
+                                    }
+                                    assignmentDate = moment(assignmentScores[j].handin_datetime);
+                                }
+                                if (count > 0) {
+                                    // have to access at index '0' because of chartjs series
+                                    graph.data[0][i] = average / count;
+                                }
+                            }
+                            iterDate.add(1, 'd');
+                        }
+
+                    },
+                    function error(response) {
+                        toastService.error('The server wasn\'t able to get the student\'s grades for this class.');
+                    }
+                  );
+              });
+
         } else {
             console.error("Requested category of " + category + " does not exist");
         }
