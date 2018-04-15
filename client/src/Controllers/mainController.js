@@ -630,7 +630,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
 
     $rootScope.$on('user:auth', function(event, data) {
         if(data.type === 'login') {
-            userService.getAllNotificationsForUser(userService.user.id, null).then(
+            userService.getAllRelevantNotificationsForUser(userService.user.id).then(
                 function success(data) {},
                 function error(response) {}
             );
@@ -722,7 +722,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
 
         $q.all(promises)
             .then(function() {
-                userService.getAllNotificationsForUser(userService.user.id).then(
+                userService.getAllRelevantNotificationsForUser(userService.user.id).then(
                     function success() {},
                     function error() {}
                 );
