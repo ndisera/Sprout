@@ -77,6 +77,8 @@ users_router.register('notifications', viewset=NotificationViewSet, base_name='u
 users_router.register('focus', viewset=FocusStudentViewSet, base_name='users-focus', parents_query_lookups=['user'])
 # Add nested route for notifications as /users/{pk}/picture
 users_router.register('picture', viewset=ProfilePictureViewSet, base_name='users-picture', parents_query_lookups=['sproutuserprofile'])
+# Add nested route for page rank as /users/{pk}/pagerank
+users_router.register('pagerank', viewset=PageRankViewSet, base_name='users-pagerank', parents_query_lookups=['user'])
 
 urlpatterns = router.urls
 
