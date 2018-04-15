@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 import random
 import pandas as pd
 from sklearn import linear_model
@@ -53,6 +53,8 @@ class CategoryCalculator():
         # name__StartDate__EndDate__specificId
         # ex) test__2018-02-21__2018-02-28__1
 
+        # dataframe order: tests (per test), avg behavior, avg effort, grades (per class)
+
         # https://stackoverflow.com/a/4143837/3518046
         behavior_effort_lists = {}
         for behavior in self.behavior_efforts:
@@ -80,7 +82,12 @@ class CategoryCalculator():
             # extract the data
             dates = [test_val.date for test_val in test_scores]
             dates_index = pd.Index(data=dates)
-            scores = [test_val.score for test_val in test_scores]
+            # standardize to a percentage
+            test_min = test_scores[0].standardized_test.min_score
+            test_max = test_scores[0].standardized_test.max_score
+            scores = [(test_val.score - test_min) /
+                      float(test_max - test_min)
+                      for test_val in test_scores]
             test_series = pd.Series(data=scores, index=dates_index)
 
             # union the two indexes together to 'merge/interweave' the lists
@@ -108,9 +115,13 @@ class CategoryCalculator():
             # extract the data
             dates = [score.date for score in behaviors_efforts]
             dates_index = pd.Index(data=dates)
-            behaviors = [score.behavior for score in behaviors_efforts]
+            # standardize to a percentage
+            behaviors = [score.behavior / float(5)
+                         for score in behaviors_efforts]
             behaviors_series = pd.Series(data=behaviors, index=dates_index)
-            efforts = [score.effort for score in behaviors_efforts]
+            # efforts = [score.effort for score in behaviors_efforts]
+            efforts = [score.effort / float(5)
+                         for score in behaviors_efforts]
             efforts_series = pd.Series(data=efforts, index=dates_index)
 
             # union the two indexes together to 'merge/interweave' the lists
@@ -136,10 +147,10 @@ class CategoryCalculator():
         df = df.reindex(index=new_df_indexes)
         # put the data into our dataframe
         df_map[df_counter] = ('behavior', 0)  # specific id of 0 because we're dealing with the average, not a class
-        df[df_counter] = behavior_means[0]
+        df[df_counter] = behavior_means
         df_counter += 1
         df_map[df_counter] = ('effort', 0)
-        df[df_counter] = effort_means[0]
+        df[df_counter] = effort_means
         df_counter += 1
 
         ### Grades
@@ -151,7 +162,10 @@ class CategoryCalculator():
             # extract the data
             dates = [grade_val.handin_datetime.date() for grade_val in grade_scores]
             dates_index = pd.Index(data=dates)
-            scores = [grade_val.score for grade_val in grade_scores]
+            # standardize to a percentage
+            scores = [(grade_val.score - grade_val.assignment.score_min) /
+                      float(grade_val.assignment.score_max - grade_val.assignment.score_min)
+                      for grade_val in grade_scores]
             grade_series = pd.Series(data=scores, index=dates_index)
 
             # union the two indexes together to 'merge/interweave' the lists
@@ -176,7 +190,8 @@ class CategoryCalculator():
         #   More intuitively, the y axis is the independent variable: score. The x axis is the dependent variable: time
 
         # convert dates into days elapsed since today
-        X = map(lambda x: x.days, (df.index.values - datetime.datetime.now().date()))
+        current_date = datetime.now().date()
+        X = map(lambda x: x.days, (current_date - df.index.values))
         X = sm.add_constant(X)  # Add constant to allow fitting the y-intercept
 
         # list of tuples containing (df column, start date, end date, r-squared value, and coefficient)
@@ -186,10 +201,15 @@ class CategoryCalculator():
         # todo: don't even consider something if the most recent datapoint is more than 2 weeks old
         for i in range(0, len(df.index), 3):  # Step size of 3 when shrinking data down
             for curr_dataset in df:
+                # If the most recent data point for a series is more than 2 weeks old, don't consider it for display
+                last_data_timedelta = current_date = curr_dataset.last_valid_index()
+                if last_data_timedelta > timedelta(weeks=2):
+                    continue
+
                 y = df[curr_dataset]  # todo: do each value individually and see if there's a difference
                 model = sm.OLS(y[i:], X[i:], missing='drop').fit()
 
-                # Store the information
+                # Store the information needed to generate a results string
                 results_dic.append((curr_dataset, df.index[i], df.last_valid_index(), model.rsquared, model.params[1]))
 
         # Select the progress category by choosing the run with the highest r^2 value
