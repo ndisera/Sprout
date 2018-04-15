@@ -220,24 +220,30 @@
                                                ng-href="{{ s.href }}" 
                                                ng-mouseover="searchMouseOver(s, 'student')"
                                                ng-class="{ 'active': s.id === activeSearchLink.id && activeSearchLink.type === searchLinkTypes['student'], }"
-                                               ng-repeat="s in studentResults | limitTo:3">
-                                                {{ s.title }}
+                                               ng-repeat="s in studentResults | limitTo:maxResults">
+                                                <div class="list-group-item-inner">
+                                                    {{ s.title }}
+                                                </div>
                                             </a>
                                             <li class="list-group-item header" ng-show="studentPagesResults.length > 0">Student Pages</li>
                                             <a class="list-group-item" 
                                                ng-href="{{ s.href }}" 
                                                ng-mouseover="searchMouseOver(s, 'student')"
                                                ng-class="{ 'active': s.id === activeSearchLink.id && activeSearchLink.type === searchLinkTypes['studentPage'], }"
-                                               ng-repeat="s in studentPagesResults | limitTo:3">
-                                                {{ s.title }}
+                                               ng-repeat="s in studentPagesResults | limitTo:maxResults">
+                                                <div class="list-group-item-inner">
+                                                    {{ s.title }}
+                                                </div>
                                             </a>
                                             <li class="list-group-item header" ng-show="otherPagesResults.length > 0">Other Pages</li>
                                             <a class="list-group-item" 
                                                ng-href="{{ s.href }}" 
                                                ng-mouseover="searchMouseOver(s, 'student')"
                                                ng-class="{ 'active': s.id === activeSearchLink.id && activeSearchLink.type === searchLinkTypes['otherPage'], }"
-                                               ng-repeat="s in otherPagesResults | limitTo:3">
-                                                {{ s.title }}
+                                               ng-repeat="s in otherPagesResults | limitTo:maxResults">
+                                                <div class="list-group-item-inner">
+                                                    {{ s.title }}
+                                                </div>
                                             </a>
                                         </ul>
                                     </div>

@@ -15,9 +15,9 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
     var defaultSearchPlaceholder = 'Search...';
     $scope.searchPlaceHolder = defaultSearchPlaceholder;
 
-    $scope.showSearchResults = false;
+    $scope.showSearchResults = true;
 
-    var maxResults = 3;
+    $scope.maxResults = 4;
     var widthOfSpace = 2.8125;
     var keyCodes = {
         up: 38,
@@ -203,7 +203,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
     };
 
     $scope.updateSearch = function() {
-        var searchStrings = $scope.searchString.split(' ');
+        var searchStrings = $scope.searchString.trim().split(' ');
         _.each(searchStrings, function(elem) { elem = elem.toLowerCase(); });
 
         var studentSet = {};
@@ -216,7 +216,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
         _.each($scope.studentInfo.students, function(elem) {
             var fullName = elem.first_name + ' ' + elem.last_name;
             fullName = fullName.toLowerCase();
-            if(fullName.includes($scope.searchString.toLowerCase())) {
+            if(fullName.includes($scope.searchString.trim().toLowerCase())) {
                 $scope.studentResults.push({
                     id: elem.id,
                     first_name: elem.first_name,
@@ -234,10 +234,10 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
         // next search first or last name with split search results
         _.each(searchStrings, function(elem) {
             var matchingStudents = _.filter($scope.studentInfo.students, function(student) {
-                var firstName = student.first_name.includes(elem);
-                var lastName = student.last_name.includes(elem);
-                var studentId = student.student_id.includes(elem);
-                var birthdate = student.birthdate.includes(elem);
+                var firstName = student.first_name.toLowerCase().includes(elem);
+                var lastName = student.last_name.toLowerCase().includes(elem);
+                var studentId = student.student_id.toLowerCase().includes(elem);
+                var birthdate = student.birthdate.toLowerCase().includes(elem);
 
                 return (firstName || lastName || studentId || birthdate);
             });
@@ -247,8 +247,8 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
                 if(!studentSet[student.id]) {
                     $scope.studentResults.push({
                         id: student.id,
-                        first_name: elem.first_name,
-                        last_name: elem.last_name,
+                        first_name: student.first_name,
+                        last_name: student.last_name,
                         title: student.first_name + ' ' + student.last_name + ' (' + student.student_id + ')',
                         href: '/student/' + student.id,
                         type: $scope.searchLinkTypes['student'],
@@ -366,7 +366,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
 
         // now I need to update the active search link index
         var iterIndex     = 0;
-        var studentsToAdd = $scope.studentResults.length > maxResults ? maxResults : $scope.studentResults.length;
+        var studentsToAdd = $scope.studentResults.length > $scope.maxResults ? $scope.maxResults : $scope.studentResults.length;
         for(var i = 0; i < studentsToAdd; ++i) {
             if(entry.id === $scope.studentResults[i].id && entry.type === $scope.studentResults[i].type) {
                 $scope.activeSearchLinkIndex = iterIndex;
@@ -375,7 +375,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
             iterIndex++;
         }
 
-        var studentPagesToAdd = $scope.studentPagesResults.length > maxResults ? maxResults : $scope.studentPagesResults.length;
+        var studentPagesToAdd = $scope.studentPagesResults.length > $scope.maxResults ? $scope.maxResults : $scope.studentPagesResults.length;
         for(var i = 0; i < studentPagesToAdd; ++i) {
             if(entry.id === $scope.studentPagesResults[i].id && entry.type === $scope.studentPagesResults[i].type) {
                 $scope.activeSearchLinkIndex = iterIndex;
@@ -384,7 +384,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
             iterIndex++;
         }
 
-        var otherPagesToAdd = $scope.otherPagesResults.length > maxResults ? maxResults : $scope.otherPagesResults.length;
+        var otherPagesToAdd = $scope.otherPagesResults.length > $scope.maxResults ? $scope.maxResults : $scope.otherPagesResults.length;
         for(var i = 0; i < otherPagesToAdd; ++i) {
             if(entry.id === $scope.otherPagesResults[i].id && entry.type === $scope.otherPagesResults[i].type) {
                 $scope.activeSearchLinkIndex = iterIndex;
@@ -413,7 +413,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
             $scope.activeSearchLinkIndex--;
 
             var iterIndex     = 0;
-            var studentsToAdd = $scope.studentResults.length > maxResults ? maxResults : $scope.studentResults.length;
+            var studentsToAdd = $scope.studentResults.length > $scope.maxResults ? $scope.maxResults : $scope.studentResults.length;
             for(var i = 0; i < studentsToAdd; ++i) {
                 if(iterIndex === $scope.activeSearchLinkIndex) {
                     updateActiveSearchLink($scope.studentResults[i], 'student', $scope.activeSearchLinkIndex);
@@ -422,7 +422,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
                 iterIndex++;
             }
 
-            var studentPagesToAdd = $scope.studentPagesResults.length > maxResults ? maxResults : $scope.studentPagesResults.length;
+            var studentPagesToAdd = $scope.studentPagesResults.length > $scope.maxResults ? $scope.maxResults : $scope.studentPagesResults.length;
             for(var i = 0; i < studentPagesToAdd; ++i) {
                 if(iterIndex === $scope.activeSearchLinkIndex) {
                     updateActiveSearchLink($scope.studentPagesResults[i], 'studentPage', $scope.activeSearchLinkIndex);
@@ -431,7 +431,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
                 iterIndex++;
             }
 
-            var otherPagesToAdd = $scope.otherPagesResults.length > maxResults ? maxResults : $scope.otherPagesResults.length;
+            var otherPagesToAdd = $scope.otherPagesResults.length > $scope.maxResults ? $scope.maxResults : $scope.otherPagesResults.length;
             for(var i = 0; i < otherPagesToAdd; ++i) {
                 if(iterIndex === $scope.activeSearchLinkIndex) {
                     updateActiveSearchLink($scope.otherPagesResults[i], 'otherPage', $scope.activeSearchLinkIndex);
@@ -446,7 +446,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
             var temp = $scope.activeSearchLinkIndex + 1;
 
             var iterIndex     = 0;
-            var studentsToAdd = $scope.studentResults.length > maxResults ? maxResults : $scope.studentResults.length;
+            var studentsToAdd = $scope.studentResults.length > $scope.maxResults ? $scope.maxResults : $scope.studentResults.length;
             for(var i = 0; i < studentsToAdd; ++i) {
                 if(iterIndex === temp) {
                     updateActiveSearchLink($scope.studentResults[i], 'student', temp);
@@ -455,7 +455,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
                 iterIndex++;
             }
 
-            var studentPagesToAdd = $scope.studentPagesResults.length > maxResults ? maxResults : $scope.studentPagesResults.length;
+            var studentPagesToAdd = $scope.studentPagesResults.length > $scope.maxResults ? $scope.maxResults : $scope.studentPagesResults.length;
             for(var i = 0; i < studentPagesToAdd; ++i) {
                 if(iterIndex === temp) {
                     updateActiveSearchLink($scope.studentPagesResults[i], 'studentPage', temp);
@@ -464,7 +464,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
                 iterIndex++;
             }
 
-            var otherPagesToAdd = $scope.otherPagesResults.length > maxResults ? maxResults : $scope.otherPagesResults.length;
+            var otherPagesToAdd = $scope.otherPagesResults.length > $scope.maxResults ? $scope.maxResults : $scope.otherPagesResults.length;
             for(var i = 0; i < otherPagesToAdd; ++i) {
                 if(iterIndex === temp) {
                     updateActiveSearchLink($scope.otherPagesResults[i], 'otherPage', temp);
@@ -507,7 +507,9 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
 
     $rootScope.$on('$routeChangeSuccess', function(event, current, prev) {
         if(userService.user.id !== null) {
-            userService.incrementPageRank(userService.user.id, $location.path());
+            var path = $location.path();
+            userService.incrementPageRank(userService.user.id, path);
+            pageRanks[path] = pageRanks[path] ? pageRanks[path] + 1 : 1;
         }
     });
 
