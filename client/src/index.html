@@ -97,8 +97,8 @@
                 <div class="container-fluid">
                     <div class="row voffset3">
                         <div class="col-xs-9 col-sm-12">
-                            <a href="/profile" ng-click="toggleSidebar(false)">
-                                <img id="sidebar-logo" class="center-block" src="img/logo/svg/green_white_logo_transparent.svg">
+                            <a href="/profile" ng-click="toggleSidebar(false)" tabindex="-1">
+                                <img id="sidebar-logo" class="center-block" src="img/logo/svg/green_white_logo_transparent.svg"/>
                             </a>
                         </div>
                         <div class="col-xs-3 visible-xs">
@@ -111,7 +111,7 @@
                         <div class="col-xs-12 no-padding">
                             <ul class="list-group" ng-cloak>
                                 <li ng-if="!link.adminRequired || (link.adminRequired && user.isSuperUser)" ng-repeat="link in sidebarLinks" ng-click="sidebarLinkClick(link);" class="list-group-item" ng-class="{ 'active': sidebarLinkActive(link), }">
-                                    <a ng-href="{{ link.href }}">
+                                    <a ng-href="{{ link.href }}" tabindex="-1">
                                         <span class="glyphicon glyphicon-{{ link.glyph }}"></span>
                                         {{ link.title }}
                                         <span class="badge" ng-if="link.badgeList.length > 0">{{ link.badgeList.length }}</span>
@@ -193,12 +193,13 @@
                         <div class="col-xs-12 col-sm-8">
                             <form id="topbar-search" ng-submit="navigateToStudent()">
                                 <div class="input-group">
-                                    <input id="search-placeholder" type="text" autocomplete="off" class="form-control" placeholder="{{ searchPlaceHolder }}"/>
+                                    <input id="search-placeholder" type="text" autocomplete="off" class="form-control" placeholder="{{ searchPlaceHolder }}" tabindex="-1"/>
                                     <input id="search-input" 
                                            type="text" 
                                            autocomplete="off" 
                                            class="form-control" 
                                            name="student" 
+                                           tabindex="0"
                                            ng-trim="false" 
                                            ng-focus="focusSearch($event, true)" 
                                            ng-blur="focusSearch($event, false)" 
