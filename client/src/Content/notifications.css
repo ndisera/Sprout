@@ -207,6 +207,11 @@
     cursor: default;
 }
 
+.notifications-panel:hover .notifications-remove-icon:hover, .notifications-remove-icon:hover, .notifications-remove-icon:focus {
+    background-color: #d9534f;
+    color: #EEE;
+}
+
 .notifications-birthday.panel-wrapper {
     border-color: #5ab9ea;
 }
@@ -255,8 +260,38 @@
     color: #8860d0;
 }
 
-.notifications-panel:hover .notifications-remove-icon:hover, .notifications-remove-icon:hover, .notifications-remove-icon:focus {
-    background-color: #d9534f;
-    color: #EEE;
+.notifications-test-score.panel-wrapper {
+    border-color: #963484;
 }
+
+.notifications-test-score .notifications-panel:hover {
+    background-color: #f8ecf6;
+}
+
+.notifications-test-score .notifications-panel:hover .notifications-remove-icon {
+    background-color: #f8ecf6;
+}
+
+.notifications-test-score .notifications-content-icon {
+    color: #963484;
+}
+
+.notifications-behavior.panel-wrapper {
+    border-color: #ffc67c;
+}
+
+.notifications-behavior .notifications-panel:hover {
+    background-color: #fff4e6;
+}
+
+.notifications-behavior .notifications-panel:hover .notifications-remove-icon {
+    background-color: #fff4e6;
+}
+
+.notifications-behavior .notifications-content-icon {
+    color: #ffc67c;
+}
+
+
+
 

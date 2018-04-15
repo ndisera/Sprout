@@ -195,6 +195,14 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, us
             panelClass: 'notifications-iep-goal',
             iconClass: 'fa-chart-line',
         },
+        4: {
+            panelClass: 'notifications-behavior',
+            iconClass: 'fa-user-times',
+        },
+        5: {
+            panelClass: 'notifications-test-score',
+            iconClass: 'fa-clipboard-list',
+        },
     }
 
     $scope.notificationClass = function(notification) {
