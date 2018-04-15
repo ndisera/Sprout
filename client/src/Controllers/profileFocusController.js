@@ -406,24 +406,10 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
             var section = _.find(sectionData.sections, function(elem) { return elem.id === specificId; });
 
             sectionService.getAssignmentsForSection(section.id).then(
-              function success(data) {
-                  $scope.selectedSection = section;
-
-                  if (data.assignments.length === 0) {
-                      $scope.assignments = [];
-                      $scope.upcomingAssignments = [];
-                      $scope.missingAssignments = [];
+              function success(assignmentsData) {
+                  if (assignmentsData.assignments.length === 0) {
                       return;
                   }
-
-                  $scope.assignments = data.assignments;
-                  // tranforms dates to moments
-                  _.each($scope.assignments, function (elem) {
-                      elem.due_date = moment(elem.due_date);
-                  });
-                  $scope.assignments = _.sortBy(data.assignments, function (elem) {
-                      return elem.due_date;
-                  });
 
                   // get all the grades for this class
                   var gradesConfig = {
@@ -438,10 +424,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                   //copied from the studentGradesController
                   studentService.getGradesForStudent(studentId, gradesConfig).then(
                     function success(data) {
-                        var assignmentScores = data;
-                        // reset relevant data
-                        $scope.grades = data.grades;
-                        $scope.assignmentsToGrades = {};
+                        var assignmentScores = data.grades;
 
                         //set the y-axis bounds
                         graph.options.scales.yAxes[0].ticks.min = 0;
@@ -472,23 +455,24 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                         for (var i = 0; i < dateDiff + 1; i++) {
                             graph.labels[i] = iterDate.format('MM/DD').toString();
 
-                            if (assignmentScores.grades[j]) {
-                                var assignmentDate = moment(assignmentScores.grades[j].handin_datetime);
+                            if (assignmentScores[j]) {
+                                var assignmentDate = moment(assignmentScores[j].handin_datetime);
                                 var average = 0;
                                 var count = 0;
                                 while (assignmentDate.diff(iterDate, 'd') === 0) {
-                                    var currentAssignment = _.find($scope.assignments, function(elem) { return elem.id === assignmentScores.grades[j].assignment; });
+                                    var currentAssignment = _.find(assignmentData.assignments, function(elem) {
+                                        return elem.id === assignmentScores[j].assignment;
+                                    });
                                     var assignmentMin = currentAssignment.score_min;
                                     var assignmentMax = currentAssignment.score_max;
-                                    var percentage = 100 * (assignmentScores.grades[j].score - assignmentMin) / (assignmentMax - assignmentMin);
-                                    average += percentage;
+                                    average += 100 * (assignmentScores[j].score - assignmentMin) / (assignmentMax - assignmentMin);
                                     count++;
 
                                     j++;
-                                    if (j >= assignmentScores.grades.length) {
+                                    if (j >= assignmentScores.length) {
                                         break;
                                     }
-                                    assignmentDate = moment(assignmentScores.grades[j].handin_datetime);
+                                    assignmentDate = moment(assignmentScores[j].handin_datetime);
                                 }
                                 if (count > 0) {
                                     // have to access at index '0' because of chartjs series
