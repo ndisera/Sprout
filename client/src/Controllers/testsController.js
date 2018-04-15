@@ -116,7 +116,7 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
                     val: $scope.selectedTest.id,
                 },
             ],
-            sort: ['date', student.id],
+            sort: ['date'],
         };
 
         testService.getTestScores(config).then(
