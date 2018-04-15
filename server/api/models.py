@@ -634,7 +634,7 @@ class StandardizedTestScore(models.Model):
         behavior_effors = Behavior.objects.filter(enrollment__student=my_student)
         test_scores = StandardizedTestScore.objects.filter(student=my_student)
 
-        calculator = BehaviorNotificationCalculator(student=my_student,
+        calculator = TestScoreNotificationCalculator(student=my_student,
                                                  grades=grades,
                                                  attendances=attendances,
                                                  behavior_efforts=behavior_effors,
