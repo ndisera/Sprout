@@ -67,7 +67,8 @@ def set_link(class_id, path, method, link):
     else:
         return link
 
-
+# Disable PATCH endpoints, since the frontend does not use them and PUT avoids data-trashing race conditions
+del mixins.UpdateModelMixin.partial_update
 class NestedDynamicViewSet(NestedViewSetMixin, DynamicModelViewSet):
     pass
 
