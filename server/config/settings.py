@@ -224,3 +224,6 @@ DESCRIPTION_CHARFIELD_MAX_LENGTH = 1600
 FRONTEND_PORT = 8001 # Define only a port if the frontend and backend run on the same host but different ports
 
 USER_PAGE_RANK_TIMESPAN_DAYS = 14 # If a user has not visited a page in this amount of time, its rank is reset
+
+# If a Behavior scores is older than this, it is considered meaniningless for the purposes of trend calculation
+BEHAVIOR_AGE_TREND_CUTOFF_DAYS = 7 * 3

@@ -524,11 +524,12 @@ class FocusStudentSerializer(DynamicModelSerializer):
     def to_representation(self, instance):
         representation = super(FocusStudentSerializer, self).to_representation(instance)
 
+        oldest_behavior_date = datetime.date.today() - datetime.timedelta(days=settings.BEHAVIOR_AGE_TREND_CUTOFF_DAYS)
         # Get the Sprout-generated categories
         student = representation['student']
         grades = Grade.objects.filter(student=student)
         attendances = AttendanceRecord.objects.filter(enrollment__student=student) # Attendances not currently tracked by Sprout
-        behavior_efforts = Behavior.objects.filter(enrollment__student=student)
+        behavior_efforts = Behavior.objects.filter(enrollment__student=student, date__range=[str(oldest_behavior_date), str(datetime.date.today())])
         test_scores = StandardizedTestScore.objects.filter(student=student)
         calculator = CategoryCalculator(student=student, grades=grades, attendances=attendances, behavior_efforts=behavior_efforts,
                                         test_scores=test_scores)
