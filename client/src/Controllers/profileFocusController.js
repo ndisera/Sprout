@@ -20,13 +20,13 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
         {
             // category gets passed to UpdateFocusGraphs, along with the specificID.
             category: 'behavior',
-            displayName: 'Behavior',
+            displayName: 'Average Behavior',
             uniqueId: 'behavior',
             href: '/behaviors',
         },
         {
             category: 'effort',
-            displayName: 'Effort',
+            displayName: 'Average Effort',
             uniqueId: 'effort',
             href: '/behaviors',
         },
@@ -284,8 +284,8 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                     graph.options.scales.yAxes[0].ticks.min = 1;
                     graph.options.scales.yAxes[0].ticks.max = 5;
 
-                    // make sure to display the legend
-                    graph.options.legend.display = true;
+                    // don't display the legend
+                    graph.options.legend.display = false;
 
                     // account for weekends
                     graph.options.spanGaps = false;
