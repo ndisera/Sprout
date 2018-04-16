@@ -140,13 +140,33 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
         return false;
     }
 
+    function isStaleTest(category, student) {
+        var splitString = category.split('__');
+        var type = splitString[0];
+        var id = null;
+        if(splitString.length > 3) {
+            id = parseInt(splitString[3]);
+        }
+
+        if(type && type === 'test') {
+            if(!id) { 
+                return true;
+            }
+
+            var found = _.findIndex(testData.standardized_test, function(elem) { return elem.id === id; });
+            return found === -1;
+        }
+        return false;
+    }
+
     // set up for focus student must be done everytime new focus student is added to list
     function setUpFocusStudent(focusStudent) {
         if(focusStudent.focus_category === null 
             || focusStudent.focus_category === undefined 
             || focusStudent.focus_category === '' 
             || focusStudent.focus_category === 'none'
-            || isStaleClass(focusStudent.focus_category, focusStudent)) {
+            || isStaleClass(focusStudent.focus_category, focusStudent)
+            || isStaleTest(focusStudent.focus_category)) {
             focusStudent.focus_category = defaultFocusCategory();
         }
 
