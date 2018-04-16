@@ -365,7 +365,6 @@ app.config(function($httpProvider, $locationProvider, $routeProvider) {
                 }
             })
 
-
             .when('/profile/students', {
                 templateUrl: 'html/profileStudents.html',
                 controller: 'profileStudentsController',
