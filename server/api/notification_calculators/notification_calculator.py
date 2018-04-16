@@ -84,6 +84,17 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
         behavior_effort_list = self.behavior_efforts.filter(enrollment_id=new_behavior.enrollment_id).distinct()
         # We should only ever have one list
 
+        # If the behavior point that triggered the notification was above the halfway mark, don't trigger a notification
+        skip_behavior = False
+        skip_effort = False
+
+        if new_behavior.behavior >= 3:
+            skip_behavior = True
+
+        if new_behavior.effort >= 3:
+            skip_effort = True
+
+
         # only continue with the learning if we have at least ten examples to train off of, and 3 to test
         training_size = 10
         prediction_size = 3
@@ -125,33 +136,36 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
 
 
         # machine learnin'
-        b_clf = svm.OneClassSVM(nu=0.7, kernel='rbf', gamma='auto')
-        b_clf.fit(b_train_data)
-        b_prediction_data = b_clf.predict(b_test_data)
 
-        e_clf = svm.OneClassSVM(nu=0.7, kernel='rbf', gamma='auto')
-        e_clf.fit(e_train_data)
-        e_prediction_data = b_clf.predict(e_test_data)
+        if not skip_behavior:
+            b_clf = svm.OneClassSVM(nu=0.7, kernel='rbf', gamma='auto')
+            b_clf.fit(b_train_data)
+            b_prediction_data = b_clf.predict(b_test_data)
 
-        # 1 means expected, -1 means this is an abnormality
+            # 1 means expected, -1 means this is an abnormality
 
-        # if the last 3 are abnormalities, trigger a notification
-        student_name = new_behavior.enrollment.student.first_name + " " + new_behavior.enrollment.student.last_name
-        if sum(b_prediction_data) <= -3:
-            title = "Abnormal Behavior Scores"
-            body = "Sprout has noticed an abnormal pattern of recent behavior scores for " + student_name + "."
-            date = str(new_behavior.date)
-            student = new_behavior.enrollment.student
-            notification = Notification(title, body, date, student)
-            to_return.append(notification)
+            # if the last 3 are abnormalities, trigger a notification
+            student_name = new_behavior.enrollment.student.first_name + " " + new_behavior.enrollment.student.last_name
+            if sum(b_prediction_data) <= -3:
+                title = "Abnormal Behavior Scores"
+                body = "Sprout has noticed an abnormal pattern of recent behavior scores for " + student_name + "."
+                date = str(new_behavior.date)
+                student = new_behavior.enrollment.student
+                notification = Notification(title, body, date, student)
+                to_return.append(notification)
 
-        if sum(e_prediction_data) <= -3:
-            title = "Abnormal Effort Scores"
-            body = "Sprout has noticed an abnormal pattern of recent effort scores for " + student_name + "."
-            date = new_behavior.date
-            student = new_behavior.enrollment.student
-            notification = Notification(title, body, date, student)
-            to_return.append(notification)
+        if not skip_effort:
+            e_clf = svm.OneClassSVM(nu=0.7, kernel='rbf', gamma='auto')
+            e_clf.fit(e_train_data)
+            e_prediction_data = e_clf.predict(e_test_data)
+
+            if sum(e_prediction_data) <= -3:
+                title = "Abnormal Effort Scores"
+                body = "Sprout has noticed an abnormal pattern of recent effort scores for " + student_name + "."
+                date = new_behavior.date
+                student = new_behavior.enrollment.student
+                notification = Notification(title, body, date, student)
+                to_return.append(notification)
 
         # raise NotImplemented  # use this to not have to edit behaviors everytime for debugging
         return to_return
