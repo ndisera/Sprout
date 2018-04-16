@@ -347,14 +347,6 @@ class FinalGradeSerializer(DynamicModelSerializer):
         fields = '__all__'
     enrollment = DynamicRelationField('EnrollmentSerializer')
 
-    def validate_final_percent(self, final_percent):
-        """
-        Ensure the final_percent is in the valid range to be a percentage
-        """
-        if final_percent > 100 or final_percent < 0:
-            raise serializers.ValidationError('should be in the range 0-100')
-        return final_percent
-
     def validate_letter_grade(self, letter_grade):
         """
         Normalize the letter grade to be capitalized
