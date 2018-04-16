@@ -8,6 +8,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
 
     $scope.behaviorNote = {};
     $scope.editingNote = false;
+    $scope.generating = false;
 
     $scope.hasBehaviorService = false;
     if (service !== null && service !== undefined && service.service_requirements !== null && service.service_requirements !== undefined) {
@@ -878,6 +879,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
      * Downloads a report pdf
      */
     $scope.generateReport = function() {
+        $scope.generating = true;
         $scope.report.behaviorSum = 0;
         $scope.report.effortSum = 0;
         $scope.report.behaviorCount = 0;
@@ -988,6 +990,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
         });
         var classTitle = $scope.report.class.title.split(' ').join('_');
         doc.save($scope.student.first_name + '_' + $scope.student.last_name + '_' + classTitle + '_' + currentDate + '.pdf');
+        $scope.generating = false;
 
         // clear report obj
         $scope.report = {};
@@ -1004,6 +1007,11 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
         }
+    });
+
+    // hides hidden graphs if back button is pressed when modal is up
+    $scope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
+        $scope.modalOpen = false;
     });
 
     /**
