@@ -136,6 +136,7 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
 
 
         # machine learnin'
+        student_name = new_behavior.enrollment.student.first_name + " " + new_behavior.enrollment.student.last_name
 
         if not skip_behavior:
             b_clf = svm.OneClassSVM(nu=0.7, kernel='rbf', gamma='auto')
@@ -145,7 +146,6 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
             # 1 means expected, -1 means this is an abnormality
 
             # if the last 3 are abnormalities, trigger a notification
-            student_name = new_behavior.enrollment.student.first_name + " " + new_behavior.enrollment.student.last_name
             if sum(b_prediction_data) <= -3:
                 title = "Abnormal Behavior Scores"
                 body = "Sprout has noticed an abnormal pattern of recent behavior scores for " + student_name + "."
