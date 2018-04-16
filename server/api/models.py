@@ -631,6 +631,13 @@ class Behavior(models.Model):
         interested_parties.append(my_student.case_manager)
         for user in interested_parties:
             for notification in notifications:
+                # If there are already unread behavior notifications for this user for this student, get rid of them
+                Notification.objects.filter(user=user,
+                                            unread=True,
+                                            student=my_student,
+                                            title=notification.title,
+                                            category=constants.NotificationCategories.BEHAVIOR).delete()
+                # Add the new notification
                 Notification.objects.create(user=user,
                                             partial_link="/behaviors",
                                             unread=True,
@@ -697,10 +704,17 @@ class AttendanceRecord(models.Model):
                                                             test_scores=test_scores)
         notifications = calculator.get_notifications(self)
         for notification in notifications:
+            # If there are already unread attendance notifications for this user for this student, get rid of them
+            Notification.objects.filter(user=my_student.case_manager,
+                                        unread=True,
+                                        student=my_student,
+                                        title=notification.title,
+                                        category=constants.NotificationCategories.ATTENDANCE).delete()
+            # Add the new notification
             Notification.objects.create(user=my_student.case_manager,
                                         partial_link="/attendance",
                                         unread=True,
-                                        category=constants.NotificationCategories.BEHAVIOR,
+                                        category=constants.NotificationCategories.ATTENDANCE,
                                         content_object=self,
                                         **notification._asdict())
 
@@ -743,6 +757,13 @@ class StandardizedTestScore(models.Model):
                                                  test_scores=test_scores)
         notifications = calculator.get_notifications(self)
         for notification in notifications:
+            # If there are already unread test score notifications for this user for this student, get rid of them
+            Notification.objects.filter(user=my_student.case_manager,
+                                        unread=True,
+                                        student=my_student,
+                                        title=notification.title,
+                                        category=constants.NotificationCategories.TEST_SCORE).delete()
+            # Add the new notification
             Notification.objects.create(user=my_student.case_manager,
                                         partial_link="/tests",
                                         unread=True,
@@ -819,8 +840,16 @@ class Grade(models.Model):
                                                  behavior_efforts=behavior_effors,
                                                  test_scores=test_scores)
         notifications = calculator.get_notifications(self)
+        my_student = self.student
         for notification in notifications:
-            Notification.objects.create(user=self.student.case_manager,
+            # If there are already unread grade notifications for this user for this student, get rid of them
+            Notification.objects.filter(user=my_student.case_manager,
+                                        unread=True,
+                                        student=my_student,
+                                        title=notification.title,
+                                        category=constants.NotificationCategories.GRADE).delete()
+            # Add the new notification
+            Notification.objects.create(user=my_student.case_manager,
                                         partial_link="/grades",
                                         unread=True,
                                         category=constants.NotificationCategories.GRADE,

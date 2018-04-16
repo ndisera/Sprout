@@ -25,6 +25,7 @@ class NotificationCategories(ChoiceEnum):
     IEP_GOAL = 3
     BEHAVIOR = 4
     TEST_SCORE = 5
+    ATTENDANCE = 6
 
 
 class ServiceType(ChoiceEnum):
