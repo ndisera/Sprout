@@ -106,7 +106,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
         }
 
         // make sure the class is in the student's schedule
-        return $scope.studentToSectionsLookup[student.id] && $scope.studentToSectionsLookup[student.id][entry.specificID];
+        return $scope.studentToSectionsLookup[student.student] && $scope.studentToSectionsLookup[student.student][entry.specificID];
     };
 
     function defaultFocusCategory() {
