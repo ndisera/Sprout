@@ -224,6 +224,7 @@ if __name__ == "__main__":
     print "generating enrollments..."
     enrollments = []
     for student in students:
+        new_enrollments = []
         student_sections = set()
         for term in terms:
             sections_this_term = sections_by_term[term.id]
@@ -232,8 +233,8 @@ if __name__ == "__main__":
                 while new_section.id in student_sections:
                     new_section = random.choice(sections_this_term)
                 student_sections.add(new_section.id)
-                enrollments.append(Enrollment(section=new_section.id, student=student.id, id=None))
-        response = enrollments_service.add_many_enrollments(enrollments)
+                new_enrollments.append(Enrollment(section=new_section.id, student=student.id, id=None))
+        response = enrollments_service.add_many_enrollments(new_enrollments)
         enrollments.extend([Enrollment(**enrollment) for enrollment in response.json()['enrollments']])
 
     # generate behaviors. Depends: enrollments, services
