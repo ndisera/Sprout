@@ -284,8 +284,8 @@ if __name__ == "__main__":
     # generate attendances. Depends: enrollments
     print "generating attendance..."
     attendances = attendance_generator.generate_attendances(
-        date_range_start=datetime.datetime.combine(school_year_start, datetime.time()),
-        date_range_end=datetime.datetime.today())
+        date_range_start=school_year_start,
+        date_range_end=datetime.date.today())
     # same issue as behaviors -- adding all at once times out server
     # TODO: make this not dumb
     split_attendances = [[], ]
