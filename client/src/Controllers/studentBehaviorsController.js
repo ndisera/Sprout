@@ -5,7 +5,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
     // so populate with serires instead
 
     $scope.report = {};
-
+    $scope.generating = false;
     $scope.behaviorNote = {};
     $scope.editingNote = false;
 
@@ -34,7 +34,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
 
     $scope.isSuperUser = userService.user.isSuperUser;
     $scope.isCaseManager = false;
-    if($scope.student.case_manager === userService.user.id) {
+    if ($scope.student.case_manager === userService.user.id) {
         $scope.isCaseManager = true;
     }
 
@@ -878,6 +878,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
      * Downloads a report pdf
      */
     $scope.generateReport = function() {
+        $scope.generating = true;
         $scope.report.behaviorSum = 0;
         $scope.report.effortSum = 0;
         $scope.report.behaviorCount = 0;
@@ -962,25 +963,35 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
 
         for (var i = 0; i < behaviorReportGraph.data[0].length; i++) {
             // for every class (if there is one)
+            var firstDate = "";
             for (var j = 0; j < behaviorReportGraph.data.length; j++) {
                 var date = $scope.sharedGraph.labels[i]; // actually get date
                 var behavior = behaviorReportGraph.data[j][i] === null ? "" : behaviorReportGraph.data[j][i];
                 var effort = effortReportGraph.data[j][i] === null ? "" : effortReportGraph.data[j][i];
-                if (includeClassNames) {
+                if (includeClassNames && (behavior !== "" || effort !== "")) {
+                    if (date === firstDate) {
+                        date = "";
+                    } else if (date !== firstDate || firstDate === "") {
+                        firstDate = date;
+                    }
                     var className = $scope.sharedGraph.series[j];
                     rows.push([date, className, behavior, effort]);
-                } else {
+                } else if (!includeClassNames && (behavior !== "" || effort !== "")) {
                     rows.push([date, behavior, effort]);
                 }
             }
         }
 
-        doc.autoTable(columns, rows, { showHeader: 'firstPage' });
+        doc.autoTable(columns, rows, {
+            showHeader: 'firstPage'
+        });
         var classTitle = $scope.report.class.title.split(' ').join('_');
         doc.save($scope.student.first_name + '_' + $scope.student.last_name + '_' + classTitle + '_' + currentDate + '.pdf');
 
         // clear report obj
         $scope.report = {};
+
+        $scope.generating = false;
 
         // close modal here since data-dismiss isn't working
         $scope.modalOpen = false;
@@ -994,6 +1005,11 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, chartInstance.chart.width, chartInstance.chart.height);
         }
+    });
+
+    // hides hidden graphs if back button is pressed when modal is up
+    $scope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
+        $scope.modalOpen = false;
     });
 
     /**
