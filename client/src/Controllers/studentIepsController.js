@@ -317,6 +317,13 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
         // can take first and last because it's sorted
         var iterDate = iep.datapoints[0].date.clone();
         var dateDiff = iep.datapoints[iep.datapoints.length - 1].date.diff(iep.datapoints[0].date, 'd');
+
+        iep.graph.data   = [];
+        iep.graph.labels = [];
+        iep.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
+        iep.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
+        iep.graph.labels = _.times(dateDiff + 1, _.constant(null));
+
         var j = 0;
         for(var i = 0; i < dateDiff + 1; i++) {
             iep.graph.labels[i] = iterDate.format('MM/DD').toString();
