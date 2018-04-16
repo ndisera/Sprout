@@ -36,7 +36,7 @@ yes yes | python manage.py collectstatic > /dev/null
 popd
 
 # Start uwsgi server
-uwsgi --socket /tmp/django_api.sock --chdir="${SCRIPT_PATH}"/../server/ --module api.wsgi -H "${SCRIPT_PATH}/../server/env" &
+uwsgi --enable-threads --socket /tmp/django_api.sock --chdir="${SCRIPT_PATH}"/../server/ --module api.wsgi -H "${SCRIPT_PATH}/../server/env" &
 uwsgi=$!
 
 echo ""
