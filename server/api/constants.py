@@ -23,6 +23,8 @@ class NotificationCategories(ChoiceEnum):
     BIRTHDAY = 1
     GRADE = 2
     IEP_GOAL = 3
+    BEHAVIOR = 4
+    TEST_SCORE = 5
 
 
 class ServiceType(ChoiceEnum):
