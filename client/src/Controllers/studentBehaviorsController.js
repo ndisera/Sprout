@@ -1,4 +1,4 @@
-app.controller("studentBehaviorsController", function($scope, $rootScope, $routeParams, $location, toastService, userService, behaviorService, studentService, data, terms, service, student) {
+app.controller("studentBehaviorsController", function($scope, $rootScope, $routeParams, $location, $timeout, toastService, userService, behaviorService, studentService, data, terms, service, student) {
     $scope.location = $location;
 
     // I'm displaying all classes in the report dropdown, I need to display all classes that are valid for the chosen term
@@ -878,7 +878,9 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
      * Downloads a report pdf
      */
     $scope.generateReport = function() {
-        $scope.generating = true;
+        $timeout(function() {
+            $scope.generating = true;
+        }, 0);
         $scope.report.behaviorSum = 0;
         $scope.report.effortSum = 0;
         $scope.report.behaviorCount = 0;
@@ -1010,6 +1012,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
     // hides hidden graphs if back button is pressed when modal is up
     $scope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
         $scope.modalOpen = false;
+        $scope.generating = false;
     });
 
     /**

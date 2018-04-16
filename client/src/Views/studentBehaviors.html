@@ -18,7 +18,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header grey modal-wrapper">
-                <button type="button" class="close" data-dismiss="modal" ng-click="modalOpen = false">&times;</button>
+                <button type="button" class="close" data-dismiss="modal" ng-click="modalOpen=false;generating=false;">&times;</button>
                 <h4 class="modal-title">Create Behavior and Effort Report for {{ student.first_name }} {{ student.last_name }}</h4>
             </div>
             <div class="modal-body">
@@ -66,7 +66,7 @@
                 </div>
                 <div class="btn-manipulate-row">
                     <button ng-disabled="reportForm.$invalid" class="btn btn-success" ng-click="generateReport()">
-                        <i ng-if="generating" class="fas fa-circle-notch fa-spin"></i>
+                        <span ng-if="generating"><i class="fas fa-circle-notch fa-spin"></i></span>
                         <span ng-if="!generating" class="glyphicon glyphicon-ok"></span>
                     </button>
                 </div>
