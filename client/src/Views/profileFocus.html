@@ -44,7 +44,10 @@
                                                     {{ focusStudent.focus_graph.category.displayName }} <span class="caret"></span>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-right">
-                                                    <li ng-repeat="entry in focusCategories" ng-click="selectFocusCategory(focusStudent, entry)" ng-class="{ 'active': entry.uniqueId === focusStudent.focus_graph.category.uniqueId, }">
+                                                    <li ng-repeat="entry in focusCategories" 
+                                                        ng-click="selectFocusCategory(focusStudent, entry)" 
+                                                        ng-if="shouldDisplayDropdownOption(entry, focusStudent)"
+                                                        ng-class="{ 'active': entry.uniqueId === focusStudent.focus_graph.category.uniqueId, }">
                                                         <a class="focus-student-assign-link">
                                                             <span>{{ entry.displayName }}  </span>
                                                             <span ng-if="entry.uniqueId === focusStudent.focus_graph.category.uniqueId" class="glyphicon glyphicon-ok"></span>

@@ -1,6 +1,6 @@
 app.controller("profileFocusController", function ($scope, $rootScope, $q, $location, toastService,
-                                                   studentData, focusData, testData, sectionData,
-                                                   sectionService, studentService, userService, testService, behaviorService) {
+                                                   studentData, focusData, testData, enrollmentData, terms,
+                                                   sectionService, studentService, userService, testService, termService, behaviorService) {
     $scope.location = $location;
 
     $scope.editing = false;
@@ -12,7 +12,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
     // $scope.focusCategoryData = true;
     // $scope.progressCategoryData = true;
     // $scope.cautionCategoryData = true;
-
+    
 
     // categories must be populated before setting up students
     // add any static categories here
@@ -42,7 +42,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
             href: '/tests',
         });
     });
-    _.each(sectionData.sections, function(elem) {
+    _.each(enrollmentData.sections, function(elem) {
         $scope.focusCategories.push({
             category: 'grades',
             displayName: elem.title,
@@ -69,6 +69,46 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
         $scope.focusStudents = _.sortBy(focusData.focus_students, 'ordering');
     }
 
+    $scope.sectionsLookup = {};
+    if(enrollmentData) {
+        $scope.sectionsLookup = _.indexBy(enrollmentData.sections, 'id');
+    }
+
+    var allTerms              = [];
+    var currentTerms          = [];
+    $scope.currentTermsLookup = {};
+    if(terms && terms.terms) {
+        allTerms = terms.terms;
+    }
+    currentTerms = termService.getAllCurrentTerms(allTerms);
+    $scope.currentTermsLookup = _.indexBy(currentTerms, 'id');
+
+    // used to determine if a dropdown entry for a section should be displayed
+    $scope.studentToSectionsLookup = {};
+    _.each($scope.students, function(student) {
+        $scope.studentToSectionsLookup[student.id] = {};
+    });
+    _.each(enrollmentData.enrollments, function(enrollment) {
+        if($scope.studentToSectionsLookup[enrollment.student]) {
+            $scope.studentToSectionsLookup[enrollment.student][enrollment.section] = true;
+        }
+    });
+
+    $scope.shouldDisplayDropdownOption = function(entry, student) {
+        if(entry.category !== 'grades') {
+            return true;
+        }
+
+        // if the class isn't in a current term
+        var term = $scope.sectionsLookup[entry.specificID].term;
+        if(!$scope.currentTermsLookup[term]) {
+            return false;
+        }
+
+        // make sure the class is in the student's schedule
+        return $scope.studentToSectionsLookup[student.id] && $scope.studentToSectionsLookup[student.id][entry.specificID];
+    };
+
     function defaultFocusCategory() {
         var today = moment();
         var pastWeek = moment(today).subtract(2, 'w');
@@ -77,9 +117,36 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
             + today.format('YYYY-MM-DD').toString();
     }
 
+    // tells me if I should reset a user's focus category
+    function isStaleClass(category, student) {
+        var splitString = category.split('__');
+        var type = splitString[0];
+        var id = null;
+        if(splitString.length > 3) {
+            id = parseInt(splitString[3]);
+        }
+
+        if(type && type === 'grades') {
+            if(!id) {
+                return true;
+            }
+
+            var entry = {
+                category: type,
+                specificID: id,
+            };
+            return !$scope.shouldDisplayDropdownOption(entry, student);
+        }
+        return false;
+    }
+
     // set up for focus student must be done everytime new focus student is added to list
     function setUpFocusStudent(focusStudent) {
-        if(focusStudent.focus_category === null || focusStudent.focus_category === undefined || focusStudent.focus_category === '' || focusStudent.focus_category === 'none') {
+        if(focusStudent.focus_category === null 
+            || focusStudent.focus_category === undefined 
+            || focusStudent.focus_category === '' 
+            || focusStudent.focus_category === 'none'
+            || isStaleClass(focusStudent.focus_category, focusStudent)) {
             focusStudent.focus_category = defaultFocusCategory();
         }
 
@@ -352,6 +419,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
 
                     // don't need the legend
                     graph.options.legend.display = false;
+                    graph.options.spanGaps = true;
 
                     //set the series name to the test name
                     graph.series[0] = test.test_name;
@@ -403,7 +471,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
              * Grades for a class
              * Uses the specificID for the section ID
              */
-            var section = _.find(sectionData.sections, function(elem) { return elem.id === specificId; });
+            var section = _.find(enrollmentData.sections, function(elem) { return elem.id === specificId; });
 
             sectionService.getAssignmentsForSection(section.id).then(
               function success(assignmentsData) {
@@ -432,6 +500,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
 
                         // don't need the legend
                         graph.options.legend.display = false;
+                        graph.options.spanGaps = true;
 
                         //set the series name to the class name
                         graph.series[0] = section.title;
@@ -460,7 +529,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                                 var average = 0;
                                 var count = 0;
                                 while (assignmentDate.diff(iterDate, 'd') === 0) {
-                                    var currentAssignment = _.find(assignmentData.assignments, function(elem) {
+                                    var currentAssignment = _.find(assignmentsData.assignments, function(elem) {
                                         return elem.id === assignmentScores[j].assignment;
                                     });
                                     var assignmentMin = currentAssignment.score_min;
@@ -690,7 +759,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
 
     // this is called when the user selects a different focus category
     // for now, makes the default date range span the past 2 weeks
-    // TODO(gzuber): I don't think I shouldn't set dates from here
+    // TODO(gzuber): I don't think I should set dates from here
     $scope.selectFocusCategory = function(focusStudent, category) {
         var toSave = copyFocusStudent(focusStudent);
 
@@ -709,6 +778,12 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
         }
         else if (category.category === "test") {
             toSave.focus_category = "test__"
+                + pastWeek.format('YYYY-MM-DD').toString() + "__"
+                + today.format('YYYY-MM-DD').toString() + "__"
+                + category.specificID;
+        }
+        else if (category.category === "grades") {
+            toSave.focus_category = "grades__"
                 + pastWeek.format('YYYY-MM-DD').toString() + "__"
                 + today.format('YYYY-MM-DD').toString() + "__"
                 + category.specificID;

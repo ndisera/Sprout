@@ -328,8 +328,31 @@ app.config(function ($httpProvider, $locationProvider, $routeProvider) {
                 testData: function(testService) {
                     return testService.getTests();
                 },
-                sectionData: function (sectionService) {
-                    return sectionService.getSections();
+                enrollmentData: function ($q, userService, enrollmentService) {
+                    //TODO(gzuber): I don't like this in script.js...
+                    var deferred = $q.defer();
+                    userService.authVerify().then(
+                        function success() {
+                            var config = {
+                                include: ['section.*', ],
+                            };
+                            enrollmentService.getStudentEnrollments(config).then(
+                                function success(data) {
+                                    deferred.resolve(data);
+                                },
+                                function error(response) {
+                                    deferred.reject(response);
+                                }
+                            );
+                        },
+                        function error(response) {
+                            deferred.reject(response);
+                        }
+                    );
+                    return deferred.promise;
+                },
+                terms: function(termService) {
+                    return termService.getTerms();
                 },
             }
         })
