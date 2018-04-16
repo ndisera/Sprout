@@ -135,8 +135,9 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
     var graphEndDateKey = 'graphEndDate';
 
     // calculate first and last days of school week
-    $scope[graphStartDateKey] = moment().startOf('isoWeek');
-    $scope[graphEndDateKey] = moment().startOf('isoWeek').add(4, 'd');
+    $scope.dateRange = {};
+    $scope.dateRange[graphStartDateKey] = moment().startOf('isoWeek');
+    $scope.dateRange[graphEndDateKey] = moment().startOf('isoWeek').add(4, 'd');
 
     //TODO(gzuber): there must be a better way to do this...
     function legendClick(e, legendItem) {
@@ -330,16 +331,25 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
      */
     $scope.graphDateRangeChange = function(varName, newDate) {
         // update date
-        $scope[varName] = newDate;
+        if(newDate === null || newDate === undefined) {
+            return;
+        }
+
+        var tempDate = moment(newDate);
+        if(!tempDate.isValid()) {
+            return;
+        }
+        console.log(tempDate);
+        $scope.dateRange[varName] = tempDate.clone();
 
         // broadcast event to update min/max values
         if (varName === graphStartDateKey) {
             $scope.$broadcast('pickerUpdate', graphEndDateKey, {
-                minDate: $scope[graphStartDateKey]
+                minDate: $scope.dateRange[graphStartDateKey]
             });
         } else if (varName === graphEndDateKey) {
             $scope.$broadcast('pickerUpdate', graphStartDateKey, {
-                maxDate: $scope[graphEndDateKey]
+                maxDate: $scope.dateRange[graphEndDateKey]
             });
         }
 
@@ -347,6 +357,10 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
         $scope.activeBehaviorLegendItem = null;
 
         updateGraph();
+    };
+
+    $scope.graphDateRangeStringChange = function(val) {
+        console.log(val);
     };
 
     /**
@@ -360,11 +374,11 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
             exclude: ['id', ],
             filter: [{
                     name: 'date.range',
-                    val: $scope.graphStartDate.format('YYYY-MM-DD').toString(),
+                    val: $scope.dateRange.graphStartDate.format('YYYY-MM-DD').toString(),
                 },
                 {
                     name: 'date.range',
-                    val: $scope.graphEndDate.format('YYYY-MM-DD').toString(),
+                    val: $scope.dateRange.graphEndDate.format('YYYY-MM-DD').toString(),
                 },
                 {
                     name: 'enrollment.student',
@@ -377,7 +391,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
         behaviorService.getStudentBehavior(config).then(
             function success(data) {
                 // calculate how many entries of data our graph will have
-                var dateDiff = $scope.graphEndDate.diff($scope.graphStartDate, 'd');
+                var dateDiff = $scope.dateRange.graphEndDate.diff($scope.dateRange.graphStartDate, 'd');
 
                 // clear labels and data
                 $scope.sharedGraph.labels = [];
@@ -391,7 +405,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
                 $scope.behaviorAvgInfo = [];
                 $scope.effortAvgInfo = [];
 
-                var termsToInclude = termsByDateRange($scope.terms, $scope.graphStartDate, $scope.graphEndDate);
+                var termsToInclude = termsByDateRange($scope.terms, $scope.dateRange.graphStartDate, $scope.dateRange.graphEndDate);
 
                 var hasSection = false;
                 _.each(termsToInclude, function(termId) {
@@ -418,7 +432,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
                 $scope.avgEffortGraph.data.push(_.times(dateDiff + 1, _.constant(null)));
 
                 // iterate through each date, setting data as necessary
-                var iterDate = $scope.graphStartDate.clone();
+                var iterDate = $scope.dateRange.graphStartDate.clone();
                 var j = 0;
                 for (var i = 0; i < dateDiff + 1; i++) {
                     $scope.sharedGraph.labels[i] = iterDate.format('MM/DD').toString();
@@ -715,9 +729,9 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
 
                     // update the graph and avg graph
                     var entryDate = moment(updatedEntry.date);
-                    if (entryDate >= $scope.graphStartDate && entryDate <= $scope.graphEndDate) {
+                    if (entryDate >= $scope.dateRange.graphStartDate && entryDate <= $scope.dateRange.graphEndDate) {
                         var index = $scope.sectionToDataIndex[entry.section];
-                        var dateIndex = Math.abs($scope.graphStartDate.diff(entryDate, 'd'));
+                        var dateIndex = Math.abs($scope.dateRange.graphStartDate.diff(entryDate, 'd'));
                         if (type === 'behavior') {
                             if (updatedEntry.behavior === null) {
                                 $scope.behaviorAvgInfo[dateIndex].count--;
@@ -777,9 +791,9 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
 
                     // update the graph
                     var entryDate = moment(updatedEntry.date);
-                    if (entryDate >= $scope.graphStartDate && entryDate <= $scope.graphEndDate) {
+                    if (entryDate >= $scope.dateRange.graphStartDate && entryDate <= $scope.dateRange.graphEndDate) {
                         var index = $scope.sectionToDataIndex[entry.section];
-                        var dateIndex = Math.abs($scope.graphStartDate.diff(entryDate, 'd'));
+                        var dateIndex = Math.abs($scope.dateRange.graphStartDate.diff(entryDate, 'd'));
                         if (type === 'behavior') {
                             $scope.behaviorGraph.data[index][dateIndex] = updatedEntry.behavior;
 
@@ -930,8 +944,8 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
 
         var doc = new jsPDF('p', 'pt'); // was mm previous, 1 mm is 2.83465 pt
         doc.setFont('Times', 'normal');
-        var startDate = moment($scope.graphStartDate).format('YYYY-MM-DD').toString();
-        var endDate = moment($scope.graphEndDate).format('YYYY-MM-DD').toString();
+        var startDate = moment($scope.dateRange.graphStartDate).format('YYYY-MM-DD').toString();
+        var endDate = moment($scope.dateRange.graphEndDate).format('YYYY-MM-DD').toString();
 
         var width = 180;
         var height = 90;
