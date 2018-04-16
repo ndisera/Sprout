@@ -609,6 +609,10 @@ class Behavior(models.Model):
         """
         Check the new behavior, generating notifications if it is significantly outside of normal
         """
+        # Clean up any notifications which might have already been associated with this object
+        self.notifications.all().delete()
+        super(Behavior, self).save(**kwargs)
+
         my_student = self.enrollment.student
         grades = Grade.objects.filter(student=my_student)
         attendances = AttendanceRecord.objects.filter(enrollment__student=my_student)
@@ -621,12 +625,13 @@ class Behavior(models.Model):
                                                  behavior_efforts=behavior_effors,
                                                  test_scores=test_scores)
         notifications = calculator.get_notifications(self)
-        super(Behavior, self).save(**kwargs)
-        for notification in notifications:
-            try:
-                Notification.objects.get(**notification._asdict())
-            except Notification.DoesNotExist:
-                Notification.objects.create(user=my_student.case_manager,
+
+        # For a behavior notification, interested parties are the case manager as well as all system admins
+        interested_parties = [admin for admin in SproutUser.objects.filter(is_superuser=True)]
+        interested_parties.append(my_student.case_manager)
+        for user in interested_parties:
+            for notification in notifications:
+                Notification.objects.create(user=user,
                                             partial_link="/behaviors",
                                             unread=True,
                                             category=constants.NotificationCategories.BEHAVIOR,
@@ -675,6 +680,10 @@ class AttendanceRecord(models.Model):
         """
         Check the new attendance record, generating notifications if it is significantly outside of normal
         """
+        # Clean up any notifications which might have already been associated with this object
+        self.notifications.all().delete()
+        super(AttendanceRecord, self).save(**kwargs)
+
         my_student = self.enrollment.student
         grades = Grade.objects.filter(student=my_student)
         attendances = AttendanceRecord.objects.filter(enrollment__student=my_student)
@@ -687,17 +696,13 @@ class AttendanceRecord(models.Model):
                                                             behavior_efforts=behavior_effors,
                                                             test_scores=test_scores)
         notifications = calculator.get_notifications(self)
-        super(AttendanceRecord, self).save(**kwargs)
         for notification in notifications:
-            try:
-                Notification.objects.get(**notification._asdict())
-            except Notification.DoesNotExist:
-                Notification.objects.create(user=my_student.case_manager,
-                                            partial_link="/attendance",
-                                            unread=True,
-                                            category=constants.NotificationCategories.BEHAVIOR,
-                                            content_object=self,
-                                            **notification._asdict())
+            Notification.objects.create(user=my_student.case_manager,
+                                        partial_link="/attendance",
+                                        unread=True,
+                                        category=constants.NotificationCategories.BEHAVIOR,
+                                        content_object=self,
+                                        **notification._asdict())
 
 
 class StandardizedTestScore(models.Model):
@@ -721,6 +726,10 @@ class StandardizedTestScore(models.Model):
         """
         Check the new score, generating notifications if it is significantly outside of normal
         """
+        # Clean up any notifications which might have already been associated with this object
+        self.notifications.all().delete()
+        super(StandardizedTestScore, self).save(**kwargs)
+
         my_student = self.student
         grades = Grade.objects.filter(student=my_student)
         attendances = AttendanceRecord.objects.filter(enrollment__student=my_student)
@@ -733,17 +742,13 @@ class StandardizedTestScore(models.Model):
                                                  behavior_efforts=behavior_effors,
                                                  test_scores=test_scores)
         notifications = calculator.get_notifications(self)
-        super(StandardizedTestScore, self).save(**kwargs)
         for notification in notifications:
-            try:
-                Notification.objects.get(**notification._asdict())
-            except Notification.DoesNotExist:
-                Notification.objects.create(user=my_student.case_manager,
-                                            partial_link="/tests",
-                                            unread=True,
-                                            category=constants.NotificationCategories.TEST_SCORE,
-                                            content_object=self,
-                                            **notification._asdict())
+            Notification.objects.create(user=my_student.case_manager,
+                                        partial_link="/tests",
+                                        unread=True,
+                                        category=constants.NotificationCategories.TEST_SCORE,
+                                        content_object=self,
+                                        **notification._asdict())
 
 
 class Assignment(models.Model):
@@ -799,6 +804,10 @@ class Grade(models.Model):
         """
         Check the new grade, generating notifications if it is significantly outside of normal
         """
+        # Clean up any notifications which might have already been associated with this object
+        self.notifications.all().delete()
+        super(Grade, self).save(**kwargs)
+
         grades = Grade.objects.filter(student=self.student)
         attendances = AttendanceRecord.objects.filter(enrollment__student=self.student)
         behavior_effors = Behavior.objects.filter(enrollment__student=self.student)
@@ -810,17 +819,13 @@ class Grade(models.Model):
                                                  behavior_efforts=behavior_effors,
                                                  test_scores=test_scores)
         notifications = calculator.get_notifications(self)
-        super(Grade, self).save(**kwargs)
         for notification in notifications:
-            try:
-                Notification.objects.get(**notification._asdict())
-            except Notification.DoesNotExist:
-                Notification.objects.create(user=self.student.case_manager,
-                                            partial_link="/grades",
-                                            unread=True,
-                                            category=constants.NotificationCategories.GRADE,
-                                            content_object=self,
-                                            **notification._asdict())
+            Notification.objects.create(user=self.student.case_manager,
+                                        partial_link="/grades",
+                                        unread=True,
+                                        category=constants.NotificationCategories.GRADE,
+                                        content_object=self,
+                                        **notification._asdict())
 
 
 class FinalGrade(models.Model):

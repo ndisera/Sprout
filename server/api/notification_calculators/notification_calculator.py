@@ -80,17 +80,14 @@ class BehaviorNotificationCalculator(AbstractNotificationCalculator):
         """
         to_return = []
 
-        # only save a list if it's the same class as the new behavior score
-        behavior_effort_list = []
-        for behavior in self.behavior_efforts:
-            if behavior.enrollment_id == new_behavior.enrollment_id:
-                behavior_effort_list.append(behavior)
+        # only consider a datapoint if it's the same class as the new behavior score
+        behavior_effort_list = self.behavior_efforts.filter(enrollment_id=new_behavior.enrollment_id).distinct()
         # We should only ever have one list
 
         # only continue with the learning if we have at least ten examples to train off of, and 3 to test
         training_size = 10
         prediction_size = 3
-        if len(behavior_effort_list) < training_size + prediction_size + 1:
+        if behavior_effort_list.count() < training_size + prediction_size + 1:
             return to_return
 
         # extract the data
@@ -180,16 +177,13 @@ class TestScoreNotificationCalculator(AbstractNotificationCalculator):
         to_return = []
 
         # only save a list if it's the same class as the new test score
-        test_list = []
-        for test in self.test_scores:
-            if test.standardized_test_id == new_score.standardized_test_id:
-                test_list.append(test)
+        test_list = self.test_scores.filter(standardized_test_id=new_score.standardized_test_id).distinct()
         # We should only ever have one list
 
         # only continue with the learning if we have at least 5 examples to train off of, and 3 to test
         training_size = 5
         prediction_size = 3
-        if len(test_list) < training_size + prediction_size + 1:
+        if test_list.count() < training_size + prediction_size + 1:
             return to_return  # return empty
 
         # extract the data
