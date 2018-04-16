@@ -102,7 +102,11 @@ class CategoryCalculator():
         :return: prepared version of focus
         :rtype: str
         """
-        return focus
+
+        current_date = datetime.now().date()
+        two_weeks_ago_date = (datetime.now() - timedelta(weeks=2)).date()
+
+        return focus + '__' + str(current_date) + '__' + str(two_weeks_ago_date)
 
     def analyze_data(self):
         # separator character is 2 underscores
