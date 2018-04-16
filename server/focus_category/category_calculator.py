@@ -95,17 +95,34 @@ class CategoryCalculator():
 
     def prepare_focus_category(self, focus):
         """
-        Convert the category the user has selected into the format expected by the frontend
+        Update the focus category to a current date range. All the other formatting has already been done
 
         :param focus: category string selected by the user
         :return: prepared version of focus
         :rtype: str
         """
 
+        if focus is None:
+            return focus  # The frontend will handle this
+
         current_date = datetime.now().date()
         two_weeks_ago_date = (datetime.now() - timedelta(weeks=2)).date()
 
-        return focus + '__' + str(current_date) + '__' + str(two_weeks_ago_date)
+        separator = "__"
+        string_parts = focus.split(separator)
+        # replace index 1 and 2: those are the dates
+        if len(string_parts) == 1:
+            return string_parts[0]
+
+        string_parts[1] = str(two_weeks_ago_date)
+        string_parts[2] = str(current_date)
+
+        new_focus = separator.join(string_parts)
+        return new_focus
+
+
+
+
 
     def analyze_data(self):
         # separator character is 2 underscores

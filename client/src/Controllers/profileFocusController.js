@@ -463,7 +463,7 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                     }
                 },
                 function error(response) {
-                    toastService.error('The server wasn\'t able to get test scores for "' + studentsLookup[studentId].first_name + ' ' + studentsLookup[studentId].last_name + '"');
+                    toastService.error('The server wasn\'t able to get all test scores "');
                 }
             );
         } else if (category === "grades") {
