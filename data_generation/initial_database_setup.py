@@ -189,6 +189,7 @@ if __name__ == "__main__":
 
     # every teacher gets three random classes per term
     print "generating sections..."
+    sections_by_term = {}
     sections = []
     if args.boring:
         sections.append(Section(teacher=teacher_ids[0], title="CS 5510", term=terms[0].id, schedule_position=1, id=None, import_id=None))
@@ -200,10 +201,12 @@ if __name__ == "__main__":
                 for i in range(num_sections_per_teacher):
                     title = random.choice(section_subjects) + ' ' + str(random.randint(1000, 9999))
                     period = i + 1
-                    sections.append(Section(teacher=teacher, title=title, term=term.id, schedule_position=period, id=None, import_id=None))
+                    section = Section(teacher=teacher, title=title, term=term.id, schedule_position=period, id=None, import_id=None)
+                    sections.append(section)
 
-    response = sections_service.add_many_sections(sections)
-    sections = [Section(**section) for section in response.json()['sections']]
+            response = sections_service.add_many_sections(sections)
+            sections_by_term[term.id] = [Section(**section) for section in response.json()['sections']]
+            sections.extend(sections_by_term[term.id])
 
     # create section lookup
     sections_lookup = {}
@@ -217,24 +220,21 @@ if __name__ == "__main__":
     for student_id in services:
         service_generator.serviceService.add_many_services(services[student_id], student_id)
 
-    # generate enrollments
+    # generate enrollments -- Each student should be enrolled in num_sections_per_student per term
     print "generating enrollments..."
     enrollments = []
-    if args.boring:
-        for student in students:
-            for section in sections:
-                enrollments.append(Enrollment(section=section.id, student=student.id, id=None))
-    else:
-        for student in students:
-            student_sections = set()
+    for student in students:
+        student_sections = set()
+        for term in terms:
+            sections_this_term = sections_by_term[term.id]
             for i in range(num_sections_per_student):
-                new_section = random.choice(sections)
+                new_section = random.choice(sections_this_term)
                 while new_section.id in student_sections:
-                    new_section = random.choice(sections)
+                    new_section = random.choice(sections_this_term)
                 student_sections.add(new_section.id)
                 enrollments.append(Enrollment(section=new_section.id, student=student.id, id=None))
-    response = enrollments_service.add_many_enrollments(enrollments)
-    enrollments = [Enrollment(**enrollment) for enrollment in response.json()['enrollments']]
+        response = enrollments_service.add_many_enrollments(enrollments)
+        enrollments.extend([Enrollment(**enrollment) for enrollment in response.json()['enrollments']])
 
     # generate behaviors. Depends: enrollments, services
     print "generating behaviors..."
