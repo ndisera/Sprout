@@ -189,22 +189,23 @@ if __name__ == "__main__":
 
     # every teacher gets three random classes per term
     print "generating sections..."
-    sections_by_term = {}
     sections = []
+    sections_by_term = {}
     if args.boring:
         sections.append(Section(teacher=teacher_ids[0], title="CS 5510", term=terms[0].id, schedule_position=1, id=None, import_id=None))
         sections.append(Section(teacher=teacher_ids[1], title="CS 4400", term=terms[0].id, schedule_position=6, id=None, import_id=None))
     else:
         section_subjects = ['Math', 'English', 'Science', 'Reading', 'Social Studies', 'Spanish', 'PE', 'Study Hall',]
         for term in terms:
+            new_sections = []
             for teacher in teacher_ids:
                 for i in range(num_sections_per_teacher):
                     title = random.choice(section_subjects) + ' ' + str(random.randint(1000, 9999))
                     period = i + 1
                     section = Section(teacher=teacher, title=title, term=term.id, schedule_position=period, id=None, import_id=None)
-                    sections.append(section)
+                    new_sections.append(section)
 
-            response = sections_service.add_many_sections(sections)
+            response = sections_service.add_many_sections(new_sections)
             sections_by_term[term.id] = [Section(**section) for section in response.json()['sections']]
             sections.extend(sections_by_term[term.id])
 
@@ -232,6 +233,7 @@ if __name__ == "__main__":
                 new_section = random.choice(sections_this_term)
                 while new_section.id in student_sections:
                     new_section = random.choice(sections_this_term)
+                assert new_section.term == term.id, "Error Will Robinson"
                 student_sections.add(new_section.id)
                 new_enrollments.append(Enrollment(section=new_section.id, student=student.id, id=None))
         response = enrollments_service.add_many_enrollments(new_enrollments)
