@@ -270,11 +270,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                             ],
                         };
 
-                        if(iep.datapoints.length === 0) {
-                            iep.graph.show = false;
-                        }
-                        else {
-                            iep.graph.show = true;
+                        if(iep.datapoints.length > 0) {
                             buildIepGraph(iep);
                         }
                     }
@@ -312,6 +308,9 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
     }
 
     function buildIepGraph(iep) {
+        if(iep.datapoints.length === 0) {
+            return;
+        }
         iep.datapoints = _.sortBy(iep.datapoints, function(elem) { return elem.date; });
 
         // iterate through each date, setting data as necessary
