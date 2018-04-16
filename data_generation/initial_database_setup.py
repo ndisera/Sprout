@@ -24,6 +24,8 @@ from lib.services.settings import SchoolSettings, DailySchedule, TermSettings, S
 from lib.services.term import Term, TermService
 from lib.services.users import User, UsersService
 
+from lib.constants import NotificationCategories, ServiceType
+
 if __name__ == "__main__":
     # disable annoying warnings
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -240,6 +242,11 @@ if __name__ == "__main__":
     for enrollment in enrollments:
         section = sections_lookup[enrollment.section]
         term = term_lookup[section.term]
+
+        behavior_services = [service for service in services[enrollment.student] if service.type == ServiceType.BEHAVIOR]
+        if len(behavior_services) < 1:
+            # If this student does not have a behavior service, skip generating behaviors
+            continue
 
         # generate records for every day unless I'm in the current term
         num_days = 0
