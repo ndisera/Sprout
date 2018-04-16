@@ -270,11 +270,7 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
                             ],
                         };
 
-                        if(iep.datapoints.length === 0) {
-                            iep.graph.show = false;
-                        }
-                        else {
-                            iep.graph.show = true;
+                        if(iep.datapoints.length > 0) {
                             buildIepGraph(iep);
                         }
                     }
@@ -312,12 +308,22 @@ app.controller("studentIepsController", function($scope, $rootScope, $location, 
     }
 
     function buildIepGraph(iep) {
+        if(iep.datapoints.length === 0) {
+            return;
+        }
         iep.datapoints = _.sortBy(iep.datapoints, function(elem) { return elem.date; });
 
         // iterate through each date, setting data as necessary
         // can take first and last because it's sorted
         var iterDate = iep.datapoints[0].date.clone();
         var dateDiff = iep.datapoints[iep.datapoints.length - 1].date.diff(iep.datapoints[0].date, 'd');
+
+        iep.graph.data   = [];
+        iep.graph.labels = [];
+        iep.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
+        iep.graph.data.push(_.times(dateDiff + 1, _.constant(null)));
+        iep.graph.labels = _.times(dateDiff + 1, _.constant(null));
+
         var j = 0;
         for(var i = 0; i < dateDiff + 1; i++) {
             iep.graph.labels[i] = iterDate.format('MM/DD').toString();

@@ -51,7 +51,7 @@ class SettingsService(BaseService):
         Patch the one-and-only school model (fake-o singleton)
         """
         uri = self.complete_uri_template.format(endpoint="/settings/school/{id}").format(id=school.id)
-        return self._patch_model(school, uri)
+        return self._put_model(school, uri)
 
     def add_schedule(self, schedule):
         return self.add_many_schedules([schedule])
