@@ -9,25 +9,6 @@
     </div>
 </div>
 <div ng-if="attendance.length > 0">
-    <div class="panel-wrapper">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Calendar</h3>
-            </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="table-responsive no-border">
-                            <div class="calendar-container">
-                                <div ui-calendar="uiConfig.calendar" ng-model="eventSources" calendar="attendanceCalendar">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="row">
         <div class="col-xs-12 col-sm-6">
             <div class="input-group">
@@ -78,6 +59,23 @@
                                     <canvas id="student-attendance-type-graph" class="chart chart-doughnut" chart-data="typeGraph.data" chart-labels="typeGraph.labels" chart-options="typeGraph.options" chart-dataset-override="typeGraph.datasetOverride">
                             </canvas>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-wrapper voffset4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Calendar</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="calendar-container">
+                            <div ui-calendar="uiConfig.calendar" ng-model="eventSources" calendar="attendanceCalendar">
                             </div>
                         </div>
                     </div>
