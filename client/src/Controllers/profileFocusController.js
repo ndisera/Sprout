@@ -14,6 +14,9 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
     // $scope.cautionCategoryData = true;
     
 
+    $scope.emptyGraphString = 'We couldn\'t find anything for this category. As more data is added for this student, this category should fill up.';
+    
+
     // categories must be populated before setting up students
     // add any static categories here
     $scope.focusCategories = [
@@ -678,7 +681,8 @@ app.controller("profileFocusController", function ($scope, $rootScope, $q, $loca
                     toastService.error('The server wasn\'t able to save your reordering.');
                 });
         },
-        cancel: '.not-sortable',
+        //cancel: '.not-sortable',
+        items: 'div.focus-student-row:not(.not-sortable)',
     };
 
     /***
