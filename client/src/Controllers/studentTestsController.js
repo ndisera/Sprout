@@ -247,12 +247,6 @@ app.controller("studentTestsController", function ($scope, $rootScope, $location
     };
 
     $scope.saveScore = function(test, score) {
-        var found = _.findIndex(test.scores, function(elem) { return elem.date.format('YYYY-MM-DD').toString() === score.date_temp.format('YYYY-MM-DD').toString(); });
-        if(found > -1) {
-            toastService.error('A student can only have one score per day for a test.');
-            return;
-        }
-
         var newScore = copyScore(score);
 
         newScore.date  = score.date_temp.format('YYYY-MM-DD').toString();
