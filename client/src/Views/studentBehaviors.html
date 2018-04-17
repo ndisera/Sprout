@@ -30,7 +30,7 @@
                         </div>
                         <div ng-if="report.class.title != null">
                             <div class="voffset3 col-xs-12 centerText">
-                                <p><b>Behavior</b></p>
+                                <p class="no-bottom-margin"><b>Behavior</b></p>
                             </div>
                             <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'Average'">
                                 <canvas id="preview_student_avg_behavior" class="chart chart-line" chart-data="avgBehaviorGraph.data" chart-labels="sharedGraph.labels" chart-options="avgBehaviorGraph.options" chart-click="onClick">
@@ -45,7 +45,7 @@
                             </canvas>
                             </div>
                             <div class="voffset3 col-xs-12 centerText">
-                                <p><b>Effort</b></p>
+                                <p class="no-bottom-margin"><b>Effort</b></p>
                             </div>
                             <div class="student-behaviors-report-graph col-xs-12" ng-if="report.class.title === 'Average'">
                                 <canvas id="preview_student_avg_effort" class="chart chart-line" chart-data="avgEffortGraph.data" chart-labels="sharedGraph.labels" chart-options="avgEffortGraph.options" chart-click="onClick">
