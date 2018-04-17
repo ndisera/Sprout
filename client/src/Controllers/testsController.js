@@ -52,7 +52,7 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
         doc.text(15 * scale, 54 * scale, "Taken:")
         doc.autoTable(takenColumns, takenRows, { startY: 58 * scale, showHeader: 'firstPage'});
         doc.setFont('Times', 'normal');
-        let first = doc.autoTable.previous;
+        var first = doc.autoTable.previous;
         doc.text(15 * scale, first.finalY + (12 * scale), "Not Taken:");
         doc.autoTable(notTakenColumns, notTakenRows, { startY: first.finalY + (16 * scale), showHeader: 'firstPage'});
         doc.save($scope.selectedTest.test_name + '_' + currentDate + '.pdf');

@@ -92,7 +92,7 @@ app.controller("servicesController", function($scope, $rootScope, $location, toa
 
         doc.text(15 * scale, 46 * scale, "Fulfilled:");
         doc.autoTable(columns, fulfilledRows, { startY: 50 * scale, showHeader: 'firstPage'});
-        let first = doc.autoTable.previous;
+        var first = doc.autoTable.previous;
         doc.setFont('Times', 'normal');
         doc.text(15 * scale, first.finalY + (12 * scale), "Unfulfilled:");
         doc.autoTable(columns, unfulfilledRows, { startY: first.finalY + (16 * scale), showHeader: 'firstPage'});
