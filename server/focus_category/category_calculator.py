@@ -244,9 +244,11 @@ class CategoryCalculator():
                           float(grade_val.assignment.score_max - grade_val.assignment.score_min)
                           for grade_val in grade_scores]
                 grade_series = pd.Series(data=scores, index=dates_index)
+                # resolve duplicate indexes for grades by averaging
+                grade_series = grade_series.groupby(grade_series.index).mean()
 
                 # union the two indexes together to 'merge/interweave' the lists
-                new_df_indexes = df.index.union(dates_index)
+                new_df_indexes = df.index.union(grade_series.index)
 
                 # reindex our dataframe. Otherwise, the new data will be stuck in limbo and never considered
                 df = df.reindex(index=new_df_indexes)
@@ -275,6 +277,10 @@ class CategoryCalculator():
             self.analysis_results = []
 
             for curr_dataset in df:  # curr_dataset is an index of the column in the data set
+                # move on if there is no data
+                if not df[curr_dataset].notna().values.any():
+                    continue
+
                 # If the most recent data point for a series is more than 2 weeks old, don't consider it for display
                 last_data_timedelta = current_date - df[curr_dataset].last_valid_index()
                 if last_data_timedelta > timedelta(weeks=2):
@@ -320,8 +326,8 @@ class CategoryCalculator():
                 self.analysis_results.append(negative_example)
 
         except Exception as e:
-            self.logger.error(e.message)
-            self.logger.error(traceback.format_exc())
+            print e.message
+            print traceback.format_exc()
             return
             # do nothing except log and return
             # This is bad general coding style. However, this code must never ever break. It's much more preferable
