@@ -233,7 +233,7 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, $time
             var deferred = $q.defer();
             behaviorService.addBehavior(req).then(
                 function success(data) {
-                    succeeded.push(req);
+                    succeeded.push(data.behavior);
                     updateSaveProgress(true);
                     deferred.resolve();
                 },
@@ -250,7 +250,7 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, $time
             var deferred = $q.defer();
             behaviorService.updateBehavior(req.id, req).then(
                 function success(data) {
-                    succeeded.push(req);
+                    succeeded.push(data.behavior);
                     updateSaveProgress(true);
                     deferred.resolve();
                 },
@@ -268,7 +268,7 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, $time
             var deferred = $q.defer();
             studentService.updateBehaviorNoteForStudent(req.student, req.id, req).then(
                 function success(data) {
-                    commentsSucceeded.push(req);
+                    commentsSucceeded.push(data.behavior_note);
                     updateSaveProgress(true);
                     deferred.resolve();
                 },
@@ -285,7 +285,7 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, $time
             var deferred = $q.defer();
             studentService.addBehaviorNoteForStudent(req.student, req).then(
                 function success(data) {
-                    commentsSucceeded.push(req);
+                    commentsSucceeded.push(data.behavior_note);
                     updateSaveProgress(true);
                     deferred.resolve();
                 },

@@ -163,7 +163,7 @@ app.controller("inputTestsController", function ($scope, $location, $q, $timeout
             var deferred = $q.defer();
             testService.addTestScore(elem).then(
                 function success(data) {
-                    succeeded.push(elem);
+                    succeeded.push(data.standardized_test_score);
                     updateSaveProgress(true);
                     deferred.resolve();
                 },
@@ -180,7 +180,7 @@ app.controller("inputTestsController", function ($scope, $location, $q, $timeout
             var deferred = $q.defer();
             testService.updateTestScore(elem.id, elem).then(
                 function success(data) {
-                    succeeded.push(elem);
+                    succeeded.push(data.standardized_test_score);
                     updateSaveProgress(true);
                     deferred.resolve();
                 },
@@ -265,7 +265,7 @@ app.controller("inputTestsController", function ($scope, $location, $q, $timeout
         _.each(scores, function(elem) {
             if(_.has(studentsLookup, elem.student)) {
                 studentsLookup[elem.student].score    = elem.score;
-                studentsLookup[elem.student].score_id = elem.score_id;
+                studentsLookup[elem.student].score_id = elem.id;
                 studentsLookup[elem.student].score_temp = null;
             }
         });
