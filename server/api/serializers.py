@@ -521,7 +521,7 @@ class FocusStudentSerializer(DynamicModelSerializer):
         student = representation['student']
         grades = Grade.objects.filter(student=student)
         attendances = AttendanceRecord.objects.filter(enrollment__student=student) # Attendances not currently tracked by Sprout
-        behavior_efforts = Behavior.objects.filter(enrollment__student=student, date__range=[str(oldest_behavior_date), str(datetime.date.today())])
+        behavior_efforts = Behavior.objects.filter(enrollment__student=student, date__gt=str(oldest_behavior_date))
         test_scores = StandardizedTestScore.objects.filter(student=student)
         calculator = CategoryCalculator(student=student, grades=grades, attendances=attendances, behavior_efforts=behavior_efforts,
                                         test_scores=test_scores)
