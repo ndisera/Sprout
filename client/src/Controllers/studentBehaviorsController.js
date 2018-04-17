@@ -824,6 +824,7 @@ app.controller("studentBehaviorsController", function($scope, $rootScope, $route
             $scope.updateClassGraphs();
         }
         $scope.modalOpen = true;
+        $scope.generating = false;
     };
 
     /**
