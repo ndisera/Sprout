@@ -70,7 +70,7 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
             responsive: true,
             maintainAspectRatio: false,
             legend: {
-                display: true,
+                display: false,
                 position: 'bottom',
             },
         },
@@ -95,7 +95,7 @@ app.controller("studentAttendanceController", function($scope, $rootScope, $wind
             responsive: true,
             maintainAspectRatio: false,
             legend: {
-                display: true,
+                display: false,
                 position: 'bottom',
             },
         },
