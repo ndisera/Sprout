@@ -233,6 +233,16 @@ class CategoryCalculator():
 
             ### Grades
             for grade_scores in grades_lists.itervalues():  # Dict
+                if len(grade_scores) == 0:
+                    # No data at all
+                    continue
+
+                # Check the assignment range
+                grade_range = float(grade_scores[0].assignment.score_max - grade_scores[0].assignment.score_min)
+                if grade_range == 0:
+                    # No useful data will come of this: skip it
+                    continue
+
                 # set a mapping, so we can do a lookup later
                 self.df_map[df_counter] = ('grades', grade_scores[0].assignment.section_id)
 
