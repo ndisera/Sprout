@@ -19,6 +19,8 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, $time
     $scope.successString = null;
     $scope.errorString   = null;
 
+    $scope.loadStatus = 0;
+
     $scope.behaviorDateChange = function(varName, date) {
         $scope.behaviorDate = date;
 
@@ -35,84 +37,94 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, $time
 
         var dateString = $scope.behaviorDate.format('YYYY-MM-DD').toString();
 
-        //TODO(gzuber): split this up to a call per student?
-        var enrollmentConfig = {
-            filter: [],
-            exclude: ['section.*', ],
-            include: ['section.id', 'section.title', 'section.schedule_position', ],
-        };
-        _.each(currentTerms, function(elem) { enrollmentConfig.filter.push({ name: 'section.term.in', val: elem.id, }); });
-        _.each($scope.students, function(elem) { enrollmentConfig.filter.push({ name: 'student.id.in', val: elem.id, }); });
+        $scope.loadStatus = 0;
 
-        enrollmentService.getStudentEnrollments(enrollmentConfig).then(
-            function success(data) {
-                var enrollments = [];
-                var sections    = [];
-                if(data) {
-                    if(data.enrollments) {
-                        enrollments = data.enrollments;
-                    }
-                    if(data.sections) {
-                        sections = data.sections;
-                    }
-                }
-                enrollmentsLookup = _.indexBy(enrollments, 'id');
-                sectionsLookup    = _.indexBy(sections, 'id');
+        _.each($scope.students, function(student) {
+            var enrollmentConfig = {
+                filter: [{ name: 'student.id', val: student.id, }, ],
+                exclude: ['section.*', ],
+                include: ['section.id', 'section.title', 'section.schedule_position', ],
+            };
+            _.each(currentTerms, function(elem) { enrollmentConfig.filter.push({ name: 'section.term.in', val: elem.id, }); });
 
-                var behaviorConfig = {
-                    filter: [{ name: 'date', val: $scope.behaviorDate.format('YYYY-MM-DD').toString(), }, ],
-                };
-                _.each(enrollments, function(elem) { behaviorConfig.filter.push({ name: 'enrollment.in', val: elem.id, }); });
-                
-                behaviorService.getStudentBehavior(behaviorConfig).then(
-                    function success(data) {
-                        var behaviors = [];
-                        if(data && data.behaviors) {
-                            behaviors = data.behaviors;
+            enrollmentService.getStudentEnrollments(enrollmentConfig).then(
+                function success(data) {
+                    var enrollments = [];
+                    var sections    = [];
+                    if(data) {
+                        if(data.enrollments) {
+                            enrollments = data.enrollments;
                         }
-                        var behaviorsByEnrollment = _.indexBy(behaviors, 'enrollment');
-
-                        // reset my old data
-                        resetStudents($scope.students);
-
-                        // got my data, start building the structure
-                        _.each(enrollments, function(elem) {
-                            var student = null;
-                            if(_.has(studentsLookup, elem.student)) {
-                                student = studentsLookup[elem.student];
-                            }
-
-                            // guarantee that these objects are at least empty with the correct keys
-                            var section = null;
-                            if(_.has(sectionsLookup, elem.section)) {
-                                section = sectionsLookup[elem.section];
-                            }
-                            section = copyObj(section, sectionKeys, true);
-
-                            var behavior = null;
-                            if(_.has(behaviorsByEnrollment, elem.id)) {
-                                behavior = behaviorsByEnrollment[elem.id];
-                            }
-                            section.behavior = copyObj(behavior, behaviorKeys, true);
-                            setObjProperty(section.behavior, 'enrollment', elem.id);
-                            setObjProperty(section.behavior, 'date', dateString);
-
-                            student.sections.push(section);
-                        });
-
-                        _.each($scope.students, function(elem) {
-                            _.sortBy(elem.sections, 'schedule_position');
-                        });
-
-                        console.log($scope.students);
-                    },
-                    function error(response) {
+                        if(data.sections) {
+                            sections = data.sections;
+                        }
                     }
-                );
-            },
-            function error(response) {
-            }
-        );
+
+                    if(enrollments.length === 0) {
+                        $scope.loadStatus++;
+                        return;
+                    }
+
+                    // update enrollment and sections lookups
+                    _.each(enrollments, function(enrollment) {
+                        enrollmentsLookup[enrollment.id] = enrollment;
+                    });
+                    _.each(sections, function(section) {
+                        if(!_.has(sectionsLookup, section.id)) {
+                            sectionsLookup[section.id] = section;
+                        }
+                    });
+
+                    var behaviorConfig = {
+                        filter: [{ name: 'date', val: $scope.behaviorDate.format('YYYY-MM-DD').toString(), }, ],
+                    };
+                    _.each(enrollments, function(elem) { behaviorConfig.filter.push({ name: 'enrollment.in', val: elem.id, }); });
+
+                    behaviorService.getStudentBehavior(behaviorConfig).then(
+                        function success(data) {
+                            var behaviors = [];
+                            if(data && data.behaviors) {
+                                behaviors = data.behaviors;
+                            }
+                            var behaviorsByEnrollment = _.indexBy(behaviors, 'enrollment');
+
+                            // reset my old data
+                            resetStudents([student]);
+
+                            // got my data, start building the structure
+                            _.each(enrollments, function(elem) {
+                                // guarantee that these objects are at least empty with the correct keys
+                                var section = null;
+                                if(_.has(sectionsLookup, elem.section)) {
+                                    section = sectionsLookup[elem.section];
+                                }
+                                section = copyObj(section, sectionKeys, true);
+
+                                var behavior = null;
+                                if(_.has(behaviorsByEnrollment, elem.id)) {
+                                    behavior = behaviorsByEnrollment[elem.id];
+                                }
+                                section.behavior = copyObj(behavior, behaviorKeys, true);
+                                setObjProperty(section.behavior, 'enrollment', elem.id);
+                                setObjProperty(section.behavior, 'date', dateString);
+
+                                student.sections.push(section);
+                            });
+
+                            _.sortBy(student.sections, 'schedule_position');
+
+                            $scope.loadStatus++;
+                        },
+                        function error(response) {
+                            toastService.error('Something went wrong... The server wasn\'t able to get behavior records. Please try again later.');
+                        }
+                    );
+                },
+                function error(response) {
+                    toastService.error('Something went wrong... The server wasn\'t able to get behavior records. Please try again later.');
+                }
+            );
+        });
 
         // get behavior comments
         _.each($scope.students, function(elem) {
@@ -136,6 +148,7 @@ app.controller("inputBehaviorController", function ($scope, $location, $q, $time
                     setObjProperty(elem.comment, 'date', dateString);
                 },
                 function error(response) {
+                    toastService.error('Something went wrong... The server wasn\'t able to get behavior comments. Please try again later.');
                 }
             );
         });
