@@ -240,7 +240,9 @@ app.controller("inputTestsController", function ($scope, $location, $q, $timeout
                 { name: 'standardized_test', val: $scope.selectedTest.id, },
             ],
         };
-        _.each($scope.studentFilterResults, function(elem) { config.filter.push({ name: 'student.in', val: elem.id, }); });
+        if($scope.studentFilterResults && $scope.studentFilterResults.length < 50) {
+            _.each($scope.studentFilterResults, function(elem) { config.filter.push({ name: 'student.in', val: elem.id, }); });
+        }
 
         testService.getTestScores(config).then(
             function success(data) {

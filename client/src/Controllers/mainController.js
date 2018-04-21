@@ -258,6 +258,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
             });
         });
 
+        var id = 0;
         // now check for matching student page strings
         _.each(searchStrings, function(elem) {
             var matchingPages = [];
@@ -267,7 +268,6 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
                 }
             });
 
-            var id = 0;
             // for each student, for each student page match, push a matching "student page" result
             _.each($scope.studentResults, function(student) {
                 _.each(matchingPages, function(page) {
@@ -287,7 +287,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
         });
 
         var otherPagesSet = {};
-        var id = 0;
+        id = 0;
         // now check for site-wide pages
         _.each(searchStrings, function(elem) {
             _.each($scope.otherPages, function(page) {
