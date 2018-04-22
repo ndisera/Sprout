@@ -111,6 +111,7 @@ a {
 #sidebar .list-group-item > a:focus,
 #sidebar .list-group-item > a:hover {
     text-decoration: none;
+    outline: none;
 }
 
 #sidebar .list-group-item > a > span.glyphicon {
