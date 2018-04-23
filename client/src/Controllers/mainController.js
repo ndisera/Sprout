@@ -213,22 +213,31 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
         $scope.otherPagesResults   = [];
 
         // search full name first, should be top of list
-        _.each($scope.studentInfo.students, function(elem) {
-            var fullName = elem.first_name + ' ' + elem.last_name;
-            fullName = fullName.toLowerCase();
-            if(fullName.includes($scope.searchString.trim().toLowerCase())) {
-                $scope.studentResults.push({
-                    id: elem.id,
-                    first_name: elem.first_name,
-                    last_name: elem.last_name,
-                    title: elem.first_name + ' ' + elem.last_name + ' (' + elem.student_id + ')',
-                    href: '/student/' + elem.id,
-                    type: $scope.searchLinkTypes['student'],
-                });
+        // but only if there's a space
+        if(searchStrings.length > 1) {
+            _.each($scope.studentInfo.students, function(elem) {
+                var fullName = elem.first_name + ' ' + elem.last_name;
+                fullName = fullName.toLowerCase();
+                if(fullName.includes($scope.searchString.trim().toLowerCase())) {
+                    $scope.studentResults.push({
+                        id: elem.id,
+                        first_name: elem.first_name,
+                        last_name: elem.last_name,
+                        title: elem.first_name + ' ' + elem.last_name + ' (' + elem.student_id + ')',
+                        href: '/student/' + elem.id,
+                        type: $scope.searchLinkTypes['student'],
+                    });
 
-                // mark that it's in the results already
-                studentSet[elem.id] = { studentPages: {}, };
-            }
+                    // mark that it's in the results already
+                    studentSet[elem.id] = { studentPages: {}, };
+                }
+            });
+        }
+
+        // this cache is made to remember which search string resulted in which student match
+        var searchStringToStudentResults = {};
+        _.each(searchStrings, function(elem) {
+            searchStringToStudentResults[elem] = new Set();
         });
 
         // next search first or last name with split search results
@@ -254,52 +263,9 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
                         type: $scope.searchLinkTypes['student'],
                     });
                     studentSet[student.id] = { studentPages: {}, };
-                }
-            });
-        });
 
-        var id = 0;
-        // now check for matching student page strings
-        _.each(searchStrings, function(elem) {
-            var matchingPages = [];
-            _.each($scope.studentPages, function(page) {
-                if(page.str.includes(elem)) {
-                    matchingPages.push(page);
-                }
-            });
-
-            // for each student, for each student page match, push a matching "student page" result
-            _.each($scope.studentResults, function(student) {
-                _.each(matchingPages, function(page) {
-                    if(!studentSet[student.id].studentPages[page.uniqueKey]) {
-                        $scope.studentPagesResults.push({
-                            id: id,
-                            student: student.id,
-                            title: student.first_name + ' ' + student.last_name + '\'s ' + page.title + ' page',
-                            href: '/student/' + student.id + page.href,
-                            type: $scope.searchLinkTypes['studentPage'],
-                        });
-                        studentSet[student.id].studentPages[page.uniqueKey] = true;
-                        id++;
-                    }
-                });
-            });
-        });
-
-        var otherPagesSet = {};
-        id = 0;
-        // now check for site-wide pages
-        _.each(searchStrings, function(elem) {
-            _.each($scope.otherPages, function(page) {
-                if(!otherPagesSet[page.uniqueKey] && page.str.includes(elem)) {
-                    $scope.otherPagesResults.push({
-                        id: id,
-                        title: page.title,
-                        href: page.href,
-                        type: $scope.searchLinkTypes['otherPage'],
-                    });
-                    otherPagesSet[page.uniqueKey] = true;
-                    id++;
+                    // mark which search string resulted in which student
+                    searchStringToStudentResults[elem].add(student.id);
                 }
             });
         });
@@ -318,8 +284,121 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
             return -totalRank;
         });
 
+
+        // this will mainly show when users don't have ranks relevant to search
+        // the thought process is... I want to prioritize the first elements in
+        // the search string as matches to students. For later elements in search
+        // string, assume those are page names. That being said, all results are
+        // returned.
+        // i.e. "an be" should prioritize treating "an" as the student (like anne)
+        // and "be" as a page (like behavior). But it should eventually list "be"
+        // as student and "an" as page
+        var searchStringsReverse = searchStrings.slice(0);
+        searchStringsReverse.reverse();
+
+        var id = 0;
+        // now check for matching student page strings
+        _.each(searchStringsReverse, function(elem) {
+            var matchingPages = [];
+            _.each($scope.studentPages, function(page) {
+                if(page.str.includes(elem)) {
+                    matchingPages.push(page);
+                }
+            });
+
+            // for each student, for each student page match, push a matching "student page" result
+            _.each($scope.studentResults, function(student) {
+                _.each(matchingPages, function(page) {
+                    // first make sure this search string didn't match this student also
+                    if(searchStringsReverse.length > 1 && searchStringToStudentResults[elem].has(student.id)) {
+                        return;
+                    }
+
+                    if(!studentSet[student.id].studentPages[page.uniqueKey]) {
+                        $scope.studentPagesResults.push({
+                            id: id,
+                            student: student.id,
+                            title: student.first_name + ' ' + student.last_name + '\'s ' + page.title + ' page',
+                            href: '/student/' + student.id + page.href,
+                            type: $scope.searchLinkTypes['studentPage'],
+                        });
+                        studentSet[student.id].studentPages[page.uniqueKey] = true;
+                        id++;
+                    }
+                });
+            });
+        });
+
+        // sort this here, because relevant search results should be prioritized over a user's top hits
         $scope.studentPagesResults = _.sortBy($scope.studentPagesResults, function(elem) {
             return pageRanks[elem.href] ? -pageRanks[elem.href] : 0;
+        });
+
+        // if there were matching students, but not enough matching student pages, start suggesting top page ranks
+        if($scope.studentResults.length > 0 && $scope.studentPagesResults.length < $scope.maxResults) {
+            var studentResultsLookup = _.indexBy($scope.studentResults, 'id');
+
+            var studentPagesToAdd = $scope.maxResults - $scope.studentPagesResults.length;
+            var studentPagesAdded = 0;
+
+            var pageRankArray = _.map(_.keys(pageRanks), function(elem) { return { href: elem, counter: pageRanks[elem], }; });
+            var studentPageRankArray = _.filter(pageRankArray, function(elem) { return elem.href.startsWith('/student/') && elem.href.split('/').length === 4; });
+            var sortedStudentPageRankArray = _.sortBy(studentPageRankArray, function(elem) { return -elem.counter; });
+
+            _.each(sortedStudentPageRankArray, function(elem) {
+                if(studentPagesAdded >= studentPagesToAdd) {
+                    return;
+                }
+
+                var splitUrl = elem.href.split('/');
+
+                var studentId = splitUrl[2];
+                if(!studentResultsLookup[studentId]) {
+                    return;
+                }
+                var student = studentResultsLookup[studentId];
+
+                // find the student page this corresponds to
+                var pageUrl = '/' + splitUrl[3];
+                var studentPageIndex = _.findIndex($scope.studentPages, function(elem) { return elem.href === pageUrl; });
+                if(studentPageIndex === -1) {
+                    return;
+                }
+                var page = $scope.studentPages[studentPageIndex];
+
+                if(!studentSet[studentId].studentPages[page.uniqueKey]) {
+                    $scope.studentPagesResults.push({
+                        id: id,
+                        student: student.id,
+                        title: student.first_name + ' ' + student.last_name + '\'s ' + page.title + ' page',
+                        href: '/student/' + student.id + page.href,
+                        type: $scope.searchLinkTypes['studentPage'],
+                    });
+                    studentSet[student.id].studentPages[page.uniqueKey] = true;
+                    id++;
+                    studentPagesAdded++;
+                }
+
+            });
+        }
+
+        // find results for the "other pages" section
+        var otherPagesSet = {};
+        id = 0;
+        // now check for site-wide pages
+        _.each(searchStrings, function(elem) {
+            _.each($scope.otherPages, function(page) {
+                if(!otherPagesSet[page.uniqueKey] && page.str.includes(elem)) {
+                    $scope.otherPagesResults.push({
+                        id: id,
+                        title: page.title,
+                        href: page.href,
+                        type: $scope.searchLinkTypes['otherPage'],
+                    });
+                    otherPagesSet[page.uniqueKey] = true;
+                    id++;
+                }
+            });
         });
 
         $scope.otherPagesResults = _.sortBy($scope.otherPagesResults, function(elem) {
@@ -515,7 +594,8 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
 
     var pageRankWatcher = $rootScope.$on('user:auth', function(event, data) {
         if(data.type === 'login') {
-            userService.getPageRankings(userService.user.id).then(
+            var config = { exclude: ['id', 'user', ], };
+            userService.getPageRankings(userService.user.id, config).then(
                 function success(data) {
                     _.each(data.page_ranks, function(elem) {
                         pageRanks[elem.url] = elem.counter;
