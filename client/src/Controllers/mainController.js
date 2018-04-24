@@ -203,9 +203,7 @@ app.controller('mainController', function ($scope, $rootScope, $location, $q, $t
     };
 
     $scope.updateSearch = function() {
-        var searchStrings = $scope.searchString.trim().split(' ');
-        _.each(searchStrings, function(elem) { elem = elem.toLowerCase(); });
-
+        var searchStrings = $scope.searchString.trim().toLowerCase().split(' ');
         var studentSet = {};
 
         $scope.studentResults      = [];
