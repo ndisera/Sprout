@@ -19,27 +19,30 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
     $scope.teachers = userData.sprout_users;
     $scope.editingAll = true;
 
-    var termsLookup        = {};
+    var termsLookup = {};
     var termSettingsLookup = {};
-    var scheduleLookup     = {};
+    var scheduleLookup = {};
 
     $scope.terms = [];
     $scope.selectedTerm = null;
     var currentTerms = [];
     var currentTermsLookup = {};
 
-    if(termData.terms !== null && termData.terms !== undefined) {
-        $scope.terms       = termService.transformAndSortTerms(termData.terms);
-        termsLookup        = _.indexBy($scope.terms, 'id');
+    if (termData.terms !== null && termData.terms !== undefined) {
+        $scope.terms = termService.transformAndSortTerms(termData.terms);
+        termsLookup = _.indexBy($scope.terms, 'id');
         termSettingsLookup = _.indexBy(termData.term_settings, 'id');
-        scheduleLookup     = _.indexBy(termData.daily_schedules, 'id');
+        scheduleLookup = _.indexBy(termData.daily_schedules, 'id');
 
         currentTerms = termService.getAllCurrentTerms(termData.terms);
 
         // set up an option for all current terms
-        if(currentTerms.length > 0) {
+        if (currentTerms.length > 0) {
             // create special term for all current terms
-            $scope.terms.unshift({ id: -1, name: 'All Current Terms', });
+            $scope.terms.unshift({
+                id: -1,
+                name: 'All Current Terms',
+            });
             currentTermsLookup = _.indexBy(currentTerms, 'id');
         }
 
@@ -51,17 +54,22 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
         $scope.selectedTerm = term;
 
         var sectionsForTermFilter = null;
-        if(term.id === -1) {
+        if (term.id === -1) {
             // all current terms
-            sectionsForTermFilter = function(elem) { return _.has(currentTermsLookup, elem.term); };
-        }
-        else {
-            sectionsForTermFilter = function(elem) { return elem.term === term.id; };
+            sectionsForTermFilter = function(elem) {
+                return _.has(currentTermsLookup, elem.term);
+            };
+        } else {
+            sectionsForTermFilter = function(elem) {
+                return elem.term === term.id;
+            };
         }
         $scope.termSections = _.filter($scope.sections, sectionsForTermFilter);
     };
 
-    $scope.selectTerm($scope.selectedTerm);
+    if ($scope.terms.length > 0) {
+        $scope.selectTerm($scope.selectedTerm);
+    }
 
     $scope.toggleTeacherEdit = function() {
         $scope.teacherEdit = !$scope.teacherEdit;
@@ -101,14 +109,16 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             $scope.sections = _.sortBy(data.sections, 'schedule_position');
             // set display 'period' information
             _.each($scope.sections, function(elem) {
-                if(elem.schedule_position !== null) {
+                if (elem.schedule_position !== null) {
                     var term = termsLookup[elem.term];
                     var termSettings = termSettingsLookup[term.settings];
                     var schedule = scheduleLookup[termSettings.schedule];
                     elem.period = 'Day ' + Math.floor((elem.schedule_position / schedule.periods_per_day) + 1) + ' Period ' + ((elem.schedule_position % schedule.periods_per_day) + 1);
                 }
             });
-            $scope.selectTerm($scope.selectedTerm);
+            if ($scope.terms.length > 0) {
+                $scope.selectTerm($scope.selectedTerm);
+            }
         }, function error(response) {
             setErrorMessage(response);
             toastService.error("The server was unable to get the teacher's classes." + errorResponse());
@@ -288,7 +298,7 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
      * Attempts to send a password reset link to email
      * @param {boolean} passwordReset - true for reset, false for grant access
      */
-    $scope.attemptPasswordReset = function (passwordReset) {
+    $scope.attemptPasswordReset = function(passwordReset) {
         $scope.sendingAccessEmail = !passwordReset;
         $scope.sendingResetEmail = passwordReset;
         // use selected teacher's email
@@ -296,10 +306,11 @@ app.controller("manageTeachersController", function($scope, $rootScope, $locatio
             function success(response) {
                 $scope.sendingAccessEmail = false;
                 $scope.sendingResetEmail = false;
-                var message = passwordReset ? "An email containing instructions to reset this teacher's password has been sent to "
-                : "An email to grant access to this teacher has been sent to ";
+                var message = passwordReset ? "An email containing instructions to reset this teacher's password has been sent to " :
+                    "An email to grant access to this teacher has been sent to ";
                 toastService.success(message + $scope.teacherV.email + ".");
-            }, function error(response) {
+            },
+            function error(response) {
                 $scope.sendingAccessEmail = false;
                 $scope.sendingResetEmail = false;
                 setErrorMessage(response);
