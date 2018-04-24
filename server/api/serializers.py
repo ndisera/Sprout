@@ -9,6 +9,7 @@ from rest_auth.serializers import LoginSerializer, UserDetailsSerializer, Passwo
 from rest_auth.registration.serializers import RegisterSerializer
 from focus_category.category_calculator import CategoryCalculator
 from django.conf import settings
+from django.db.utils import OperationalError
 
 import datetime
 
@@ -22,6 +23,25 @@ class ProfilePictureSerializer(DynamicModelSerializer):
 
 class PageRankSerializer(DynamicModelSerializer):
     user = DynamicRelationField('SproutUserSerializer')
+
+    # Remember when we last purged the DB for too-old pagerank records
+    last_purge_date = datetime.date(year=1990, month=1, day=1)
+
+    def __init__(self, *args, **kwargs):
+        """
+        Clean up all too-old pagerank records if we haven't done so today. Initialize to a very far past date
+        """
+        super(PageRankSerializer, self).__init__(*args, **kwargs)
+        try:
+            if datetime.date.today() > PageRankSerializer.last_purge_date:
+                too_old_date = datetime.date.today() - datetime.timedelta(days=settings.USER_PAGE_RANK_TIMESPAN_DAYS)
+                too_old_rankings = PageRank.objects.filter(date__lte=too_old_date)
+                too_old_rankings.delete()
+                PageRankSerializer.last_purge_date = datetime.date.today()
+        except OperationalError:
+            # While migrations are running no tables exist and this code will fail to run, so just don't fail
+            pass
+
 
     class Meta:
         fields = ('id', 'user', 'url', )
