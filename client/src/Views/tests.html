@@ -49,7 +49,7 @@
                     <span><b>Info:</b> It looks like there aren't any students that took the test in this date range.</span>
                 </div>
                 <div ng-hide="takenBy.length === 0">
-                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="taken" name="taken" ng-model="takenSearch">
+                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="taken" name="taken" ng-model="takenSearch.text">
                     </br>
                     <div class="table-responsive scrollableTableDiv table-select">
                         <table class="table table-hover">
@@ -87,7 +87,7 @@
                     <span><b>Info:</b> It looks like there aren't any students that haven't taken the test in this date range.</span>
                 </div>
                 <div ng-hide="notTakenBy.length === 0">
-                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="notTaken" name="notTaken" ng-model="notTakenSearch">
+                    <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="notTaken" name="notTaken" ng-model="notTakenSearch.text">
                     </br>
                     <div class="table-responsive scrollableTableDiv table-select">
                         <table class="table table-hover">

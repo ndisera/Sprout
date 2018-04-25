@@ -29,7 +29,7 @@
                 <span><b>Info:</b> It looks like there aren't any students with a fulfilled service requirement of this type.</span>
             </div>
             <div ng-if="fulfilledStudents.length > 0">
-                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="fulfilled" name="fulfilled" ng-model="fulfilledSearch">
+                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="fulfilled" name="fulfilled" ng-model="fulfilledSearch.text">
                 </br>
                 <div class="table-responsive scrollableTableDiv table-select">
                     <table class="table table-hover">
@@ -63,7 +63,7 @@
                 <span><b>Info:</b> It looks like there aren't any students with an unfulfilled service requirement of this type.</span>
             </div>
             <div ng-if="unfulfilledStudents.length > 0">
-                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="unfulfilled" name="unfulfilled" ng-model="unfulfilledSearch">
+                <input type="text" autocomplete="off" class="form-control" placeholder="Filter Students" list="unfulfilled" name="unfulfilled" ng-model="unfulfilledSearch.text">
                 </br>
                 <div class="table-responsive scrollableTableDiv table-select">
                     <table class="table table-hover">

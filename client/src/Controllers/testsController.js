@@ -159,10 +159,10 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
      * @param {student} student - student to be filtered.
      */
     $scope.takenFilter = function(student) {
-        if ($scope.takenSearch == null) {
+        if ($scope.takenSearch.text == null) {
             return true;
         }
-        var input = $scope.takenSearch.toUpperCase();
+        var input = $scope.takenSearch.text.toUpperCase();
         var fullname = student.first_name + " " + student.last_name;
         if (student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
             student.last_name.toUpperCase().includes(input) || fullname.toUpperCase().includes(input) ||
@@ -177,10 +177,10 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
      * @param {student} student - student to be filtered.
      */
     $scope.notTakenFilter = function(student) {
-        if ($scope.notTakenSearch == null) {
+        if ($scope.notTakenSearch.text == null) {
             return true;
         }
-        var input = $scope.notTakenSearch.toUpperCase();
+        var input = $scope.notTakenSearch.text.toUpperCase();
         var fullname = student.first_name + " " + student.last_name;
         if (student.student_id.toUpperCase().includes(input) || student.first_name.toUpperCase().includes(input) ||
             student.last_name.toUpperCase().includes(input) || fullname.toUpperCase().includes(input)) {
@@ -193,4 +193,6 @@ app.controller("testsController", function($scope, $rootScope, $location, toastS
     if ($scope.tests.length > 0) {
         $scope.selectTest($scope.tests[0]);
     }
+    $scope.notTakenSearch = { text: ""};
+    $scope.takenSearch = { text: ""};
 });

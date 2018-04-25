@@ -125,10 +125,10 @@ app.controller("servicesController", function($scope, $rootScope, $location, toa
      * @param {student} student - student to be filtered.
      */
     $scope.fulfilledFilter = function(student) {
-        if ($scope.fulfilledSearch == null) {
+        if ($scope.fulfilledSearch.text == null) {
             return true;
         }
-        var input = $scope.fulfilledSearch.toUpperCase();
+        var input = $scope.fulfilledSearch.text.toUpperCase();
         return filterStudents(student, input);
     };
 
@@ -136,14 +136,16 @@ app.controller("servicesController", function($scope, $rootScope, $location, toa
      * Filter used for unfulfilled results
      * @param {student} student - student to be filtered.
      */
-    $scope.unfulFIlledFilter = function(student) {
-        if ($scope.unfulfilledSearch == null) {
+    $scope.unfulfilledFilter = function(student) {
+        if ($scope.unfulfilledSearch.text == null) {
             return true;
         }
-        var input = $scope.unfulfilledSearch.toUpperCase();
+        var input = $scope.unfulfilledSearch.text.toUpperCase();
         return filterStudents(student, input);
     };
 
     // initialization
     updateResults();
+    $scope.fulfilledSearch = { text: ""};
+    $scope.unfulfilledSearch = { text: ""};
 });
